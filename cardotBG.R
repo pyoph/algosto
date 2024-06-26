@@ -6,7 +6,7 @@ library(ggplot2)
 ### Article 2015
 
 #Nombre d'échantillons
-n = 100
+n = 100000
 
 #Dimension
 d = 10 
@@ -20,27 +20,40 @@ m = rep(0,d)
 
 c = 1.5
 
-U = rnorm(d)
 
-sommem = 0
+Sigma <- diag(d)
+
+#10000 échantillons tirés selon une loi N(0,Id)
+
+X <- mvtnorm::rmvnorm(n,sigma=Sigma)
+dim(X)                      
+moyennem = matrix(0,n,d)
+
+dim(X)
+
+#Stockage des itérations
+miter = matrix(0,n,d)
 
 #Calcul de mn et de bar(mn)
 
 for (i in 1:n)
 {
-U = rnorm(d)
 
-#Calcul de la moyenne des m jusqu'à la i-1 ième itération
-moyennem = mean(m)
-
-gamma = c/i^(3/2) #pour un premier essai on prend alpha = 3/2
+gamma = c/i^(0.67) #pour un premier essai on prend alpha = 0.67
 
 #Mise à jour de mn
 
-m = m + (gamma*(U - m))/sqrt((U  - m)^2)
+m = m + (gamma*(X[i] - m))/sqrt((X[i]  - m)^2)
 
-#Mise à jour de la moyenne des mn
+miter[i,] = m
 
-moyennem = moyennem - 1/(i + 1)*(moyennem - m)
+moyennem[i,] = moyennem[i,]*i/(i+1) + 1/(i+1)*m
 
 }
+
+miter[100,]
+mvrai = Gmedian(X)
+sqrt(sum(mvrai^2))
+sqrt(sum(m^2)) 
+
+moyennem
