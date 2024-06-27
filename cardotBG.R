@@ -6,7 +6,7 @@ library(ggplot2)
 ### Article 2015
 
 #Nombre d'échantillons
-n = 100000
+n = 1000
 
 #Dimension
 d = 10 
@@ -20,6 +20,7 @@ m = rep(0,d)
 
 c = 1.5
 
+m
 
 Sigma <- diag(d)
 
@@ -28,32 +29,48 @@ Sigma <- diag(d)
 X <- mvtnorm::rmvnorm(n,sigma=Sigma)
 dim(X)                      
 moyennem = matrix(0,n,d)
+dim(moyennem)
+((X[4,] - moyennem[3,]) %*% t(X[4,] - moyennem[3,]) - V)/norm((X[4,] - moyennem[3,]) %*% t(X[4,] - moyennem[3,]) - V,type = "F")
 
 dim(X)
 
+V = matrix(0,d,d)
+
 #Stockage des itérations
 miter = matrix(0,n,d)
+miter[1,] = m
+m
+miter[1,]
 
-#Calcul de mn et de bar(mn)
+sqrt(sum((m - X[100,])^2))
 
-for (i in 1:n)
+
+for (i in 1:999)
 {
 
 gamma = c/i^(0.67) #pour un premier essai on prend alpha = 0.67
 
 #Mise à jour de mn
 
-m = m + (gamma*(X[i] - m))/sqrt((X[i]  - m)^2)
+m = m + (gamma*(X[i,] - m))/sqrt(sum(X[i,]  - m)^2)
 
 miter[i,] = m
 
-moyennem[i,] = moyennem[i,]*i/(i+1) + 1/(i+1)*m
+if(i == 1)
+{
+  moyennem[i,] = miter[i,]
+  #print(moyennem[i,])
+}
+
+if(i >= 2){
+  moyennem[i,] = colMeans(miter[1:i,])
+  
+}
+  
+V = V + gamma*((X[i+1,] - moyennem[i,]) %*% t(X[i+1,] - moyennem[i,]) - V)/norm((X[i+1,] - moyennem[i,]) %*% t(X[i+1,] - moyennem[i,]) - V,type = "F")
+
+moyennem = moyennem*i/(i+1) + 1/(i+1)*m
+
 
 }
 
-miter[100,]
-mvrai = Gmedian(X)
-sqrt(sum(mvrai^2))
-sqrt(sum(m^2)) 
-
-moyennem
