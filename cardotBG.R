@@ -57,7 +57,7 @@ miter = matrix(0,n,d)
 
 
 
-for (i in 1:999)
+for (i in 1:(n-1))
 {
 
 gamma = c/i^(0.8) #pour un premier essai on prend alpha = 0.8
@@ -108,9 +108,9 @@ moyenneV <- i/(i+1)*moyenneV + 1/(i + 1)*V
 
 #Stockage des erreurs quadratiques
 
-erreursM <- rep(0,9999)
+erreursM <- rep(0,(n-1))
 
-erreursV <- rep(0,9999)
+erreursV <- rep(0,(n-1))
 
 #Calcul des erreurs quadratiques
 
@@ -158,3 +158,32 @@ p <- ggplot(data_long, aes(x = x, y = value, color = type)) +
 print(p)
 
 
+###Online learning 
+
+beta = 1/2
+
+#Taille d'un bloc
+
+k = 100
+
+t = n/k
+
+m = rep(0,d)
+
+for (i in 1:t) 
+{
+
+S <- rep(0,d)
+gamma = c/i^(0.6) 
+
+S <- rowSums(sapply(1:k, function(j) (X[(i - 1) * k + j, ] - m) / sqrt(sum((X[(i - 1) * k + j, ] - m)^2))))
+
+m <- m - gamma/k^(beta)*S/k
+
+
+
+}
+
+mvrai = Gmedian(X)
+m
+mvrai
