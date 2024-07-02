@@ -1,6 +1,7 @@
 library(RobRegression)
 library(Gmedian)
 library(ggplot2)
+library(far)
 
 
 ### Article 2015
@@ -22,7 +23,6 @@ c = 1.5
 
 Sigma <- diag(d)
 
-
 #Calcul de la vraie médiane géométrique
 
 mvrai <- Gmedian(X)
@@ -37,6 +37,7 @@ X <- mvtnorm::rmvnorm(n,sigma=Sigma)
 dim(X)                      
 moyennem = rep(0,d)
 
+VvectproprX <- eigen(cov(X))$vectors
 
 #Stockage des itérations de matrices dans un tableau
 VIter <- array(0, dim = c(d, d, n))
@@ -44,6 +45,22 @@ VIter <- array(0, dim = c(d, d, n))
 #Initialisation de V
 
 V <- matrix(0,n,d)
+
+
+#Tableau de stockage des vecteurs propres estimés orthonormalisés
+
+Uorth <- array(0,dim = c(n,d,d))
+
+#Stockage des vecteurs propres dans un tableau
+
+U <- array(1, dim = c(n, d, d))
+
+#Initialisation de U avec des vecteurs propres pas trop éloignés de ceux de cov(X)
+
+for (i in (1:n))
+  {
+U[i,,] <- VvectproprX + 0.01*matrix(1,d,d)
+}
 
 
 dim(moyennem)
@@ -97,14 +114,25 @@ if(i >= 2) {
   
 }
 
+
 #Mise à jour de moyenneV
 
 moyenneV <- i/(i+1)*moyenneV + 1/(i + 1)*V
 
+#Estimation des vecteurs propres de Vt et orthonormalisation
 
+  for (l in (1:d)) 
+  {
+  Un =  U[i,l,]/sqrt(U[i,l,]^2)
+  
+  U[i+1,l,] <-  U[i,l,] + 1/(i + 1)*(moyenneV %*% Un - U[i,l,])
+  }
+
+
+#Orthonormalisation des vecteurs propres
+Uorth[i+1,,] <- orthonormalization(U[i+1,,], basis=TRUE, norm=TRUE)
 
 }
-
 
 #Stockage des erreurs quadratiques
 
@@ -114,20 +142,20 @@ erreursV <- rep(0,(n-1))
 
 #Calcul des erreurs quadratiques
 
-for (i in 1:9999) 
+for (i in 1:(n-1)) 
 {
   erreursM[i] <- sqrt(sum(mvrai - miter[i])^2)
 }
 
 
 
-for (i in 1:9999) 
+for (i in 1:(n-1)) 
 {
   erreursV[i] <- norm(Vvrai$covmedian - VIter[,,i],type = "F")
 }
 
 data <- data.frame(
-  x = 1000:9999,
+  x = 1000:(n - 1),
   erreursM = erreursM[1000:9999],
   erreursV = erreursV[1000:9999]
 
@@ -158,32 +186,143 @@ p <- ggplot(data_long, aes(x = x, y = value, color = type)) +
 print(p)
 
 
-###Online learning 
+###Online estimation
 
 beta = 1/2
 
 #Taille d'un bloc
 
-k = 100
+k = 10
 
 t = n/k
 
+#Initialisation de m
 m = rep(0,d)
+
+moyennem = rep(0,d)
+
+V <- matrix(0,d,d)
+
+#Stockage des itérations de médiane géométrique 
+
+miter = matrix(0,t,d)
+
+
+#Stockage des itérations de matrices dans un tableau
+VIter <- array(0, dim = c(d, d, t))
+
+
 
 for (i in 1:t) 
 {
 
+#Somme des médianes géométriques
 S <- rep(0,d)
+
+#Somme matrices 
+
+Smatr <- matrix(0,d,d)
+
 gamma = c/i^(0.6) 
 
 S <- rowSums(sapply(1:k, function(j) (X[(i - 1) * k + j, ] - m) / sqrt(sum((X[(i - 1) * k + j, ] - m)^2))))
 
-m <- m - gamma/k^(beta)*S/k
+#Mise à jour de m
+
+m <- m + gamma/k^(beta)*S/k
+
+miter[i,] = m
+
+if(i == 1)
+{
+  moyennem = miter[i,]
+}
+
+if(i >= 2){
+  moyennem = colMeans(miter[1:i,])
+  
+}
+
+moyennem = moyennem*i/(i+1) + 1/(i+1)*m
+
+#Smatr <- rowSums(sapply(1:k, function(j) ((X[(i - 1) * k + j, ] - m) %*% t(X[(i - 1) * k + j, ] - m))/norm((X[(i - 1) * k + j, ] - m) %*% t(X[(i - 1) * k + j, ] - m),type = "F"))-V)
+
+  for (j in 1: k) 
+  {
+  Smatr <- Smatr +  ((X[(i - 1) * k + j, ] - m) %*% t(X[(i - 1) * k + j, ] - m))/norm((X[(i - 1) * k + j, ] - m) %*% t(X[(i - 1) * k + j, ] - m),type = "F")-V
+  
+  }
 
 
+
+#Stockage des itérations de matrices dans un tableau
+VIter[,,i] <- V
+
+V <- V + gamma/k*1/k^(beta)*Smatr
 
 }
 
 mvrai = Gmedian(X)
 m
 mvrai
+
+V
+
+Vvrai <- WeiszfeldCov(X)$covmedian
+
+Vvrai
+
+
+#Stockage des erreurs quadratiques
+
+erreursM <- rep(0,(t-1))
+
+erreursV <- rep(0,(t-1))
+
+#Calcul des erreurs quadratiques
+
+for (i in 1:(t-1)) 
+{
+  erreursM[i] <- sqrt(sum(mvrai - miter[i])^2)
+}
+
+
+
+for (i in 1:(t-1)) 
+{
+  erreursV[i] <- norm(Vvrai - VIter[,,i],type = "F")
+}
+
+data <- data.frame(
+  x = 1:(t - 1),
+  erreursM = erreursM[1:(t-1)],
+  erreursV = erreursV[1:(t-1)]
+  
+)
+
+
+# Transformer les données en un format long pour ggplot2
+data_long <- data.frame(
+  x = rep(data$x, 2),
+  value = c(data$erreursM, data$erreursV),
+  type = rep(c("Erreur M", "Erreur V"), each = nrow(data))
+)
+
+# Créer le graphique avec ggplot2
+p <- ggplot(data_long, aes(x = x, y = value, color = type)) +
+  geom_line(size = 1) +
+  scale_x_log10() +   # Échelle logarithmique pour l'axe x
+  scale_y_log10() +   # Échelle logarithmique pour l'axe y
+  scale_color_manual(values = c("Erreur M" = "red", "Erreur V" = "blue"),
+                     labels = c("Erreur M" = "Courbe rouge : Erreur d'estimation de m", 
+                                "Erreur V" = "Courbe bleue : Erreur d'estimation de V")) +
+  labs(x = "Itérations", y = "Erreur Quadratique", 
+       title = "Erreur quadratique des Algorithmes",
+       color = "Type d'Erreur") +
+  theme_minimal()
+
+# Afficher le graphique
+print(p)
+
+
+
