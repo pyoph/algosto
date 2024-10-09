@@ -15,9 +15,9 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-source("C://Users/Paul/Downloads/parametres.R")
-source("C://Users/Paul/Downloads/simulations.R")
-source("C://Users/Paul/Downloads/algorithmes.R")
+#source("C://Users/Paul/Downloads/parametres.R")
+#source("C://Users/Paul/Downloads/simulations.R")
+#source("C://Users/Paul/Downloads/algorithmes.R")
 
 #Calcule les erreurs d'estimation de la médiane géométrique
 calculErreursM <- function(miter,mvrai,n)

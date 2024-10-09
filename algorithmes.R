@@ -312,7 +312,7 @@ estimMVOutliers <- function(Y,c,n,d,q,r)
     stat[i] <- resultatOutlier$S
 
     phat[i] <- resultatOutlier$phat
-    print(phat[i])
+    #print(phat[i])
 
   }
 
@@ -325,5 +325,223 @@ estimMVOutliers <- function(Y,c,n,d,q,r)
 
   return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
 }
+
+
+streaming <- function(Y,t,k,c,n,d,q,r)
+{
+  
+  sampsize = d^2
+  
+  
+  
+  #Initialisation de m
+  m = r*rnorm(d)
+  
+  
+  #Stockage des estimations des valeurs propres de la matrice de covariance
+  lambdaIter = matrix(0,n,d)
+  #lambda <- eigen(Vvrai)$values
+  lambda <- rep(1,d)
+  lambdatilde <- rep(1,d)
+  
+  #vp2 <- eigen(Vvrai)$values
+  slog <- 1
+  w <- 2
+  
+  beta = 1/2
+  
+  #Yv <- mvtnorm::rmvnorm(1000000,sigma=Sigma)
+  
+  ##Estimation de mn
+  
+  #Initialisation de m
+  
+  m <- r*rnorm(d)
+  
+  
+  #Sigma <- diag(d)
+  
+  #Initialisation de V
+  
+  V = matrix(0,d,d)
+  
+  
+  
+  moyennem = m
+  
+  
+  
+  
+  moyenneV <- V
+  
+  #Stockage des itérations de médiane géométrique 
+  
+  miter = matrix(0,t,d)
+  
+  stat <- rep(0,t-1)
+  phat <- rep(0,t-1)
+  #Stockage des itérations de matrices dans un tableau
+  VIter <- array(0, dim = c(d, d, t))
+  
+  #Stockage des vecteurs propres
+  
+  U <- array(1, dim = c(t, q, q))
+  
+  
+  #Valeurs propres de V
+  vpMCM <- matrix(0,t,d)
+  
+  
+  #Initialisation de U avec des vecteurs propres pas trop éloignés de ceux de cov(X)
+  
+  U[1,,] <-  1.5*diag(q)
+  
+  # Vecteur pour stocker les labels des outliers
+  outlier_labels <- rep(0, t-1)
+  
+  phat <- rep(0,t-1)
+  
+  
+  finboucle = t - 1
+  
+  for (i in (1:finboucle)) 
+  {
+    
+    #print(i)  
+    
+    #Somme des médianes géométriques
+    S <- rep(0,d)
+    
+    #Somme matrices 
+    
+    Smatr <- matrix(0,d,d)
+    
+    gamma = c/i^(0.75) 
+    
+    
+    for (j in 1:k) 
+    {
+      
+      S <- S + (Y[(i - 1) * k + j, ] - m)/ sqrt(sum((Y[(i - 1) * k + j, ] - m)^2))
+    }
+    
+    #S <- rowSums(sapply(1:k, function(j) (Y[(i - 1) * k + j, ] - m) 
+    
+    #Mise à jour de m
+    
+    m <- m + gamma*k^(beta)*S/k
+    
+    
+    moyennem = moyennem*i/(i+1) + 1/(i+1)*m
+    
+    miter[i,] = moyennem
+    
+    
+    
+    
+    
+    for (j in 1 : k) 
+    {
+      Smatr <- Smatr +  ((Y[(i - 1) * k + j, ] - moyennem) %*% t(Y[(i - 1) * k + j, ] - m)-V)/norm((Y[(i - 1) * k + j, ] - moyennem) %*% t(Y[(i - 1) * k + j, ] - m)-V,type = "F") 
+      
+    }
+    
+    
+    V <- V + gamma/k*k^(beta)*Smatr
+    
+    
+    
+    
+    
+    
+    
+    #Mise à jour de moyenneV
+    
+    moyenneV <- i/(i+1)*moyenneV + 1/(i + 1)*V
+    
+    
+    #Stockage des itérations de matrices dans un tableau
+    VIter[,,i] <- moyenneV
+    
+    #Estimation des vecteurs propres de Vt et orthonormalisation
+    
+    for (l in (1:d)) 
+    {
+      Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
+      
+      U[i+1,,l] <-  U[i,,l] + 1/(i + 1)*(moyenneV %*% Un - U[i,,l])
+    }
+    
+    
+    #matrice <- U[i+1,,]
+    
+    #Tri des vecteurs en ordre décroissant de norme
+    #normes_colonnes <- apply(matrice, 2, function(col) sqrt(sum(col^2)))
+    
+    ## order() pour obtenir les indices de tri par ordre décroissant des normes
+    #indices_tri <- order(normes_colonnes, decreasing = TRUE)
+    
+    # Trier la matrice selon les normes décroissantes des colonnes
+    #matrice <-matrice[,indices_tri]
+    
+    #U[i+1,,] <- matrice
+    
+    
+    
+    #Orthogonalisation des vecteurs propres
+    U[i+1,,] <- orthonormalization(U[i+1,,], basis=TRUE, norm=FALSE)
+    
+    #Estimation des valeurs propres de la MCM
+    vpMCM[i,] = apply(U[i,,], 2, function(col) sqrt(sum(col^2)))
+    
+    #Prendre norme de U[]
+    #Z=Y[i,]
+    # Z2=X2[i,]
+    #E1=    Z^2*(sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
+    #slog=slog+log(i+1)^w
+    #vp2=vp2+log(i+1)^w *((slog)^(-1)) *(lambda - vp2)
+    #vp0 = vp2
+    #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
+    #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
+    #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
+    lambdaResultat <- RobbinsMC2(1e2,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+    lambda <- lambdaResultat$vp
+    lambdatilde <- lambdaResultat$lambda
+    #print(lambda)
+    lambdaIter[i,] <- lambdatilde
+    
+    #Rédiger partie simulation
+    #vp  = lambdaEstim (précédente valeur de lambda) sample 100
+    
+    #Récupération des résultats de la fonction Outlier
+    resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+    # Vérifier si l'entrée est un outlier
+    if (resultatOutlier$outlier_label) {
+      
+      #Estimation des valeurs propres selon une procédure de Robbins-Monro
+      
+      outlier_labels[i] <- 1
+      
+      
+    }
+    stat[i] <- resultatOutlier$S
+    
+    phat[i] <- resultatOutlier$phat
+    #print(phat[i])
+    
+  
+  
+  
+  
+  
+  
+  
+    
+  }  
+  
+  
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
+}
+
 
 
