@@ -110,12 +110,15 @@ calculErreursSigma <- function(SigmaVrai,U,lambda,n,d)
 {
 
   erreursSigmaEstim <- rep(0,n - 1)
-
+  
+  
 
   for (i in 1:(n-1))
   {
+    U[i,,] <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
+    
 
-    SigmaEstim <- solve(U[i,,]) %*% diag(lambda) %*% U[i,,]
+    SigmaEstim <- U[i,,] %*% diag(lambda)%*% t(U[i,,])
 
     erreursSigmaEstim[i] <- norm(SigmaEstim - SigmaVrai,type = "F")
   }

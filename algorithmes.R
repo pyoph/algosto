@@ -22,14 +22,13 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
 
   # Détection des outliers pas online prendre les U
 
-  vectPV <- abs(VP)/sqrt(sum(VP^2))
-
+  vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
 
   S <- 0
 
   # Calcul de la statistique S
   for (j in 1:length(lambda)) {
-    S <- S + 1/lambda[j] * sum((vectPV[, j] * (donnee - m)^2))
+    S <- S + 1/lambda[j] * sum((vectPV[, j] * (donnee - m))^2)
   }
 
   # Calcul de la p-value basée sur la statistique du Chi2
@@ -141,7 +140,7 @@ estimMVOutliers <- function(Y,c,n,d,q,r)
 
   #Initialisation de V
 
-  V = matrix(0,d,d)
+  V = diag(d)
 
   #Calcul de la vraie matrice de covariance médiane
 
@@ -217,10 +216,10 @@ estimMVOutliers <- function(Y,c,n,d,q,r)
 
     #Test pour gérer la non négativité de Vn
 
-    #if (gamma >= norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F"))
-    #{
-    # gamma = norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F")
-    #}
+    if (gamma >= norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F"))
+    {
+    gamma = norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F")
+    }
 
 
 
@@ -337,6 +336,8 @@ streaming <- function(Y,t,k,c,n,d,q,r)
   #Initialisation de m
   m = r*rnorm(d)
   
+  V = diag(d)
+  
   
   #Stockage des estimations des valeurs propres de la matrice de covariance
   lambdaIter = matrix(0,n,d)
@@ -361,9 +362,6 @@ streaming <- function(Y,t,k,c,n,d,q,r)
   
   #Sigma <- diag(d)
   
-  #Initialisation de V
-  
-  V = matrix(0,d,d)
   
   
   
@@ -417,6 +415,13 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     Smatr <- matrix(0,d,d)
     
     gamma = c/i^(0.75) 
+    
+    #Test pour gérer la non négativité de Vn
+    
+    if (gamma >= norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F"))
+    {
+      gamma = norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F")
+    }
     
     
     for (j in 1:k) 
