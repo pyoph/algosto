@@ -29,7 +29,7 @@ source("~/work/algosto/resultats.R")
 params <- initialiser_parametres(
   d = 10,
   q = 10,
-  n = 1e4,
+  n = 1e6,
   c = sqrt(10),
   m0 = rep(0, 10),
   Sigma1 = diag(sqrt(1:10)),
@@ -97,4 +97,9 @@ table_contingence(resultsSimul$labelsVrais[1:999999],resultsStr$outlier_labels)
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
 affiche_erreurs_Sigma(calculErreursSigma(params$Sigma1,resultsStr$U,resultsStr$lambdatilde,params$n/params$k,params$d),params$n/params$k,params$c)
+results$U[9999,,] <- results$U[9999,,] %*% diag(1/sqrt(colSums(results$U[9999,,]^2)))
 
+SigmaEstim <- results$U[9999,,] %*% diag(results$lambdaIter[9999,])%*% t(results$U[9999,,])
+plot(params$Sigma1,SigmaEstim) 
+abline(0,1)
+ 
