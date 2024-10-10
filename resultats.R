@@ -118,7 +118,7 @@ calculErreursSigma <- function(SigmaVrai,U,lambda,n,d)
     U[i,,] <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
     
 
-    SigmaEstim <- U[i,,] %*% diag(lambda)%*% t(U[i,,])
+    SigmaEstim <- t(U[i,,]) %*% diag(lambda)%*% U[i,,]
 
     erreursSigmaEstim[i] <- norm(SigmaEstim - SigmaVrai,type = "F")
   }
@@ -157,7 +157,7 @@ affiche_erreurs_mediane_geometrique <- function(erreursM,n)
   p <- ggplot(data, aes(x = x, y = erreursM, color = type)) +
     geom_line(size = 1) +
     scale_x_log10() +   # Échelle logarithmique pour l'axe x
-    scale_y_log10() +   # Échelle logarithmique pour l'axe y
+    #scale_y_log10() +   # Échelle logarithmique pour l'axe y
     scale_color_manual(values = c("Erreur d'estimation de m" = "red"),
                        labels = c("Erreur d'estimation de m")) +
     labs(x = "Taille de l'échantillon", y = "Erreur Quadratique",
@@ -187,7 +187,7 @@ affiche_erreurs_mcm <- function(erreursV,n,c)
   p <- ggplot(data, aes(x = x, y = erreursV, color = type)) +
     geom_line(size = 1) +
     scale_x_log10() +   # Échelle logarithmique pour l'axe x
-    scale_y_log10() +   # Échelle logarithmique pour l'axe y
+    #scale_y_log10() +   # Échelle logarithmique pour l'axe y
     scale_color_manual(values = c("Erreur V" = "red"),
                        labels = c(paste("Erreur d'estimation de V c = ", c))) +
     labs(x = "Taille de l'échantillon", y = "Erreur norme de Frobenius",
@@ -216,7 +216,7 @@ affiche_erreurs_vp_mcm <- function(erreursVpMCM,n)
   p <- ggplot(data, aes(x = x, y = erreursVpMCM, color = type)) +
     geom_line(size = 1) +
     scale_x_log10() +   # Échelle logarithmique pour l'axe x
-    scale_y_log10() +   # Échelle logarithmique pour l'axe y
+    #scale_y_log10() +   # Échelle logarithmique pour l'axe y
     scale_color_manual(values = c("Erreur d'estimation de m" = "red"),
                        labels = c("Erreur d'estimation de m")) +
     labs(x = "Taille de l'échantillon", y = "Erreur Quadratique",
@@ -245,7 +245,7 @@ affiche_erreurs_vectp_mcm <- function(erreursVectPMCM,n,c)
   p <- ggplot(data, aes(x = x, y = erreursVectPMCM, color = type)) +
     geom_line(size = 1) +
     scale_x_log10() +   # Échelle logarithmique pour l'axe x
-    scale_y_log10() +   # Échelle logarithmique pour l'axe y
+    #scale_y_log10() +   # Échelle logarithmique pour l'axe y
     scale_color_manual(values = c("Erreur V" = "red"),
                        labels = c(paste("Erreur d'estimation des vecteurs propres de la MCM  c = ", c))) +
     labs(x = "Taille de l'échantillon", y = "Erreur norme de Frobenius",
@@ -272,7 +272,7 @@ affiche_erreurs_cov <- function(erreursCov,n)
   p <- ggplot(data, aes(x = x, y = erreursCov, color = type)) +
     geom_line(size = 1) +
     scale_x_log10() +   # Échelle logarithmique pour l'axe x
-    scale_y_log10() +   # Échelle logarithmique pour l'axe y
+    #scale_y_log10() +   # Échelle logarithmique pour l'axe y
     scale_color_manual(values = c("Erreur d'estimation des valeurs propres de la matrice de covariance" = "red"),
                        labels = c("Erreur d'estimation des valeurs propres de la matrice de covariance")) +
     labs(x = "Taille de l'échantillon", y = "Erreur Quadratique",
@@ -297,12 +297,12 @@ affiche_erreurs_Sigma <- function(erreursSigma,n,c)
     erreursSigma = erreursSigma[1:(n - 1)],
     type = rep("Erreur d'estimation de Sigma", n - 1)
   )
-
+data()
 
   p <- ggplot(data, aes(x = x, y = erreursSigma, color = type)) +
     geom_line(size = 1) +
     scale_x_log10() +   # Échelle logarithmique pour l'axe x
-    scale_y_log10() +   # Échelle logarithmique pour l'axe y
+    #scale_y_log10() +   # Échelle logarithmique pour l'axe y
     scale_color_manual(values = c("Erreur Sigma" = "red"),
                        labels = c(paste("Erreur d'estimation de Sigma c = ", c))) +
     labs(x = "Taille de l'échantillon", y = "Erreur norme de Frobenius",

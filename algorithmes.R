@@ -276,8 +276,8 @@ estimMVOutliers <- function(Y,c,n,d,q,r)
     #vp = apply(U[i+1,,],2,norm)
 
     #Estimation des valeurs propres de la MCM
-    vpMCM[i,] = apply(U[i,,], 2, function(col) sqrt(sum(col^2)))
-
+    #vpMCM[i,] = apply(U[i,,], 2, function(col) sqrt(sum(col^2)))
+    vpMCM[i,] = sqrt(colSums(U[i,,]^2))
     #Prendre norme de U[]
     Z=Y[i,]
     # Z2=X2[i,]
@@ -497,8 +497,8 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     U[i+1,,] <- orthonormalization(U[i+1,,], basis=TRUE, norm=FALSE)
     
     #Estimation des valeurs propres de la MCM
-    vpMCM[i,] = apply(U[i,,], 2, function(col) sqrt(sum(col^2)))
-    
+    #vpMCM[i,] = apply(U[i,,], 2, function(col) sqrt(sum(col^2)))
+    vpMCM[i,] = sqrt(colSums(U[i,,]^2))
     #Prendre norme de U[]
     #Z=Y[i,]
     # Z2=X2[i,]
@@ -509,7 +509,7 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
     #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
     #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
-    lambdaResultat <- RobbinsMC2(1e2,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+    lambdaResultat <- RobbinsMC2(sampsize,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
     lambda <- lambdaResultat$vp
     lambdatilde <- lambdaResultat$lambda
     #print(lambda)

@@ -42,7 +42,8 @@ params <- initialiser_parametres(
   r = 1,
   k = 1
 )
-#params$n
+params$n
+
 
 #eigen(resultsSimul$Vvrai)$vectors
 
@@ -69,7 +70,6 @@ resultsStr <- streaming(Z,params$n/params$k,params$k,params$c,params$n,params$d,
 affiche_erreurs_mediane_geometrique(calculErreursM(results$miter,params$m,params$n/params$k),params$n/params$k)
 
 #Affichage de l'estimation des erreurs pour l'estimation de Vbarre
-
 affiche_erreurs_mcm(calculErreursV(results$VIter,resultsSimul$Vvrai,params$n/params$k),params$n/params$k,params$c)
 
 #Affichage de l'erreur d'estimation des valeurs propres de la MCM
@@ -84,7 +84,7 @@ affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(params$Sigma1)$v
 resultsSimul$VcovVrai
 #Affichage de l'erreur d'estimation des valeurs propres de la matrice de covariance
 
-affiche_erreurs_cov(calculErreursValPropreCov(resultsStr$lambdaIter,eigen(params$Sigma1)$values,params$n/params$k),params$n/params$k)
+affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Sigma1)$values,params$n/params$k),params$n/params$k)
 
 #Tracer avec les vraies valeurs 
 
@@ -96,10 +96,8 @@ table_contingence(resultsSimul$labelsVrais[1:999999],resultsStr$outlier_labels)
 
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
-affiche_erreurs_Sigma(calculErreursSigma(params$Sigma1,resultsStr$U,resultsStr$lambdatilde,params$n/params$k,params$d),params$n/params$k,params$c)
+affiche_erreurs_Sigma(calculErreursSigma(params$Sigma1,results$U,results$lambdatilde,params$n/params$k,params$d),params$n/params$k,params$c)
 results$U[9999,,] <- results$U[9999,,] %*% diag(1/sqrt(colSums(results$U[9999,,]^2)))
-
-SigmaEstim <- results$U[9999,,] %*% diag(results$lambdaIter[9999,])%*% t(results$U[9999,,])
 plot(params$Sigma1,SigmaEstim) 
 abline(0,1)
  
