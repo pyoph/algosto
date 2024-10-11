@@ -32,8 +32,8 @@ params <- initialiser_parametres(
   n = 1e6,
   c = sqrt(10),
   m0 = rep(0, 10),
-  Sigma1 = diag(sqrt(1:10)),
-  Sigma2 = 10 * diag(sqrt(1:10)),
+  Sigma1 = diag((1:10)),#Tester une matrice de covariance non diagonale
+  Sigma2 = 10 * diag((1:10)),
   p1 = 1,
   p2 = 0,
 
