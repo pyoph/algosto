@@ -136,7 +136,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
-estimMVOutliers <- function(Y,c,n,d,q,r,aa = 0.75) 
+estimMVOutliers <- function(Y,c,n,d,q,r,aa) 
 {
 
   sampsize = d^2

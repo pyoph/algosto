@@ -32,8 +32,19 @@ params <- initialiser_parametres(
   n = 1e6,
   c = sqrt(10),
   m0 = rep(0, 10),
-  Sigma1 = diag((1:10)),#Tester une matrice de covariance non diagonale
-  Sigma2 = 10 * diag((1:10)),
+  Sigma2 = diag(1:10),#Tester une matrice de covariance non diagonale
+  Sigma1 =  matrix(c(2, 0.8, 0.5, 0.3, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005,
+                     0.8, 3, 0.7, 0.4, 0.3, 0.2, 0.1, 0.05, 0.02, 0.01,
+                     0.5, 0.7, 1.5, 0.6, 0.5, 0.3, 0.2, 0.1, 0.05, 0.02,
+                     0.3, 0.4, 0.6, 2.5, 0.7, 0.5, 0.3, 0.2, 0.1, 0.05,
+                   0.2, 0.3, 0.5, 0.7, 1.8, 0.8, 0.5, 0.3, 0.2, 0.1,
+                   0.1, 0.2, 0.3, 0.5, 0.8, 2.2, 0.7, 0.5, 0.3, 0.2,
+                     0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.7, 0.6, 0.5, 0.3,
+                     0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.6, 2.1, 0.7, 0.5,
+                     0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.9, 0.8,
+                    0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.8, 2.5),
+                   nrow = 10, ncol = 10, byrow = TRUE),
+  #Sigma3 = 10 * diag((1:10)),
   p1 = 1,
   p2 = 0,
 
@@ -53,11 +64,9 @@ resultsSimul <- genererEchantillon(params$n,params$d,params$mu1,params$mu2,param
 
 Z <- resultsSimul$Z
 #Z
-results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75)
+results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.9)
 
 resultsStr <- streaming(Z,params$n/params$k,params$k,params$c,params$n,params$d,params$q,params$r)
-
-
 
 #lambdaResultat <- RobbinsMC2(1e4,results$vpMCM[99,],10^(-8),alpha = 0.75,c= 2,w=2,samp=1e4, initbarre = results$vpMCM[99,],cbarre=0)
 
@@ -70,6 +79,7 @@ resultsStr <- streaming(Z,params$n/params$k,params$k,params$c,params$n,params$d,
 affiche_erreurs_mediane_geometrique(calculErreursM(results$miter,params$m,params$n/params$k),params$n/params$k)
 
 #Affichage de l'estimation des erreurs pour l'estimation de Vbarre
+
 affiche_erreurs_mcm(calculErreursV(results$VIter,resultsSimul$Vvrai,params$n/params$k),params$n/params$k,params$c)
 
 #Affichage de l'erreur d'estimation des valeurs propres de la MCM
@@ -84,7 +94,7 @@ affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(params$Sigma1)$v
 #resultsSimul$VcovVrai
 #Affichage de l'erreur d'estimation des valeurs propres de la matrice de covariance
 affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Sigma1)$values,params$n/params$k),params$n/params$k)
-
+results$U[999,,] 
 #Tracer avec les vraies valeurs 
 
 #Comparaison stat khi-deux avec densité théorique Khi deux

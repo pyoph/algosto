@@ -87,7 +87,7 @@ calculErreursVectpMCM <- function(UMCM,UMCMvrai,n,d)
 
   erreursUMCM <- rep(0,n - 1)
   
-  UMCMvrai <- UMCMvrai %*% diag(1/sqrt(colSums(UMCMvrai^2)))
+  UMCMvrai <- abs(UMCMvrai) %*% diag(1/sqrt(colSums(UMCMvrai^2)))
   
   for (i in 1:(n-1))
   {
