@@ -136,7 +136,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
-estimMVOutliers <- function(Y,c,n,d,q,r,aa = 1) 
+estimMVOutliers <- function(Y,c,n,d,q,r,aa = 0.75) 
 {
 
   sampsize = d^2
@@ -264,7 +264,7 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa = 1)
 
     #Mise à jour de moyenneV
   
-    moyenneV <- 1 - 1/(i+1)^aa*moyenneV + 1/(i + 1)^aa*V
+    moyenneV <- i/(i+1)*moyenneV + 1/(i + 1)*V
 
 
     VIter[,,i] = moyenneV
@@ -274,7 +274,7 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa = 1)
     for (l in (1:q))
     {
       Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
-      U[i+1,,l] <-  (1 - 1/(i + 1)^aa)*U[i,,l] + 1/(i + 1)^aa*(moyenneV %*% Un)
+      U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
     }
 
 

@@ -29,7 +29,7 @@ source("~/work/algosto/resultats.R")
 params <- initialiser_parametres(
   d = 10,
   q = 10,
-  n = 1e4,
+  n = 1e6,
   c = sqrt(10),
   m0 = rep(0, 10),
   Sigma1 = diag(sqrt(1:10)),
@@ -53,7 +53,7 @@ resultsSimul <- genererEchantillon(params$n,params$d,params$mu1,params$mu2,param
 
 Z <- resultsSimul$Z
 #Z
-results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa =1)
+results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75)
 
 resultsStr <- streaming(Z,params$n/params$k,params$k,params$c,params$n,params$d,params$q,params$r)
 
