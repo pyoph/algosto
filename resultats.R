@@ -86,18 +86,17 @@ calculErreursVectpMCM <- function(UMCM,UMCMvrai,n,d)
 {
 
   erreursUMCM <- rep(0,n - 1)
-
-  normes_colonnes <- apply(UMCMvrai, 2, function(col) sqrt(sum(col^2)))
-
-  UMCMvrai <- 1/normes_colonnes*UMCMvrai
-
-
+  
+  UMCMvrai <- UMCMvrai %*% diag(1/sqrt(colSums(UMCMvrai^2)))
+  
   for (i in 1:(n-1))
   {
-    normes_colonnes <- apply(UMCM[i,,], 2, function(col) sqrt(sum(col^2)))
-
-    UMCM[i,,] <- 1/normes_colonnes*abs(UMCM[i,,])
-
+    UMCM[i,,] <- UMCM[i,,] %*% diag(1/sqrt(colSums(UMCM[i,,]^2)))
+    
+    #for (j in (1:d))
+    #{
+    #UMCM[i,,j] <- UMCM[i,,j]/lambdaIter[i,j]
+    #}
     erreursUMCM[i] <- norm(UMCMvrai - UMCM[i,,],type = "F")
   }
   return(erreursUMCM)
@@ -118,8 +117,7 @@ calculErreursSigma <- function(SigmaVrai,U,lambda,n,d)
     U[i,,] <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
     
 
-    SigmaEstim <- t(U[i,,]) %*% diag(lambda)%*% U[i,,]
-
+    SigmaEstim <- U[i,,] %*% diag(lambda)%*% t(U[i,,])
     erreursSigmaEstim[i] <- norm(SigmaEstim - SigmaVrai,type = "F")
   }
   return(erreursSigmaEstim)

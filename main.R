@@ -81,9 +81,8 @@ affiche_erreurs_vp_mcm(calculErreursVpMCM(results$vpMCM,resultsSimul$VpvraiesV,p
 #Affichage de l'erreur d'estimation des vecteurs propres de la MCM
 
 affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(params$Sigma1)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
-resultsSimul$VcovVrai
+#resultsSimul$VcovVrai
 #Affichage de l'erreur d'estimation des valeurs propres de la matrice de covariance
-
 affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Sigma1)$values,params$n/params$k),params$n/params$k)
 
 #Tracer avec les vraies valeurs 
@@ -92,12 +91,20 @@ affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Si
 
 densiteHistKhi2(results$stat,params$d)
 #results$outlier_labels
-table_contingence(resultsSimul$labelsVrais[1:999999],resultsStr$outlier_labels)
+table_contingence(resultsSimul$labelsVrais[1:999999],results$outlier_labels)
 
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
 affiche_erreurs_Sigma(calculErreursSigma(params$Sigma1,results$U,results$lambdatilde,params$n/params$k,params$d),params$n/params$k,params$c)
-results$U[9999,,] <- results$U[9999,,] %*% diag(1/sqrt(colSums(results$U[9999,,]^2)))
+results$U[999999,,] <- results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
+results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
+SigmaEstim <- t(results$U[999999,,])%*%diag(results$lambdaIter[999999,])%*%results$U[999999,,]
+
 plot(params$Sigma1,SigmaEstim) 
 abline(0,1)
- 
+
+statTheorique <- calculeStatChi2(resultsSimul$Z,params$Sigma1)
+
+densiteHistKhi2(statTheorique,params$d)
+
+
