@@ -91,7 +91,7 @@ calculErreursVectpMCM <- function(UMCM,UMCMvrai,n,d)
   
   for (i in 1:(n-1))
   {
-    UMCM[i,,] <- UMCM[i,,] %*% diag(1/sqrt(colSums(UMCM[i,,]^2)))
+    UMCM[i,,] <- abs(UMCM[i,,]) %*% diag(1/sqrt(colSums(UMCM[i,,]^2)))
     
     #for (j in (1:d))
     #{
