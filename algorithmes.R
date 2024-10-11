@@ -279,18 +279,18 @@ estimMVOutliers <- function(Y,c,n,d,q,r)
 
 
 
-    matrice <- U[i+1,,]
+    #matrice <- U[i+1,,]
 
     #Tri des vecteurs en ordre décroissant de norme
-    normes_colonnes <- apply(matrice, 2, function(col) sqrt(sum(col^2)))
-
+    #normes_colonnes <- apply(matrice, 2, function(col) sqrt(sum(col^2)))
+    
     # order() pour obtenir les indices de tri par ordre décroissant des normes
-    indices_tri <- order(normes_colonnes, decreasing = TRUE)
+    #indices_tri <- order(normes_colonnes, decreasing = TRUE)
 
     # Trier la matrice selon les normes décroissantes des colonnes
-    matrice <-matrice[,indices_tri]
+    #matrice <-matrice[,indices_tri]
 
-    U[i+1,,] <- matrice
+    #U[i+1,,] <- matrice
     #Orthogonalisation des vecteurs propres
     U[i+1,,] <- orthonormalization(U[i+1,,],basis = TRUE, norm = FALSE)
 
