@@ -37,17 +37,17 @@ params <- initialiser_parametres(
                      0.8, 3, 0.7, 0.4, 0.3, 0.2, 0.1, 0.05, 0.02, 0.01,
                      0.5, 0.7, 1.5, 0.6, 0.5, 0.3, 0.2, 0.1, 0.05, 0.02,
                      0.3, 0.4, 0.6, 2.5, 0.7, 0.5, 0.3, 0.2, 0.1, 0.05,
-                   0.2, 0.3, 0.5, 0.7, 1.8, 0.8, 0.5, 0.3, 0.2, 0.1,
-                   0.1, 0.2, 0.3, 0.5, 0.8, 2.2, 0.7, 0.5, 0.3, 0.2,
+                     0.2, 0.3, 0.5, 0.7, 1.8, 0.8, 0.5, 0.3, 0.2, 0.1,
+                     0.1, 0.2, 0.3, 0.5, 0.8, 2.2, 0.7, 0.5, 0.3, 0.2,
                      0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.7, 0.6, 0.5, 0.3,
                      0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.6, 2.1, 0.7, 0.5,
                      0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.9, 0.8,
-                    0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.8, 2.5),
+                     0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.8, 2.5),
                    nrow = 10, ncol = 10, byrow = TRUE),
   #Sigma3 = 10 * diag((1:10)),
   p1 = 1,
   p2 = 0,
-
+  
   mu1 = rep(0,10 ),
   mu2 = 5 * rep(1, 10),
   r = 1,
@@ -56,16 +56,26 @@ params <- initialiser_parametres(
 params$n
 
 
+# Creation d'une matrice de covariance
+A <- matrix(runif(100, min=-1, max=1), nrow=10)
+A <- (A + t(A)) / 2 
+cov_matrix <- A %*% t(A)
+
+cov_matrix
+
 #eigen(resultsSimul$Vvrai)$vectors
 
-resultsSimul <- genererEchantillon(params$n,params$d,params$mu1,params$mu2,params$p1,params$p2,params$Sigma1,params$Sigma2)
+resultsSimul <- genererEchantillon(params$n,params$d,params$mu1,params$mu2,params$p1,params$p2,cov_matrix,params$Sigma2)
 
 #resultsSimul$labelsVrais
 
 Z <- resultsSimul$Z
 #Z
-results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.9)
+results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75)
 
+
+
+  
 resultsStr <- streaming(Z,params$n/params$k,params$k,params$c,params$n,params$d,params$q,params$r)
 
 #lambdaResultat <- RobbinsMC2(1e4,results$vpMCM[99,],10^(-8),alpha = 0.75,c= 2,w=2,samp=1e4, initbarre = results$vpMCM[99,],cbarre=0)
@@ -90,10 +100,10 @@ affiche_erreurs_vp_mcm(calculErreursVpMCM(results$vpMCM,resultsSimul$VpvraiesV,p
 
 #Affichage de l'erreur d'estimation des vecteurs propres de la MCM
 
-affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(params$Sigma1)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
+affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(cov_matrix)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
 #resultsSimul$VcovVrai
 #Affichage de l'erreur d'estimation des valeurs propres de la matrice de covariance
-affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Sigma1)$values,params$n/params$k),params$n/params$k)
+affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(cov_matrix)$values,params$n/params$k),params$n/params$k)
 results$U[999,,] 
 #Tracer avec les vraies valeurs 
 
@@ -105,12 +115,12 @@ table_contingence(resultsSimul$labelsVrais[1:999999],results$outlier_labels)
 
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
-affiche_erreurs_Sigma(calculErreursSigma(params$Sigma1,results$U,results$lambdatilde,params$n/params$k,params$d),params$n/params$k,params$c)
+affiche_erreurs_Sigma(calculErreursSigma(cov_matrix,results$U,results$lambdatilde,params$n/params$k,params$d),params$n/params$k,params$c)
 results$U[999999,,] <- results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
 results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
 SigmaEstim <- t(results$U[999999,,])%*%diag(results$lambdaIter[999999,])%*%results$U[999999,,]
 
-plot(params$Sigma1,SigmaEstim) 
+plot(cov_matrix,SigmaEstim) 
 abline(0,1)
 
 statTheorique <- calculeStatChi2(resultsSimul$Z,params$Sigma1)

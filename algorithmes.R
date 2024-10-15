@@ -214,8 +214,17 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
   #Initialisation de U avec des vecteurs propres pas trop éloignés de ceux de cov(X)
 
-  U[1,,] <-  1.5*diag(q)
-
+  #U[1,,] <-  1.5*diag(q)
+  
+  matrix_random <- matrix(0, d, d)
+  
+  # Générer chaque colonne aléatoire sur la sphère unité
+  for (i in 1:d) {
+    v <- rnorm(d)  # Tirer un vecteur d composantes normales
+    matrix_random[, i] <- v / sqrt(sum(v^2))  # Normaliser
+  }
+  
+  U[1,,] <- matrix_random
 
 
 
