@@ -322,30 +322,29 @@ table_contingence <- function(labels,outliers_labels)
   table(labels, outliers_labels)
 }
 
-
-#Affiche l'histogramme et la densité du Khi deux
-
-densiteHistKhi2 <- function(S,d)
-{
-
+densiteHistKhi2 <- function(S, d) {
   # Créer un dataframe pour ggplot
   df <- data.frame(S = S)
-
-  # Densité théorique du Chi2
+  
+  # Densité théorique du Chi2 : générer des valeurs de x couvrant les valeurs de S
   x_vals <- seq(0, max(S), length.out = 500)
   chi2_density <- data.frame(
     x = x_vals,
     density = dchisq(x_vals, df = d)
   )
-
+  
   # Représentation graphique : Histogramme des valeurs de S et densité théorique du Chi2
   ggplot(df, aes(x = S)) +
-    geom_histogram(aes(y = ..density..), bins = 30, fill = "lightblue", color = "black") +
+    # Histogramme avec densité normale
+    geom_histogram(aes(y = ..density..), bins = 30, fill = "lightblue", color = "black", alpha = 0.7) +
+    
+    # Courbe de densité théorique du Chi2
     geom_line(data = chi2_density, aes(x = x, y = density), color = "red", size = 1) +
+    
+    # Titres et labels
     labs(title = "Comparaison des valeurs de S et de la densité théorique du Chi2",
          x = "Valeurs de S", y = "Densité") +
+    
+    # Thème
     theme_minimal()
-
-
 }
-

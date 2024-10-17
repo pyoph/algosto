@@ -26,7 +26,7 @@ source("~/work/algosto/resultats.R")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
 
-n <- 1e4
+n <- 1e7
 
 d <- 10
 
@@ -34,11 +34,17 @@ mu1 <- rep(0,d)
 
 m2 <- 5*rep(1,d)
 
-Sigma1 <- diag(1:10)
+#Sigma1 <- diag(1:10)
 
 
 Sigma2 <- 10*diag(1:10)
 
+set.seed(123)
+
+#Création d'une matrice de covariance
+A <- matrix(runif(100, min=-1, max=1), nrow=10)
+A <- (A + t(A)) / 2  
+Sigma1 <- A %*% t(A)
 
 
 
@@ -110,9 +116,10 @@ SigmaEstim <- t(results$U[999999,,])%*%diag(results$lambdaIter[999999,])%*%resul
 plot(params$Sigma,SigmaEstim) 
 abline(0,1)
 
-statTheorique <- calculeStatChi2(resultsSimul$Z,params$Sigma)
+statTheorique <- calculeStatChi2(Z,params$Sigma)
 
 densiteHistKhi2(statTheorique,params$d)
+
 
 
 
