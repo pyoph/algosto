@@ -1,11 +1,11 @@
-#install.packages("microbenchmark")
-#install.packages("matlib")
-#install.packages("MASS")
-#install.packages("reshape2")
-#install.packages("corrplot")
-#install.packages("dlpyr")
-#install.packages("devtools")
-#install.packages("usethis")
+install.packages("microbenchmark")
+install.packages("matlib")
+install.packages("MASS")
+install.packages("reshape2")
+install.packages("corrplot")
+install.packages("dlpyr")
+install.packages("devtools")
+install.packages("usethis")
 
 library(reshape2)
 library(RobRegression)
@@ -26,7 +26,7 @@ source("~/work/algosto/resultats.R")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
 
-n <- 1e7
+n <- 1e6
 
 d <- 10
 
@@ -34,7 +34,7 @@ mu1 <- rep(0,d)
 
 m2 <- 5*rep(1,d)
 
-#Sigma1 <- diag(1:10)
+Sigma1 <- diag(sqrt(1:10))
 
 
 Sigma2 <- 10*diag(1:10)
@@ -44,7 +44,7 @@ set.seed(123)
 #Création d'une matrice de covariance
 A <- matrix(runif(100, min=-1, max=1), nrow=10)
 A <- (A + t(A)) / 2  
-Sigma1 <- A %*% t(A)
+#Sigma1 <- A %*% t(A)
 
 
 
@@ -60,7 +60,7 @@ Z <- resultsSimul$Z
 params <- initialiser_parametres(
   Y = Z,
   c = sqrt(10),
-  r = 1,
+  r = 1.5,
   k = 1
 )
 
@@ -108,15 +108,29 @@ table_contingence(resultsSimul$labelsVrais[1:999999],results$outlier_labels)
 
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
-affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdatilde,params$n/params$k,params$d),params$n/params$k,params$c)
+affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d),params$n/params$k,params$c)
 results$U[999999,,] <- results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
 results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
-SigmaEstim <- t(results$U[999999,,])%*%diag(results$lambdaIter[999999,])%*%results$U[999999,,]
+SigmaEstim <- (results$U[999999,,])%*%diag(results$lambdaIter[999999,])%*%t(results$U[999999,,])
 
 plot(params$Sigma,SigmaEstim) 
 abline(0,1)
+erreursSigma <- calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d)
+erreursSigmaMoyenne <- erreursSigma$erreursSigmaMoyenne
 
 statTheorique <- calculeStatChi2(Z,params$Sigma)
+erreursSigmaMoyenne[9999]
+erreursSigmaMoyenne[999999]
+erreursSigmaMoyenne[9999]
+erreursSigmaMoyenneRep <- matrix(0,n,10)
+resultsRep <- rep(0,10)
+for (i in 1:10){
+  resultsRep[i] <- estimMVOutliers(Z,params$c,params$n,params$d,params$d,params$r)
+  erreursSigmaMoyenneRep[,i] <- calculErreursSigma(params$Sigma,resultsRep[i]$U,resultsRep[i]$lambdaIter,params$n/params$k,params$d)
+  affiche_erreurs_Sigma(erreursSigmaMoyenneRep[,i],params$n/params$k,params$c)
+  
+}
+affiche_erreurs_Sigma(erreursSigmaMoyenne,params$n/params$k,params$c)
 
 densiteHistKhi2(statTheorique,params$d)
 

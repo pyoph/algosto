@@ -97,7 +97,7 @@ calculErreursVectpMCM <- function(UMCM,UMCMvrai,n,d)
     #{
     #UMCM[i,,j] <- UMCM[i,,j]/lambdaIter[i,j]
     #}
-    erreursUMCM[i] <- norm(UMCMvrai - UMCM[i,,],type = "F")
+    erreursUMCM[i] <- (norm(UMCMvrai - UMCM[i,,],type = "F"))
   }
   return(erreursUMCM)
 }
@@ -110,17 +110,24 @@ calculErreursSigma <- function(SigmaVrai,U,lambda,n,d)
 
   erreursSigmaEstim <- rep(0,n - 1)
   
+  erreursSigmaMoyenne <- rep(0, n - 1)
   
 
   for (i in 1:(n-1))
   {
     U[i,,] <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
     
-
-    SigmaEstim <- U[i,,] %*% diag(lambda)%*% t(U[i,,])
-    erreursSigmaEstim[i] <- norm(SigmaEstim - SigmaVrai,type = "F")
+   # for (j in (1:d)) 
+  #  {
+   #   SigmaEstim <- 1/lambda[i,j]*U[i,,j]%*%t(U[i,,j])
+    #}  
+    SigmaEstim <- (U[i,,]) %*% diag(lambda[i,])%*% t(U[i,,])
+    #SigmaEstim <- diag(lambda[i,])
+    erreursSigmaEstim[i] <- (norm(SigmaEstim - SigmaVrai,type = "F"))/i
+    erreursSigmaMoyenne[i] <- mean(erreursSigmaEstim[1:i])
+    
   }
-  return(erreursSigmaEstim)
+  return(list(erreursSigmaEstim = erreursSigmaEstim, erreursSigmaMoyenne = erreursSigmaMoyenne))
 }
 
 
