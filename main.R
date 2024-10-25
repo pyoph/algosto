@@ -1,11 +1,11 @@
-install.packages("microbenchmark")
-install.packages("matlib")
-install.packages("MASS")
-install.packages("reshape2")
-install.packages("corrplot")
-install.packages("dlpyr")
-install.packages("devtools")
-install.packages("usethis")
+#install.packages("microbenchmark")
+#install.packages("matlib")
+#install.packages("MASS")
+#install.packages("reshape2")
+#install.packages("corrplot")
+#install.packages("dlpyr")
+#install.packages("devtools")
+#install.packages("usethis")
 
 library(reshape2)
 library(RobRegression)
@@ -34,7 +34,7 @@ mu1 <- rep(0,d)
 
 mu2 <- 5*rep(1,d)
 
-#Sigma1 <- diag(sqrt(1:10))
+Sigma1 <- diag(sqrt(1:10))
 
 
 Sigma2 <- 10*diag(1:10)
@@ -51,7 +51,7 @@ Sigma1 <- A %*% t(A)
 p1 <- 0.95
 
 #Pourcentage d'outliers
-p2 <- 0.05
+p2 <- 1-p1
 
 resultsSimul <- genererEchantillon(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
 
@@ -61,9 +61,13 @@ Z <- resultsSimul$Z
 params <- initialiser_parametres(
   Y = Z,
   c = sqrt(10),
+  #Sigma = diag(sqrt(1:d)),
+  Sigma = Sigma1,
   r = 1.5,
   k = 1
 )
+
+params$Sigma
 
 #eigen(resultsSimul$Vvrai)$vectors
 
@@ -106,7 +110,8 @@ affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Si
 densiteHistKhi2(results$stat,params$d)
 #results$outlier_labels
 table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels)
-
+plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1));abline(h = 0.05)
+length(results$outlier_labels)
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
 affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d),params$n/params$k,params$c)
@@ -135,4 +140,4 @@ for (i in 1:10){
 densiteHistKhi2(statTheorique,params$d)
 
 
-
+params$Sigma

@@ -19,12 +19,12 @@ library("dplyr")
 
 
 
-initialiser_parametres <- function(Y,c,r,k) {
+initialiser_parametres <- function(Y,c,r,k,Sigma = diag(ncol(Y))) {
   # Initialisation des paramètres
   params <- list(
     d = ncol(Y)   ,              # Dimension des données mettre ncol(Y)
     n = nrow(Y),# Taille de l'échantillon nrow(Y)
-    Sigma = cov(Y),
+    Sigma = Sigma,
     q = d,              # Nombre de plus grandes valeurs propres
     c = c,        # Taux d'apprentissage
     #m = m0,      # Moyenne réelle (vecteur de zéros)

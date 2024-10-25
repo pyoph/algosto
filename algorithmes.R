@@ -16,27 +16,6 @@ library("MASS")
 library("corrplot")
 library("dplyr")
 
-calculeStatChi2 <- function(Z,Sigma)
-{
-  
-  vectPV <- eigen(Sigma)$vectors 
-  vectPV <- vectPV %*% diag(1/sqrt(colSums(vectPV^2)))
-  lambda <- eigen(Sigma)$values
-
-  stat <- rep(0,nrow(Z))  
-  
-for (i in 1: nrow(Z)){   
-  # Calcul de la statistique S
-  S <- 0
-  for (j in 1:length(lambda)) {
-    S <- S + 1/lambda[j] * sum((vectPV[, j] * (Z[i,]))^2)
-  }
-  stat[i] = S
-}
-  return (stat = stat)
-  
-    
-}
 
 #Fonction de détection des outliers prend en paramètre une nouvelle donnée
 Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
@@ -139,7 +118,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 estimMVOutliers <- function(Y,c,n,d,q,r,aa) 
 {
 
-  sampsize = d^2
+  sampsize = d
   
   #Initialisation du vecteur avec les vrais paramètres
 
@@ -283,8 +262,8 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
     for (l in (1:q))
     {
       Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
-      #U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*Un + 1/(i + 1)^(aa)*(moyenneV %*% Un)
-      U[i+1,,l] <- Un + gamma*(moyenneV %*% Un) 
+      U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
+      #U[i+1,,l] <- U[i,,] + gamma*(moyenneV %*% Un) 
     }
 
 
