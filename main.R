@@ -41,19 +41,20 @@ Sigma2 <- 10*diag(1:10)
 
 set.seed(123)
 
-#Création d'une matrice de covariance
+#Création d'une matrice de covariance non nécessairement diagonale
 A <- matrix(runif(100, min=-1, max=1), nrow=10)
 A <- (A + t(A)) / 2  
 Sigma1 <- A %*% t(A)
-
+Sigma1=(Sigma1+diag(10))/10
+eigen(Sigma1)$values
 
 #Pourcentage de non outliers
-p1 <- 0.95
+p1 <- 0.9
 
 #Pourcentage d'outliers
 p2 <- 1-p1
 
-resultsSimul <- genererEchantillon(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
+resultsSimul <- genererEchantillon(n,d,mu1,mu2,p1,p2,Sigma1 =Sigma1 ,Sigma2)
 
 
 Z <- resultsSimul$Z
@@ -61,12 +62,12 @@ Z <- resultsSimul$Z
 params <- initialiser_parametres(
   Y = Z,
   c = sqrt(10),
-  #Sigma = diag(sqrt(1:d)),
   Sigma = Sigma1,
+  #Sigma = Sigma1,
   r = 1.5,
   k = 1
 )
-
+cov(Z)
 params$Sigma
 
 #eigen(resultsSimul$Vvrai)$vectors
@@ -110,7 +111,7 @@ affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Si
 densiteHistKhi2(results$stat,params$d)
 #results$outlier_labels
 table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels)
-plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1));abline(h = 0.05)
+plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1));abline(h = 0.1)
 length(results$outlier_labels)
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
