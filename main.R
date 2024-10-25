@@ -26,15 +26,15 @@ source("~/work/algosto/resultats.R")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
 
-n <- 1e6
+n <- 1e4
 
 d <- 10
 
 mu1 <- rep(0,d)
 
-m2 <- 5*rep(1,d)
+mu2 <- 5*rep(1,d)
 
-Sigma1 <- diag(sqrt(1:10))
+#Sigma1 <- diag(sqrt(1:10))
 
 
 Sigma2 <- 10*diag(1:10)
@@ -44,13 +44,14 @@ set.seed(123)
 #Création d'une matrice de covariance
 A <- matrix(runif(100, min=-1, max=1), nrow=10)
 A <- (A + t(A)) / 2  
-#Sigma1 <- A %*% t(A)
+Sigma1 <- A %*% t(A)
 
 
+#Pourcentage de non outliers
+p1 <- 0.95
 
-p1 <- 1
-
-p2 <- 0
+#Pourcentage d'outliers
+p2 <- 0.05
 
 resultsSimul <- genererEchantillon(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
 
@@ -104,19 +105,20 @@ affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Si
 
 densiteHistKhi2(results$stat,params$d)
 #results$outlier_labels
-table_contingence(resultsSimul$labelsVrais[1:999999],results$outlier_labels)
+table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels)
 
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
 affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d),params$n/params$k,params$c)
-results$U[999999,,] <- results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
-results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
+results$U[99999,,] <- results$U[99999,,] %*% diag(1/sqrt(colSums(results$U[99999,,]^2)))
+results$U[99999,,] %*% diag(1/sqrt(colSums(results$U[99999,,]^2)))
 SigmaEstim <- (results$U[999999,,])%*%diag(results$lambdaIter[999999,])%*%t(results$U[999999,,])
 
 plot(params$Sigma,SigmaEstim) 
 abline(0,1)
 erreursSigma <- calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d)
 erreursSigmaMoyenne <- erreursSigma$erreursSigmaMoyenne
+affiche_erreurs_Sigma(erreursSigmaMoyenne,params$n/params$k,params$c)
 
 statTheorique <- calculeStatChi2(Z,params$Sigma)
 erreursSigmaMoyenne[9999]
@@ -130,10 +132,7 @@ for (i in 1:10){
   affiche_erreurs_Sigma(erreursSigmaMoyenneRep[,i],params$n/params$k,params$c)
   
 }
-affiche_erreurs_Sigma(erreursSigmaMoyenne,params$n/params$k,params$c)
-
 densiteHistKhi2(statTheorique,params$d)
-
 
 
 

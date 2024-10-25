@@ -283,7 +283,8 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
     for (l in (1:q))
     {
       Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
-      U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
+      #U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*Un + 1/(i + 1)^(aa)*(moyenneV %*% Un)
+      U[i+1,,l] <- Un + gamma*(moyenneV %*% Un) 
     }
 
 

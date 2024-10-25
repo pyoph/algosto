@@ -311,7 +311,7 @@ data()
     scale_color_manual(values = c("Erreur Sigma" = "red"),
                        labels = c(paste("Erreur d'estimation de Sigma c = ", c))) +
     labs(x = "Taille de l'échantillon", y = "Erreur norme de Frobenius",
-         title = "Erreur d'estimation de Sigma",
+         title = "Erreur d'estimation de Sigma quelconque",
          color = "Type d'Erreur") +
     theme_minimal()
 
