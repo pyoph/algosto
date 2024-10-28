@@ -15,22 +15,20 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-
-
 #Fonction de détection des outliers prend en paramètre une nouvelle donnée
 Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
-
+  
   # Détection des outliers pas online prendre les U
-
+  
   vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
-
+  
   S <- 0
-
+  
   # Calcul de la statistique S
   for (j in 1:length(lambda)) {
     S <- S + 1/lambda[j] * sum((vectPV[, j] * (donnee - m))^2)
   }
-
+  
   # Calcul de la p-value basée sur la statistique du Chi2
   phat <- pchisq(S, df = length(lambda), lower.tail = FALSE)
   #print(phat)
@@ -40,11 +38,10 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
   } else {
     outlier_label <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
   }
-
+  
   # Retourner le label, la p-value et la statistique S
   return(list(outlier_label = outlier_label, phat = phat, S = S))
 }
-
 #Estimation des valeurs propres de Sigma
 
 RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,samp=mc_sample_size,init=detoile)
@@ -190,8 +187,14 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
 
   U <- array(1, dim = c(n, q, q))
+  
+  #Vecteurs propres pour l'algorithme SGA
+  Uphi <- array(1, dim = c(n, q, q))
+  
+  #Stockage des phijn
+  phijn <- matrix(0,n,d)
 
-  #Initialisation de U avec des vecteurs propres pas trop éloignés de ceux de cov(X)
+  #Initialisation de U avec des vecteurs propres sur la sphère unité
 
   #U[1,,] <-  1.5*diag(q)
   
@@ -205,7 +208,7 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
   
   U[1,,] <- matrix_random
 
-
+  Uphi[1,,] <- matrix_random
 
   #Stockage des itérations
   miter = matrix(0,n,d)
@@ -256,14 +259,29 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
 
     VIter[,,i] = moyenneV
-
-    #Estimation des vecteurs propres de Vt et orthogonalisation
-
+   #U[i,,] <- orthonormalization(U[i,,],basis = TRUE, norm = TRUE)
+    #Calcul des phijn
+    for (l in (1:q))
+    {
+      phijn[i,l] <- t(Y[i+1,] - m)%*%Uphi[i,,l]
+      
+    }
+    
     for (l in (1:q))
     {
       Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
       U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
-      #U[i+1,,l] <- U[i,,] + gamma*(moyenneV %*% Un) 
+      #U[i+1,,l] <- U[i,,l] + gamma*((Y[i+1,] - m)%*%t((Y[i+1,] - m)) %*% U[i,,l])
+      
+      S <- rep(0,d)
+      if (l  >= 2){
+      for (iter in (1:(l - 1)))
+      {
+       S <- S + phijn[i,iter]*Uphi[i,,iter] 
+      }
+      }
+      Uphi[i+1,,l]= Uphi[i,,l] + gamma*phijn[i,l] * ((Y[i+1,] - m) - phijn[i,l]* Uphi[i,,l] - 2 * S )
+      
     }
 
 
@@ -332,7 +350,7 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
 
 
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,Uphi = Uphi,phijn = phijn,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
 }
 
 

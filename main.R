@@ -26,7 +26,7 @@ source("~/work/algosto/resultats.R")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
 
-n <- 1e4
+n <- 1e6
 
 d <- 10
 
@@ -49,7 +49,7 @@ Sigma1=(Sigma1+diag(10))/10
 eigen(Sigma1)$values
 
 #Pourcentage de non outliers
-p1 <- 0.9
+p1 <- 0.85
 
 #Pourcentage d'outliers
 p2 <- 1-p1
@@ -101,6 +101,12 @@ affiche_erreurs_vp_mcm(calculErreursVpMCM(results$vpMCM,resultsSimul$VpvraiesV,p
 #Affichage de l'erreur d'estimation des vecteurs propres de la MCM
 
 affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(params$Sigma)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
+#Phi = results$phijn
+#Phi[9999,]
+Phi1 = t(Z[9998,] - results$m)%*%results$U[9999,,1]
+Phi1
+affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$Uphi,eigen(params$Sigma)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
+#results$Uphi[9000:9999,,]
 #resultsSimul$VcovVrai
 #Affichage de l'erreur d'estimation des valeurs propres de la matrice de covariance
 affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Sigma)$values,params$n/params$k),params$n/params$k)
