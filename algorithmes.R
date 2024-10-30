@@ -112,7 +112,8 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
-estimMVOutliers <- function(Y,c,n,d,q,r,aa) 
+estimMVOutliers <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vinit = diag(d),
+                            U = array(1, dim = c(n, q, q)),stat = rep(0,n-1),vpMCM = matrix(0,n,d), lambda = rep(1,d),lambdatilde = rep(1,d))
 {
 
   sampsize = d
@@ -130,14 +131,14 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
   #Initialisation de m
 
-  m <- r*rnorm(d)
+  m <- minit
 
 
   #Sigma <- diag(d)
 
   #Initialisation de V
 
-  V = diag(d)
+  V <- Vinit
 
   #Calcul de la vraie matrice de covariance médiane
 
@@ -152,7 +153,7 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
   #Stockage des outliers
 
-  stat <- rep(0,n-1)
+  stat <- stat
 
   #Calcul de la vraie MCM par l'algorithme de Weiszfeld
 
@@ -166,13 +167,13 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
   VIter <- array(0, dim = c(d, d, n))
 
   #Valeurs propres de V
-  vpMCM <- matrix(0,n,d)
+  #vpMCM <- matrix(0,n,d)
 
   #Initialisation de lambda
 
   #lambda <- eigen(Vvrai)$values
-  lambda <- rep(1,d)
-  lambdatilde <- rep(1,d)
+  #lambda <- rep(1,d)
+  #lambdatilde <- rep(1,d)
 
   #vp2 <- eigen(Vvrai)$values
   slog <- 1
@@ -184,9 +185,8 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
   #Stockage des vecteurs propres dans un tableau
 
-
-
-  U <- array(1, dim = c(n, q, q))
+#Si départ = 0 initialisation de U sur la sphère unité
+if(depart == 0){
   
   #Vecteurs propres pour l'algorithme SGA
   Uphi <- array(1, dim = c(n, q, q))
@@ -209,20 +209,21 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
   U[1,,] <- matrix_random
 
   Uphi[1,,] <- matrix_random
-
+}
+  
   #Stockage des itérations
   miter = matrix(0,n,d)
 
   # Vecteur pour stocker les labels des outliers
-  outlier_labels <- rep(0, n-1)
+  outlier_labels <- rep(0, niter-1)
 
   phat <- rep(0,n-1)
 
-  for (i in 1:(dim(Y)[1]-1))
+  for (i  in 1:(niter-1))
   {
 
     gamma = c/i^(0.75)
-
+    #gamma = c/i
 
 
 
@@ -261,11 +262,11 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
     VIter[,,i] = moyenneV
    #U[i,,] <- orthonormalization(U[i,,],basis = TRUE, norm = TRUE)
     #Calcul des phijn
-    for (l in (1:q))
-    {
-      phijn[i,l] <- t(Y[i+1,] - m)%*%Uphi[i,,l]
-      
-    }
+    #for (l in (1:q))
+    #{
+     # phijn[i,l] <- sum(t(Y[i+1,] - m)*Uphi[i,,l])
+      #print(phijn[i,l])
+    #}
     
     for (l in (1:q))
     {
@@ -273,14 +274,15 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
       U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
       #U[i+1,,l] <- U[i,,l] + gamma*((Y[i+1,] - m)%*%t((Y[i+1,] - m)) %*% U[i,,l])
       
-      S <- rep(0,d)
-      if (l  >= 2){
-      for (iter in (1:(l - 1)))
-      {
-       S <- S + phijn[i,iter]*Uphi[i,,iter] 
-      }
-      }
-      Uphi[i+1,,l]= Uphi[i,,l] + gamma*phijn[i,l] * ((Y[i+1,] - m) - phijn[i,l]* Uphi[i,,l] - 2 * S )
+      #if (l  >= 2){
+        
+       # S <- rep(0,d)
+      #for (iter in (1:(l - 1)))
+      #{
+       #S <- S + phijn[i,iter]*Uphi[i,,iter] 
+      #}
+      #}
+      #Uphi[i+1,,l]= Uphi[i,,l] + gamma * phijn[i,l]*((Y[i+1,] - m) - phijn[i,l]*Uphi[i,,l] )
       
     }
 
@@ -350,14 +352,14 @@ estimMVOutliers <- function(Y,c,n,d,q,r,aa)
 
 
 
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,Uphi = Uphi,phijn = phijn,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
 }
 
 
 streaming <- function(Y,t,k,c,n,d,q,r)
 {
   
-  sampsize = d^2
+  sampsize = d
   
   
   

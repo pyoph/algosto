@@ -26,7 +26,7 @@ source("~/work/algosto/resultats.R")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
 
-n <- 1e6
+n <- 1e4
 
 d <- 10
 
@@ -74,7 +74,11 @@ params$Sigma
 
 #resultsSimul$labelsVrais
 #Z
-results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75)
+results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75,niter = 1e3)
+
+#Détection des outliers après 10^3 itérations
+results2 <- estimMVOutliers(Z,params$c ,n = 1e4,params$d,params$d,params$r,aa = 0.75,niter = 1e4,depart = 1e3,minit = results$m, Vinit = results$V,
+                            U = results$U,stat = results$stat,vpMCM = results$vpMCM, lambda = results$lambda,lambdatilde = results$lambdatilde)
 
 resultsStr <- streaming(Z,params$n/params$k,params$k,params$c,params$n,params$d,params$q,params$r)
 
@@ -103,22 +107,22 @@ affiche_erreurs_vp_mcm(calculErreursVpMCM(results$vpMCM,resultsSimul$VpvraiesV,p
 affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(params$Sigma)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
 #Phi = results$phijn
 #Phi[9999,]
-Phi1 = t(Z[9998,] - results$m)%*%results$U[9999,,1]
-Phi1
-affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$Uphi,eigen(params$Sigma)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
+
+#affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$Uphi,eigen(params$Sigma)$vectors,params$n/params$k,params$d),params$n/params$k,params$c)
 #results$Uphi[9000:9999,,]
 #resultsSimul$VcovVrai
 #Affichage de l'erreur d'estimation des valeurs propres de la matrice de covariance
-affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Sigma)$values,params$n/params$k),params$n/params$k)
+affiche_erreurs_cov(calculErreursValPropreCov(results2$lambdaIter,eigen(params$Sigma)$values,params$n/params$k),params$n/params$k)
 #Tracer avec les vraies valeurs 
 
 #Comparaison stat khi-deux avec densité théorique Khi deux
 
 densiteHistKhi2(results$stat,params$d)
 #results$outlier_labels
-table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels)
-plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1));abline(h = 0.1)
-length(results$outlier_labels)
+table_contingence(resultsSimul$labelsVrais[9000:9999],results2$outlier_labels[9000:9999])
+plot(1:(n-1),cumsum(results2$outlier_labels)/(1:(n-1)),ylim = c(0,1));abline(h = 0.15)
+length(results2$outlier_labels)
+
 #calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
 
 affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d),params$n/params$k,params$c)
