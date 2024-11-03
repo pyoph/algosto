@@ -20,17 +20,20 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
   
   # Détection des outliers pas online prendre les U
   
-  vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
+  vectPV <- abs(VP) %*% diag(1/sqrt(colSums(VP^2)))
   
   S <- 0
   
   # Calcul de la statistique S
-  for (j in 1:length(lambda)) {
-    S <- S + 1/lambda[j] * sum((vectPV[, j] * (donnee - m))^2)
-  }
+    
+    for (j in 1:length(lambda)) {
+      S <- S + 1/lambda[j] * (t(VPSigma[,j]) %*% (donnee - m))^2 
+      
+    }
+  
   
   # Calcul de la p-value basée sur la statistique du Chi2
-  phat <- pchisq(S, df = length(lambda), lower.tail = FALSE)
+  phat <- pchisq(S, df = length(lambda),lower.tail =FALSE)
   #print(phat)
   # Détection de l'outlier
   if (phat < seuil_p_value) {
@@ -222,7 +225,7 @@ if(depart == 0){
   for (i  in 1:(niter-1))
   {
 
-    gamma = c/i^(0.75)
+    gamma = c/(i+depart)^(0.75)
     #gamma = c/i
 
 
@@ -256,7 +259,7 @@ if(depart == 0){
 
     #Mise à jour de moyenneV
   
-    moyenneV <- i/(i+1)*moyenneV + 1/(i + 1)*V
+    moyenneV <- (i+depart)/(i + depart +1)*moyenneV + 1/(i + 1)*V
 
 
     VIter[,,i] = moyenneV

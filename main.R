@@ -26,7 +26,7 @@ source("~/work/algosto/resultats.R")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
 
-n <- 1e4
+n <- 1e6
 
 d <- 10
 
@@ -67,17 +67,17 @@ params <- initialiser_parametres(
   r = 1.5,
   k = 1
 )
-cov(Z)
+#cov(Z)
 params$Sigma
 
 #eigen(resultsSimul$Vvrai)$vectors
 
 #resultsSimul$labelsVrais
 #Z
-results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75,niter = 1e3)
+results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75,niter = 1e6)
 
 #Détection des outliers après 10^3 itérations
-results2 <- estimMVOutliers(Z,params$c ,n = 1e4,params$d,params$d,params$r,aa = 0.75,niter = 1e4,depart = 1e3,minit = results$m, Vinit = results$V,
+results2 <- estimMVOutliers(Z,params$c ,n = 1e4,params$d,params$d,params$r,aa = 0.75,niter = 1e4,depart = 1e2 + 1,minit = results$m, Vinit = results$V,
                             U = results$U,stat = results$stat,vpMCM = results$vpMCM, lambda = results$lambda,lambdatilde = results$lambdatilde)
 
 resultsStr <- streaming(Z,params$n/params$k,params$k,params$c,params$n,params$d,params$q,params$r)
@@ -112,23 +112,21 @@ affiche_erreurs_vectp_mcm(calculErreursVectpMCM(results$U,eigen(params$Sigma)$ve
 #results$Uphi[9000:9999,,]
 #resultsSimul$VcovVrai
 #Affichage de l'erreur d'estimation des valeurs propres de la matrice de covariance
-affiche_erreurs_cov(calculErreursValPropreCov(results2$lambdaIter,eigen(params$Sigma)$values,params$n/params$k),params$n/params$k)
+affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Sigma)$values,params$n/params$k),params$n/params$k)
 #Tracer avec les vraies valeurs 
 
 #Comparaison stat khi-deux avec densité théorique Khi deux
 
 densiteHistKhi2(results$stat,params$d)
 #results$outlier_labels
-table_contingence(resultsSimul$labelsVrais[9000:9999],results2$outlier_labels[9000:9999])
-plot(1:(n-1),cumsum(results2$outlier_labels)/(1:(n-1)),ylim = c(0,1));abline(h = 0.15)
-length(results2$outlier_labels)
+table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels[1:9999])
+plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1),'l');abline(h = ((p1)*0.05 +1- p1))
+#length(results2$outlier_labels)
 
-#calculErreursSigma(params$Sigma1,results$U,resultsStr$lambdatilde,params$n,params$d)
-
-affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d),params$n/params$k,params$c)
-results$U[99999,,] <- results$U[99999,,] %*% diag(1/sqrt(colSums(results$U[99999,,]^2)))
-results$U[99999,,] %*% diag(1/sqrt(colSums(results$U[99999,,]^2)))
-SigmaEstim <- (results$U[999999,,])%*%diag(results$lambdaIter[999999,])%*%t(results$U[999999,,])
+#affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d),params$n/params$k,params$c)
+VP <- results$U[9999,,] %*% diag(1/sqrt(colSums(results$U[9999,,]^2)))
+VP <- results$U[999,,] %*% diag(1/sqrt(colSums(results$U[9999,,]^2)))
+SigmaEstim <- VP %*%diag(results$lambdaIter[9999,])%*%t(VP)
 
 plot(params$Sigma,SigmaEstim) 
 abline(0,1)
@@ -136,7 +134,6 @@ erreursSigma <- calculErreursSigma(params$Sigma,results$U,results$lambdaIter,par
 erreursSigmaMoyenne <- erreursSigma$erreursSigmaMoyenne
 affiche_erreurs_Sigma(erreursSigmaMoyenne,params$n/params$k,params$c)
 
-statTheorique <- calculeStatChi2(Z,params$Sigma)
 erreursSigmaMoyenne[9999]
 erreursSigmaMoyenne[999999]
 erreursSigmaMoyenne[9999]
@@ -148,7 +145,117 @@ for (i in 1:10){
   affiche_erreurs_Sigma(erreursSigmaMoyenneRep[,i],params$n/params$k,params$c)
   
 }
-densiteHistKhi2(statTheorique,params$d)
+#densiteHistKhi2(statTheorique,params$d)
+outliervrais <- numeric(n)  
+# Boucle pour calculer les valeurs des outliers
+for (i in 1:n) {
+  # Vérifiez que Z, resultsSimul, et les éléments passés à Outlier sont correctement définis
+  outliervrais[i] <- Outlier(
+    Z[i, ],                     # L'élément de Z à traiter
+    0.05,                       # Niveau de confiance
+    resultsSimul$VcovVrai$vectors,  # Vecteurs propres de la matrice
+    rep(0, d),                  
+    eigen(params$Sigma)$values   # Valeurs propres de la matrice
+  )
+}
+# Conversion en vecteurs pour éviter les erreurs de type 'list'
+resultsSimul$labelsVrais <- unlist(resultsSimul$labelsVrais)  # Conversion en vecteur
+outliervrais <- unlist(outliervrais)                          # Conversion en vecteur
+
+# Vérification et appel de table_contingence
+table_contingence(resultsSimul$labelsVrais, outliervrais)
+
+table_contingence(as.vector(resultsSimul$labelsVrais),as.vector(outliervrais))
+length(outliervrais)
+
+invSigma <- solve(params$Sigma)
+
+# Boucle pour calculer les valeurs des outliers
+for (i in 1:n) {
+  # Vérifiez que Z, resultsSimul, et les éléments passés à Outlier sont correctement définis
+  outliervrais[i] <- Outlier(
+    Z[i, ],                     # L'élément de Z à traiter
+    0.05,                       # Niveau de confiance
+    resultsSimul$VcovVrai$vectors,  # Vecteurs propres de la matrice
+    rep(0, d),                  
+    eigen(params$Sigma)$values   # Valeurs propres de la matrice
+  )
+}
+# Conversion en vecteurs pour éviter les erreurs de type 'list'
+resultsSimul$labelsVrais <- unlist(resultsSimul$labelsVrais)  # Conversion en vecteur
+outliervrais <- unlist(outliervrais)                          # Conversion en vecteur
+
+#params$Sigma
+# Vérification et appel de table_contingence
+table_contingence(resultsSimul$labelsVrais, outliervrais)
+
+table_contingence(as.vector(resultsSimul$labelsVrais),as.vector(outliervrais))
+length(outliervrais)
+dim(Z)
+outliervrais <- numeric(n)  
+# Boucle pour calculer les valeurs des outliers
+
+var(Z[1,])
+var(Z)
+
+
+invSigma <- solve(params$Sigma)
+
 
 
 params$Sigma
+
+
+S <- sum(Z1^2)
+
+pchisq(S, df = params$d,lower.tail =FALSE)
+#print(pha
+
+VPSigma <- results$U[i,,] %*% diag(1/sqrt(colSums(VPSigma^2)))
+#VPSigma <- VPSigma %*% diag(1/sqrt(colSums(VPSigma^2)))
+lambda <- results$lambdaIter[9999,]
+
+for (i in 1:n) {
+
+  #VPSigma <- eigen(params$Sigma)$vectors
+  #VPSigma <- orthonormalization(VPSigma,basis = TRUE, norm = TRUE)
+  
+  #lambda <- eigen(params$Sigma)$values
+  
+  
+  S <- 0
+  
+
+      for (j in 1:length(lambda)) {
+     S <- S + 1/lambda[j] * (t(VPSigma[,j]) %*% (Z[i,]))^2 
+    
+      }
+  
+  
+  #S <- sum(S^2)
+  
+  #Zi <- 1/sqrt(var(Z[i,])) %*% Z[i,]
+  
+  
+  phat <- pchisq(S, df = params$d,lower.tail =FALSE)
+  #print(phat)
+  # Détection de l'outlier
+  #print(phat)
+  
+  
+  
+  if (phat < 0.05) {
+    outliervrais[i] <- 1  # Indiquer qu'il s'agit d'un outlier
+  } else {
+    outliervrais[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
+  }
+  
+  
+}
+# Conversion en vecteurs pour éviter les erreurs de type 'list'
+resultsSimul$labelsVrais <- unlist(resultsSimul$labelsVrais)  # Conversion en vecteur
+outliervrais <- unlist(outliervrais)                          # Conversion en vecteur
+
+# Vérification et appel de table_contingence
+table_contingence(resultsSimul$labelsVrais, outliervrais)
+
