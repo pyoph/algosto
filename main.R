@@ -26,7 +26,7 @@ source("~/work/algosto/resultats.R")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
 
-n <- 1e6
+n <- 1e4
 
 d <- 10
 
@@ -49,7 +49,7 @@ Sigma1=(Sigma1+diag(10))/10
 eigen(Sigma1)$values
 
 #Pourcentage de non outliers
-p1 <- 0.95
+p1 <- 0.98
 
 #Pourcentage d'outliers
 p2 <- 1-p1
@@ -74,7 +74,7 @@ params$Sigma
 
 #resultsSimul$labelsVrais
 #Z
-results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75,niter = 1e6)
+results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75,niter = 1e4)
 
 #Détection des outliers après 10^3 itérations
 results2 <- estimMVOutliers(Z,params$c ,n = 1e4,params$d,params$d,params$r,aa = 0.75,niter = 1e4,depart = 1e2 + 1,minit = results$m, Vinit = results$V,
@@ -119,7 +119,7 @@ affiche_erreurs_cov(calculErreursValPropreCov(results$lambdaIter,eigen(params$Si
 
 densiteHistKhi2(results$stat,params$d)
 #results$outlier_labels
-table_contingence(resultsSimul$labelsVrais[1:999999],results$outlier_labels[1:999999])
+table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels[1:9999])
 plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1),'l');abline(h = ((p1)*0.05 +1- p1))
 #length(results2$outlier_labels)
 

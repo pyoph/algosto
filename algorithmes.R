@@ -20,14 +20,14 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
   
   # Détection des outliers pas online prendre les U
   
-  vectPV <- abs(VP) %*% diag(1/sqrt(colSums(VP^2)))
+  vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
   
   S <- 0
   
   # Calcul de la statistique S
     
     for (j in 1:length(lambda)) {
-      S <- S + 1/lambda[j] * (t(VPSigma[,j]) %*% (donnee - m))^2 
+      S <- S + 1/lambda[j] * (t(vectPV[,j]) %*% (donnee - m))^2 
       
     }
   
