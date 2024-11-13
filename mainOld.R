@@ -123,6 +123,16 @@ table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels[1:9999
 plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1),'l');abline(h = ((p1)*0.05 +1- p1))
 #length(results2$outlier_labels)
 
+#affiche_erreurs_Sigma(calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d),params$n/params$k,params$c)
+VP <- results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
+VP <- results$U[999999,,] %*% diag(1/sqrt(colSums(results$U[999999,,]^2)))
+SigmaEstim <- VP %*%diag(results$lambdaIter[999999,])%*%t(VP)
+
+plot(params$Sigma,SigmaEstim) 
+abline(0,1)
+erreursSigma <- calculErreursSigma(params$Sigma,results$U,results$lambdaIter,params$n/params$k,params$d)
+erreursSigmaMoyenne <- erreursSigma$erreursSigmaMoyenne
+affiche_erreurs_Sigma(erreursSigmaMoyenne,params$n/params$k,params$c)
 
 ####Détection d'outliers avec la distance de Mahalanobis
 
@@ -132,8 +142,11 @@ mahaDist <- mahalanobis(x = Z, center = rep(0,d), cov = params$Sigma)
 # Cutoff values from chi-square distribution to identify outliers
 cutoff <- qchisq(p = 0.95, df = d)
 
-# Data frame combinant Z et mahaDist
+# Créer un data frame combinant Z et mahaDist
 df <- data.frame(Z, Mahalanobis_Distance = mahaDist, labels_vrais = resultsSimul$labelsVrais)
+
+# Afficher le data frame
+print(df)
 
 #Calcul des p-values
 df$p <- pchisq(df$Mahalanobis_Distance,df = d,lower.tail =   FALSE )
@@ -141,7 +154,7 @@ df$p <- pchisq(df$Mahalanobis_Distance,df = d,lower.tail =   FALSE )
 #Identification des outliers
 df <- df %>%
   mutate(Outlier = ifelse(Mahalanobis_Distance > cutoff, 'Yes','No'))
-# proportion d'outliers
+# Calculer la proportion d'outliers
 proportion_outliers <- df %>%
   summarise(Proportion = mean(Outlier == 'Yes')) %>%
   pull(Proportion)
