@@ -4,6 +4,8 @@
 #install.packages("reshape2")
 #install.packages("corrplot")
 #install.packages("dlpyr")
+#install.packages("fbm")
+#install.packages("mvnfast")
 library(reshape2)
 library(RobRegression)
 library(Gmedian)
@@ -15,7 +17,7 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-
+library("mvnfast")
 
 genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
 {
@@ -34,8 +36,9 @@ genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
 
   # Générer les vecteurs gaussiens
   vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-  vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
-
+  #vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
+  vecteurs_mu2 <- rmvt(n2, mu1,diag(d),df = 1, ncores = 1, A = NULL)
+  
   # Ajouter des labels
   labels_mu1 <- rep(0, n1)  # Labels pour les vecteurs avec moyenne mu1
   labels_mu2 <- rep(1, n2)  # Labels pour les vecteurs avec moyenne mu2
