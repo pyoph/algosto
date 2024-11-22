@@ -53,7 +53,7 @@ Sigma1=(Sigma1+diag(10))/10
 eigen(Sigma1)$values
 
 #Pourcentage de non outliers
-p1 <- 1
+p1 <- 0.95
 
 #Pourcentage d'outliers
 p2 <- 1-p1
@@ -65,10 +65,15 @@ Z <- resultsSimul$Z
 
 set.seed(4567)
 
-res.KurtM.Tribe <- EPPlab(Z, PPalg = "Tribe", n.simu = 100,maxiter = 200, sphere = TRUE)
+res.KurtM.Tribe <- EPPlab(Z, PPalg = "PSO", n.simu = 100,maxiter = 10000, sphere = TRUE)
 
 OUTms <- EPPlabOutlier(res.KurtM.Tribe, k = 1, location = median, scale = sd)
 help(EPPlabOutlier)
 summary(OUTms)
 
-plot(OUTms, las = 1)
+outliersEPP <- OUTms$outlier
+#outliersEPP
+
+table_contingence(resultsSimul$labelsVrais[1:9999],outliersEPP[1:9999])
+
+#plot(OUTms, las = 1)

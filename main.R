@@ -18,10 +18,10 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-source("~/work/algosto/parametres.R")
-source("~/work/algosto/simulations.R")
-source("~/work/algosto/algorithmes.R")
-source("~/work/algosto/resultats.R")
+source("~/algosto/parametres.R")
+source("~/algosto/simulations.R")
+source("~/algosto/algorithmes.R")
+source("~/algosto/resultats.R")
 #usethis::create_package("C:/Users/Paul/Documents/codeRTheseLPSM")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
@@ -49,7 +49,7 @@ Sigma1=(Sigma1+diag(10))/10
 eigen(Sigma1)$values
 
 #Pourcentage de non outliers
-p1 <- 0.98
+p1 <- 0.9
 
 #Pourcentage d'outliers
 p2 <- 1-p1

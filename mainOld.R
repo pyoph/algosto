@@ -137,7 +137,7 @@ affiche_erreurs_Sigma(erreursSigmaMoyenne,params$n/params$k,params$c)
 ####Détection d'outliers avec la distance de Mahalanobis
 
 #Calcul de la distance de Mahalanobis
-mahaDist <- mahalanobis(x = Z, center = rep(0,d), cov = params$Sigma)
+mahaDist <- mahalanobis(x = Z,center = mean(Z),cov(Z))
 
 # Cutoff values from chi-square distribution to identify outliers
 cutoff <- qchisq(p = 0.95, df = d)
