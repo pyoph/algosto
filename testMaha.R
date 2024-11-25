@@ -40,6 +40,7 @@ Sigma2 <- 10*diag(1:10)
 set.seed(123)
 
 
+
 #Pourcentage de non outliers
 p1 <- 0.98
 
@@ -69,10 +70,20 @@ for (delta in taux_contamination)
 {
   p1 <- 1 - delta/100
   p2 <- 1 - p1
+  
   resultsSimul <- genererEchantillon(n,d,mu1,mu2,p1,p2,Sigma1 =Sigma1 ,Sigma2)
   
-  
   Z <- resultsSimul$Z
+  
+  params <- initialiser_parametres(
+    Y = Z,
+    c = sqrt(10),
+    Sigma = Sigma1,
+    #Sigma = Sigma1,
+    r = 1.5,
+    k = 1
+  )
+  
   
   outliers_listMaha <- check_outliers(Z, method = "mahalanobis_robust")
   tc <- table_contingence(resultsSimul$labelsVrais[1:9999],as.numeric(outliers_listMaha)[1:9999])
@@ -88,7 +99,7 @@ for (delta in taux_contamination)
   faux_negatifs_EPP[i] <- tc["0","1"]
   
   
-  results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75,niter = 1e4)
+  results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 1,niter = 1e4)
   
   tc <- table_contingence(resultsSimul$labelsVrais[1:9999],results$outlier_labels[1:9999])
   
@@ -101,7 +112,7 @@ for (delta in taux_contamination)
 
 # Créer un data.frame final
 results_outlier_df <- data.frame(
-  #"Taux de Contamination (%)" = taux_contamination,
+  "Taux de Contamination (%)" = taux_contamination,
   "FP_Mahalanobis" = faux_positifs_maha,
   "FN_Mahalanobis" = faux_negatifs_maha,
   "FP_EPP" = faux_positifs_EPP,
@@ -109,5 +120,8 @@ results_outlier_df <- data.frame(
   "FP_Online" = faux_positifs_online,
   "FN_Online" = faux_negatifs_online
 )
+results_outlier_df
 
+table_latex <- xtable(results_outlier_df, caption = "Faux positifs et faux négatifs pour chaque méthode", label = "tab:results_outliers")
+print(table_latex, type = "latex", file = "results_outliers.tex", include.rownames = FALSE)
 

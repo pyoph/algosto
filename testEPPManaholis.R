@@ -72,7 +72,7 @@ help(EPPlabOutlier)
 summary(OUTms)
 
 outliersEPP <- OUTms$outlier
-#outliersEPP
+outliersEPP
 
 table_contingence(resultsSimul$labelsVrais[1:9999],outliersEPP[1:9999])
 
