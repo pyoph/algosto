@@ -19,6 +19,23 @@ library("corrplot")
 library("dplyr")
 library("mvnfast")
 
+creerMatriceToeplitz <- function(rho,d) 
+{
+  
+  # Construire la matrice de Toeplitz
+  toeplitz_matrix <- matrix(0, nrow = d, ncol = d)
+  
+  # Remplir la matrice avec rho^{|i - j|}
+  for (i in 1:d) {
+    for (j in 1:d) {
+      toeplitz_matrix[i, j] <- rho^abs(i - j)
+    }
+  }
+  return(diag(sqrt(1:10))%*%toeplitz_matrix%*%diag(sqrt(1:10)))
+}
+
+
+
 genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
 {
 

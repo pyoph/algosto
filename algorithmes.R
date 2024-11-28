@@ -78,6 +78,34 @@ RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,sa
   return(list(vp=vp2,niter=i, lambdalist=lambdalist, vplist=vplist))
 }
 
+#Détection offline des outliers
+
+detectionOffline <- function(Z,SigmaEstim,median,seuil_p_value)
+{
+  
+  outliers_labels <- rep(0,d)
+  for (i  in 1:(nrow(Z)))
+  {
+    
+    #Calcul stat de test
+    
+    S <- (Z[i,] - median)%*%solve(SigmaEstim)%*%t(Z[i,] - median)
+    
+    phat <- pchisq(S, df = d,lower.tail =FALSE)
+    #print(phat)
+    outlier_label <- 0
+    # Détection de l'outlier
+    if (phat < seuil_p_value) {
+      outlier_label <- 1      } 
+    else {
+      outlier_label <- 0  }
+    outliers_labels[i] <- outlier_label
+    
+  }
+  
+  return (outliers_labels)
+  
+}
 
 #Estimation des valeurs propres de Sigma
 
