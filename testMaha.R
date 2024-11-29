@@ -36,23 +36,12 @@ seuil_p_value <- 0.05
 
 Sigma1 <- creerMatriceToeplitz(rho,d)
 
-Z <- resultsSimul$Z
-
-Rvar <- RobVar(Z)
-
-Sigmaestim <- Rvar$variance
-
-median <- Rvar$median
+Sigma2 <- creerMatriceToeplitz(0.2,d)
 
 
-outliers_labels <- detectionOffline(Z,Sigmaestim,median,0.05)
+mu1 <- rep(0,d)
 
-
-
-
-
-table_contingence(resultsSimul$labelsVrais[1:9999],outliers_labels[1:9999])
-
+mu2 <- 5*rep(1,d)
 ###Construction d' un tableau de résultats
 
 taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)  
@@ -75,7 +64,7 @@ for (delta in taux_contamination)
   p2 <- 1 - p1
   
   
-  resultsSimul <- genererEchantillon(n,d,mu1,mu2,p1,p2,Sigma1 =Sigma1 ,Sigma2)
+  resultsSimul <- genererEchantillon(n,d,mu1,mu2,p1,p2,Sigma1 =Sigma1 ,Sigma2 = Sigma2)
   
   outliers_labels <- rep(0,n)
   
@@ -95,14 +84,14 @@ for (delta in taux_contamination)
   tc <- table_contingence(resultsSimul$labelsVrais[1:9999],as.numeric(outliers_listMaha)[1:9999])
   faux_positifs_maha[i] <- tc["1","0"]
   faux_negatifs_maha[i] <- tc["0","1"]   
-  #res.KurtM.Tribe <- EPPlab(Z, PPalg = "PSO", n.simu = 100,maxiter = 1000, sphere = TRUE)
-  #OUTms <- EPPlabOutlier(res.KurtM.Tribe, k = 1, location = median, scale = sd)
+  res.KurtM.Tribe <- EPPlab(Z, PPalg = "GA", n.simu = 100,maxiter = 1000, sphere = TRUE)
+  OUTms <- EPPlabOutlier(res.KurtM.Tribe, k = 1, location = median, scale = sd)
   
-  #outliersEPP <- OUTms$outlier
-  #tc <- table_contingence(resultsSimul$labelsVrais[1:9999],as.numeric(outliersEPP)[1:9999])
+  outliersEPP <- OUTms$outlier
+  tc <- table_contingence(resultsSimul$labelsVrais[1:9999],as.numeric(outliersEPP)[1:9999])
   
-  #faux_positifs_EPP[i] <- tc["1","0"]
-  #faux_negatifs_EPP[i] <- tc["0","1"]
+  faux_positifs_EPP[i] <- tc["1","0"]
+  faux_negatifs_EPP[i] <- tc["0","1"]
   
   
   results <- estimMVOutliers(Z,params$c ,params$n,params$d,params$d,params$r,aa = 0.75,niter = 1e4)
@@ -117,9 +106,9 @@ for (delta in taux_contamination)
   
   SigmaEstim <- Rvar$variance
   
-  median <- Rvar$median
+  m <- Rvar$median
   
-  outliers_labels <- detectionOffline(Z,SigmaEstim,median,0.05)
+  outliers_labels <- detectionOffline(Z,SigmaEstim,m,0.05)
   
   tc <- table_contingence(resultsSimul$labelsVrais[1:9999],outliers_labels[1:9999])
   
@@ -134,17 +123,21 @@ for (delta in taux_contamination)
 
 # Créer un data.frame final
 results_outlier_df <- data.frame(
-  "Taux de Contamination (%)" = taux_contamination,
-  "FP_Mahalanobis" = faux_positifs_maha,
-  "FN_Mahalanobis" = faux_negatifs_maha,
-  "FP_EPP" = faux_positifs_EPP,
-  "FN_EPP" = faux_negatifs_EPP,
-  "FP_Online" = faux_positifs_online,
-  "FN_Online" = faux_negatifs_online,
-  "FP_Offline" = faux_positifs_offline,
-  "FN_Offline" = faux_negatifs_offline
+  "FP_Mahalanobis" = as.integer(faux_positifs_maha),
+  "FN_Mahalanobis" = as.integer(faux_negatifs_maha),
+  "FP_EPP" = as.integer(faux_positifs_EPP),
+  "FN_EPP" = as.integer(faux_negatifs_EPP),
+  "FP_Online" = as.integer(faux_positifs_online),
+  "FN_Online" = as.integer(faux_negatifs_online),
+  "FP_Offline" = as.integer(faux_positifs_offline),
+  "FN_Offline" = as.integer(faux_negatifs_offline)
+  #row.names =  taux_contamination
 )
+row.names(results_outlier_df) <- taux_contamination
+
 results_outlier_df
 
 table_latex <- xtable(results_outlier_df, caption = "Faux positifs et faux négatifs pour chaque méthode", label = "tab:results_outliers")
+
+print(table_latex, file = "results_outlierPerturbVarianceToeplitz.tex",digits = 0)
 
