@@ -52,9 +52,10 @@ genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
   n2 <- n - n1
 
   # Générer les vecteurs gaussiens
+  #vecteurs_mu1 <- rmvt(n1, mu1,Sigma1,df = 1, ncores = 1, A = NULL)
   vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-  vecteurs_mu2 <- mvrnorm(n2, mu1, Sigma2)
-  #vecteurs_mu2 <- rmvt(n2, mu1,Sigma1,df = 1, ncores = 1, A = NULL)
+  vecteurs_mu2 <- rmvt(n2, mu1,sigma = diag(d),df = 1, ncores = 1, A = NULL)
+  #vecteurs_mu2 <- matrix(runif(n2 * d, min = -20, max = 20), nrow = n2, ncol = d)
   
   # Ajouter des labels
   labels_mu1 <- rep(0, n1)  # Labels pour les vecteurs avec moyenne mu1
