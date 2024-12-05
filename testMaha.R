@@ -30,14 +30,14 @@ n <- 1e4
 
 d <- 10
 
-rho <- 0.9
+rho <- 0.3
 
 seuil_p_value <- 0.05
 
 Sigma1 <- creerMatriceToeplitz(rho,d)
 
-Sigma2 <- creerMatriceToeplitz(0.4,d)
-
+Sigma2 <- creerMatriceToeplitz(0.35,d)
+Sigma1 <- diag(sqrt(1:d))
 
 mu1 <- rep(0,d)
 
@@ -79,8 +79,8 @@ for (i in seq_along(taux_contamination)) {
   temps_maha[i] <- system.time({
     outliers_listMaha <- check_outliers(Z, method = "mahalanobis_robust")
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_listMaha)[1:9999])
-    faux_positifs_maha[i] <- tc["1", "0"]
-    faux_negatifs_maha[i] <- tc["0", "1"]
+    faux_negatifs_maha[i] <- tc["1", "0"]
+    faux_positifs_maha[i] <- tc["0", "1"]
   })["elapsed"]
   
   # Temps pour la méthode EPP
@@ -89,9 +89,9 @@ for (i in seq_along(taux_contamination)) {
     OUTms <- EPPlabOutlier(res.KurtM.Tribe, k = 1, location = median, scale = sd)
     outliersEPP <- OUTms$outlier
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliersEPP)[1:9999])
-    faux_positifs_EPP[i] <- tc["1", "0"]
-    faux_negatifs_EPP[i] <- tc["0", "1"]
-  })["elapsed"]
+    faux_negatifs_EPP[i] <- tc["1", "0"]
+    faux_positifs_EPP[i] <- tc["0", "1"]
+  })["elapsed"] 
   
   # Temps pour la méthode Online
   temps_online[i] <- system.time({
@@ -104,8 +104,8 @@ for (i in seq_along(taux_contamination)) {
     )
     results <- estimMVOutliers(Z, params$c, params$n, params$d, params$d, params$r, aa = 0.75, niter = 1e4)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], results$outlier_labels[1:9999])
-    faux_positifs_online[i] <- tc["1", "0"]
-    faux_negatifs_online[i] <- tc["0", "1"]
+    faux_negatifs_online[i] <- tc["1", "0"]
+    faux_positifs_online[i] <- tc["0", "1"]
   })["elapsed"]
   
   # Temps pour la méthode Offline
@@ -114,9 +114,9 @@ for (i in seq_along(taux_contamination)) {
     SigmaEstim <- Rvar$variance
     m <- Rvar$median
     outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.05)
-    tc <- table_contingence(resultsSimul$labelsVrais[1:9999], outliers_labels[1:9999])
-    faux_positifs_offline[i] <- tc["1", "0"]
-    faux_negatifs_offline[i] <- tc["0", "1"]
+    tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
+    faux_negatifs_offline[i] <- tc["1", "0"]
+    faux_positifs_offline[i] <- tc["0", "1"]
   })["elapsed"]
 }
 
@@ -125,22 +125,25 @@ for (i in seq_along(taux_contamination)) {
 
 results_outliers <- data.frame(
   #Taux_Contamination = taux_contamination,
-  FP_Mahalanobis = faux_positifs_maha,
   FN_Mahalanobis = faux_negatifs_maha,
+  FP_Mahalanobis = faux_positifs_maha,
   Temps_Mahalanobis = temps_maha,
   FP_EPP = faux_positifs_EPP,
   FN_EPP = faux_negatifs_EPP,
   Temps_EPP = temps_EPP,
-  FP_Online = faux_positifs_online,
   FN_Online = faux_negatifs_online,
+  FP_Online = faux_positifs_online,
   Temps_Online = temps_online,
-  FP_Offline = faux_positifs_offline,
   FN_Offline = faux_negatifs_offline,
+  FP_Offline = faux_positifs_offline,
   Temps_Offline = temps_offline
 )
 
+#Tester mahalanobis threshold = 0,05
+
 row.names(results_outliers) <- taux_contamination
 
+results_outliers
 
 table_latex <- xtable(results_outliers, caption = "Faux positifs et faux négatifs pour chaque méthode", label = "tab:results_outliers")
 
