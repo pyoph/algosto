@@ -36,13 +36,79 @@ seuil_p_value <- 0.05
 
 Sigma1 <- creerMatriceToeplitz(rho,d)
 
-Sigma2 <- creerMatriceToeplitz(0.35,d)
-Sigma1 <- diag(sqrt(1:d))
+Sigma2 <- creerMatriceToeplitz(0.7,d)
+#Sigma1 <- diag(sqrt(1:d))
 
 mu1 <- rep(0,d)
 
 mu2 <- 5*rep(1,d)
-###Construction d' un tableau de résultats
+
+
+
+
+p1 <- 0.98
+p2 <- 1 - p1
+
+
+resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2)
+
+#cov(Z)
+
+Z <- resultsSimul$Z
+
+
+p1 <- 1 
+p2 <- 1 - p1
+
+
+
+
+Rvar <- RobVar(Z)
+
+m <- Rvar$median
+#Z[1,]
+
+Sigma <- Rvar$variance
+
+dim(Sigma)
+
+cov(Z)
+Sigma1
+outliers_labels <- detectionOffline(Z, SigmaEstim = Sigma1,m, 0.05)
+tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
+
+tc
+resultsSimul$labelsVrais[1:9999]
+
+outliers_labels <- rep(0,n)
+m = rep(0,d)
+for (i in nrow(Z)) 
+{
+  
+  S <- t(Z[i,] - m)%*%solve(Sigma1)%*%(Z[i,] - m) 
+  
+  # Calcul de la p-value basée sur la statistique du Chi2
+  phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
+  #print(phat)
+  # Détection de l'outlier
+  if (phat < 0.05) {
+    outliers_labels[i] <- 1  # Indiquer qu'il s'agit d'un outlier
+  } else {
+    outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
+  }
+  
+  #if (S > cutoff) {outliers_labels[i] <- 1}
+  #else {outliers_labels[i] <- 0}
+  #}
+}
+
+
+
+
+indices_labels_1 <- which(outliers_labels[1:9999] == 1)
+
+# Affichage des indices
+print(indices_labels_1)
 
 taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)  
 faux_positifs_maha <- numeric(length(taux_contamination))
@@ -77,7 +143,8 @@ for (i in seq_along(taux_contamination)) {
   
   # Temps pour la méthode Mahalanobis
   temps_maha[i] <- system.time({
-    outliers_listMaha <- check_outliers(Z, method = "mahalanobis_robust")
+    outliers_listMaha <- check_outliers(Z, method = "mahalanobis_robust",  mahalanobis_robust = stats::qchisq(p = 1 - 0.05, df = ncol(Z))
+)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_listMaha)[1:9999])
     faux_negatifs_maha[i] <- tc["1", "0"]
     faux_positifs_maha[i] <- tc["0", "1"]
@@ -115,8 +182,22 @@ for (i in seq_along(taux_contamination)) {
     m <- Rvar$median
     outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.05)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
-    faux_negatifs_offline[i] <- tc["1", "0"]
-    faux_positifs_offline[i] <- tc["0", "1"]
+    tc
+    which(outliers_labels == 1)
+    # Vérification de l'existence des indices dans la table
+    
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {
+      faux_positifs_offline[i] <- ifelse(!is.na(tc["1", "0"]), 0,tc["1", "0"])
+    } else {
+      faux_positifs_offline[i] <- 0
+    }
+      if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
+        faux_negatifs_offline[i] <- ifelse(!is.na(tc["0", "1"]), 0,tc["0", "1"])
+      } else {
+        faux_negatifs_offline[i] <- 0
+      }
+      
+      
   })["elapsed"]
 }
 
@@ -148,3 +229,6 @@ results_outliers
 table_latex <- xtable(results_outliers, caption = "Faux positifs et faux négatifs pour chaque méthode", label = "tab:results_outliers")
 
 print(table_latex, file = "results_outliersAvecTemps.tex",digits = 0)
+
+
+

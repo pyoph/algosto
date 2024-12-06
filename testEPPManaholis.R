@@ -40,7 +40,6 @@ mu2 <- 5*rep(1,d)
 
 Sigma1 <- diag(sqrt(1:10))
 
-
 Sigma2 <- 10*diag(1:10)
 
 set.seed(123)

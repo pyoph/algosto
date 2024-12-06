@@ -21,7 +21,7 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
   
   vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
   
-  cutoff <- qchisq(p = 0.95, df = 10)
+  #cutoff <- qchisq(p = 0.95, df = 10)
   
   S <- 0
   
@@ -37,14 +37,14 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
   phat <- pchisq(S, df = length(lambda),lower.tail =FALSE)
   #print(phat)
   # Détection de l'outlier
-  #if (phat < seuil_p_value) {
-   # outlier_label <- 1  # Indiquer qu'il s'agit d'un outlier
-  #} else {
-   # outlier_label <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
-  #}
+  if (phat < seuil_p_value) {
+    outlier_label <- 1  # Indiquer qu'il s'agit d'un outlier
+  } else {
+    outlier_label <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
+  }
   
-  if (S > cutoff) {outlier_label <- 1}
-  else {outlier_label <- 0}
+  #if (S > cutoff) {outlier_label <- 1}
+  #else {outlier_label <- 0}
   
   # Retourner le label, la p-value et la statistique S
   return(list(outlier_label = outlier_label, phat = phat, S = S))
@@ -86,43 +86,58 @@ RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,sa
 
 #Détection offline des outliers
 
-detectionOffline <- function(Z,SigmaEstim,median,seuil_p_value)
+detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value)
+
 {
   
   outliers_labels <- rep(0,n)
   
-  cutoff <- qchisq(p = 0.95, df = ncol(Z))
+  #cutoff <- qchisq(p = 0.95, df = ncol(Z))
   
     
   vectPV <- eigen(SigmaEstim)$vectors
   lambda <- eigen(SigmaEstim)$values
   vectPV <- vectPV %*% diag(1/sqrt(colSums(vectPV^2)))
-  cutoff <- qchisq(p = 0.95, df = 10)
+  #cutoff <- qchisq(p = 0.95, df = ncol(Z))
+
   
-  for (i in 1:nrow(Z) ){
-  S <- 0
   
-  # Calcul de la statistique S
-  
-  for (j in 1:length(lambda)) {
-    S <- S + 1/lambda[j] * ((Z[i,] - m)%*% vectPV[,j])^2 
+  outliers_labels <- rep(0,n)
+  #m = rep(0,d)
+  for (i in nrow(Z)) 
+  {
     
+    
+    S <- 0
+    
+    # Calcul de la statistique S
+    
+    for (j in 1:length(lambda)) {
+     S <- S + 1/lambda[j] * (sum((Z[i,] - m)* vectPV[,j]))^2 
+    
+    }
+    
+    
+    #S <- t(Z[i,] - m)%*%solve(SigmaEstim)%*%(Z[i,] - m) 
+    
+    # Calcul de la p-value basée sur la statistique du Chi2
+    phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
+    
+    # Calcul de la p-value basée sur la statistique du Chi2
+    #phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
+    #print(phat)
+    # Détection de l'outlier
+    if (phat < seuil_p_value) {
+      outliers_labels[i] <- 1  # Indiquer qu'il s'agit d'un outlier
+    } else {
+      outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
+    }
+    
+    #if (S > cutoff) {outliers_labels[i] <- 1}
+    #else {outliers_labels[i] <- 0}
+    #}
   }
   
-  
-  # Calcul de la p-value basée sur la statistique du Chi2
-  #phat <- pchisq(S, df = length(lambda),lower.tail =FALSE)
-  #print(phat)
-  # Détection de l'outlier
-  #if (phat < seuil_p_value) {
-   # outliers_labels[i] <- 1  # Indiquer qu'il s'agit d'un outlier
-  #} else {
-   # outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
-  #}
-  
-  if (S > cutoff) {outliers_labels[i] <- 1}
-  else {outliers_labels[i] <- 0}
-  }
   
   return (outliers_labels)
   
@@ -380,7 +395,10 @@ if(depart == 0){
     #vp  = lambdaEstim (précédente valeur de lambda) sample 100
 
     #Récupération des résultats de la fonction Outlier
-    resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+    #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+    
+    resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
+    
     # Vérifier si l'entrée est un outlier
     if (resultatOutlier$outlier_label) {
 
@@ -601,7 +619,9 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     #vp  = lambdaEstim (précédente valeur de lambda) sample 100
     
     #Récupération des résultats de la fonction Outlier
-    resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+    #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+    resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
+    
     # Vérifier si l'entrée est un outlier
     if (resultatOutlier$outlier_label) {
       
