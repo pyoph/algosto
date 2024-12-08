@@ -21,7 +21,7 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
   
   vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
   
-  #cutoff <- qchisq(p = 0.95, df = 10)
+  cutoff <- qchisq(p = 0.975, df = 10)
   
   S <- 0
   
@@ -37,14 +37,14 @@ Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
   phat <- pchisq(S, df = length(lambda),lower.tail =FALSE)
   #print(phat)
   # Détection de l'outlier
-  if (phat < seuil_p_value) {
-    outlier_label <- 1  # Indiquer qu'il s'agit d'un outlier
-  } else {
-    outlier_label <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
-  }
+  #if (phat < seuil_p_value) {
+   # outlier_label <- 1  # Indiquer qu'il s'agit d'un outlier
+   #} else {
+    #outlier_label <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
+  #}
   
-  #if (S > cutoff) {outlier_label <- 1}
-  #else {outlier_label <- 0}
+  if (S > cutoff) {outlier_label <- 1}
+  else {outlier_label <- 0}
   
   # Retourner le label, la p-value et la statistique S
   return(list(outlier_label = outlier_label, phat = phat, S = S))
@@ -92,19 +92,18 @@ detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value)
   
   outliers_labels <- rep(0,n)
   
-  #cutoff <- qchisq(p = 0.95, df = ncol(Z))
+  cutoff <- qchisq(p = 0.975, df = ncol(Z))
   
     
   vectPV <- eigen(SigmaEstim)$vectors
   lambda <- eigen(SigmaEstim)$values
   vectPV <- vectPV %*% diag(1/sqrt(colSums(vectPV^2)))
-  #cutoff <- qchisq(p = 0.95, df = ncol(Z))
+  cutoff <- qchisq(p = 0.975, df = ncol(Z))
 
   
   
-  outliers_labels <- rep(0,n)
   #m = rep(0,d)
-  for (i in nrow(Z)) 
+  for (i in 1:nrow(Z)) 
   {
     
     
@@ -127,18 +126,19 @@ detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value)
     #phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
     #print(phat)
     # Détection de l'outlier
-    if (phat < seuil_p_value) {
-      outliers_labels[i] <- 1  # Indiquer qu'il s'agit d'un outlier
-    } else {
-      outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
-    }
+    #if (phat < seuil_p_value) {
+     # outliers_labels[i] <- 1  # Indiquer qu'il s'agit d'un outlier
+      #print("OK")
+     #} else {
+      #outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
+    #}
     
-    #if (S > cutoff) {outliers_labels[i] <- 1}
-    #else {outliers_labels[i] <- 0}
+    if (S > cutoff) {outliers_labels[i] <- 1}
+    else {outliers_labels[i] <- 0}
     #}
   }
-  
-  
+    
+  #print(which(outliers_labels == 1))
   return (outliers_labels)
   
 }
