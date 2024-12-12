@@ -86,13 +86,13 @@ RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,sa
 
 #Détection offline des outliers
 
-detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value)
+detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value, cutoff =qchisq(p = 0.975, df = ncol(Z)))
 
 {
   
   outliers_labels <- rep(0,n)
   
-  cutoff <- qchisq(p = 0.975, df = ncol(Z))
+   #cutoff <- qchisq(p = 0.975, df = ncol(Z))
   
     
   vectPV <- eigen(SigmaEstim)$vectors
@@ -180,7 +180,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
 estimMVOutliers <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vinit = diag(d),
-                            U = array(1, dim = c(n, q, q)),stat = rep(0,n-1),vpMCM = matrix(0,n,d), lambda = rep(1,d),lambdatilde = rep(1,d))
+                            U = array(1, dim = c(n, q, q)),stat = rep(0,n-1),vpMCM = matrix(0,n,d), lambda = rep(1,d),lambdatilde = rep(1,d),methode = "eigen",seuil_p_value = 0.05,cutoff =qchisq(p = 0.975, df = d),niterRMon = d^2 )
 {
 
   sampsize = d
@@ -374,31 +374,44 @@ if(depart == 0){
 
     #Estimation des valeurs propres de la MCM
     #vpMCM[i,] = apply(U[i,,], 2, function(col) sqrt(sum(col^2)))
-    vpMCM[i,] = sqrt(colSums(U[i,,]^2))
-    #Prendre norme de U[]
-    Z=Y[i,]
-    # Z2=X2[i,]
-    #E1=    Z^2*(sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
-    #slog=slog+log(i+1)^w
-    #vp2=vp2+log(i+1)^w *((slog)^(-1)) *(lambda - vp2)
-    #vp0 = vp2
-    #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
-    #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
-    #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
-    lambdaResultat <- RobbinsMC2(1e2,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
-    lambda <- lambdaResultat$vp
-    lambdatilde <- lambdaResultat$lambda
-    #print(lambda)
-    lambdaIter[i,] <- lambdatilde
-
+    
     #Rédiger partie simulation
     #vp  = lambdaEstim (précédente valeur de lambda) sample 100
 
     #Récupération des résultats de la fonction Outlier
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+    if(methode == "eigen"){
+    VPropresV <- eigen(V)$vectors
+    valPV <- eigen(V)$values
+    lambdaResultat <- RobbinsMC2(1e2,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+    lambda <- lambdaResultat$vp
+    lambdatilde <- lambdaResultat$lambda
+    #print(lambda)
+    lambdaIter[i,] <- lambdatilde
     
     resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
     
+    }
+    else {
+      vpMCM[i,] = sqrt(colSums(U[i,,]^2))
+      #Prendre norme de U[]
+      #Z=Y[i,]
+      # Z2=X2[i,]
+      #E1=    Z^2*(sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
+      #slog=slog+log(i+1)^w
+      #vp2=vp2+log(i+1)^w *((slog)^(-1)) *(lambda - vp2)
+      #vp0 = vp2
+      #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
+      #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
+      #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
+      lambdaResultat <- RobbinsMC2(1e2,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+      lambda <- lambdaResultat$vp
+      lambdatilde <- lambdaResultat$lambda
+      #print(lambda)
+      lambdaIter[i,] <- lambdatilde
+      
+      
+      resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)}
     # Vérifier si l'entrée est un outlier
     if (resultatOutlier$outlier_label) {
 
