@@ -98,7 +98,7 @@ detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value, cutoff =qchisq(p = 0.
   vectPV <- eigen(SigmaEstim)$vectors
   lambda <- eigen(SigmaEstim)$values
   vectPV <- vectPV %*% diag(1/sqrt(colSums(vectPV^2)))
-  cutoff <- qchisq(p = 0.975, df = ncol(Z))
+  #cutoff <- qchisq(p = 0.975, df = ncol(Z))
 
   
   
@@ -142,6 +142,39 @@ detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value, cutoff =qchisq(p = 0.
   return (outliers_labels)
   
 }
+
+
+#Détection des outliers à partir d'un vecteur de distances et d'un cutoff
+
+
+detectionOutliers <- function(distances, cutoff =qchisq(p = 0.975))
+  
+{
+  
+  outliers_labels <- rep(0,n)
+  
+  #cutoff <- qchisq(p = 0.975, df = ncol(Z))
+  
+  
+  
+  
+  
+  #m = rep(0,d)
+  for (i in 1:nrow(Z)) 
+  {
+    
+    
+    
+    if (distances[i] > cutoff) {outliers_labels[i] <- 1}
+    else {outliers_labels[i] <- 0}
+    #}
+  }
+  
+  #print(which(outliers_labels == 1))
+  return (outliers_labels)
+  
+}
+
 
 #Estimation des valeurs propres de Sigma
 

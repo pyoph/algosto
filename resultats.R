@@ -293,7 +293,7 @@ affiche_erreurs_cov <- function(erreursCov,n)
 
 
 #Affiche les erreurs d'estimation de la médiane géométrique
-affiche_erreurs_Sigma <- function(erreursSigma,n,c)
+affiche_erreurs_Sigma <- function(erreursSigma,n,c = sqrt(d))
 {
 
   # Créer le data frame

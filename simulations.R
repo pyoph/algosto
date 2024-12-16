@@ -21,6 +21,19 @@ library("mvnfast")
 
 #Permuter lignes colonnes Toeplitz
 
+# Fonction pour permuter des lignes et des colonnes dans une matrice
+permuterLignesColonnes <- function(matrice, lignes_a_permuter = c(1, 2), colonnes_a_permuter = c(1, 2)) {
+  
+  # Permuter les lignes
+  matrice[lignes_a_permuter, ] <- matrice[rev(lignes_a_permuter), ]
+  
+  # Permuter les colonnes
+  matrice[, colonnes_a_permuter] <- matrice[, rev(colonnes_a_permuter)]
+  
+  # Retourner la matrice modifiée
+  return(matrice)
+}
+
 
 #Plan de simulation : à écrire. Protocole
 
@@ -39,7 +52,10 @@ creerMatriceToeplitz <- function(rho,d)
       toeplitz_matrix[i, j] <- rho^abs(i - j)
     }
   }
-#  return(diag(sqrt(1:10))%*%toeplitz_matrix%*%diag(sqrt(1:10)))
+
+  
+  
+  #  return(diag(sqrt(1:10))%*%toeplitz_matrix%*%diag(sqrt(1:10)))
   return(toeplitz_matrix)
 }
 
@@ -63,8 +79,8 @@ genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
   # Générer les vecteurs gaussiens
   #vecteurs_mu1 <- rmvt(n1, mu1,Sigma1,df = 1, ncores = 1, A = NULL)
   vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-  #vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma2)
-  vecteurs_mu2 <- rmvt(n2, mu1,sigma = Sigma1,df = 1, ncores = 1, A = NULL)
+  vecteurs_mu2 <- mvrnorm(n2, mu1, Sigma2)
+  #vecteurs_mu2 <- rmvt(n2, mu1,sigma = Sigma1,df = 1, ncores = 1, A = NULL)
   #vecteurs_mu2 <- matrix(runif(n2 * d, min = -20, max = 20), nrow = n2, ncol = d)
   
   # Ajouter des labels

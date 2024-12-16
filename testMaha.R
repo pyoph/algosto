@@ -5,6 +5,7 @@
 library(xtable)
 library(reshape2)
 library(RobRegression)
+library("robustbase")
 library(Gmedian)
 library(ggplot2)
 library(far)
@@ -24,6 +25,7 @@ source("~/algosto/simulations.R")
 source("~/algosto/algorithmes.R")
 source("~/algosto/resultats.R")
 source("~/algosto/seuils.R")
+source("~/algosto/shrinkage.R")
 #usethis::create_package("C:/Users/Paul/Documents/codeRTheseLPSM")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
@@ -31,7 +33,7 @@ n <- 1e4
 
 d <- 10
 
-rho <- 0.7
+rho <- 0.8
 
 seuil_p_value <- 0.05
 
@@ -39,7 +41,9 @@ distances <- rep(0,n)
 
 Sigma1 <- creerMatriceToeplitz(rho,d)
 
-Sigma2 <- creerMatriceToeplitz(0.4,d)
+Sigma2 <- permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,d),colonnes_a_permuter = c(1,d))
+
+#Sigma2 <- creerMatriceToeplitz(0.4,d)
 #Sigma1 <- diag(sqrt(1:d))
 #Sigma1 <- diag(d)
 mu1 <- rep(0,d)
@@ -71,7 +75,10 @@ m <- Rvar$median
 Sigma <- Rvar$variance
 
 
-outliers_labels <- detectionOffline(Z, SigmaEstim = Sigma,m, 0.025)
+distances <- calcule_vecteur_distances(Z,m,Sigma)
+cutoff <- calcule_cutoff(distances,d)
+
+outliers_labels <- detectionOffline(Z, SigmaEstim = Sigma,m, 0.025,cutoff)
 tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
 
 tc
@@ -119,6 +126,9 @@ faux_positifs_online <- numeric(length(taux_contamination))
 faux_negatifs_online <- numeric(length(taux_contamination))
 faux_positifs_offline <- numeric(length(taux_contamination))
 faux_negatifs_offline <- numeric(length(taux_contamination))
+faux_positifs_comed <- numeric(length(taux_contamination))
+faux_negatifs_comed <- numeric(length(taux_contamination))
+
 
 # Vecteurs pour stocker les temps de calcul
 temps_maha <- numeric(length(taux_contamination))
@@ -131,6 +141,9 @@ temps_maha <- numeric(length(taux_contamination))
 temps_EPP <- numeric(length(taux_contamination))
 temps_online <- numeric(length(taux_contamination))
 temps_offline <- numeric(length(taux_contamination))
+temps_comed <- numeric(length(taux_contamination))
+
+
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
@@ -197,7 +210,9 @@ for (i in seq_along(taux_contamination)) {
     Rvar <- RobVar(Z)
     SigmaEstim <- Rvar$variance
     m <- Rvar$median
-    outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025)
+    distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
+    cutoff <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc
 
@@ -210,7 +225,30 @@ for (i in seq_along(taux_contamination)) {
     
       
   })["elapsed"]
-}
+
+  # Temps pour la comédiane
+  temps_comed[i] <- system.time({
+    med <- covComed(Z)$center
+    comed <- covComed(Z)$cov
+    length(med)
+    dim(comed)
+    #(Z[1,] - med) %*% solve(comed) %*% (t(Z[1,] - med))
+    distances <- calcule_vecteur_distances(Z,med,comed)
+    cutoff <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOutliers(distances,cutoff)
+    tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
+    tc
+    
+    #print(i)
+    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
+      faux_positifs_comed[i]   <- tc["0", "1"]
+    } 
+    #else {faux_positifs_maha[i]   <- 0}
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_comed[i] <- tc["1","0"]}
+    
+    
+  })["elapsed"]
+  }
 
 
 
@@ -228,7 +266,10 @@ results_outliers <- data.frame(
   Temps_Online = temps_online,
   FN_Offline = faux_negatifs_offline,
   FP_Offline = faux_positifs_offline,
-  Temps_Offline = temps_offline
+  Temps_Offline = temps_offline,
+  FN_Comed = faux_negatifs_comed,
+  FP_Offline = faux_positifs_comed,
+  Temps_Offline = temps_comed
 )
 
 #Tester mahalanobis threshold = 0,05
