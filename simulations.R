@@ -23,13 +23,13 @@ library("mvnfast")
 
 # Fonction pour permuter des lignes et des colonnes dans une matrice
 permuterLignesColonnes <- function(matrice, lignes_a_permuter = c(1, 2), colonnes_a_permuter = c(1, 2)) {
-  
+
   # Permuter les lignes
   matrice[lignes_a_permuter, ] <- matrice[rev(lignes_a_permuter), ]
-  
+
   # Permuter les colonnes
   matrice[, colonnes_a_permuter] <- matrice[, rev(colonnes_a_permuter)]
-  
+
   # Retourner la matrice modifiée
   return(matrice)
 }
@@ -40,12 +40,12 @@ permuterLignesColonnes <- function(matrice, lignes_a_permuter = c(1, 2), colonne
 #Estimation de Sigma critère et détection outliers
 
 #Mettre l'identité dans la diagonale de Toeplitz
-creerMatriceToeplitz <- function(rho,d) 
+creerMatriceToeplitz <- function(rho,d)
 {
-  
+
   # Construire la matrice de Toeplitz
   toeplitz_matrix <- matrix(0, nrow = d, ncol = d)
-  
+
   # Remplir la matrice avec rho^{|i - j|}
   for (i in 1:d) {
     for (j in 1:d) {
@@ -53,8 +53,8 @@ creerMatriceToeplitz <- function(rho,d)
     }
   }
 
-  
-  
+
+
   #  return(diag(sqrt(1:10))%*%toeplitz_matrix%*%diag(sqrt(1:10)))
   return(toeplitz_matrix)
 }
@@ -80,11 +80,11 @@ genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
   #vecteurs_mu1 <- rmvt(n1, mu1,Sigma1,df = 1, ncores = 1, A = NULL)
   vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
   #vecteurs_mu2 <- mvrnorm(n2, mu1, Sigma2)
-  vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
-  
-  #vecteurs_mu2 <- rmvt(n2, mu1,sigma = Sigma1,df = 1, ncores = 1, A = NULL)
+  #vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
+
+  vecteurs_mu2 <- rmvt(n2, mu1,sigma = Sigma1,df = 1, ncores = 1, A = NULL)
   #vecteurs_mu2 <- matrix(runif(n2 * d, min = -20, max = 20), nrow = n2, ncol = d)
-  
+
   # Ajouter des labels
   labels_mu1 <- rep(0, n1)  # Labels pour les vecteurs avec moyenne mu1
   labels_mu2 <- rep(1, n2)  # Labels pour les vecteurs avec moyenne mu2
