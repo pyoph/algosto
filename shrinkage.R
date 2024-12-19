@@ -26,8 +26,6 @@ source("~/algosto/algorithmes.R")
 source("~/algosto/resultats.R")
 source("~/algosto/seuils.R")
 
-
-
 n <- 1e4
 
 d <- 10
@@ -62,8 +60,8 @@ covCor <- function(Y, k = -1) {
   }
   n <- N - k    # effective sample size
   c <- p / n    # concentration ratio
-  sample <- (t(Y) %*% Y) / n   
-  #sample <- covComed(Z)
+  #sample <- (t(Y) %*% Y) / n   
+  sample <- covComed(Y)$cov
   # compute shrinkage target
   samplevar <- diag(sample)
   sqrtvar <- sqrt(samplevar)
@@ -74,6 +72,7 @@ covCor <- function(Y, k = -1) {
   # estimate the parameter that we call pi in Ledoit and Wolf (2003, JEF)
   Y2 <- Y^2
   sample2 <- (t(Y2) %*% Y2) / n   
+  #sample2 <- covComed(Y2)
   piMat <- sample2 - sample^2
   pihat <- sum(piMat)
   
@@ -114,13 +113,14 @@ p2 <- 1 - p1
 
 Est <- covComed(Z)
 
-Z
+Z1 <- Est$Z
 
-#Est2 <- cov.comed(Z)
+dim(Z1)
 
 
 m <- covComed(Z)
 
+Est$center
 
 m$center
 
@@ -133,9 +133,7 @@ Z <- resultsSimul$Z
 sigmahat <- covCor(Z)
 
 
-Com <- Est$cov
-
-Est$
+Com <- covCor(Z)
 
 
 

@@ -16,13 +16,12 @@ library("MASS")
 library("corrplot")
 library("dplyr")
 #Fonction de détection des outliers prend en paramètre une nouvelle donnée
-Outlier <- function(donnee, seuil_p_value, VP, m, lambda) {
+Outlier <- function(donnee, seuil_p_value, VP, m, lambda,cutoff = qchisq(p = 0.975, df = 10)) {
   
   
   vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
   
-  cutoff <- qchisq(p = 0.975, df = 10)
-  
+
   S <- 0
   
   # Calcul de la statistique S
@@ -415,13 +414,19 @@ if(depart == 0){
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
     if(methode == "eigen"){
     VPropresV <- eigen(V)$vectors
+    VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    
     valPV <- eigen(V)$values
     lambdaResultat <- RobbinsMC2(1e2,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
     lambda <- lambdaResultat$vp
     lambdatilde <- lambdaResultat$lambda
     #print(lambda)
     lambdaIter[i,] <- lambdatilde
-    
+    #Calcul de Sigma
+    #Sigma <- VPropresV %*% diag(valPV) %*% t(VPropresV)
+    #distances <- rep(0,nrow(Z))
+    #distances <- calcule_vecteur_distances(Z,m,Sigma)
+    #cutoff <- calcule_cutoff(distances,d)
     resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
     
     }
@@ -442,6 +447,19 @@ if(depart == 0){
       lambdatilde <- lambdaResultat$lambda
       #print(lambda)
       lambdaIter[i,] <- lambdatilde
+      
+    
+      #VPropresV <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
+      
+      # for (j in (1:d)) 
+      #  {
+      #   SigmaEstim <- 1/lambda[i,j]*U[i,,j]%*%t(U[i,,j])
+      #}  
+      #Sigma <- (VPropresV) %*% diag(lambdatilde)%*% t(VPropresV)
+      
+      #distances <- rep(0,nrow(Z))
+      #distances <- calcule_vecteur_distances(Z,m, Sigma)
+      #cutoff <- calcule_cutoff(distances,d)
       
       
       resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)}

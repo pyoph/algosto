@@ -33,7 +33,7 @@ n <- 1e4
 
 d <- 10
 
-rho <- 0.8
+rho <- 0.5
 
 seuil_p_value <- 0.05
 
@@ -41,7 +41,7 @@ distances <- rep(0,n)
 
 Sigma1 <- creerMatriceToeplitz(rho,d)
 
-Sigma2 <- permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,d),colonnes_a_permuter = c(1,d))
+Sigma2 <- permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2),colonnes_a_permuter = c(1,2))
 
 #Sigma2 <- creerMatriceToeplitz(0.4,d)
 #Sigma1 <- diag(sqrt(1:d))
@@ -117,6 +117,8 @@ indices_labels_1 <- which(outliers_labels[1:9999] == 1)
 # Affichage des indices
 print(indices_labels_1)
 
+######Boucle calcul outliers#####
+
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)  
 faux_positifs_maha <- numeric(length(taux_contamination))
 faux_negatifs_maha <- numeric(length(taux_contamination))
@@ -128,6 +130,8 @@ faux_positifs_offline <- numeric(length(taux_contamination))
 faux_negatifs_offline <- numeric(length(taux_contamination))
 faux_positifs_comed <- numeric(length(taux_contamination))
 faux_negatifs_comed <- numeric(length(taux_contamination))
+faux_positifs_shrink <- numeric(length(taux_contamination))
+faux_negatifs_shrink <- numeric(length(taux_contamination))
 
 
 # Vecteurs pour stocker les temps de calcul
@@ -142,12 +146,12 @@ temps_EPP <- numeric(length(taux_contamination))
 temps_online <- numeric(length(taux_contamination))
 temps_offline <- numeric(length(taux_contamination))
 temps_comed <- numeric(length(taux_contamination))
-
+temps_shrink <- numeric(length(taux_contamination))
 
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  
+  #delta <- 2
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
   
@@ -194,7 +198,7 @@ for (i in seq_along(taux_contamination)) {
       r = 1.5,
       k = 1
     )
-    results <- estimMVOutliers(Z, params$c, params$n, params$d, params$d, params$r, aa = 0.75, niter = 1e4, methode = "eigen")
+    results <- estimMVOutliers(Z, params$c, params$n, params$d, params$d, params$r, aa = 0.75, niter = 1e4,niterRMon = d ,methode = "eigen")
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], results$outlier_labels[1:9999])
     tc
     if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
@@ -210,9 +214,9 @@ for (i in seq_along(taux_contamination)) {
     Rvar <- RobVar(Z)
     SigmaEstim <- Rvar$variance
     m <- Rvar$median
-    distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
-    cutoff <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
+    #distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
+    #cutoff <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff = qchisq(p = 0.975, df = ncol(Z)))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc
 
@@ -248,6 +252,32 @@ for (i in seq_along(taux_contamination)) {
     
     
   })["elapsed"]
+  
+  
+  # Temps pour la comédiane
+  temps_shrink[i] <- system.time({
+    med <- covComed(Z)$center
+    SigmaShrink <- covCor(Z)
+    length(med)
+    #dim(comed)
+    #(Z[1,] - med) %*% solve(comed) %*% (t(Z[1,] - med))
+    distances <- calcule_vecteur_distances(Z,med,SigmaShrink)
+    cutoff <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOutliers(distances,cutoff)
+    tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
+    tc
+    
+    #print(i)
+    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
+      faux_positifs_shrink[i]   <- tc["0", "1"]
+    } 
+    #else {faux_positifs_maha[i]   <- 0}
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_shrink[i] <- tc["1","0"]}
+    
+    
+  })["elapsed"]
+  
+  
   }
 
 
@@ -258,9 +288,9 @@ results_outliers <- data.frame(
   FN_Mahalanobis = faux_negatifs_maha,
   FP_Mahalanobis = faux_positifs_maha,
   Temps_Mahalanobis = temps_maha,
-  FP_EPP = faux_positifs_EPP,
-  FN_EPP = faux_negatifs_EPP,
-  Temps_EPP = temps_EPP,
+  #FP_EPP = faux_positifs_EPP,
+  #FN_EPP = faux_negatifs_EPP,
+  #Temps_EPP = temps_EPP,
   FN_Online = faux_negatifs_online,
   FP_Online = faux_positifs_online,
   Temps_Online = temps_online,
@@ -268,8 +298,11 @@ results_outliers <- data.frame(
   FP_Offline = faux_positifs_offline,
   Temps_Offline = temps_offline,
   FN_Comed = faux_negatifs_comed,
-  FP_Offline = faux_positifs_comed,
-  Temps_Offline = temps_comed
+  FP_Comed = faux_positifs_comed,
+  Temps_Comed = temps_comed,
+  FN_Shrink = faux_negatifs_shrink,
+  FP_Shrink = faux_positifs_shrink,
+  Temps_Shrink = temps_shrink
 )
 
 #Tester mahalanobis threshold = 0,05
@@ -280,5 +313,5 @@ results_outliers
 
 table_latex <- xtable(results_outliers, caption = "Faux positifs et faux négatifs pour chaque méthode", label = "tab:results_outliers")
 
-print(table_latex, file = "results_outliersAvecTempsContamNormalVar.tex",digits = 0)
+print(table_latex, file = "results_outliersAvecTempsContamNormalVarQuantileKhi20975.tex",digits = 0)
 
