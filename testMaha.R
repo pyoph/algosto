@@ -85,9 +85,9 @@ resultsSimul$labelsVrais[1:9999]
 outliers_labels <- rep(0,n)
 #m = rep(0,d)
 for (i in 1:nrow(Z))
-  {
+{
   S <- 0
-
+  
   S <- (Z[i,] - m)%*%solve(Sigma1)%*%t(Z[i,] - m)
   #print(S)
   # Calcul de la p-value basée sur la statistique du Chi2
@@ -100,7 +100,7 @@ for (i in 1:nrow(Z))
   } else {
     outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
   }
-
+  
   #if (S > cutoff) {outliers_labels[i] <- 1}
   #else {outliers_labels[i] <- 0}
   #}
@@ -115,9 +115,27 @@ indices_labels_1 <- which(outliers_labels[1:9999] == 1)
 # Affichage des indices
 print(indices_labels_1)
 
+
+###Test avec covariance empirique et moyenne empirique
+
+SigmaTest <- diag(1:d)
+
+
+
+distances <- calcule_vecteur_distancesEmpirique(Z,SigmaTest)
+
+outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0,95,df = d))
+
+tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers)[1:9999])
+
+tc
+
 ######Boucle calcul outliers#####
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
+
+faux_positifs_covEmp <- numeric(length(taux_contamination))
+faux_negatifs_covEmp <- numeric(length(taux_contamination))
 faux_positifs_maha <- numeric(length(taux_contamination))
 faux_negatifs_maha <- numeric(length(taux_contamination))
 faux_positifs_EPP <- numeric(length(taux_contamination))
@@ -132,11 +150,6 @@ faux_positifs_shrink <- numeric(length(taux_contamination))
 faux_negatifs_shrink <- numeric(length(taux_contamination))
 
 
-# Vecteurs pour stocker les temps de calcul
-temps_maha <- numeric(length(taux_contamination))
-temps_EPP <- numeric(length(taux_contamination))
-temps_online <- numeric(length(taux_contamination))
-temps_offline <- numeric(length(taux_contamination))
 
 # Vecteurs pour stocker les temps de calcul
 temps_maha <- numeric(length(taux_contamination))
@@ -145,56 +158,93 @@ temps_online <- numeric(length(taux_contamination))
 temps_offline <- numeric(length(taux_contamination))
 temps_comed <- numeric(length(taux_contamination))
 temps_shrink <- numeric(length(taux_contamination))
+temps_covEmp <- numeric(length(taux_contamination))
+
+#Matrice pour stocker les erreurs de calcul de Sigma
+
+erreursSigma <-  array(0, dim = c(n, length(taux_contamination), 10))
+
 
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  #delta <- ²²²²
+  delta <- 0
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
-
+  
   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2)
   Z <- resultsSimul$Z
-
-  # Temps pour la méthode Mahalanobis
+  
+  # Temps pour la cov empirique
+  
+  temps_covEmp[i] <- system.time({
+    
+    distances <- calcule_vecteur_distancesEmpirique(Z,SigmaTest)
+    
+    outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0,95,df = d))
+    
+    tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers)[1:9999])
+    
+    
+    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
+      if ("0" %in% rownames(tc) && "0" %in% colnames(tc))
+      {faux_positifs_covEmp[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])}
+      else faux_positifs_covEmp[i]   <- 0
+    }
+    #faux_positifs_maha[i] 
+    #else {faux_positifs_maha[i]   <- 0}
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {if ("1" %in% rownames(tc) && "1" %in% colnames(tc)) {faux_negatifs_covEmp[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
+    else {faux_negatifs_covEmp[i] <- 0}
+    #else {faux_negatifs_maha[i] <- tc["1", "0"]}
+    #faux_negatifs_maha[i]
+    tc
+  })["elapsed"]
+  
+  
+  
+  
+  # Temps pour la méthode OGK
   temps_maha[i] <- system.time({
-
-
+    
+    
     res <- covOGK(Z, sigmamu = s_mad)
     Sigma <- res$cov
     med <- res$center
     distances <- calcule_vecteur_distances(Z,med,Sigma)
-    cutoff = calcule_cutoff(distances,d)
+    #cutoff = calcule_cutoff(distances,d)
+    cutoff =  qchisq(p = 0.95, df = ncol(Z))
     #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
     outliers_listMaha <- detectionOutliers(distances, cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_listMaha)[1:9999])
     tc
     if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-      faux_positifs_maha[i]   <- tc["0", "1"]
+      faux_positifs_maha[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]) 
     }
+    #faux_positifs_maha[i] 
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_maha[i] <- tc["1","0"]}
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_maha[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
     #else {faux_negatifs_maha[i] <- tc["1", "0"]}
-
+    #faux_negatifs_maha[i]
+    tc
   })["elapsed"]
-
+  
   # Temps pour la méthode EPP
   #temps_EPP[i] <- system.time({
-    #res.KurtM.Tribe <- EPPlab(Z, PPalg = "GA", n.simu = 100, maxiter = 1000, sphere = TRUE)
-    #OUTms <- EPPlabOutlier(res.KurtM.Tribe, k = qchisq(p = 0.975, df = ncol(Z)), location = median, scale = sd)
-    #outliersEPP <- OUTms$outlier
-    #tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliersEPP)[1:9999])
-    #tc
-    #if(i == 1){faux_negatifs_EPP[i] <- 0 }else{faux_negatifs_EPP[i] <- tc["1", "0"]}
-    #faux_positifs_EPP[i] <- tc["0", "1"]
-    #if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-    #  faux_positifs_EPP[i]   <- tc["0", "1"]
-    #}
-    #else {faux_positifs_maha[i]   <- 0}
-    #if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_EPP[i] <- tc["1","0"]}
-
-#  })["elapsed"]
-
+  #res.KurtM.Tribe <- EPPlab(Z, PPalg = "GA", n.simu = 100, maxiter = 1000, sphere = TRUE)
+  #OUTms <- EPPlabOutlier(res.KurtM.Tribe, k = qchisq(p = 0.975, df = ncol(Z)), location = median, scale = sd)
+  #outliersEPP <- OUTms$outlier
+  #tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliersEPP)[1:9999])
+  #tc
+  #if(i == 1){faux_negatifs_EPP[i] <- 0 }else{faux_negatifs_EPP[i] <- tc["1", "0"]}
+  #faux_positifs_EPP[i] <- tc["0", "1"]
+  #if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
+  #  faux_positifs_EPP[i]   <- tc["0", "1"]
+  #}
+  #else {faux_positifs_maha[i]   <- 0}
+  #if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_EPP[i] <- tc["1","0"]}
+  
+  #  })["elapsed"]
+  
   # Temps pour la méthode Online
   temps_online[i] <- system.time({
     params <- initialiser_parametres(
@@ -209,41 +259,41 @@ for (i in seq_along(taux_contamination)) {
     U <- results$U
     lambda <- results$lambdaIter
     distances <- calcule_vecteur_distancesOnline(Z,miter,U,lambda)
-    c <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances, cutoff = c)
+    #c <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], outliers_labels[1:9999])
     tc
     if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-      faux_positifs_online[i]   <- tc["0", "1"]
+      faux_positifs_online[i]   <- tc["0", "1"]/((tc["0","0"] + tc["0","1"]))
     }
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_online[i] <- tc["1","0"]}
-
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_online[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
+    
   })["elapsed"]
-
+  
   # Temps pour la méthode Offline
   temps_offline[i] <- system.time({
     Rvar <- RobVar(Z)
     SigmaEstim <- Rvar$variance
     m <- Rvar$median
     distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
-    cutoff <- calcule_cutoff(distances,d)
-    #outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff = qchisq(p = 0.975, df = ncol(Z)))
-    outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
-
+    #cutoff <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.05,cutoff = qchisq(p = 0.95, df = ncol(Z)))
+    #outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
+    
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc
-
-        #print(i)
+    
+    #print(i)
     if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-      faux_positifs_offline[i]   <- tc["0", "1"]
+      faux_positifs_offline[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["1", "1"])
     }
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_offline[i] <- tc["1","0"]}
-
-
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_offline[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
+    
+    
   })["elapsed"]
-
+  
   # Temps pour la comédiane
   temps_comed[i] <- system.time({
     med <- covComed(Z)$center
@@ -252,22 +302,23 @@ for (i in seq_along(taux_contamination)) {
     dim(comed)
     #(Z[1,] - med) %*% solve(comed) %*% (t(Z[1,] - med))
     distances <- calcule_vecteur_distances(Z,med,comed)
-    cutoff <- calcule_cutoff(distances,d)
+    #cutoff <- calcule_cutoff(distances,d)
+    cutoff <- qchisq(p = 0.95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc
-
+    
     #print(i)
     if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-      faux_positifs_comed[i]   <- tc["0", "1"]
+      faux_positifs_comed[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])
     }
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_comed[i] <- tc["1","0"]}
-
-
+    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_comed[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
+    
+    
   })["elapsed"]
-
-
+  
+  
   # Temps pour la comédiane
   temps_shrink[i] <- system.time({
     med <- covComed(Z)$center
@@ -276,23 +327,24 @@ for (i in seq_along(taux_contamination)) {
     #dim(comed)
     #(Z[1,] - med) %*% solve(comed) %*% (t(Z[1,] - med))
     distances <- calcule_vecteur_distances(Z,med,SigmaShrink)
-    cutoff <- calcule_cutoff(distances,d)
+    #cutoff <- calcule_cutoff(distances,d)
+    cutoff <- qchisq(p = 0,95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc
-
+    
     #print(i)
     if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
       faux_positifs_shrink[i]   <- tc["0", "1"]
     }
     #else {faux_positifs_maha[i]   <- 0}
     if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_shrink[i] <- tc["1","0"]}
-
-
+    
+    
   })["elapsed"]
-
-
-  }
+  
+  
+}
 
 
 
@@ -328,4 +380,3 @@ results_outliers
 table_latex <- xtable(results_outliers, caption = "Faux positifs et faux négatifs pour chaque méthode", label = "tab:results_outliers")
 
 print(table_latex, file = "results_outliersAvecTempsContamVarianceCutoffdist.tex",digits = 0)
-

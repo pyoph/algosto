@@ -79,8 +79,8 @@ genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2)
   # Générer les vecteurs gaussiens
   #vecteurs_mu1 <- rmvt(n1, mu1,Sigma1,df = 1, ncores = 1, A = NULL)
   vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-  #vecteurs_mu2 <- mvrnorm(n2, mu1, Sigma2)
-  #vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
+  vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
+#  vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
 
   vecteurs_mu2 <- rmvt(n2, mu1,sigma = Sigma1,df = 1, ncores = 1, A = NULL)
   #vecteurs_mu2 <- matrix(runif(n2 * d, min = -20, max = 20), nrow = n2, ncol = d)
