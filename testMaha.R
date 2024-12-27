@@ -31,6 +31,26 @@ source("~/algosto/shrinkage.R")
 #usethis::create_package("C:/Users/Paul/Documents/codeRTheseLPSM")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
+# Remplir automatiquement les valeurs inexistantes avec 0
+safe_access_tc <- function(tc, default = 0) {
+  # Identifier toutes les combinaisons possibles des noms de lignes et colonnes
+  all_rows <- unique(c(rownames(tc), "0", "1"))  # Ajoutez vos besoins ici
+  all_cols <- unique(c(colnames(tc), "0", "1"))
+
+  # Initialiser une matrice complète
+  full_tc <- matrix(default, nrow = length(all_rows), ncol = length(all_cols),
+                    dimnames = list(all_rows, all_cols))
+
+  # Remplir avec les valeurs existantes
+  for (row in rownames(tc)) {
+    for (col in colnames(tc)) {
+      full_tc[row, col] <- tc[row, col]
+    }
+  }
+  return(full_tc)
+}
+
+
 n <- 1e4
 
 d <- 10
@@ -87,7 +107,7 @@ outliers_labels <- rep(0,n)
 for (i in 1:nrow(Z))
 {
   S <- 0
-  
+
   S <- (Z[i,] - m)%*%solve(Sigma1)%*%t(Z[i,] - m)
   #print(S)
   # Calcul de la p-value basée sur la statistique du Chi2
@@ -100,7 +120,7 @@ for (i in 1:nrow(Z))
   } else {
     outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
   }
-  
+
   #if (S > cutoff) {outliers_labels[i] <- 1}
   #else {outliers_labels[i] <- 0}
   #}
@@ -168,45 +188,39 @@ erreursSigma <-  array(0, dim = c(n, length(taux_contamination), 10))
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  delta <- 0
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
-  
+
   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2)
   Z <- resultsSimul$Z
-  
+
   # Temps pour la cov empirique
-  
+
   temps_covEmp[i] <- system.time({
-    
+
     distances <- calcule_vecteur_distancesEmpirique(Z,SigmaTest)
-    
+
     outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0,95,df = d))
-    
+
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers)[1:9999])
-    
-    
-    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-      if ("0" %in% rownames(tc) && "0" %in% colnames(tc))
-      {faux_positifs_covEmp[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])}
-      else faux_positifs_covEmp[i]   <- 0
-    }
-    #faux_positifs_maha[i] 
-    #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {if ("1" %in% rownames(tc) && "1" %in% colnames(tc)) {faux_negatifs_covEmp[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
-    else {faux_negatifs_covEmp[i] <- 0}
-    #else {faux_negatifs_maha[i] <- tc["1", "0"]}
-    #faux_negatifs_maha[i]
-    tc
-  })["elapsed"]
-  
-  
-  
-  
+      tc <- safe_access_tc(tc)
+
+      tc
+
+    faux_positifs_covEmp[i]   <- tc["0", "1"]/(p2*10000)
+
+     faux_negatifs_covEmp[i] <- tc["1","0"]/(p1*10000)
+      #faux_negatifs_maha[i]
+      tc
+    })["elapsed"]
+
+
+
+
   # Temps pour la méthode OGK
   temps_maha[i] <- system.time({
-    
-    
+
+
     res <- covOGK(Z, sigmamu = s_mad)
     Sigma <- res$cov
     med <- res$center
@@ -217,17 +231,17 @@ for (i in seq_along(taux_contamination)) {
     outliers_listMaha <- detectionOutliers(distances, cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_listMaha)[1:9999])
     tc
-    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-      faux_positifs_maha[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]) 
-    }
-    #faux_positifs_maha[i] 
+    tc <- safe_access_tc(tc)
+    faux_positifs_maha[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])
+    #faux_positifs_maha[i]
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_maha[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
+
+    faux_negatifs_maha[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
     #else {faux_negatifs_maha[i] <- tc["1", "0"]}
     #faux_negatifs_maha[i]
     tc
   })["elapsed"]
-  
+
   # Temps pour la méthode EPP
   #temps_EPP[i] <- system.time({
   #res.KurtM.Tribe <- EPPlab(Z, PPalg = "GA", n.simu = 100, maxiter = 1000, sphere = TRUE)
@@ -242,9 +256,9 @@ for (i in seq_along(taux_contamination)) {
   #}
   #else {faux_positifs_maha[i]   <- 0}
   #if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_EPP[i] <- tc["1","0"]}
-  
+
   #  })["elapsed"]
-  
+
   # Temps pour la méthode Online
   temps_online[i] <- system.time({
     params <- initialiser_parametres(
@@ -262,15 +276,14 @@ for (i in seq_along(taux_contamination)) {
     #c <- calcule_cutoff(distances,d)
     outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], outliers_labels[1:9999])
-    tc
-    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
+    tc <- safe_access_tc(tc)
+
       faux_positifs_online[i]   <- tc["0", "1"]/((tc["0","0"] + tc["0","1"]))
-    }
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_online[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
-    
+  faux_negatifs_online[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+
   })["elapsed"]
-  
+
   # Temps pour la méthode Offline
   temps_offline[i] <- system.time({
     Rvar <- RobVar(Z)
@@ -280,20 +293,17 @@ for (i in seq_along(taux_contamination)) {
     #cutoff <- calcule_cutoff(distances,d)
     outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.05,cutoff = qchisq(p = 0.95, df = ncol(Z)))
     #outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
-    
+
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
-    tc
-    
+    tc <- safe_access_tc(tc)
     #print(i)
-    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
       faux_positifs_offline[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["1", "1"])
-    }
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_offline[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
-    
-    
+    faux_negatifs_offline[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+
+
   })["elapsed"]
-  
+
   # Temps pour la comédiane
   temps_comed[i] <- system.time({
     med <- covComed(Z)$center
@@ -306,19 +316,17 @@ for (i in seq_along(taux_contamination)) {
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
-    tc
-    
+    tc <- safe_access_tc(tc)
+
     #print(i)
-    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
       faux_positifs_comed[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])
-    }
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_comed[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
-    
-    
+    faux_negatifs_comed[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+
+
   })["elapsed"]
-  
-  
+
+
   # Temps pour la comédiane
   temps_shrink[i] <- system.time({
     med <- covComed(Z)$center
@@ -331,19 +339,17 @@ for (i in seq_along(taux_contamination)) {
     cutoff <- qchisq(p = 0,95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
-    tc
-    
+    tc <- safe_access_tc(tc)
+
+
     #print(i)
-    if ("0" %in% rownames(tc) && "1" %in% colnames(tc)) {
-      faux_positifs_shrink[i]   <- tc["0", "1"]
-    }
+      faux_positifs_shrink[i]   <- tc["0", "1"]/(tc["0","1"] + tc["0","0"])
     #else {faux_positifs_maha[i]   <- 0}
-    if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_shrink[i] <- tc["1","0"]}
-    
-    
+    faux_negatifs_shrink[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+
   })["elapsed"]
-  
-  
+
+
 }
 
 
@@ -351,6 +357,9 @@ for (i in seq_along(taux_contamination)) {
 
 results_outliers <- data.frame(
   #Taux_Contamination = taux_contamination,
+  FN_Cov = faux_negatifs_covEmp,
+  FP_Cov= faux_positifs_covEmp,
+  Tps_Cov = temps_covEmp,
   FN_OGK = faux_negatifs_maha,
   FP_OGK = faux_positifs_maha,
   Tps_OGK = temps_maha,
