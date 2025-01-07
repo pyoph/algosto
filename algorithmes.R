@@ -105,7 +105,7 @@ detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value, cutoff =qchisq(p = 0.
   #m = rep(0,d)
   for (i in 1:nrow(Z))
   {
-
+    print(i)
 
     S <- 0
 
@@ -147,7 +147,7 @@ detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value, cutoff =qchisq(p = 0.
 #Détection des outliers à partir d'un vecteur de distances et d'un cutoff
 
 
-detectionOutliers <- function(distances, cutoff =qchisq(p = 0.975))
+detectionOutliers <- function(distances, cutoff =qchisq(p = 0.95,df = ncol(Z)))
 
 {
 
@@ -163,7 +163,7 @@ detectionOutliers <- function(distances, cutoff =qchisq(p = 0.975))
   for (i in 1:nrow(Z))
   {
 
-
+   print(i)
 
     if (distances[i] > cutoff) {outliers_labels[i] <- 1}
     else {outliers_labels[i] <- 0}

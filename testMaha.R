@@ -188,6 +188,7 @@ erreursSigma <-  array(0, dim = c(n, length(taux_contamination), 10))
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
+  delta <- 2
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
 
@@ -198,7 +199,7 @@ for (i in seq_along(taux_contamination)) {
 
   temps_covEmp[i] <- system.time({
 
-    distances <- calcule_vecteur_distancesEmpirique(Z,SigmaTest)
+   distances <- calcule_vecteur_distancesEmpirique(Z,Sigma1)
 
     outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0,95,df = d))
 
@@ -296,6 +297,7 @@ for (i in seq_along(taux_contamination)) {
 
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc <- safe_access_tc(tc)
+    tc
     #print(i)
       faux_positifs_offline[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["1", "1"])
     #else {faux_positifs_maha[i]   <- 0}
@@ -318,7 +320,7 @@ for (i in seq_along(taux_contamination)) {
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc <- safe_access_tc(tc)
 
-    #print(i)
+        #print(i)
       faux_positifs_comed[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])
     #else {faux_positifs_maha[i]   <- 0}
     faux_negatifs_comed[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
@@ -331,7 +333,7 @@ for (i in seq_along(taux_contamination)) {
   temps_shrink[i] <- system.time({
     med <- covComed(Z)$center
     SigmaShrink <- covCor(Z)
-    length(med)
+    #length(med)
     #dim(comed)
     #(Z[1,] - med) %*% solve(comed) %*% (t(Z[1,] - med))
     distances <- calcule_vecteur_distances(Z,med,SigmaShrink)
@@ -339,6 +341,7 @@ for (i in seq_along(taux_contamination)) {
     cutoff <- qchisq(p = 0,95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
+    tc
     tc <- safe_access_tc(tc)
 
 
