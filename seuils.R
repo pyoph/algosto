@@ -47,19 +47,19 @@ resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigm
 
 Z <- resultsSimul$Z
 
-calcule_vecteur_distancesEmpirique <- function(Z,Sigma)
+calcule_vecteur_distancesEmpirique <- function(Z)
 
 {
 
   distances <- rep(0,n)
   
-  
+  CovEmp <- (t(Z)%*%Z)/(n - 1)
   
   for  (i in 1:nrow(Z))
   {
-    CovEmp <- (t(Z[i,])%*%Z[i,])/n
+    #CovEmp <- (t(Z[i,])%*%Z[i,])
     distances[i] = as.numeric(Z[i,] - mean(Z[i,])) %*% solve(CovEmp) %*% (as.numeric(t(Z[i,] - mean(Z[i,]))))
-
+    #distances[i] = as.numeric(Z[i,])%*%as.numeric(Z[i,])
   }
 
   return (distances)

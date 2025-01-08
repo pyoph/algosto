@@ -60,8 +60,8 @@ covCor <- function(Y, k = -1) {
   }
   n <- N - k    # effective sample size
   c <- p / n    # concentration ratio
-  #sample <- (t(Y) %*% Y) / n   
-  sample <- covComed(Y)$cov
+  sample <- (t(Y) %*% Y) / n   
+  #sample <- covComed(Y)$cov
   # compute shrinkage target
   samplevar <- diag(sample)
   sqrtvar <- sqrt(samplevar)
