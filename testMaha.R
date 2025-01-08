@@ -51,7 +51,7 @@ safe_access_tc <- function(tc, default = 0) {
 }
 
 
-n <- 1e5
+n <- 1e4
 
 d <- 10
 
@@ -71,6 +71,9 @@ Sigma2 <- permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2),colonnes_a_pe
 mu1 <- rep(0,d)
 
 mu2 <- 5*rep(1,d)
+
+
+
 
 
 ######Boucle calcul outliers#####
@@ -111,7 +114,7 @@ erreursSigma <-  array(0, dim = c(n, length(taux_contamination), 10))
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  delta <- 0
+  delta <- 2
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
   #mu1
@@ -120,8 +123,9 @@ for (i in seq_along(taux_contamination)) {
   # Temps pour la cov empirique
 
   temps_covEmp[i] <- system.time({
-   distances <- calcule_vecteur_distancesEmpirique(Z)
-
+   #distances <- calcule_vecteur_distancesEmpirique(Z)
+   distances <- calcule_vecteur_distancesEmpiriqueVrai(Z,Sigma1,n)
+   distances
     outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0.95,df = d))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers)[1:9999])
       tc <- safe_access_tc(tc)

@@ -65,6 +65,25 @@ for  (i in 1:nrow(Z))
   return (distances)
 }
 
+calcule_vecteur_distancesEmpiriqueVrai <- function(Z,Sigma,n)
+  
+{
+  
+  distances <- rep(0,n)
+  CovEmp <- Sigma1
+  #CovEmp <- solve(cov(Z))%*%CovEmp
+  
+  for  (i in 1:nrow(Z))
+  {
+    #CovEmp <- (t(Z[i,])%*%Z[i,])
+    distances[i] = as.numeric(t(Z[i,])) %*% solve(CovEmp) %*% (as.numeric(Z[i,]))
+    #distances[i] = as.numeric(Z[i,])%*%as.numeric(Z[i,])
+  }
+  
+  return (distances)
+}
+
+
 
 
 calcule_vecteur_distances <- function(Z,m,Sigma)
