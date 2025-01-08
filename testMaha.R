@@ -51,7 +51,7 @@ safe_access_tc <- function(tc, default = 0) {
 }
 
 
-n <- 1e4
+n <- 1e5
 
 d <- 10
 
@@ -114,22 +114,19 @@ for (i in seq_along(taux_contamination)) {
   delta <- 0
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
-  
+  #mu1
   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2)
   Z <- resultsSimul$Z
-
   # Temps pour la cov empirique
 
   temps_covEmp[i] <- system.time({
-
    distances <- calcule_vecteur_distancesEmpirique(Z)
 
     outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0.95,df = d))
-
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers)[1:9999])
       tc <- safe_access_tc(tc)
 
-      tc
+      
 
     faux_positifs_covEmp[i]   <- tc["0", "1"]/(tc["0","0"] + tc["1","0"])
 
