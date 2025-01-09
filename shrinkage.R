@@ -20,11 +20,11 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-source("~/work/algosto/parametres.R")
-source("~/work/algosto/simulations.R")
-source("~/work/algosto/algorithmes.R")
-source("~/work/algosto/resultats.R")
-source("~/work/algosto/seuils.R")
+source("~/algosto/parametres.R")
+source("~/algosto/simulations.R")
+source("~/algosto/algorithmes.R")
+source("~/algosto/resultats.R")
+source("~/algosto/seuils.R")
 
 n <- 1e4
 
