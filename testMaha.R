@@ -123,18 +123,18 @@ for (i in seq_along(taux_contamination)) {
   temps_covEmp[i] <- system.time({
    #distances <- calcule_vecteur_distancesEmpirique(Z)
    distances <- calcule_vecteur_distancesEmpiriqueVrai(Z,Sigma1,n)
-   distances
+   #distances
     outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0.95,df = d))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers)[1:9999])
       tc <- safe_access_tc(tc)
 
       
-
-    faux_positifs_covEmp[i]   <- tc["0", "1"]/(tc["0","0"] + tc["1","0"])
-
-     faux_negatifs_covEmp[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs_covEmp[i]   <- tc["0", "1"]/(tc["0","0"] + tc["1","0"])}
+      if((tc["1","0"] + tc["1","1"]) != 0)
+      {faux_negatifs_covEmp[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
       #faux_negatifs_maha[i]
-      tc
+      #tc
     })["elapsed"]
 
 
@@ -155,15 +155,16 @@ for (i in seq_along(taux_contamination)) {
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_listMaha)[1:9999])
     tc
     tc <- safe_access_tc(tc)
-    faux_positifs_maha[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs_maha[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
     #faux_positifs_maha[i]
     #else {faux_positifs_maha[i]   <- 0}
-
-    faux_negatifs_maha[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs_maha[i] <- round((tc["1", "0"]/(tc["1","0"] + tc["1","1"]))*100,2)}
     #else {faux_negatifs_maha[i] <- tc["1", "0"]}
     #faux_negatifs_maha[i]
-    faux_negatifs_maha[i]
-    tc
+    #faux_negatifs_maha[i]
+    #tc
   })["elapsed"]
 
   # Temps pour la méthode EPP
@@ -203,10 +204,10 @@ for (i in seq_along(taux_contamination)) {
     tc <- safe_access_tc(tc)
     
     if((tc["0","0"] + tc["0","1"]) != 0)
-    {faux_positifs_online[i]   <- tc["0", "1"]/((tc["0","0"] + tc["0","1"]))}
+    {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
     #else {faux_positifs_maha[i]   <- 0}
     if((tc["1","0"] + tc["1","1"]) != 0){
-    faux_negatifs_online[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+    faux_negatifs_online[i] <- round((tc["1", "0"]/(tc["1","0"] + tc["1","1"]))*100,2)
     }
   })["elapsed"]
 
