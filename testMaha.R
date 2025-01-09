@@ -113,10 +113,11 @@ erreursSigma <-  array(0, dim = c(n, length(taux_contamination), 10))
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
+  #delta <- 2
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
   #mu1
-  resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2)
+  resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = "variance")
   Z <- resultsSimul$Z
   # Temps pour la cov empirique
 
@@ -214,11 +215,13 @@ for (i in seq_along(taux_contamination)) {
   # Temps pour la méthode Offline
   temps_offline[i] <- system.time({
     Rvar <- RobVar(Z)
-    SigmaEstim <- Rvar$variance
-    m <- Rvar$median
-    distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
+    
+    
+  m <- Rvar$median
+  SigmaEstim <- Rvar$variance
+  distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     #cutoff <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
+  outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     #outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
 
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
@@ -288,9 +291,9 @@ for (i in seq_along(taux_contamination)) {
 
 results_outliers <- data.frame(
   #Taux_Contamination = taux_contamination,
-  FN_Cov = faux_negatifs_covEmp,
-  FP_Cov= faux_positifs_covEmp,
-  Tps_Cov = temps_covEmp,
+  #FN_Cov = faux_negatifs_covEmp,
+  #FP_Cov= faux_positifs_covEmp,
+  #Tps_Cov = temps_covEmp,
   FN_OGK = faux_negatifs_maha,
   FP_OGK = faux_positifs_maha,
   Tps_OGK = temps_maha,
@@ -317,6 +320,6 @@ row.names(results_outliers) <- taux_contamination
 
 results_outliers
 
-table_latex <- xtable(results_outliers, caption = "Faux positifs et faux négatifs pour chaque méthode", label = "tab:results_outliers")
+table_latex <- xtable(results_outliers, caption = "Faux positifs et faux négatifs pour chaque méthode contamination moyenne rho 0.8", label = "tab:results_outliers")
 
-print(table_latex, file = "results_outliersAvecTempsContamVarianceCutoffdist.tex",digits = 0)
+print(table_latex, file = "results_outliersAvecTempsContamMoyenneCutoffdistrho0huitVar.tex",digits = 0)
