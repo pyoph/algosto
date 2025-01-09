@@ -1,9 +1,9 @@
-#install.packages("easystats")
-#install.packages("bigutilsr")
-#install.packages("xtable")
-#install.packages("RGMM")
-#install.packages("rrcov")
-#install.packages("mvnfast")
+install.packages("easystats")
+install.packages("bigutilsr")
+install.packages("xtable")
+install.packages("RGMM")
+install.packages("rrcov")
+install.packages("mvnfast")
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -22,12 +22,12 @@ library("bigutilsr")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/seuils.R")
-source("~/algosto/shrinkage.R")
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
+source("~/work/algosto/resultats.R")
+source("~/work/algosto/seuils.R")
+source("~/work/algosto/shrinkage.R")
 #usethis::create_package("C:/Users/Paul/Documents/codeRTheseLPSM")
 #devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
 
@@ -55,7 +55,7 @@ n <- 1e4
 
 d <- 10
 
-rho <- 0.5
+rho <- 0.8
 
 seuil_p_value <- 0.05
 
@@ -111,10 +111,8 @@ temps_covEmp <- numeric(length(taux_contamination))
 erreursSigma <-  array(0, dim = c(n, length(taux_contamination), 10))
 
 
-
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  delta <- 2
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
   #mu1
@@ -203,10 +201,13 @@ for (i in seq_along(taux_contamination)) {
     outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], outliers_labels[1:9999])
     tc <- safe_access_tc(tc)
-    faux_positifs_online[i]   <- tc["0", "1"]/((tc["0","0"] + tc["0","1"]))
+    
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs_online[i]   <- tc["0", "1"]/((tc["0","0"] + tc["0","1"]))}
     #else {faux_positifs_maha[i]   <- 0}
-  faux_negatifs_online[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
-
+    if((tc["1","0"] + tc["1","1"]) != 0){
+    faux_negatifs_online[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+    }
   })["elapsed"]
 
   # Temps pour la méthode Offline
@@ -216,17 +217,19 @@ for (i in seq_along(taux_contamination)) {
     m <- Rvar$median
     distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     #cutoff <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.05,cutoff = qchisq(p = 0.95, df = ncol(Z)))
+    outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     #outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
 
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc <- safe_access_tc(tc)
-    tc
+    #tc
     #print(i)
-      faux_positifs_offline[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])
-    #else {faux_positifs_maha[i]   <- 0}
-    faux_negatifs_offline[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
-
+    if((tc["0","1"] + tc["0","0"])!= 0)
+      {faux_positifs_offline[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
+      #else {faux_positifs_maha[i]   <- 0}
+    if((tc["1","0"] + tc["1","1"]) != 0){
+    faux_negatifs_offline[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)
+    }
   })["elapsed"]
 
   # Temps pour la comédiane
@@ -244,9 +247,11 @@ for (i in seq_along(taux_contamination)) {
     tc <- safe_access_tc(tc)
 
         #print(i)
-    faux_positifs_comed[i]   <- tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])
+    if((tc["0","1"] + tc["0","0"])!= 0)
+    {faux_positifs_comed[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
     #else {faux_positifs_maha[i]   <- 0}
-    faux_negatifs_comed[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
+    if((tc["1","1"] + tc["1","0"])!= 0)
+    {faux_negatifs_comed[i] <- round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)}
 
 
   })["elapsed"]
@@ -264,16 +269,15 @@ for (i in seq_along(taux_contamination)) {
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
-    tc
+    #tc
     tc <- safe_access_tc(tc)
 
-
-    #print(i)
-      faux_positifs_shrink[i]   <- tc["0", "1"]/(tc["0","1"] + tc["0","0"])
-    #else {faux_positifs_maha[i]   <- 0}
-    faux_negatifs_shrink[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])
-
-  })["elapsed"]
+    if((tc["0","1"] + tc["0","0"])!= 0)                   
+      {faux_positifs_shrink[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
+    #else {faux_positifs_maha[i] if   <- 0}
+    if((tc["1","0"] + tc["1","1"])!= 0){
+    faux_negatifs_shrink[i] <- round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)
+    }  })["elapsed"]
 
 
 }

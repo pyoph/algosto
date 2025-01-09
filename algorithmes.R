@@ -163,7 +163,7 @@ detectionOutliers <- function(distances, cutoff =qchisq(p = 0.95,df = ncol(Z)))
   for (i in 1:nrow(Z))
   {
 
-   print(i)
+   #print(i)
 
     if (distances[i] > cutoff) {outliers_labels[i] <- 1}
     else {outliers_labels[i] <- 0}
