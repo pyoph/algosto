@@ -14,11 +14,14 @@
     - afficher les erreurs d'estimation des différentes quantités d'intérêt :
 
 * Outliers.R : fonctions qui : 
-      - calculent les distances de Mahalanobis
+      - calculent les distances de Mahalanobis ;
       - detectent les outliers
 
 * computeOutliers.R : 
       - appliquent plusieurs algorithmes pour détecter les outliers
+
+* main.R :
+  - lancement des fonctions dans les précédents fichiers
 
 ## Exemple d'utilisation 
 
