@@ -18,7 +18,7 @@
       - detectent les outliers
 
 * computeOutliers.R : 
-      -appliquent plusieurs algorithmes pour détecter les outliers
+      - appliquent plusieurs algorithmes pour détecter les outliers
 
 ## Exemple d'utilisation 
 
