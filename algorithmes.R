@@ -15,39 +15,6 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-#Fonction de détection des outliers prend en paramètre une nouvelle donnée
-Outlier <- function(donnee, seuil_p_value, VP, m, lambda,cutoff = qchisq(p = 0.975, df = 10)) {
-
-
-  vectPV <- VP %*% diag(1/sqrt(colSums(VP^2)))
-
-
-  S <- 0
-
-  # Calcul de la statistique S
-
-    for (j in 1:length(lambda)) {
-      #S <- S + 1/lambda[j] * ((donnee - m)%*% vectPV[,j])^2
-      S <- S + 1/lambda[j] * (sum((donnee - m)* vectPV[,j]))^2
-    }
-
-
-  # Calcul de la p-value basée sur la statistique du Chi2
-  phat <- pchisq(S, df = length(lambda),lower.tail =FALSE)
-  #print(phat)
-  # Détection de l'outlier
-  #if (phat < seuil_p_value) {
-   # outlier_label <- 1  # Indiquer qu'il s'agit d'un outlier
-   #} else {
-    #outlier_label <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
-  #}
-
-  if (S > cutoff) {outlier_label <- 1}
-  else {outlier_label <- 0}
-
-  # Retourner le label, la p-value et la statistique S
-  return(list(outlier_label = outlier_label, phat = phat, S = S))
-}
 #Estimation des valeurs propres de Sigma
 
 RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,samp=mc_sample_size,init=detoile)
@@ -83,97 +50,6 @@ RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,sa
 
 
 
-
-#Détection offline des outliers
-
-detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value, cutoff =qchisq(p = 0.975, df = ncol(Z)))
-
-{
-
-  outliers_labels <- rep(0,n)
-
-   #cutoff <- qchisq(p = 0.975, df = ncol(Z))
-
-
-  vectPV <- eigen(SigmaEstim)$vectors
-  lambda <- eigen(SigmaEstim)$values
-  vectPV <- vectPV %*% diag(1/sqrt(colSums(vectPV^2)))
-  #cutoff <- qchisq(p = 0.975, df = ncol(Z))
-
-
-
-  #m = rep(0,d)
-  for (i in 1:nrow(Z))
-  {
-    print(i)
-
-    S <- 0
-
-    # Calcul de la statistique S
-
-    for (j in 1:length(lambda)) {
-     S <- S + 1/lambda[j] * (sum((Z[i,] - m)* vectPV[,j]))^2
-
-    }
-
-
-    #S <- t(Z[i,] - m)%*%solve(SigmaEstim)%*%(Z[i,] - m)
-
-    # Calcul de la p-value basée sur la statistique du Chi2
-    phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
-
-    # Calcul de la p-value basée sur la statistique du Chi2
-    #phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
-    #print(phat)
-    # Détection de l'outlier
-    #if (phat < seuil_p_value) {
-     # outliers_labels[i] <- 1  # Indiquer qu'il s'agit d'un outlier
-      #print("OK")
-     #} else {
-      #outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
-    #}
-
-    if (S > cutoff) {outliers_labels[i] <- 1}
-    else {outliers_labels[i] <- 0}
-    #}
-  }
-
-  #print(which(outliers_labels == 1))
-  return (outliers_labels)
-
-}
-
-
-#Détection des outliers à partir d'un vecteur de distances et d'un cutoff
-
-
-detectionOutliers <- function(distances, cutoff =qchisq(p = 0.95,df = ncol(Z)))
-
-{
-
-  outliers_labels <- rep(0,n)
-
-  #cutoff <- qchisq(p = 0.975, df = ncol(Z))
-
-
-
-
-
-  #m = rep(0,d)
-  for (i in 1:nrow(Z))
-  {
-
-   #print(i)
-
-    if (distances[i] > cutoff) {outliers_labels[i] <- 1}
-    else {outliers_labels[i] <- 0}
-    #}
-  }
-
-  #print(which(outliers_labels == 1))
-  return (outliers_labels)
-
-}
 
 
 #Estimation des valeurs propres de Sigma
@@ -212,7 +88,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
-estimMVOutliers <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vinit = diag(d),
+estimMV <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vinit = diag(d),
                             U = array(1, dim = c(n, q, q)),stat = rep(0,n-1),vpMCM = matrix(0,n,d), lambda = rep(1,d),lambdatilde = rep(1,d),methode = "eigen",seuil_p_value = 0.05,cutoff =qchisq(p = 0.975, df = d),niterRMon = d^2 )
 {
 
@@ -428,7 +304,7 @@ if(depart == 0){
     #distances <- rep(0,nrow(Z))
     #distances <- calcule_vecteur_distances(Z,m,Sigma)
     #cutoff <- calcule_cutoff(distances,d)
-    resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
+    #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
 
     }
     else {
@@ -463,19 +339,20 @@ if(depart == 0){
       #cutoff <- calcule_cutoff(distances,d)
 
 
-      resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)}
+      #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+      }
     # Vérifier si l'entrée est un outlier
-    if (resultatOutlier$outlier_label) {
+    #if (resultatOutlier$outlier_label) {
 
       #Estimation des valeurs propres selon une procédure de Robbins-Monro
 
-      outlier_labels[i] <- 1
+     # outlier_labels[i] <- 1
 
 
-    }
-    stat[i] <- resultatOutlier$S
+    #}
+    #stat[i] <- resultatOutlier$S
 
-    phat[i] <- resultatOutlier$phat
+    #phat[i] <- resultatOutlier$phat
     #print(phat[i])
 
   }
@@ -487,7 +364,7 @@ if(depart == 0){
 
 
 
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels))
 }
 
 
@@ -688,25 +565,83 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
 
     # Vérifier si l'entrée est un outlier
-    if (resultatOutlier$outlier_label) {
+    #if (resultatOutlier$outlier_label) {
 
       #Estimation des valeurs propres selon une procédure de Robbins-Monro
 
-      outlier_labels[i] <- 1
+      #outlier_labels[i] <- 1
 
 
-    }
-    stat[i] <- resultatOutlier$S
+#    }
+ #   stat[i] <- resultatOutlier$S
 
-    phat[i] <- resultatOutlier$phat
+  #  phat[i] <- resultatOutlier$phat
     #print(phat[i])
 
 
   }
 
 
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels, stat = stat,phat = phat))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM))
 }
 
 
+#Estimation de la matrice de covariance par shrinkage
+
+covCor <- function(Y, k = -1) {
+  dim.Y <- dim(Y)
+  N <- dim.Y[1]
+  p <- dim.Y[2]
+  if (k < 0) {    # demean the data and set k = 1
+    Y <- scale(Y, scale = F)
+    k <- 1
+  }
+  n <- N - k    # effective sample size
+  c <- p / n    # concentration ratio
+  #sample <- (t(Y) %*% Y) / n   
+  sample <- covComed(Y)$cov
+  # compute shrinkage target
+  samplevar <- diag(sample)
+  sqrtvar <- sqrt(samplevar)
+  rBar <- (sum(sample / outer(sqrtvar, sqrtvar)) - p) / (p * (p - 1))
+  target <- rBar * outer(sqrtvar, sqrtvar)
+  diag(target) <- samplevar
+  
+  # estimate the parameter that we call pi in Ledoit and Wolf (2003, JEF)
+  Y2 <- Y^2
+  sample2 <- (t(Y2) %*% Y2) / n   
+  #sample2 <- covComed(Y2)
+  piMat <- sample2 - sample^2
+  pihat <- sum(piMat)
+  
+  # estimate the parameter that we call gamma in Ledoit and Wolf (2003, JEF)
+  gammahat <- norm(c(sample - target), type = "2")^2
+  
+  # diagonal part of the parameter that we call rho 
+  rho_diag <- sum(diag(piMat))
+  
+  # off-diagonal part of the parameter that we call rho 
+  term1 <- (t(Y^3) %*% Y) / n;
+  term2 <- rep.row(samplevar, p) * sample;
+  term2 <- t(term2)
+  thetaMat <- term1 - term2
+  diag(thetaMat) <- 0
+  rho_off <- rBar * sum(outer(1/sqrtvar, sqrtvar) * thetaMat)
+  
+  # compute shrinkage intensity
+  rhohat <- rho_diag + rho_off
+  kappahat <- (pihat - rhohat) / gammahat
+  shrinkage <- max(0, min(1, kappahat / n))
+  
+  # compute shrinkage estimator
+  sigmahat <- shrinkage * target + (1 - shrinkage) * sample
+  
+  
+  return (sigmahat)
+  
+}
+
+rep.row <- function(x, n){
+  matrix(rep(x, each = n), nrow = n)
+}
 
