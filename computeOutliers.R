@@ -318,7 +318,3 @@ row.names(results_outliers) <- taux_contamination
 return(results_outliers)
 }
 
-calcule_outliers()
-table_latex <- xtable(results_outliers, caption = "Faux positifs et faux négatifs pour chaque méthode contamination moyenne rho 0.8", label = "tab:results_outliers")
-
-print(table_latex, file = "results_outliersAvecTempsContamMoyenneCutoffdistrho0huitVar.tex",digits = 0)
