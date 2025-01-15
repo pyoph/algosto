@@ -51,7 +51,7 @@ safe_access_tc <- function(tc, default = 0) {
 ######Boucle calcul outliers#####
 
 
-calcule_outliers <- function(n = 1e4, d = 10, c = sqrt(d),rho = 0.8, distances = rep(0,n), mu1 = rep(0,d),mu2 = 5*rep(1,d),Sigma1 = creerMatriceToeplitz(rho,d) ,Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2),colonnes_a_permuter = c(1,2))
+calcule_outliers <- function(n = 1e4, d = 10, c = sqrt(d),rho = 0.8, mu1 = rep(0,d),mu2 = 5*rep(1,d),Sigma1 = creerMatriceToeplitz(rho,d) ,Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2),colonnes_a_permuter = c(1,2))
 , contamin = "student") 
 {
 
@@ -83,7 +83,9 @@ temps_comed <- numeric(length(taux_contamination))
 temps_shrink <- numeric(length(taux_contamination))
 temps_covEmp <- numeric(length(taux_contamination))
 
-#Matrice pour stocker les erreurs de calcul de Sigma
+#Vecteur pour stocker les distances
+
+distances <- rep(0,n)
 
 #erreursSigma <-  array(0, dim = c(n, length(taux_contamination), 10))
 
