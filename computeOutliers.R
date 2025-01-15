@@ -28,7 +28,6 @@ source("~/algosto/algorithmes.R")
 source("~/algosto/resultats.R")
 source("~/algosto/Outliers.R")
 
-
 #Rajout de 0 dans les tables de contingence si les champs sont vides
 safe_access_tc <- function(tc, default = 0) {
   # Identifier toutes les combinaisons possibles des noms de lignes et colonnes
@@ -48,27 +47,6 @@ safe_access_tc <- function(tc, default = 0) {
   return(full_tc)
 }
 
-
-n <- 1e4
-
-d <- 10
-
-rho <- 0.8
-
-#seuil_p_value <- 0.05
-
-distances <- rep(0,n)
-
-Sigma1 <- creerMatriceToeplitz(rho,d)
-
-Sigma2 <- permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2),colonnes_a_permuter = c(1,2))
-
-#Sigma2 <- creerMatriceToeplitz(0.4,d)
-#Sigma1 <- diag(sqrt(1:d))
-#Sigma1 <- diag(d)
-mu1 <- rep(0,d)
-
-mu2 <- 5*rep(1,d)
 
 ######Boucle calcul outliers#####
 
@@ -123,7 +101,7 @@ for (i in seq_along(taux_contamination)) {
     #distances <- calcule_vecteur_distancesEmpirique(Z)
     distances <- calcule_vecteur_distancesEmpiriqueVrai(Z,Sigma1)
     #distances
-    outliers <- detectionOutliers(distances, cutoff = qchisq(p = 0.95,df = d))
+    outliers <- detectionOutliers(distances, nrow(Z),ncol(Z),cutoff = qchisq(p = 0.95,df = ncol(Z)))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers)[1:9999])
     tc <- safe_access_tc(tc)
     
@@ -150,7 +128,7 @@ for (i in seq_along(taux_contamination)) {
     #cutoff = calcule_cutoff(distances,d)
     cutoff =  qchisq(p = 0.95, df = ncol(Z))
     #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
-    outliers_listMaha <- detectionOutliers(distances, cutoff)
+    outliers_listMaha <- detectionOutliers(distances,nrow(Z),ncol(Z), cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_listMaha)[1:9999])
     tc
     tc <- safe_access_tc(tc)
@@ -199,7 +177,7 @@ for (i in seq_along(taux_contamination)) {
     lambda <- results$lambdaIter
     distances <- calcule_vecteur_distancesOnline(Z,miter,U,lambda)
     #c <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
+    outliers_labels <- detectionOutliers(distances, nrow(Z),ncol(Z),cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], outliers_labels[1:9999])
     tc <- safe_access_tc(tc)
     
@@ -220,7 +198,7 @@ for (i in seq_along(taux_contamination)) {
     SigmaEstim <- Rvar$variance
     distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     #cutoff <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances, cutoff =  qchisq(p = 0.95, df = ncol(Z)))
+    outliers_labels <- detectionOutliers(distances, nrow(Z),ncol(Z),cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     #outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
     
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
@@ -245,7 +223,7 @@ for (i in seq_along(taux_contamination)) {
     distances <- calcule_vecteur_distances(Z,med,comed)
     #cutoff <- calcule_cutoff(distances,d)
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
-    outliers_labels <- detectionOutliers(distances,cutoff)
+    outliers_labels <- detectionOutliers(distances,nrow(Z),ncol(Z),cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     tc <- safe_access_tc(tc)
     
@@ -270,7 +248,7 @@ for (i in seq_along(taux_contamination)) {
     distances <- calcule_vecteur_distances(Z,med,SigmaShrink)
     #cutoff <- calcule_cutoff(distances,d)
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
-    outliers_labels <- detectionOutliers(distances,cutoff)
+    outliers_labels <- detectionOutliers(distances,nrow(Z),ncol(Z),cutoff)
     tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
     #tc
     tc <- safe_access_tc(tc)

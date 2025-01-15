@@ -19,48 +19,6 @@ library("corrplot")
 library("dplyr")
 library("mvnfast")
 
-#Permuter lignes colonnes Toeplitz
-
-# Fonction pour permuter des lignes et des colonnes dans une matrice
-permuterLignesColonnes <- function(matrice, lignes_a_permuter = c(1, 2), colonnes_a_permuter = c(1, 2)) {
-
-  # Permuter les lignes
-  matrice[lignes_a_permuter, ] <- matrice[rev(lignes_a_permuter), ]
-
-  # Permuter les colonnes
-  matrice[, colonnes_a_permuter] <- matrice[, rev(colonnes_a_permuter)]
-
-  # Retourner la matrice modifiée
-  return(matrice)
-}
-
-
-#Plan de simulation : à écrire. Protocole
-
-#Estimation de Sigma critère et détection outliers
-
-#Mettre l'identité dans la diagonale de Toeplitz
-creerMatriceToeplitz <- function(rho,d)
-{
-
-  # Construire la matrice de Toeplitz
-  toeplitz_matrix <- matrix(0, nrow = d, ncol = d)
-
-  # Remplir la matrice avec rho^{|i - j|}
-  for (i in 1:d) {
-    for (j in 1:d) {
-      toeplitz_matrix[i, j] <- rho^abs(i - j)
-    }
-  }
-
-
-
-  #  return(diag(sqrt(1:10))%*%toeplitz_matrix%*%diag(sqrt(1:10)))
-  return(toeplitz_matrix)
-}
-
-
-
 genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2,contamin = "moyenne")
 {
 

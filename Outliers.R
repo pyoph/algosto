@@ -98,7 +98,7 @@ calcule_cutoff <- function(distances, d) {
 #Détection des outliers à partir d'un vecteur de distances de Mahalanobis et d'un cutoff
 
 
-detectionOutliers <- function(distances, cutoff =qchisq(p = 0.95,df = ncol(Z)))
+detectionOutliers <- function(distances, n,d,cutoff =qchisq(p = 0.95,df = d))
   
 {
   
@@ -111,7 +111,7 @@ detectionOutliers <- function(distances, cutoff =qchisq(p = 0.95,df = ncol(Z)))
   
   
   #m = rep(0,d)
-  for (i in 1:nrow(Z))
+  for (i in 1:n)
   {
     
     #print(i)
