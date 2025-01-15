@@ -95,7 +95,7 @@ for (i in seq_along(taux_contamination)) {
   p1 <- 1 - delta / 100
   p2 <- 1 - p1
   #mu1
-  resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = "student")
+  resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
   Z <- resultsSimul$Z
   # Temps pour la cov empirique
   

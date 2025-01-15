@@ -19,6 +19,7 @@ library("corrplot")
 library("dplyr")
 library("mvnfast")
 
+#Génération d'un échantillon contaminé ou non contaminé
 genererEchantillon <- function(n,d,mu1,mu2,p1,p2,Sigma1,Sigma2,contamin = "moyenne")
 {
 

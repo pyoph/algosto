@@ -57,8 +57,8 @@ creerMatriceToeplitz <- function(rho,d)
   
   
   
-  #  return(diag(sqrt(1:10))%*%toeplitz_matrix%*%diag(sqrt(1:10)))
-  return(toeplitz_matrix)
+    return(diag(sqrt(1:d))%*%toeplitz_matrix%*%diag(sqrt(1:d)))
+  #return(toeplitz_matrix)
 }
 
 
@@ -71,7 +71,7 @@ nbruns = 10
 n = 1e4
 d = 10 
 mu1 = rep(0,d)
-mu2 = 5*rep(1,d)
+mu2 = 2*rep(1,d)
 rho = 0.8
 Sigma1 = creerMatriceToeplitz(rho,d)
 
