@@ -18,14 +18,10 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-#source("~/algosto/parametres.R")
 source("~/algosto/simulations.R")
 source("~/algosto/algorithmes.R")
 source("~/algosto/resultats.R")
 source("~/algosto/computeOutliers.R")
-#usethis::create_package("C:/Users/Paul/Documents/codeRTheseLPSM")
-#devtools::load_all("C:/Users/Paul/Documents/codeRTheseLPSM")
-
 
 n <- 1e4
 
@@ -125,33 +121,6 @@ plot(1:(n-1),cumsum(results$outlier_labels)/(1:(n-1)),ylim = c(0,1),'l');abline(
 #length(results2$outlier_labels)
 
 
-####Détection d'outliers avec la distance de Mahalanobis
+#Calcul des outliers
 
-#Calcul de la distance de Mahalanobis
-mahaDist <- mahalanobis(x = Z, center = rep(0,d), cov = params$Sigma)
-
-# Cutoff values from chi-square distribution to identify outliers
-cutoff <- qchisq(p = 0.95, df = d)
-
-# Data frame combinant Z et mahaDist
-df <- data.frame(Z, Mahalanobis_Distance = mahaDist, labels_vrais = resultsSimul$labelsVrais)
-
-#Calcul des p-values
-df$p <- pchisq(df$Mahalanobis_Distance,df = d,lower.tail =   FALSE )
-
-#Identification des outliers
-df <- df %>%
-  mutate(Outlier = ifelse(Mahalanobis_Distance > cutoff, 'Yes','No'))
-# proportion d'outliers
-proportion_outliers <- df %>%
-  summarise(Proportion = mean(Outlier == 'Yes')) %>%
-  pull(Proportion)
-
-# Afficher la proportion d'outliers
-print(proportion_outliers)
-
-# Création de la table de contingence
-table_contingence <- table(df$Outlier, df$labels)
-
-# Afficher la table de contingence
-print(table_contingence)
+results_outliers <- calcule_outliers()

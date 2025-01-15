@@ -17,7 +17,7 @@ library("corrplot")
 library("dplyr")
 
 
-
+#Calcul des distances de Mahalanobis à partir de la vraie covariance 
 calcule_vecteur_distancesEmpiriqueVrai <- function(Z,Sigma)
   
 {
@@ -39,6 +39,8 @@ calcule_vecteur_distancesEmpiriqueVrai <- function(Z,Sigma)
 
 
 
+#Calcul des distances de Mahalanobis à partir de la médiane géométrique et de la covariance estimées
+
 calcule_vecteur_distances <- function(Z,m,Sigma)
 
 {
@@ -54,7 +56,7 @@ calcule_vecteur_distances <- function(Z,m,Sigma)
   return (distances)
 }
 
-
+#Calcul des distances de Mahalanobis à partir de la médiane géométrique des vecteurs propres et des valeurs propres estimées
 calcule_vecteur_distancesOnline <- function(Z,miter,U,lambda)
 {
 
@@ -77,7 +79,8 @@ for (i in 1:(n-1))
 
 }
 
-# Fonction pour calculer le cutoff
+# Fonction pour calculer le cutoff (deuxième seuil)
+
 calcule_cutoff <- function(distances, d) {
 
   # Constantes et quantiles
@@ -92,67 +95,7 @@ calcule_cutoff <- function(distances, d) {
 }
 
 
-#Détection offline des outliers
-
-detectionOffline <- function(Z,SigmaEstim,m,seuil_p_value, cutoff =qchisq(p = 0.975, df = ncol(Z)))
-  
-{
-  
-  outliers_labels <- rep(0,n)
-  
-  #cutoff <- qchisq(p = 0.975, df = ncol(Z))
-  
-  
-  vectPV <- eigen(SigmaEstim)$vectors
-  lambda <- eigen(SigmaEstim)$values
-  vectPV <- vectPV %*% diag(1/sqrt(colSums(vectPV^2)))
-  #cutoff <- qchisq(p = 0.975, df = ncol(Z))
-  
-  
-  
-  #m = rep(0,d)
-  for (i in 1:nrow(Z))
-  {
-    print(i)
-    
-    S <- 0
-    
-    # Calcul de la statistique S
-    
-    for (j in 1:length(lambda)) {
-      S <- S + 1/lambda[j] * (sum((Z[i,] - m)* vectPV[,j]))^2
-      
-    }
-    
-    
-    #S <- t(Z[i,] - m)%*%solve(SigmaEstim)%*%(Z[i,] - m)
-    
-    # Calcul de la p-value basée sur la statistique du Chi2
-    phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
-    
-    # Calcul de la p-value basée sur la statistique du Chi2
-    #phat <- pchisq(S, df = ncol(Z),lower.tail =FALSE)
-    #print(phat)
-    # Détection de l'outlier
-    #if (phat < seuil_p_value) {
-    # outliers_labels[i] <- 1  # Indiquer qu'il s'agit d'un outlier
-    #print("OK")
-    #} else {
-    #outliers_labels[i] <- 0  # Indiquer qu'il ne s'agit pas d'un outlier
-    #}
-    
-    if (S > cutoff) {outliers_labels[i] <- 1}
-    else {outliers_labels[i] <- 0}
-    #}
-  }
-  
-  #print(which(outliers_labels == 1))
-  return (outliers_labels)
-  
-}
-
-
-#Détection des outliers à partir d'un vecteur de distances et d'un cutoff
+#Détection des outliers à partir d'un vecteur de distances de Mahalanobis et d'un cutoff
 
 
 detectionOutliers <- function(distances, cutoff =qchisq(p = 0.95,df = ncol(Z)))
