@@ -11,7 +11,7 @@
     - estimer la médiane géométrique, et la matrice de covariance ;
      Fonctionne à partir des données générées (notamment le vecteur Y) par la fonction generer_echantillon du fichier simulations.R
 
-* resultats.R : a trois fonctions principales :
+* resultats.R : a comme fonctions principales :
     - calculer les erreurs ;
     - afficher les erreurs d'estimation des différentes quantités d'intérêt
 
@@ -20,7 +20,7 @@
       - detectent les outliers
 
 * computeOutliers.R : 
-      - appliquent plusieurs algorithmes pour détecter les outliers
+      - applique plusieurs algorithmes basés sur différentes estimations de la matrice de covariance pour détecter les outliers
 
 * main.R :
   - lancement des fonctions dans les précédents fichiers
