@@ -11,7 +11,7 @@
     - estimer la médiane géométrique, et la matrice de covariance ;
      Fonctionne à partir des données générées (notamment le vecteur Y) par la fonction generer_echantillon du fichier simulations.R
 
-* resultats.R : a trois fonctions principales :
+* resultats.R : a comme fonctions principales :
     - calculer les erreurs ;
     - afficher les erreurs d'estimation des différentes quantités d'intérêt
 
