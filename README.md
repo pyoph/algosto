@@ -20,7 +20,7 @@
       - detectent les outliers
 
 * computeOutliers.R : 
-      - appliquent plusieurs algorithmes pour détecter les outliers
+      - applique plusieurs algorithmes basés sur différentes estimations de la matrice de covariance pour détecter les outliers
 
 * main.R :
   - lancement des fonctions dans les précédents fichiers
