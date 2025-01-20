@@ -67,7 +67,7 @@ creerMatriceToeplitz <- function(rho,d)
 
 #Initialisation des paramètres communs à toutes les simulations
 
-nbruns = 10
+nbruns = 1
 n = 1e4
 d = 10 
 mu1 = rep(0,d)
@@ -77,4 +77,5 @@ Sigma1 = creerMatriceToeplitz(rho,d)
 
 lignes_a_permuter = c(1, 2)
 colonnes_a_permuter = c(1, 2)
-Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter , colonnes_a_permuter)
+#Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter , colonnes_a_permuter)
+Sigma2 = 2* Sigma1
