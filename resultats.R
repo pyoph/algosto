@@ -19,6 +19,31 @@ library("dplyr")
 #source("C://Users/Paul/Downloads/simulations.R")
 #source("C://Users/Paul/Downloads/algorithmes.R")
 
+#Visualiser données 
+
+visualiser_donnees <- function(Z, labelsVrais) {
+  
+  # Création du graphique
+  plot(
+    Z[, 1], Z[, 2], 
+    col = ifelse(labelsVrais == 1, "red", "black"),  # Rouge pour les outliers, noir sinon
+    pch = 16,  # Points pleins
+    xlab = "Z[,1]", 
+    ylab = "Z[,2]",
+    main = "Visualisation des données avec outliers"
+  )
+  
+  # Ajout d'une légende
+  legend(
+    "topright", 
+    legend = c("Inliers", "Outliers"), 
+    col = c("black", "red"), 
+    pch = 16
+  )
+}
+
+
+
 #Calcule les erreurs d'estimation de la médiane géométrique
 calculErreursM <- function(miter,mvrai,n)
 {
