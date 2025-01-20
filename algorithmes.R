@@ -88,18 +88,22 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
-estimMV <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vinit = diag(d),
-                            U = array(1, dim = c(n, q, q)),stat = rep(0,n-1),vpMCM = matrix(0,n,d), lambda = rep(1,d),lambdatilde = rep(1,d),methode = "eigen",seuil_p_value = 0.05,cutoff =qchisq(p = 0.975, df = d),niterRMon = d^2 )
+estimMV <- function(Y,c, exposantPas = 0.75,aa = 1,r = 1.5, methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = d),niterRMon = ncol(Y))
 {
 
-  sampsize = d
-
-  #Initialisation du vecteur avec les vrais paramètres
-
-  #Sigma <- diag(sqrt(1:d))
-
+  #Initialisations 
+  
+  minit = r*rnorm(ncol(Y))
+  Vinit = diag(ncol(Y))
+  U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y)))
+  Sigma = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
+  vpMCM = matrix(0,n,ncol(Y))
+  sampsize = ncol(Y)
+  lambda = rep(1,ncol(Y))
+  lambdatilde = rep(1,ncol(Y))
+  
   #Stockage des estimations des valeurs propres de la matrice de covariance
-  lambdaIter = matrix(0,n,d)
+  lambdaIter = matrix(0,nrow(Y),ncol(Y))
 
   #Yv <- mvtnorm::rmvnorm(1000000,sigma=Sigma)
 
@@ -125,11 +129,12 @@ estimMV <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vini
 
   #Calcul de la vraie médiane géométrique
 
-  mvrai <- rep(0,d)
+  mvrai <- rep(0,ncol(Y))
 
-  #Stockage des outliers
-
-  stat <- stat
+  #Stockage des distances
+  
+  distances <- rep(0,nrow(Y))
+  
 
   #Calcul de la vraie MCM par l'algorithme de Weiszfeld
 
@@ -140,7 +145,7 @@ estimMV <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vini
   moyenneV <- V
 
   #Stockage des itérations de matrices dans un tableau
-  VIter <- array(0, dim = c(d, d, n))
+  VIter <- array(0, dim = c(ncol(Y), ncol(Y), nrow(Y)))
 
   #Valeurs propres de V
   #vpMCM <- matrix(0,n,d)
@@ -164,41 +169,31 @@ estimMV <- function(Y,c,n,d,q,r,aa,depart = 0,niter = n,minit = r*rnorm(d), Vini
 #Si départ = 0 initialisation de U sur la sphère unité
 if(depart == 0){
 
-  #Vecteurs propres pour l'algorithme SGA
-  Uphi <- array(1, dim = c(n, q, q))
-
-  #Stockage des phijn
-  phijn <- matrix(0,n,d)
-
-  #Initialisation de U avec des vecteurs propres sur la sphère unité
-
-  #U[1,,] <-  1.5*diag(q)
-
-  matrix_random <- matrix(0, d, d)
+  
+  matrix_random <- matrix(0, ncol(Y), ncol(Y))
 
   # Générer chaque colonne aléatoire sur la sphère unité
-  for (i in 1:d) {
-    v <- rnorm(d)  # Tirer un vecteur d composantes normales
+  for (i in (1:ncol(Y))) {
+    v <- rnorm(ncol(Y))  # Tirer un vecteur d composantes normales
     matrix_random[, i] <- v / sqrt(sum(v^2))  # Normaliser
   }
 
   U[1,,] <- matrix_random
 
-  Uphi[1,,] <- matrix_random
 }
 
   #Stockage des itérations
-  miter = matrix(0,n,d)
+  miter = matrix(0,nrow(Y),ncol(Y))
 
   # Vecteur pour stocker les labels des outliers
-  outlier_labels <- rep(0, niter-1)
+  outlier_labels <- rep(0, nrow(Y)-1)
 
-  phat <- rep(0,n-1)
+  phat <- rep(0,nrow(Y)-1)
 
-  for (i  in 1:(niter-1))
+  for (i  in 1:(nrow(Y)-1))
   {
 
-    gamma = c/(i+depart)^(0.75)
+    gamma = c/(i+depart)^(exposantPas)
     #gamma = c/i
 
 
@@ -244,7 +239,7 @@ if(depart == 0){
       #print(phijn[i,l])
     #}
 
-    for (l in (1:q))
+    for (l in (1:ncol(Y)))
     {
       Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
       U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
@@ -294,7 +289,7 @@ if(depart == 0){
     VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
 
     valPV <- eigen(V)$values
-    lambdaResultat <- RobbinsMC2(1e2,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+    lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
     lambda <- lambdaResultat$vp
     lambdatilde <- lambdaResultat$lambda
     #print(lambda)
@@ -319,7 +314,7 @@ if(depart == 0){
       #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
       #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
       #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
-      lambdaResultat <- RobbinsMC2(1e2,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+      lambdaResultat <- RobbinsMC2(niterRMon,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$lambda
       #print(lambda)
@@ -354,17 +349,19 @@ if(depart == 0){
 
     #phat[i] <- resultatOutlier$phat
     #print(phat[i])
-
+#Estimation de Sigma 
+    VP <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
+    Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
   }
 
 
-  miter[n,] = miter[n-1,]
-  VIter[,,n] = VIter[,,n-1]
+  miter[nrow(Y),] = miter[nrow(Y)-1,]
+  VIter[,,nrow(Y)] = VIter[,,nrow(Y)-1]
 
 
 
 
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma))
 }
 
 

@@ -22,7 +22,7 @@ library("bigutilsr")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
-#source("~/algosto/parametres.R")
+source("~/algosto/parametres.R")
 source("~/algosto/simulations.R")
 source("~/algosto/algorithmes.R")
 source("~/algosto/resultats.R")
@@ -91,8 +91,10 @@ distances <- rep(0,n)
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  #delta <- 2
+  delta <- 2
+  contamin = "moyenne"
   p1 <- 1 - delta / 100
+  
   p2 <- 1 - p1
   #mu1
   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
@@ -173,7 +175,7 @@ for (i in seq_along(taux_contamination)) {
       #k = 1
     #)
     
-    results <- estimMV(Z, c = sqrt(d), nrow(Z), ncol(Z), ncol(Z), r = 1.5, aa = 0.75, niter = 1e4,niterRMon = d ,methode = "eigen")
+    results <- estimMV(Z, c = sqrt(d),niterRMon = d ,methode = "eigen")
     miter <- results$miter
     U <- results$U
     lambda <- results$lambdaIter
