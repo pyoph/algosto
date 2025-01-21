@@ -351,6 +351,7 @@ if(depart == 0){
 #Estimation de Sigma 
     VP <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
     Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
+    distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
   }
 
 

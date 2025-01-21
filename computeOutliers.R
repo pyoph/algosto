@@ -253,7 +253,7 @@ for (i in seq_along(taux_contamination)) {
     #cutoff <- calcule_cutoff(distances,d)
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,nrow(Z),ncol(Z),cutoff)
-    tc <- table_contingence(resultsSimul$labelsVrais[1:(n - 1)], as.numeric(outliers_labels[1:(n - 1)]))
+    tc <- table_contingence(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     #tc
     tc <- safe_access_tc(tc)
     

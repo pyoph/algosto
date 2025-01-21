@@ -57,14 +57,14 @@ for (i in seq_along(taux_contamination))
   #Estimation online
   results <- estimMV(Z, c = sqrt(d),niterRMon = d ,methode = "eigen")
   SigmaEstimOnline <- results$Sigma
-  
+  distances <- results$distances
   #Estimation offline
   resultsOffline <- RobVar(Z)
   SigmaEstimOffline <- resultsOffline$variance
   
   erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
   
-  erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
-  affiche_erreursSigmav2(erreursonline,erreursoffline,delta)
+  #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
+  #affiche_erreursSigmav2(erreursonline,erreursoffline = rep(0,,nrow(Z)),delta)
   
 }
