@@ -59,6 +59,59 @@ calculErreursM <- function(miter,mvrai,n)
 
 }
 
+#Calcul des erreurs en norme de Frobenius
+
+calculErreursNormeFrobenius <- function (Estim,Vrai)
+{
+nbiterations <- dim(Estim)[1]
+
+erreurs <- rep(0,nbiterations)
+
+for (i in (1:nbiterations))
+{
+erreurs[i] <-  norm(Vrai - Estim[i,,],type = "F")/nbiterations
+}
+return (erreurs)
+}
+
+#Affichage des erreurs 
+
+# Fonction pour afficher les erreurs d'estimation
+affiche_erreursSigmav2 <- function(erreurs_online, erreurs_offline, contamination = 2) {
+  
+  nberreurs_online <- length(erreurs_online)
+  nberreurs_offline <- length(erreurs_offline)
+  
+  if (nberreurs_online != nberreurs_offline) {
+    stop("Les vecteurs 'erreurs_online' et 'erreurs_offline' doivent avoir la même longueur.")
+  }
+  
+  # Créer le data frame
+  data <- data.frame(
+    x = rep(1:(nberreurs_online - 1), 2),
+    erreurs = c(erreurs_online[1:(nberreurs_online - 1)], erreurs_offline[1:(nberreurs_offline - 1)]),
+    type = c(rep("Online", nberreurs_online - 1), rep("Offline", nberreurs_offline - 1))
+  )
+  
+  # Créer le graphique
+  p <- ggplot(data, aes(x = x, y = erreurs, color = type, linetype = type)) +
+    geom_line(size = 1) +
+    scale_x_log10() +   # Échelle logarithmique pour l'axe x
+    scale_y_log10() +   # Échelle logarithmique pour l'axe y
+    scale_color_manual(values = c("Online" = "blue", "Offline" = "green"),
+                       labels = c(paste("Online (contamination = ", contamination , "%)", sep = ""),
+                                  paste("Offline (contamination = ", contamination , "%)", sep = ""))) +
+    labs(x = "Taille de l'échantillon", 
+         y = "Erreur norme de Frobenius",
+         title = "Comparaison des erreurs d'estimation de Sigma",
+         color = "Méthode", 
+         linetype = "Méthode") +
+    theme_minimal()
+  
+  print(p)
+}
+
+
 #Calcule les erreurs d'estimation de la matrice de covariance médiane comparer avec I_d
 
 calculErreursV <- function(Viter,Vvrai,n)

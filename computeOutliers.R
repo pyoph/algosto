@@ -22,11 +22,11 @@ library("bigutilsr")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/Outliers.R")
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
+source("~/work/algosto/resultats.R")
+source("~/work/algosto/Outliers.R")
 
 #Rajout de 0 dans les tables de contingence si les champs sont vides
 safe_access_tc <- function(tc, default = 0) {
@@ -91,7 +91,7 @@ distances <- rep(0,n)
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  delta <- 2
+  #delta <- 2
   contamin = "moyenne"
   p1 <- 1 - delta / 100
   

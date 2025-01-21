@@ -88,16 +88,15 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
-estimMV <- function(Y,c, exposantPas = 0.75,aa = 1,r = 1.5, methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = d),niterRMon = ncol(Y))
+estimMV <- function(Y,c, exposantPas = 0.75,aa = 1,r = 1.5, 
+                    minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
+                    ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
+                    vpMCM = matrix(0,n,ncol(Y))
+                    ,methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = d),niterRMon = ncol(Y))
 {
 
   #Initialisations 
-  
-  minit = r*rnorm(ncol(Y))
-  Vinit = diag(ncol(Y))
-  U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y)))
   Sigma = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
-  vpMCM = matrix(0,n,ncol(Y))
   sampsize = ncol(Y)
   lambda = rep(1,ncol(Y))
   lambdatilde = rep(1,ncol(Y))

@@ -77,5 +77,5 @@ Sigma1 = creerMatriceToeplitz(rho,d)
 
 lignes_a_permuter = c(1, 2)
 colonnes_a_permuter = c(1, 2)
-#Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter , colonnes_a_permuter)
-Sigma2 = 0.2* Sigma1
+Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter , colonnes_a_permuter)
+#Sigma2 = 0.2* Sigma1
