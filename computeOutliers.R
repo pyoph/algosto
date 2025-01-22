@@ -22,11 +22,6 @@ library("bigutilsr")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
-source("~/work/algosto/parametres.R")
-source("~/work/algosto/simulations.R")
-source("~/work/algosto/algorithmes.R")
-source("~/work/algosto/resultats.R")
-source("~/work/algosto/Outliers.R")
 
 #Rajout de 0 dans les tables de contingence si les champs sont vides
 safe_access_tc <- function(tc, default = 0) {
@@ -92,7 +87,7 @@ distances <- rep(0,n)
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
   #delta <- 2
-  contamin = "moyenne"
+  #contamin = "moyenne"
   p1 <- 1 - delta / 100
   
   p2 <- 1 - p1
@@ -103,17 +98,18 @@ for (i in seq_along(taux_contamination)) {
   
   temps_covEmp[i] <- system.time({
     #distances <- calcule_vecteur_distancesEmpirique(Z)
-    distances <- calcule_vecteur_distancesEmpiriqueVrai(Z,Sigma1)
+    #distances <- calcule_vecteur_distancesEmpiriqueVrai(Z,Sigma1)
     #distances
-    outliers <- detectionOutliers(distances, nrow(Z),ncol(Z),cutoff = qchisq(p = 0.95,df = ncol(Z)))
-    tc <- table_contingence(resultsSimul$labelsVrais[1:(n -1)], as.numeric(outliers)[1:(n - 1)])
+    distances <- calcule_vecteur_distances(Z,as.numeric(colMeans(Z)), cov(Z))
+    outliers <- detectionOutliers(distances,cutoff = qchisq(p = 0.95,df = ncol(Z)))
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) -1)], as.numeric(outliers)[1:(nrow(Z) - 1)])
     tc <- safe_access_tc(tc)
     
     
     if((tc["0","0"] + tc["0","1"]) != 0)
-    {faux_positifs_covEmp[i]   <- tc["0", "1"]/(tc["0","0"] + tc["1","0"])}
+    {faux_positifs_covEmp[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
     if((tc["1","0"] + tc["1","1"]) != 0)
-    {faux_negatifs_covEmp[i] <- tc["1","0"]/(tc["1","0"] + tc["1","1"])}
+    {faux_negatifs_covEmp[i] <- round((tc["1", "0"]/(tc["1","0"] + tc["1","1"]))*100,2)}
     #faux_negatifs_maha[i]
     #tc
   })["elapsed"]
@@ -132,8 +128,8 @@ for (i in seq_along(taux_contamination)) {
     #cutoff = calcule_cutoff(distances,d)
     cutoff =  qchisq(p = 0.95, df = ncol(Z))
     #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
-    outliers_listMaha <- detectionOutliers(distances,nrow(Z),ncol(Z), cutoff)
-    tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_listMaha)[1:9999])
+    outliers_listMaha <- detectionOutliers(distances,cutoff)
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_listMaha)[1:(nrow(Z) - 1)])
     tc
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
@@ -175,14 +171,14 @@ for (i in seq_along(taux_contamination)) {
       #k = 1
     #)
     
-    results <- estimMV(Z, c = sqrt(d),niterRMon = d ,methode = "eigen")
-    miter <- results$miter
-    U <- results$U
-    lambda <- results$lambdaIter
-    distances <- calcule_vecteur_distancesOnline(Z,miter,U,lambda)
+    results <- estimMV(Z)
+    #miter <- results$miter
+    #U <- results$U
+    #lambda <- results$lambdaIter
+    distances <- results$distances
     #c <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances, nrow(Z),ncol(Z),cutoff =  qchisq(p = 0.95, df = ncol(Z)))
-    tc <- table_contingence(resultsSimul$labelsVrais[1:(n - 1)], outliers_labels[1:(n - 1)])
+    outliers_labels <- detectionOutliers(distances,cutoff =  qchisq(p = 0.95, df = ncol(Z)))
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], outliers_labels[1:(nrow(Z) - 1)])
     tc <- safe_access_tc(tc)
     
     if((tc["0","0"] + tc["0","1"]) != 0)
@@ -202,10 +198,10 @@ for (i in seq_along(taux_contamination)) {
     SigmaEstim <- Rvar$variance
     distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     #cutoff <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances, nrow(Z),ncol(Z),cutoff =  qchisq(p = 0.95, df = ncol(Z)))
+    outliers_labels <- detectionOutliers(distances,cutoff =  qchisq(p = 0.95, df = ncol(Z)))
     #outliers_labels <- detectionOffline(Z, SigmaEstim, m, 0.025,cutoff)
     
-    tc <- table_contingence(resultsSimul$labelsVrais[1:(n - 1)], as.numeric(outliers_labels[1:(n - 1)]))
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     tc <- safe_access_tc(tc)
     #tc
     #print(i)
@@ -227,8 +223,8 @@ for (i in seq_along(taux_contamination)) {
     distances <- calcule_vecteur_distances(Z,med,comed)
     #cutoff <- calcule_cutoff(distances,d)
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
-    outliers_labels <- detectionOutliers(distances,nrow(Z),ncol(Z),cutoff)
-    tc <- table_contingence(resultsSimul$labelsVrais[1:9999], as.numeric(outliers_labels[1:9999]))
+    outliers_labels <- detectionOutliers(distances,cutoff)
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z)- 1)]))
     tc <- safe_access_tc(tc)
     
     #print(i)
@@ -252,8 +248,8 @@ for (i in seq_along(taux_contamination)) {
     distances <- calcule_vecteur_distances(Z,med,SigmaShrink)
     #cutoff <- calcule_cutoff(distances,d)
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
-    outliers_labels <- detectionOutliers(distances,nrow(Z),ncol(Z),cutoff)
-    tc <- table_contingence(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
+    outliers_labels <- detectionOutliers(distances,cutoff)
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     #tc
     tc <- safe_access_tc(tc)
     
@@ -270,9 +266,9 @@ for (i in seq_along(taux_contamination)) {
 
 results_outliers <- data.frame(
   #Taux_Contamination = taux_contamination,
-  #FN_Cov = faux_negatifs_covEmp,
-  #FP_Cov= faux_positifs_covEmp,
-  #Tps_Cov = temps_covEmp,
+  FN_Cov = faux_negatifs_covEmp,
+  FP_Cov= faux_positifs_covEmp,
+  Tps_Cov = temps_covEmp,
   FN_OGK = faux_negatifs_maha,
   FP_OGK = faux_positifs_maha,
   Tps_OGK = temps_maha,
@@ -293,7 +289,6 @@ results_outliers <- data.frame(
   Tps_Shrink = temps_shrink
 )
 
-#Tester mahalanobis threshold = 0,05
 
 row.names(results_outliers) <- taux_contamination
 

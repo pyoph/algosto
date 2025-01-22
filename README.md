@@ -1,75 +1,73 @@
-# Algorithmes stochastiques pour la statistique robuste 
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Algorithmes stochastiques pour la statistique robuste
 
 ## Fichiers du code
 
-* parametres.R : initialisation des différents paramètres communs à toutes les simulations. Fonctions de création de matrices de Toeplitz, et de permutation de lignes et de colonnes pour les matrices de variance et de covariance.
+-   parametres.R : initialisation des différents paramètres communs à
+    toutes les simulations. Fonctions de création de matrices de
+    Toeplitz, et de permutation de lignes et de colonnes pour les
+    matrices de variance et de covariance.
 
-* simulations.R : Génère $n$ vecteurs de dimension $d$, avec ou sans outliers selon 3 modes de contamination (en moyenne, en variance, avec une loi de Student à 1 degré de liberté).
-      
+-   simulations.R : Génère $n$ vecteurs de dimension $d$, avec ou sans
+    outliers selon 3 modes de contamination (en moyenne, en variance,
+    avec une loi de Student à 1 degré de liberté). Fonction principale :
+    genererEchantillon() : utilisée pour générer un échantillon non
+    contaminé ou contaminé
 
-* algorithmes.R : contient les différents algorithmes qui visent à
-    - estimer la médiane géométrique, et la matrice de covariance ;
-     Fonctionne à partir des données générées (notamment le vecteur Y) par la fonction generer_echantillon du fichier simulations.R
+-   algorithmes.R : contient les différents algorithmes qui visent à
 
-* resultats.R : a comme fonctions principales :
-    - calculer les erreurs ;
-    - afficher les erreurs d'estimation des différentes quantités d'intérêt
+    -   estimer la médiane géométrique, et la matrice de covariance ;
+        Fonctionne à partir des données générées (notamment le vecteur
+        Y) par la fonction generer_echantillon du fichier simulations.R
+        2 fonctions principales :
+        
+          estimV (estimation en ligne) et streaming (pour une estimation par blocs)
 
-* Outliers.R : fonctions qui : 
-      - calculent les distances de Mahalanobis ;
-      - detectent les outliers
+-   resultats.R : a comme fonctions principales :
 
-* computeOutliers.R : 
-      - applique plusieurs algorithmes basés sur différentes estimations de la matrice de covariance pour détecter les outliers
+    -   calculer les erreurs ;
+    -   afficher les erreurs d'estimation des différentes quantités
+        d'intérêt
 
-* main.R :
-  - lancement des fonctions dans les précédents fichiers
+-   Outliers.R : fonctions qui : - calculent les distances de
+    Mahalanobis ; - detectent les outliers
 
-## Exemple d'utilisation 
+-   computeOutliers.R : - applique plusieurs algorithmes basés sur
+    différentes estimations de la matrice de covariance pour détecter
+    les outliers
 
-Dans le fichier parametres.R modifier les paramètres souhaités 
-```r
+-   main.R :
 
-nbruns = 1
-n = 1e4
-d = 10 
-mu1 = rep(0,d)
-mu2 = 5*rep(1,d)
-rho = 0.8
+    -   lancement des fonctions dans les précédents fichiers
+
+## Exemple d'utilisation
+
+Dans le fichier parametres.R modifier les paramètres souhaités \`\`\`r
+
+nbruns = 1 n = 1e4 d = 10 mu1 = rep(0,d) mu2 = 5\*rep(1,d) rho = 0.8
 Sigma1 = creerMatriceToeplitz(rho,d)
 
-lignes_a_permuter = c(1, 2)
-colonnes_a_permuter = c(1, 2)
-Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter , colonnes_a_permuter)
+lignes_a_permuter = c(1, 2) colonnes_a_permuter = c(1, 2) Sigma2 =
+permuterLignesColonnes(Sigma1,lignes_a_permuter , colonnes_a_permuter)
 
-Dans le fichier main.R, lancer l'intégralité des lignes de code du fichier pour la détection des outliers
+Dans le fichier main.R, lancer l'intégralité des lignes de code du
+fichier pour la détection des outliers
 
-```r
+\`\`\`r
 
-
-library(reshape2)
-library(RobRegression)
-library(Gmedian)
-library(ggplot2)
-library(far)
-library(gridExtra)
-library(microbenchmark)
-library("matlib")
-library("MASS")
-library("corrplot")
-library("dplyr")
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/Outliers.R")
-source("~/algosto/computeOutliers.R")
-
-
+library(reshape2) library(RobRegression) library(Gmedian)
+library(ggplot2) library(far) library(gridExtra) library(microbenchmark)
+library("matlib") library("MASS") library("corrplot") library("dplyr")
+source("\~/algosto/parametres.R") source("\~/algosto/simulations.R")
+source("\~/algosto/algorithmes.R") source("\~/algosto/resultats.R")
+source("\~/algosto/Outliers.R") source("\~/algosto/computeOutliers.R")
 
 #Calcul des outliers
 
-for (i in (1 : nbruns)){
-results_outliers <- calcule_outliers(n,d,c,rho,mu1,mu2,Sigma1,Sigma2,contamin = "student")
-}
-
+for (i in (1 : nbruns)){ results_outliers \<-
+calcule_outliers(n,d,c,rho,mu1,mu2,Sigma1,Sigma2,contamin = "student") }

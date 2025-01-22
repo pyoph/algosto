@@ -88,11 +88,11 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
-estimMV <- function(Y,c, exposantPas = 0.75,aa = 1,r = 1.5, 
+estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, 
                     minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
                     vpMCM = matrix(0,n,ncol(Y))
-                    ,methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = d),niterRMon = ncol(Y))
+                    ,methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
 {
 
   #Initialisations 
@@ -352,6 +352,8 @@ if(depart == 0){
     VP <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
     Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
     distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+    
+    
   }
 
 
