@@ -67,7 +67,55 @@ source("\~/algosto/parametres.R") source("\~/algosto/simulations.R")
 source("\~/algosto/algorithmes.R") source("\~/algosto/resultats.R")
 source("\~/algosto/Outliers.R") source("\~/algosto/computeOutliers.R")
 
+
+#Estimation de la matrice de covariance pour différents taux de contamination
+
+
+
+#Utilisation de la fonction d'estimation online et affichage des erreurs
+
+
+taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
+
+
+
+for (i in seq_along(taux_contamination)) 
+{
+  delta <- taux_contamination[i]
+ 
+ #Proportion dans l'échantillon non contaminée et contaminée
+  p1 <- 1 - delta / 100
+  
+  p2 <- 1 - p1
+  #mu1
+ 
+  
+  resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = "moyenne")
+  Z <- resultsSimul$Z
+  
+  #Estimation online
+  results <- estimMV(Z)
+  
+  
+  #Calcul des erreurs
+  
+  erreursMiter <- calculErreursM(results$miter,rep(0,d))
+  erreursSigma <- calculErreursNormeFrobenius(results$Sigma,Sigma1)
+  
+  #Affichage des erreurs
+  
+  #affiche_erreursM(erreursMiter,contamination = delta)
+  
+  affiche_erreursSigma(erreursSigma,contamination= delta)
+  
+  
+}
+
+
+
 #Calcul des outliers
 
 for (i in (1 : nbruns)){ results_outliers \<-
 calcule_outliers(n,d,c,rho,mu1,mu2,Sigma1,Sigma2,contamin = "student") }
+
+
