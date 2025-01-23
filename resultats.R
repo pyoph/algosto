@@ -165,7 +165,7 @@ affiche_erreursSigma <- function(erreurs_online, erreurs_offline = NULL, contami
 
 
 
-#Tracé de la courbe ROC
+#Tracé de la courbe ROC et calcul AUC pour plusieurs seuils
 
 courbeROC <- function(labelsVrais,distances){
 
@@ -180,7 +180,7 @@ courbeROC <- function(labelsVrais,distances){
   #Calcul des outliers à partir des distances pour chaque seuil
   
   outliers_labels <- detectionOutliers(distances, cutoff = s)
-  tc <- table(resultsSimul$labelsVrais, outliers_labels)
+  tc <- table(labelsVrais, outliers_labels)
   tc <- safe_access_tc(tc)
   #tc
   #print(i)
@@ -190,7 +190,7 @@ courbeROC <- function(labelsVrais,distances){
   if((tc["1","0"] + tc["1","1"]) != 0){
     fpr[s] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"])),2)
   }
-  pred  <- prediction(outliers_labels, resultsSimul$labelsVrais)
+  pred  <- prediction(outliers_labels, labelsVrais)
   
   # Calculating Area under Curve
   perf <- performance(pred,"auc")

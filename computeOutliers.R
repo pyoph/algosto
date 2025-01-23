@@ -86,8 +86,8 @@ distances <- rep(0,n)
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  delta <- 2
-  contamin = "moyenne"
+  #delta <- 2
+  #contamin = "moyenne"
   p1 <- 1 - delta / 100
   
   p2 <- 1 - p1
@@ -198,9 +198,9 @@ for (i in seq_along(taux_contamination)) {
     SigmaEstim <- Rvar$variance
     distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     
-    cutoff <- calcule_cutoff(distances,d)
+    #cutoff <- calcule_cutoff(distances,d)
     outliers_labels <- detectionOutliers(distances,cutoff =  qchisq(p = 0.95, df = ncol(Z)))
-    auc <- courbeROCAUC (resultsSimul$labelsVrais,outliers_labels)
+    #auc <- courbeROCAUC (resultsSimul$labelsVrais,outliers_labels)
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     tc <- safe_access_tc(tc)
     #tc
