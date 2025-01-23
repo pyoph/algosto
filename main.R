@@ -4,6 +4,7 @@
 #install.packages("RGMM")
 #install.packages("rrcov")
 #install.packages("mvnfast")
+#install.packages("reshape")
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -31,7 +32,7 @@ source("~/work/algosto/computeOutliers.R")
 
 for (i in 1:nbruns)
 {
-  resultats_outliers <- calcule_outliers()
+  resultats_outliers <- calcule_outliers(contamin = "moyenne")
 }
 
 

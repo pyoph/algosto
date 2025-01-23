@@ -9,7 +9,9 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-
+# Load ROCR package
+library(ROCR)
+install.packages("ROCR")
 
 
 #Calcule les erreurs d'estimation de la médiane géométrique critère RMSE
@@ -159,3 +161,27 @@ affiche_erreursSigma <- function(erreurs_online, erreurs_offline = NULL, contami
   print(p)
 }
 
+
+
+
+
+#Tracé de la courbe ROC
+
+courbeROC <- function(labelsVrais,outliers_labels){
+
+#Construction de la courbe ROC 
+
+  pred <- prediction(outliers_labels, labelsVrais)
+  
+  
+  # Calculate performance (True Positive Rate and False Positive Rate)
+  perf <- performance(pred, "fpr", "tpr")
+  
+  # Plot the ROC curve
+  plot(perf, col = "darkgreen", lwd = 2, main = "Courbe ROC")
+  
+  # Add a diagonal reference line
+  abline(a = 0, b = 1, col = "red", lty = 2)
+  
+ 
+}
