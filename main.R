@@ -23,12 +23,12 @@ library("bigutilsr")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/Outliers.R")
-source("~/algosto/computeOutliers.R")
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
+source("~/work/algosto/resultats.R")
+source("~/work/algosto/Outliers.R")
+source("~/work/algosto/computeOutliers.R")
 
 for (i in 1:nbruns)
 {
@@ -44,7 +44,7 @@ for (i in seq_along(taux_contamination))
   contamin = "moyenne"
   
   delta <- taux_contamination[i]
-  
+  #delta <- 2
   
   #Génération des échantillons
   p1 <- 1 - delta / 100
