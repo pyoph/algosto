@@ -23,13 +23,13 @@ library("bigutilsr")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
-source("~/work/algosto/parametres.R")
-source("~/work/algosto/simulations.R")
-source("~/work/algosto/algorithmes.R")
-source("~/work/algosto/resultats.R")
-source("~/work/algosto/Outliers.R")
-source("~/work/algosto/computeOutliers.R")
-source("~/work/algosto/seuils.R")
+source("~/algosto/parametres.R")
+source("~/algosto/simulations.R")
+source("~/algosto/algorithmes.R")
+source("~/algosto/resultats.R")
+source("~/algosto/Outliers.R")
+source("~/algosto/computeOutliers.R")
+source("~/algosto/seuils.R")
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne")
@@ -80,10 +80,19 @@ taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)
 #Création d'un dataframe pour contenir les meilleurs AUC
 
 auc_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
+seuil_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
+
 
 rownames(auc_df) <- taux_contamination
 
+
+rownames(seuil_df) <- taux_contamination
+
 colnames(auc_df) <- methodes
+
+
+colnames(seuil_df) <- methodes
+
 
 for (i in seq_along(taux_contamination)) 
 {
@@ -100,11 +109,15 @@ for (i in seq_along(taux_contamination))
   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
   Z <- resultsSimul$Z
   
+  #Calcul du meilleur seuil selon l'AUC et de l'AUC selon chaque méthode
   for (m in methodes)
   {
     
       distances <- calcule_distances_par_methode(Z,methode = m)
-      auc_df[i,m] <- courbeROC(resultsSimul$labelsVrais,distances)
+      
+      resultats <- courbeROC(resultsSimul$labelsVrais,distances)
+      auc_df[i,m] <- resultats$auc_max
+      seuil_df[i,m] <- resultats$seuil_auc_max
   }
   
   

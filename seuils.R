@@ -10,6 +10,8 @@ library("MASS")
 library("corrplot")
 library("dplyr")
 library(ROCR)
+library(pROC)
+#install.packages("pROC")
 #install.packages("ROCR")
 
 
@@ -29,9 +31,9 @@ courbeROC <- function(labelsVrais,distances){
   
   for (s in seq_along(seuils)){
     #Calcul des outliers à partir des distances pour chaque seuil
-    
+    #s = 64
     outliers_labels <- detectionOutliers(distances, cutoff = s)
-    tc <- table(labelsVrais, outliers_labels)
+    tc <- table(resultsSimul$labelsVrais, outliers_labels)
     tc <- safe_access_tc(tc)
     #tc
     #print(i)
@@ -41,12 +43,17 @@ courbeROC <- function(labelsVrais,distances){
     if((tc["1","0"] + tc["1","1"]) != 0){
       fpr[s] <-  round((tc["0","1"]/(tc["0","0"] + tc["0","1"])),2)
     }
-    pred  <- prediction(outliers_labels, labelsVrais)
+    #outliers_labels[1] <- 1
+    #pred  <- prediction(outliers_labels,resultsSimul$labelsVrais)
     
-    # Calculating Area under Curve
-    perf <- performance(pred,"auc")
-    auc[s] <- round(as.numeric(perf@y.values)*100,2)
-  }
+    #Calcul AUC
+    #perf <- performance(pred,"auc")
+    #auc[s] <- round(as.numeric(perf@y.values)*100,2)
+    roc_obj <- roc(resultsSimul$labelsVrais, outliers_labels)
+    auc[s] <- round(auc(roc_obj)*100,2)
+    
+    
+    }
   #Construction de la courbe ROC 
   roc_df <- data.frame(Seuils = seuils, TPR = tpr, FPR = fpr,auc = auc)
   
@@ -64,11 +71,10 @@ courbeROC <- function(labelsVrais,distances){
   
   print(roc_plot)
   
-  #Renvoi du seuil pour lequel l'AUC est maximal 
+  #Renvoi du seuil pour lequel l'AUC est maximal et de l'AUC maximal
   
   seuil_auc_max <- as.numeric(roc_df$Seuils[which.max(roc_df$auc)])
+  auc_max <- max(roc_df$auc)
   
-  
-  return(seuil_auc_max)
-  
+  return(list(seuil_auc_max = seuil_auc_max, auc_max = auc_max))  
 }
