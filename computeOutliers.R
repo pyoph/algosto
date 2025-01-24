@@ -46,8 +46,7 @@ safe_access_tc <- function(tc, default = 0) {
 ######Boucle calcul outliers#####
 
 
-calcule_outliers <- function(n = 1e4, d = 10, c = sqrt(d),rho = 0.8, mu1 = rep(0,d),mu2 = 5*rep(1,d),Sigma1 = creerMatriceToeplitz(rho,d) ,Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2),colonnes_a_permuter = c(1,2))
-, contamin = "student") 
+calcule_outliers <- function(n = 1e4, d = 10, c = sqrt(d),rho = 0.8, mu1 = rep(0,d),mu2 = 5*rep(1,d),Sigma1 = creerMatriceToeplitz(rho,d) ,Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2)),colonnes_a_permuter = c(1,2),cutoff = qchisq(p = 0.95,df = ncol(Z)),contamin = "student") 
 {
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
@@ -101,7 +100,7 @@ for (i in seq_along(taux_contamination)) {
     #distances <- calcule_vecteur_distancesEmpiriqueVrai(Z,Sigma1)
     #distances
     distances <- calcule_vecteur_distances(Z,as.numeric(colMeans(Z)), cov(Z))
-    outliers <- detectionOutliers(distances,cutoff = qchisq(p = 0.95,df = ncol(Z)))
+    outliers <- detectionOutliers(distances,cutoff = cutoff)
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) -1)], as.numeric(outliers)[1:(nrow(Z) - 1)])
     tc <- safe_access_tc(tc)
     
@@ -177,7 +176,7 @@ for (i in seq_along(taux_contamination)) {
     #lambda <- results$lambdaIter
     distances <- results$distances
     #c <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances,cutoff =  qchisq(p = 0.95, df = ncol(Z)))
+    outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], outliers_labels[1:(nrow(Z) - 1)])
     tc <- safe_access_tc(tc)
     
@@ -199,7 +198,7 @@ for (i in seq_along(taux_contamination)) {
     distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     
     #cutoff <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances,cutoff =  qchisq(p = 0.95, df = ncol(Z)))
+    outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
     #auc <- courbeROCAUC (resultsSimul$labelsVrais,outliers_labels)
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     tc <- safe_access_tc(tc)

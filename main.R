@@ -82,7 +82,6 @@ taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)
 auc_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
 seuil_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
 
-
 rownames(auc_df) <- taux_contamination
 
 
@@ -121,5 +120,8 @@ for (i in seq_along(taux_contamination))
   }
   
   
-  
+  #Enregistrement dans un CSV
+  write.csv(auc_df,file = "auc.csv")
+
+  write.csv(seuil_df,file = "seuil.csv")  
 }
