@@ -29,7 +29,7 @@ source("~/work/algosto/algorithmes.R")
 source("~/work/algosto/resultats.R")
 source("~/work/algosto/Outliers.R")
 source("~/work/algosto/computeOutliers.R")
-
+source("~/work/algosto/seuils.R")
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne")
@@ -38,6 +38,7 @@ for (i in 1:nbruns)
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
+###Test fonction d'estimation online
 
 for (i in seq_along(taux_contamination)) 
 {
@@ -67,5 +68,45 @@ for (i in seq_along(taux_contamination))
   
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
   #affiche_erreursSigmav2(erreursonline,erreursoffline = rep(0,,nrow(Z)),delta)
+  
+}
+
+###Calcul du meilleur AUC pour chaque méthode
+
+methodes <- c("Cov Empirique", "OGK", "Online", "Offline", "Comédiane", "Shrinkage")
+
+taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)
+
+#Création d'un dataframe pour contenir les meilleurs AUC
+
+auc_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
+
+rownames(auc_df) <- taux_contamination
+
+colnames(auc_df) <- methodes
+
+for (i in seq_along(taux_contamination)) 
+{
+  contamin = "moyenne"
+  
+  delta <- taux_contamination[i]
+  #delta <- 2
+  
+  #Génération des échantillons
+  p1 <- 1 - delta / 100
+  
+  p2 <- 1 - p1
+  
+  resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
+  Z <- resultsSimul$Z
+  
+  for (m in methodes)
+  {
+    
+      distances <- calcule_distances_par_methode(Z,methode = m)
+      auc_df[i,m] <- courbeROC(resultsSimul$labelsVrais,distances)
+  }
+  
+  
   
 }
