@@ -116,9 +116,10 @@ for (i in seq_along(taux_contamination))
   #Calcul du meilleur seuil selon l'AUC et de l'AUC selon chaque méthode
   for (m in methodes)
   {
-    
-      distances <- calcule_distances_par_methode(Z,methode = m)
       
+         
+      distances <- calcule_distances_par_methode(Z,methode = m)
+      #print(distances)
       resultats <- courbeROC(resultsSimul$labelsVrais,distances)
       auc_df[i,m] <- resultats$auc_max
       seuil_df[i,m] <- resultats$seuil_auc_max

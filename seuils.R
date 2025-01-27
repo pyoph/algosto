@@ -32,27 +32,26 @@ courbeROC <- function(labelsVrais,distances){
   
   for (s in seq_along(seuils)){
     #Calcul des outliers à partir des distances pour chaque seuil
-    #s = 64
+    #s = 18
     outliers_labels <- detectionOutliers(distances, cutoff = s)
-    tc <- table(resultsSimul$labelsVrais, outliers_labels)
+    tc <- table(labelsVrais, outliers_labels)
     tc <- safe_access_tc(tc)
     #tc
     #print(i)
-    if((tc["0","1"] + tc["0","0"])!= 0)
+    if((tc["1","1"] + tc["1","0"])!= 0)
     {tpr[s]   <- round((tc["1", "1"]/(tc["1","1"] + tc["1","0"])),2)}
     #else {faux_positifs_maha[i]   <- 0}
-    if((tc["1","0"] + tc["1","1"]) != 0){
+    if((tc["0","1"] + tc["0","0"]) != 0){
       fpr[s] <-  round((tc["0","1"]/(tc["0","0"] + tc["0","1"])),2)
     }
     #outliers_labels[1] <- 1
     #pred  <- prediction(outliers_labels,resultsSimul$labelsVrais)
     
-    #Calcul AUC
-    #perf <- performance(pred,"auc")
-    #auc[s] <- round(as.numeric(perf@y.values)*100,2)
-    roc_obj <- roc(resultsSimul$labelsVrais, outliers_labels)
-    auc[s] <- round(auc(roc_obj)*100,2)
     
+    roc_obj <- roc(labelsVrais, outliers_labels)
+    auc[s] <- round(auc(roc_obj)*100,2)
+  }
+  
     
   #Construction de la courbe ROC 
   roc_df <- data.frame(Seuils = seuils, TPR = tpr, FPR = fpr,auc = auc)
@@ -77,6 +76,5 @@ courbeROC <- function(labelsVrais,distances){
   auc_max <- max(roc_df$auc)
   
   return(list(seuil_auc_max = seuil_auc_max, auc_max = auc_max))  
-}
 
 }
