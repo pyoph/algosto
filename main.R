@@ -40,6 +40,8 @@ taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
 ###Test fonction d'estimation online
 
+erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
+
 for (i in seq_along(taux_contamination)) 
 {
   contamin = "moyenne"
@@ -57,19 +59,21 @@ for (i in seq_along(taux_contamination))
   
   
   #Estimation online
-  results <- estimMV(Z, c = sqrt(d),niterRMon = d ,methode = "eigen")
+  results <- estimMV(Z)
   SigmaEstimOnline <- results$Sigma
   distances <- results$distances
   #Estimation offline
-  resultsOffline <- RobVar(Z)
-  SigmaEstimOffline <- resultsOffline$variance
+  #resultsOffline <- RobVar(Z)
+  #SigmaEstimOffline <- resultsOffline$variance
   
   erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
-  
+  erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
   #affiche_erreursSigmav2(erreursonline,erreursoffline = rep(0,,nrow(Z)),delta)
   
 }
+
+creer_boxplot_erreurs(erreursSigmaBoxplot,taux_contamination,methode= "online")
 
 ###Calcul du meilleur AUC pour chaque méthode
 

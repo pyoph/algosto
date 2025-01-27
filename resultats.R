@@ -11,7 +11,6 @@ library("corrplot")
 library("dplyr")
 
 
-
 #Calcule les erreurs d'estimation de la médiane géométrique critère RMSE
 
 calculErreursM <- function(miter,mvrai)
@@ -102,7 +101,32 @@ affiche_erreursM <- function(erreurs_online, erreurs_offline = NULL, contaminati
 }
 
 
+#Affichage des boxplots des erreurs
 
+# Fonction pour créer un graphique des boxplots des erreurs pour une méthode
+creer_boxplot_erreurs <- function(erreurs_matrix, taux_contamination, methode) {
+  # Convertir la matrice en un format long pour ggplot
+  erreurs_df <- data.frame(
+    TauxContamination = rep(taux_contamination, each = ncol(erreurs_matrix)),
+    Erreur = as.vector(erreurs_matrix)
+  )
+  
+  # Créer le graphique
+  p <- ggplot(erreurs_df, aes(x = factor(TauxContamination), y = Erreur)) +
+    geom_boxplot(fill = "lightblue", alpha = 0.7, color = "darkblue") +
+    labs(
+      title = paste("Boxplot des erreurs - Méthode:", methode),
+      x = "Taux de contamination (%)",
+      y = "Erreur (norme de Frobenius)"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      plot.title = element_text(hjust = 0.5)
+    )
+  
+  print(p)
+}
 
 
 # Fonction pour afficher les erreurs d'estimation de Sigma online et offline pour différents taux de contamination. 
