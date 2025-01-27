@@ -39,7 +39,6 @@ for (i in 1:nbruns)
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
 ###Test fonction d'estimation online
-<<<<<<< HEAD
 
 erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 
@@ -97,8 +96,6 @@ colnames(auc_df) <- methodes
 
 colnames(seuil_df) <- methodes
 
-=======
->>>>>>> 661875862712b4f7546a18cb504c4e554d78b4e1
 
 for (i in seq_along(taux_contamination)) 
 {

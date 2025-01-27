@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 
-=======
->>>>>>> 661875862712b4f7546a18cb504c4e554d78b4e1
 library(reshape2)
 library(RobRegression)
 library(Gmedian)
@@ -57,11 +54,6 @@ courbeROC <- function(labelsVrais,distances){
     auc[s] <- round(auc(roc_obj)*100,2)
     
     
-<<<<<<< HEAD
-  }
-=======
-    }
->>>>>>> 661875862712b4f7546a18cb504c4e554d78b4e1
   #Construction de la courbe ROC 
   roc_df <- data.frame(Seuils = seuils, TPR = tpr, FPR = fpr,auc = auc)
   
@@ -85,8 +77,6 @@ courbeROC <- function(labelsVrais,distances){
   auc_max <- max(roc_df$auc)
   
   return(list(seuil_auc_max = seuil_auc_max, auc_max = auc_max))  
-<<<<<<< HEAD
 }
-=======
+
 }
->>>>>>> 661875862712b4f7546a18cb504c4e554d78b4e1

@@ -300,7 +300,7 @@ if(depart == 0){
     #cutoff <- calcule_cutoff(distances,d)
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
     
-    VP <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
+    VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
     Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
     distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
     

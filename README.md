@@ -93,7 +93,7 @@ for (i in seq_along(taux_contamination))
   p2 <- 1 - p1
   #mu1
  
-  
+  #Génération d'un échantillon Z contaminé ou non contaminé
   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = "moyenne")
   Z <- resultsSimul$Z
   
@@ -106,11 +106,6 @@ for (i in seq_along(taux_contamination))
   erreursMiter <- calculErreursM(results$miter,rep(0,d))
   erreursSigma <- calculErreursNormeFrobenius(results$Sigma,Sigma1)
   
-  #Affichage des erreurs
-  
-  #affiche_erreursM(erreursMiter,contamination = delta)
-  
-  affiche_erreursSigma(erreursSigma,contamination= delta)
   
   
 }
