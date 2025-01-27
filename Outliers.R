@@ -17,6 +17,55 @@ library("corrplot")
 library("dplyr")
 
 
+#Calcule le vecteur distances selon la méthode choisie
+
+calcule_distances_par_methode <- function(Z, methode) {
+  distances <- NULL
+  
+  if (methode == "Shrinkage") {
+    # Méthode Shrinkage
+    med <- covComed(Z)$center
+    SigmaShrink <- covCor(Z)
+    distances <- calcule_vecteur_distances(Z, med, SigmaShrink)
+    
+  } else if (methode == "Comédiane") {
+    # Méthode Comédiane
+    med <- covComed(Z)$center
+    SigmaComed <- covComed(Z)$cov
+    distances <- calcule_vecteur_distances(Z, med, SigmaComed)
+    
+  } else if (methode == "OGK") {
+    # Méthode OGK
+    OGK_result <- covOGK(Z,sigmamu = s_mad)
+    med <- OGK_result$center
+    SigmaOGK <- OGK_result$cov
+    distances <- calcule_vecteur_distances(Z, med, SigmaOGK)
+    
+  } else if (methode == "Cov Empirique") {
+    # Méthode Empirique
+    med <- colMeans(Z)
+    SigmaEmp <- cov(Z)
+    distances <- calcule_vecteur_distances(Z, med, SigmaEmp)
+    
+  } else if (methode == "Offline") {
+    # Méthode Offline
+    med <- RobVar(Z)$median
+    SigmaOffline <- RobVar(Z)$variance
+    distances <- calcule_vecteur_distances(Z, med, SigmaOffline)
+    
+  } else if (methode == "Online") {
+    # Méthode Online
+    results <- estimMV(Z)
+    #miter <- results$miter
+    #U <- results$U
+    #lambda <- results$lambdaIter
+    distances <- results$distances
+    
+  } 
+  
+  return(distances)
+}
+
 
 #Calcul des distances de Mahalanobis à partir de la médiane géométrique et de la covariance estimées
 

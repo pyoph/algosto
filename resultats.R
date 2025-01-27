@@ -13,6 +13,7 @@ library("dplyr")
 
 
 #Calcule les erreurs d'estimation de la médiane géométrique critère RMSE
+
 calculErreursM <- function(miter,mvrai)
 {
   nb_iterations <- dim(miter)[2]
