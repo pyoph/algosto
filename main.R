@@ -14,7 +14,7 @@ library(ggplot2)
 library(far)
 library(gridExtra)
 library(microbenchmark)
-library("matlib")
+#library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
@@ -32,7 +32,7 @@ source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 for (i in 1:nbruns)
 {
-  resultats_outliers <- calcule_outliers(contamin = "moyenne",cutoff = 48)
+  resultats_outliers <- calcule_outliers(contamin = "moyenne",cutoff = 45)
 }
 
 
@@ -44,7 +44,7 @@ erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 
 for (i in seq_along(taux_contamination)) 
 {
-  contamin = "uniforme"
+  contamin = "moyenne"
   
   delta <- taux_contamination[i]
   #delta <- 0
@@ -59,7 +59,7 @@ for (i in seq_along(taux_contamination))
   
   
   #Estimation online
-  results <- estimMV(Z)
+  results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
   SigmaEstimOnline <- results$Sigma
   distances <- results$distances
   #Estimation offline

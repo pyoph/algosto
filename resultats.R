@@ -38,7 +38,7 @@ calculErreursNormeFrobenius <- function (Estim,Vrai)
   
   for (i in (1:nbiterations))
   {
-    erreurs[i] <-  norm(Vrai - Estim[i,,],type = "F")/nbiterations
+    erreurs[i] <-  norm(Vrai - Estim[i,,],type = "F")
   }
   return (erreurs)
 }
