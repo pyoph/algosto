@@ -9,7 +9,8 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-
+library(ROCR)
+#install.packages("ROCR")
 
 #Calcule les erreurs d'estimation de la médiane géométrique critère RMSE
 
@@ -183,4 +184,7 @@ affiche_erreursSigma <- function(erreurs_online, erreurs_offline = NULL, contami
   
   print(p)
 }
+
+
+
 

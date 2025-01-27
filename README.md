@@ -34,8 +34,12 @@ editor_options:
     -   afficher les erreurs d'estimation des différentes quantités
         d'intérêt
 
--   Outliers.R : fonctions qui : - calculent les distances de
-    Mahalanobis ; - detectent les outliers
+-   Outliers.R : 
+    - fonction qui calcule les distances de Mahalanobis pour différentes méthodes ;
+    - détecte les outliers en focntion d'une distance et d'un seuil
+
+-   seuils.R : 
+    - fonction courbeROC qui calcule les AUC pour différentes méthodes ;
 
 -   computeOutliers.R : - applique plusieurs algorithmes basés sur
     différentes estimations de la matrice de covariance pour détecter

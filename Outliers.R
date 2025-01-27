@@ -18,7 +18,10 @@ library("dplyr")
 
 
 #Calcule le vecteur distances selon la méthode choisie
+<<<<<<< HEAD
 
+=======
+>>>>>>> 661875862712b4f7546a18cb504c4e554d78b4e1
 calcule_distances_par_methode <- function(Z, methode) {
   distances <- NULL
   
@@ -60,7 +63,11 @@ calcule_distances_par_methode <- function(Z, methode) {
     #U <- results$U
     #lambda <- results$lambdaIter
     distances <- results$distances
+<<<<<<< HEAD
     
+=======
+  
+>>>>>>> 661875862712b4f7546a18cb504c4e554d78b4e1
   } 
   
   return(distances)
