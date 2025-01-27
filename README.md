@@ -114,7 +114,7 @@ for (i in seq_along(taux_contamination))
 
 #Calcul des outliers
 
-for (i in (1 : nbruns)){ results_outliers \<-
-calcule_outliers(n,d,c,rho,mu1,mu2,Sigma1,Sigma2,contamin = "student") }
+for (i in (1 : nbruns)){ 
+results_outliers <-calcule_outliers(n,d,c,rho,mu1,mu2,Sigma1,Sigma2,contamin = "student") }
 
 

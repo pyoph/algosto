@@ -38,16 +38,16 @@ for (i in 1:nbruns)
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
-###Test fonction d'estimation online
+###Test fonction d'estimation online affichage des boxplots des erreurs
 
 erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 
 for (i in seq_along(taux_contamination)) 
 {
-  contamin = "moyenne"
+  contamin = "uniforme"
   
   delta <- taux_contamination[i]
-  #delta <- 2
+  #delta <- 0
   
   #Génération des échantillons
   p1 <- 1 - delta / 100
@@ -69,7 +69,7 @@ for (i in seq_along(taux_contamination))
   erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
   erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
-  #affiche_erreursSigmav2(erreursonline,erreursoffline = rep(0,,nrow(Z)),delta)
+ affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
   
 }
 
