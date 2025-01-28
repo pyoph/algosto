@@ -70,7 +70,7 @@ detection <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,sam
     Vinit <- init$covmedian
     Uinit <- eigen(Vinit)$vectors
     SigmaInit <- RobVar(Y)$variance
-    lambdaInit <- RobbinsMC2(100,vp=eigen(Vinit)$values,samp=1:100)$lambda
+    lambdaInit <- RobbinsMC2( 100,vp=eigen(Vinit)$values,samp=1:100)$lambda
     results <- estimMV(Y, depart = depart_online, minit = t(minit), Vinit = Vinit, vpMCM = Uinit, lambdaInit = lambdaInit,SigmaInit =  SigmaInit)
     #Retour des résultats
     med <- results$moyennem
@@ -387,7 +387,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
 
   miter[nrow(Y),] = miter[nrow(Y)-1,]
   VIter[,,nrow(Y)] = VIter[,,nrow(Y)-1]
-
+  Sigma[nrow(Y),,] = Sigma[(nrow(Y) - 1),,]
 
 
 
