@@ -23,17 +23,25 @@ library("bigutilsr")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/Outliers.R")
-source("~/algosto/computeOutliers.R")
-source("~/algosto/seuils.R")
+library(ROCR)
+library(pROC)
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
+source("~/work/algosto/resultats.R")
+source("~/work/algosto/Outliers.R")
+source("~/work/algosto/computeOutliers.R")
+source("~/work/algosto/seuils.R")
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne",cutoff = 45)
 }
+
+
+resultats <- detection(Z)
+
+resultats$V
+
 
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
@@ -59,7 +67,7 @@ for (i in seq_along(taux_contamination))
   
   
   #Estimation online
-  results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
+  results <- estimMV(Z),Vinit = Sigma1,methode = "eigen")
   SigmaEstimOnline <- results$Sigma
   distances <- results$distances
   #Estimation offline

@@ -4,17 +4,7 @@
 #install.packages("reshape2")
 #install.packages("corrplot")
 #install.packages("dlpyr")
-library(reshape2)
-library(RobRegression)
-library(Gmedian)
-library(ggplot2)
-library(far)
-library(gridExtra)
-library(microbenchmark)
-library("matlib")
-library("MASS")
-library("corrplot")
-library("dplyr")
+
 #Estimation des valeurs propres de Sigma
 
 RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,samp=mc_sample_size,init=detoile)
@@ -85,20 +75,54 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
   return(list(vp=vp2,niter=i, lambdalist=lambdalist, vplist=vplist,lambda = lambda))
 }
 
+#Fonction qui prend en paramètre une matrice de données, et une méthode d'estimation et renvoie les paramètres estimés, les distances et les outliers
+detection <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y), 
+                      minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
+                      ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
+                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = 100,sampsize = 100)
+{
+  distances <- rep(0, nrow(Y))
+  if (methodeEstimation == "offline")
+  {
+   
+    results <- RobVar(Y)
+    
+    #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
+    med <- results$median
+    Sigma <- results$variance
+    V <- results$covmedian
+    U <- eigen(V)$vectors
+    #lambda <- RobbinsMC()
+    distances <- calcule_vecteur_distances(Y, med, Sigma)
+  }
+  else if (methodeEstimation == "online")
+  {#Y = Z
+    #On fait d'abord tourner la méthode offline sur les depart_online premières données
+    init <- RobVar(Y[1:depart_online,])
+    minit <- init$m
+    Vinit <- init$covmedian
+    Uinit <- eigen(Vinit)$vectors
+    lambdaInit <- RobbinsMC2(niterRMon,vp=eigen(Vinit)$values,samp=1:sampsize)
+    results <- estimMV(Y[(1+depart_online):nrow(Y),], depart = 1, minit = minit, Vinit = Vinit, vpMCM = Uinit, lambdaInit = lambdaInit)
+    
+  }
+  
+return(list(med = med, Sigma = Sigma,U = U ,lambda = lambda,V = V, distances = distances))
+}
 
 
 #Fonction qui estime m, et V et détecte la présence d'outliers online
 estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, 
                     minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
-                    vpMCM = matrix(0,n,ncol(Y))
+                    vpMCM = matrix(0,n,ncol(Y)),lambdaInit =  rep(1,ncol(Y))
                     ,methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
 {
 
   #Initialisations 
   Sigma = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
   sampsize = ncol(Y)
-  lambda = rep(1,ncol(Y))
+  lambda = lambdaInit
   lambdatilde = rep(1,ncol(Y))
   
   #Stockage des estimations des valeurs propres de la matrice de covariance
@@ -195,7 +219,8 @@ if(depart == 0){
     gamma = c/(i+depart)^(exposantPas)
     #gamma = c/i
 
-
+    #print((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem))
+    
 
     #Test pour gérer la non négativité de Vn
 
@@ -213,10 +238,9 @@ if(depart == 0){
 
 
 
-
+    
 
     #Mise à jour de V
-
 
     V = V + gamma*((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V)/norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F")
 

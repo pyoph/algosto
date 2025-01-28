@@ -10,8 +10,7 @@ library("matlib")
 library("MASS")
 library("corrplot")
 library("dplyr")
-library(ROCR)
-library(pROC)
+
 #install.packages("pROC")
 #install.packages("ROCR")
 
