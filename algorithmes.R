@@ -81,9 +81,10 @@ detection <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,sam
     distances <- results$distances
    # results$Sigma[101,,]
   }
-  if (methodeEstimation  == "Offline") {
-return(list(med = med, SigmaOffline = SigmaOffline ,V = V, distances = distances))}
-  else {return(list(med = med, SigmaOnline = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))}
+  if (methodeEstimation  == "online") {
+    return(list(med = med, SigmaOnline = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
+}
+  else {return(list(med = med, SigmaOffline = SigmaOffline ,V = V, distances = distances))}
 }
 
 

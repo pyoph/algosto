@@ -71,7 +71,7 @@ for (i in seq_along(taux_contamination))
   #resultsOffline <- RobVar(Z)
   #SigmaEstimOffline <- resultsOffline$variance
   
-  erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
+  #erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
   erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
  affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
