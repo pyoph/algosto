@@ -25,22 +25,18 @@ library("bigutilsr")
 library("RGMM")
 library(ROCR)
 library(pROC)
-source("~/work/algosto/parametres.R")
-source("~/work/algosto/simulations.R")
-source("~/work/algosto/algorithmes.R")
-source("~/work/algosto/resultats.R")
-source("~/work/algosto/Outliers.R")
-source("~/work/algosto/computeOutliers.R")
-source("~/work/algosto/seuils.R")
+source("~/codeThese/algosto/parametres.R")
+source("~/codeThese/algosto/simulations.R")
+source("~/codeThese/algosto/algorithmes.R")
+source("~/codeThese/algosto/resultats.R")
+source("~/codeThese/algosto/Outliers.R")
+source("~/codeThese/algosto/computeOutliers.R")
+source("~/codeThese/algosto/seuils.R")
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne",cutoff = 45)
 }
 
-
-resultats <- detection(Z)
-
-resultats$V
 
 
 
@@ -67,9 +63,10 @@ for (i in seq_along(taux_contamination))
   
   
   #Estimation online
-  results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
-  SigmaEstimOnline <- results$Sigma
-  distances <- results$distances
+  #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
+  resultats <- detection(Z,methodeEstimation = "online")
+  SigmaEstimOnline <- resultats$SigmaOnline
+  distances <- resultats$distances
   #Estimation offline
   #resultsOffline <- RobVar(Z)
   #SigmaEstimOffline <- resultsOffline$variance

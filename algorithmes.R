@@ -55,26 +55,35 @@ detection <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,sam
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
     med <- results$median
-    Sigma <- results$variance
+    SigmaOffline <- results$variance
     V <- results$covmedian
     U <- eigen(V)$vectors
     #lambda <- RobbinsMC()
-    distances <- calcule_vecteur_distances(Y, med, Sigma)
+    distances <- calcule_vecteur_distances(Y, med, SigmaOffline)
   }
   else if (methodeEstimation == "online")
   {#Y = Z
+    #depart_online = 100
     #On fait d'abord tourner la méthode offline sur les depart_online premières données
     init <- RobVar(Y[1:depart_online,])
     minit <- init$m
     Vinit <- init$covmedian
     Uinit <- eigen(Vinit)$vectors
-    lambdaInit <- RobbinsMC2(niterRMon,vp=eigen(Vinit)$values,samp=1:sampsize)$lambda
-    results <- estimMV(Y, depart = 100, minit = t(minit), Vinit = Vinit, vpMCM = Uinit, lambdaInit = lambdaInit)
-    #results$distances
-   # results$Sigma[999,,]
+    SigmaInit <- RobVar(Y)$variance
+    lambdaInit <- RobbinsMC2(100,vp=eigen(Vinit)$values,samp=1:100)$lambda
+    results <- estimMV(Y, depart = depart_online, minit = t(minit), Vinit = Vinit, vpMCM = Uinit, lambdaInit = lambdaInit,SigmaInit =  SigmaInit)
+    #Retour des résultats
+    med <- results$moyennem
+    SigmaOnline <- results$Sigma
+    U <- results$U
+    lambda <- results$lambda
+    V <- results$moyenneV
+    distances <- results$distances
+   # results$Sigma[101,,]
   }
-  
-return(list(med = med, Sigma = Sigma,U = U ,lambda = lambda,V = V, distances = distances))
+  if (methodeEstimation  == "Offline") {
+return(list(med = med, SigmaOffline = SigmaOffline ,V = V, distances = distances))}
+  else {return(list(med = med, SigmaOnline = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))}
 }
 
 
@@ -83,11 +92,12 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
                     minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
                     vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
-                    ,methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
+                    ,SigmaInit = diag(d),methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
 {
 
   #Initialisations 
   Sigma = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
+  Sigma[(1+depart),,] <- SigmaInit
   sampsize = ncol(Y)
   lambda = lambdaInit
   lambdatilde = rep(1,ncol(Y))
@@ -107,10 +117,6 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
     
     U[1,,] <- matrix_random
     
-  }
-  else {
-  VpMCM <- Uinit
-  U[1,,] <- Uinit
   }
   #Stockage des estimations des valeurs propres de la matrice de covariance
   lambdaIter = matrix(0,nrow(Y),ncol(Y))
@@ -188,7 +194,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
   for (i  in (depart+1):(nrow(Y)-1))
   {
 
-    gamma = c/(i+depart)^(exposantPas)
+    gamma = c/(i)^(exposantPas)
     #gamma = c/i
 
     ##Test pour gérer la non négativité de Vn
@@ -221,7 +227,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
 
     #Mise à jour de moyenneV
 
-    moyenneV <- (i+depart)/(i + depart +1)*moyenneV + 1/(i + 1)*V
+    moyenneV <- (i)/(i  +1)*moyenneV + 1/(i + 1)*V
 
 
     VIter[,,i] = moyenneV
@@ -296,6 +302,71 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
         #}
         #Uphi[i+1,,l]= Uphi[i,,l] + gamma * phijn[i,l]*((Y[i+1,] - m) - phijn[i,l]*Uphi[i,,l] )
         
+        #U[i+1,,] <- matrice
+        #Orthogonalisation des vecteurs propres
+        U[i+1,,] <- orthonormalization(U[i+1,,],basis = TRUE, norm = FALSE)
+        
+        vpMCM[i,] = sqrt(colSums(U[i,,]^2))
+        #Prendre norme de U[]
+        #Z=Y[i,]
+        # Z2=X2[i,]
+        #E1=    Z^2*(sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
+        #slog=slog+log(i+1)^w
+        #vp2=vp2+log(i+1)^w *((slog)^(-1)) *(lambda - vp2)
+        #vp0 = vp2
+        #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
+        #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
+        #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
+        lambdaResultat <- RobbinsMC2(niterRMon,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+        lambda <- lambdaResultat$vp
+        lambdatilde <- lambdaResultat$lambda
+        #print(lambda)
+        lambdaIter[i,] <- lambdatilde
+        
+        
+        #VPropresV <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
+        
+        # for (j in (1:d))
+        #  {
+        #   SigmaEstim <- 1/lambda[i,j]*U[i,,j]%*%t(U[i,,j])
+        #}
+        #Sigma <- (VPropresV) %*% diag(lambdatilde)%*% t(VPropresV)
+        
+        #distances <- rep(0,nrow(Z))
+        #distances <- calcule_vecteur_distances(Z,m, Sigma)
+        #cutoff <- calcule_cutoff(distances,d)
+        
+        
+        #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
+      }
+      # Vérifier si l'entrée est un outlier
+      #if (resultatOutlier$outlier_label) {
+      
+      #Estimation des valeurs propres selon une procédure de Robbins-Monro
+      
+      # outlier_labels[i] <- 1
+      
+      
+      #}
+      #stat[i] <- resultatOutlier$S
+      
+      #phat[i] <- resultatOutlier$phat
+      #print(phat[i])
+      #Estimation de Sigma 
+      VP <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
+      Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
+      #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+      #Calcul de la distance i
+      S <- 0
+      for(j in (1:ncol(Y)))
+      {
+        S <- S + 1/(lambdaIter[i,j])*(t(Y[i+1,] - moyennem)%*%VP[,j])^2
+      }
+      
+      #print(solve(Sigma[i,,]))
+      #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+      distances[i] <- S
+      
       }
       
       
@@ -311,71 +382,6 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
       # Trier la matrice selon les normes décroissantes des colonnes
       #matrice <-matrice[,indices_tri]
       
-      #U[i+1,,] <- matrice
-      #Orthogonalisation des vecteurs propres
-      U[i+1,,] <- orthonormalization(U[i+1,,],basis = TRUE, norm = FALSE)
-      
-      vpMCM[i,] = sqrt(colSums(U[i,,]^2))
-      #Prendre norme de U[]
-      #Z=Y[i,]
-      # Z2=X2[i,]
-      #E1=    Z^2*(sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
-      #slog=slog+log(i+1)^w
-      #vp2=vp2+log(i+1)^w *((slog)^(-1)) *(lambda - vp2)
-      #vp0 = vp2
-      #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
-      #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
-      #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
-      lambdaResultat <- RobbinsMC2(niterRMon,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
-      lambda <- lambdaResultat$vp
-      lambdatilde <- lambdaResultat$lambda
-      #print(lambda)
-      lambdaIter[i,] <- lambdatilde
-
-
-      #VPropresV <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
-
-      # for (j in (1:d))
-      #  {
-      #   SigmaEstim <- 1/lambda[i,j]*U[i,,j]%*%t(U[i,,j])
-      #}
-      #Sigma <- (VPropresV) %*% diag(lambdatilde)%*% t(VPropresV)
-
-      #distances <- rep(0,nrow(Z))
-      #distances <- calcule_vecteur_distances(Z,m, Sigma)
-      #cutoff <- calcule_cutoff(distances,d)
-
-
-      #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
-      }
-    # Vérifier si l'entrée est un outlier
-    #if (resultatOutlier$outlier_label) {
-
-      #Estimation des valeurs propres selon une procédure de Robbins-Monro
-
-     # outlier_labels[i] <- 1
-
-
-    #}
-    #stat[i] <- resultatOutlier$S
-
-    #phat[i] <- resultatOutlier$phat
-    #print(phat[i])
-#Estimation de Sigma 
-    VP <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
-    Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
-    #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
-    #Calcul de la distance i
-    S <- 0
-    for(j in (1:ncol(Y)))
-    {
-     S <- S + 1/(lambdaIter[i,j])*(t(Y[i+1,] - moyennem)%*%VP[,j])^2
-    }
-    
-    #print(solve(Sigma[i,,]))
-    #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
-    #distances[i] <- S
-    
   }
 
 
