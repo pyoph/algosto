@@ -5,40 +5,6 @@
 #install.packages("corrplot")
 #install.packages("dlpyr")
 
-#Estimation des valeurs propres de Sigma
-
-RobbinsMC=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,samp=mc_sample_size,init=detoile)
-{
-  p=length(vp)
-  vp2=init
-  lambda=init
-  lambdalist=c()
-  vplist=c()
-  Y=matrix(rnorm(mc_sample_size*p),ncol=p)
-  # X2=matrix(rnorm(mc_sample_size*p),ncol=p)
-  slog=1
-  for (i in 1:mc_sample_size)
-  {
-    Z=Y[i,]
-    # Z2=X2[i,]
-    E1=    Z^2*(sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
-    vp0=vp2
-    E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
-    lambda =lambda  - c*i^(-alpha)*lambda*E1 + c*i^(-alpha)* (vp)*E2
-    slog=slog+log(i+1)^w
-    vp2=vp2+log(i+1)^w *((slog)^(-1)) *(lambda - vp2)
-    eps=sqrt(sum((vp2-vp0)^2))
-    if (length(which(samp==i) > 0))
-    {
-      lambdalist=rbind(lambdalist,lambda)
-      vplist=rbind(vplist,vp2)
-    }
-    #   if ( eps < epsilon ) break;
-  }
-  return(list(vp=vp2,niter=i, lambdalist=lambdalist, vplist=vplist))
-}
-
-
 
 
 
@@ -79,7 +45,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=2,w=2,s
 detection <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y), 
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                       ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
-                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = 100,sampsize = 100)
+                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = 100)
 {
   distances <- rep(0, nrow(Y))
   if (methodeEstimation == "offline")
@@ -102,9 +68,10 @@ detection <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,sam
     minit <- init$m
     Vinit <- init$covmedian
     Uinit <- eigen(Vinit)$vectors
-    lambdaInit <- RobbinsMC2(niterRMon,vp=eigen(Vinit)$values,samp=1:sampsize)
-    results <- estimMV(Y[(1+depart_online):nrow(Y),], depart = 1, minit = minit, Vinit = Vinit, vpMCM = Uinit, lambdaInit = lambdaInit)
-    
+    lambdaInit <- RobbinsMC2(niterRMon,vp=eigen(Vinit)$values,samp=1:sampsize)$lambda
+    results <- estimMV(Y, depart = 100, minit = t(minit), Vinit = Vinit, vpMCM = Uinit, lambdaInit = lambdaInit)
+    #results$distances
+   # results$Sigma[999,,]
   }
   
 return(list(med = med, Sigma = Sigma,U = U ,lambda = lambda,V = V, distances = distances))
@@ -115,7 +82,7 @@ return(list(med = med, Sigma = Sigma,U = U ,lambda = lambda,V = V, distances = d
 estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, 
                     minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
-                    vpMCM = matrix(0,n,ncol(Y)),lambdaInit =  rep(1,ncol(Y))
+                    vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
                     ,methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
 {
 
@@ -124,7 +91,27 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
   sampsize = ncol(Y)
   lambda = lambdaInit
   lambdatilde = rep(1,ncol(Y))
+
   
+  #Si départ = 0, intialisation de U sur la sphère unité  
+  if (depart == 0)
+  {
+    
+    matrix_random <- matrix(0, ncol(Y), ncol(Y))
+    
+    #Générer chaque colonne aléatoire sur la sphère unité
+    for (i in (1:ncol(Y))) {
+      v <- rnorm(ncol(Y))  # Tirer un vecteur d composantes normales
+      matrix_random[, i] <- v / sqrt(sum(v^2))  # Normaliser
+    }
+    
+    U[1,,] <- matrix_random
+    
+  }
+  else {
+  VpMCM <- Uinit
+  U[1,,] <- Uinit
+  }
   #Stockage des estimations des valeurs propres de la matrice de covariance
   lambdaIter = matrix(0,nrow(Y),ncol(Y))
 
@@ -189,21 +176,6 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
 
   #Stockage des vecteurs propres dans un tableau
 
-#Si départ = 0 initialisation de U sur la sphère unité
-if(depart == 0){
-
-  
-  matrix_random <- matrix(0, ncol(Y), ncol(Y))
-
-  # Générer chaque colonne aléatoire sur la sphère unité
-  for (i in (1:ncol(Y))) {
-    v <- rnorm(ncol(Y))  # Tirer un vecteur d composantes normales
-    matrix_random[, i] <- v / sqrt(sum(v^2))  # Normaliser
-  }
-
-  U[1,,] <- matrix_random
-
-}
 
   #Stockage des itérations
   miter = matrix(0,nrow(Y),ncol(Y))
@@ -213,17 +185,15 @@ if(depart == 0){
 
   phat <- rep(0,nrow(Y)-1)
 
-  for (i  in 1:(nrow(Y)-1))
+  for (i  in (depart+1):(nrow(Y)-1))
   {
 
     gamma = c/(i+depart)^(exposantPas)
     #gamma = c/i
 
-    #print((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem))
+    ##Test pour gérer la non négativité de Vn
     
-
-    #Test pour gérer la non négativité de Vn
-
+    
     if (gamma >= norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F"))
     {
     gamma = norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F")
@@ -244,6 +214,7 @@ if(depart == 0){
 
     V = V + gamma*((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V)/norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F")
 
+    
     moyennem = moyennem*i/(i+1) + 1/(i+1)*m
 
     miter[i,] = moyennem
@@ -262,41 +233,6 @@ if(depart == 0){
       #print(phijn[i,l])
     #}
 
-    for (l in (1:ncol(Y)))
-    {
-      Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
-      U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
-      #U[i+1,,l] <- U[i,,l] + gamma*((Y[i+1,] - m)%*%t((Y[i+1,] - m)) %*% U[i,,l])
-
-      #if (l  >= 2){
-
-       # S <- rep(0,d)
-      #for (iter in (1:(l - 1)))
-      #{
-       #S <- S + phijn[i,iter]*Uphi[i,,iter]
-      #}
-      #}
-      #Uphi[i+1,,l]= Uphi[i,,l] + gamma * phijn[i,l]*((Y[i+1,] - m) - phijn[i,l]*Uphi[i,,l] )
-
-    }
-
-
-
-    #matrice <- U[i+1,,]
-
-    #Tri des vecteurs en ordre décroissant de norme
-    #normes_colonnes <- apply(matrice, 2, function(col) sqrt(sum(col^2)))
-
-    # order() pour obtenir les indices de tri par ordre décroissant des normes
-    #indices_tri <- order(normes_colonnes, decreasing = TRUE)
-
-    # Trier la matrice selon les normes décroissantes des colonnes
-    #matrice <-matrice[,indices_tri]
-
-    #U[i+1,,] <- matrice
-    #Orthogonalisation des vecteurs propres
-    U[i+1,,] <- orthonormalization(U[i+1,,],basis = TRUE, norm = FALSE)
-
     #vp = apply(U[i+1,,],2,norm)
 
     #Estimation des valeurs propres de la MCM
@@ -308,29 +244,77 @@ if(depart == 0){
     #Récupération des résultats de la fonction Outlier
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
     if(methode == "eigen"){
-    VPropresV <- eigen(V)$vectors
-    VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    VPropresV <- eigen(moyenneV)$vectors
+    #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
 
     valPV <- eigen(V)$values
     lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
     lambda <- lambdaResultat$vp
     lambdatilde <- lambdaResultat$lambda
     #print(lambda)
-    lambdaIter[i,] <- lambdatilde
+    #lambdaIter[i,] <- lambdatilde
+    lambdaIter[i,] <- lambda 
     #Calcul de Sigma
     #Sigma <- VPropresV %*% diag(valPV) %*% t(VPropresV)
     #distances <- rep(0,nrow(Z))
     #distances <- calcule_vecteur_distances(Z,m,Sigma)
     #cutoff <- calcule_cutoff(distances,d)
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
-    
     VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
-    Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
-    distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+    #print(lambdaIter[i,])
+    Sigma[i,,] <-  VP %*% diag(lambdaIter[i,]) %*% t(VP) 
+    #print(Sigma[i,,])
+    #Calcul de la distance i
+    S <- 0
+    for(j in (1:ncol(Y)))
+    {
+       S<- S + 1/(lambdaIter[i,j])*sum(t(Y[i+1,] - moyennem)*(VP[,j]))^2
+    }
     
+    #print(solve(Sigma[i,,]))
+    #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+    distances[i] <- S
     
     }
     else {
+      
+    print("méthode sans eigen")
+      
+      for (l in (1:ncol(Y)))
+      {
+        Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
+        U[i+1,,l] <-  (1 - 1/(i + 1)^(aa))*U[i,,l] + 1/(i + 1)^(aa)*(moyenneV %*% Un)
+        #U[i+1,,l] <- U[i,,l] + gamma*((Y[i+1,] - m)%*%t((Y[i+1,] - m)) %*% U[i,,l])
+        
+        #if (l  >= 2){
+        
+        # S <- rep(0,d)
+        #for (iter in (1:(l - 1)))
+        #{
+        #S <- S + phijn[i,iter]*Uphi[i,,iter]
+        #}
+        #}
+        #Uphi[i+1,,l]= Uphi[i,,l] + gamma * phijn[i,l]*((Y[i+1,] - m) - phijn[i,l]*Uphi[i,,l] )
+        
+      }
+      
+      
+      
+      #matrice <- U[i+1,,]
+      
+      #Tri des vecteurs en ordre décroissant de norme
+      #normes_colonnes <- apply(matrice, 2, function(col) sqrt(sum(col^2)))
+      
+      # order() pour obtenir les indices de tri par ordre décroissant des normes
+      #indices_tri <- order(normes_colonnes, decreasing = TRUE)
+      
+      # Trier la matrice selon les normes décroissantes des colonnes
+      #matrice <-matrice[,indices_tri]
+      
+      #U[i+1,,] <- matrice
+      #Orthogonalisation des vecteurs propres
+      U[i+1,,] <- orthonormalization(U[i+1,,],basis = TRUE, norm = FALSE)
+      
       vpMCM[i,] = sqrt(colSums(U[i,,]^2))
       #Prendre norme de U[]
       #Z=Y[i,]
@@ -380,8 +364,17 @@ if(depart == 0){
 #Estimation de Sigma 
     VP <- U[i,,] %*% diag(1/sqrt(colSums(U[i,,]^2)))
     Sigma[i,,] <-  VP%*% diag(lambdaIter[i,]) %*% t(VP) 
-    distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+    #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+    #Calcul de la distance i
+    S <- 0
+    for(j in (1:ncol(Y)))
+    {
+     S <- S + 1/(lambdaIter[i,j])*(t(Y[i+1,] - moyennem)%*%VP[,j])^2
+    }
     
+    #print(solve(Sigma[i,,]))
+    #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+    #distances[i] <- S
     
   }
 
