@@ -170,7 +170,7 @@ for (i in seq_along(taux_contamination)) {
       #k = 1
     #)
     
-    results <- estimMV(Z)
+    results <- estimMV(Z,depart = 100)
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter

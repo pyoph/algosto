@@ -25,13 +25,13 @@ library("bigutilsr")
 library("RGMM")
 library(ROCR)
 library(pROC)
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/Outliers.R")
-source("~/algosto/computeOutliers.R")
-source("~/algosto/seuils.R")
+source("~/codeThese/algosto/parametres.R")
+source("~/codeThese/algosto/simulations.R")
+source("~/codeThese/algosto/algorithmes.R")
+source("~/codeThese/algosto/resultats.R")
+source("~/codeThese/algosto/Outliers.R")
+source("~/codeThese/algosto/computeOutliers.R")
+source("~/codeThese/algosto/seuils.R")
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne",cutoff = 45)
@@ -64,14 +64,14 @@ for (i in seq_along(taux_contamination))
   
   #Estimation online
   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
-  resultats <- detection(Z,methodeEstimation = "online")
-  SigmaEstimOnline <- resultats$SigmaOnline
+  resultats <- estimMV(Z,depart = 100)
+  SigmaEstimOnline <- resultats$Sigma
   distances <- resultats$distances
   #Estimation offline
   #resultsOffline <- RobVar(Z)
   #SigmaEstimOffline <- resultsOffline$variance
   
-  #erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
+  erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
   erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
  affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)

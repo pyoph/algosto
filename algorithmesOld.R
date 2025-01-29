@@ -75,8 +75,8 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
     lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
     for (l in 1 :depart)
     {
-      U[l,,] <- eig_init$vectors
-      Sigma[l,,] <- resoff$variance
+    U[l,,] <- eig_init$vectors
+    Sigma[l,,] <- resoff$variance
     }
     minit=resoff$median
     Vinit=resoff$covmedian
@@ -222,7 +222,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
       
       valPV <- eigen(V)$values  
       lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
-      #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
+                                     #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$lambda
       #print(lambda)
@@ -362,9 +362,8 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
   return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma))
 }
 
-
 #Fonction qui prend en paramètre une matrice de données, et une méthode d'estimation et renvoie les paramètres estimés, les distances et les outliers
-detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y), 
+detection <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y), 
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                       ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
                       vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = 100)
