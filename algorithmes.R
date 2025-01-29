@@ -222,13 +222,13 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
     V = V + gamma*((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V)/norm((Y[i+1,] - moyennem) %*% t(Y[i+1,] - moyennem) - V,type = "F")
 
     
-    moyennem = moyennem*i/(i+1) + 1/(i+1)*m
+    moyennem = moyennem*(i - depart)/(i - depart + 1) + 1/(i - depart +1)*m
 
     miter[i,] = moyennem
 
     #Mise à jour de moyenneV
 
-    moyenneV <- (i)/(i  +1)*moyenneV + 1/(i + 1)*V
+    moyenneV <- (i - depart)/(i - depart  +1)*moyenneV + 1/(i + 1)*V
 
 
     VIter[,,i] = moyenneV
