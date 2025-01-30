@@ -632,12 +632,14 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
     #Stockage des itérations de matrices dans un tableau
     VIter[,,i] <- moyenneV
 
+
     #Estimation des vecteurs propres de Vt et orthonormalisation
 if(methode == "eigen"){
   VPropresV <- eigen(moyenneV)$vectors
   #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
-  
   valPV <- eigen(V)$values  
+  #print(VPropresV)
+  
   lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
   #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
   lambda <- lambdaResultat$vp
