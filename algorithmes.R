@@ -45,12 +45,15 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
                     vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
                     ,SigmaInit = diag(d),methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
 {
+  print(depart)
   
   lambdatilde = rep(1,ncol(Y))
   lambdaIter = matrix(0,nrow(Y),ncol(Y))
   U = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
   Sigma = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
-  #Initialisations 
+  #Stockage des distances
+  
+  distances <- rep(0,nrow(Y)) 
   #Si départ = 0, intialisation de U sur la sphère unité  
   if (depart == 0)
   {
@@ -68,11 +71,16 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
   }
   if (depart > 0)
   {
+    print("depart > 0")
     resoff=RobVar(Y[1:100,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
     eig_init=eigen(resoff$variance)
     lambdaInit=eig_init$values
     lambdatilde=lambdaInit
     lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
+    moyennem <- resoff$median
+    minit=resoff$median
+    Vinit=resoff$covmedian
+    
     for (l in 1 :depart)
     {
       U[l,,] <- eig_init$vectors
@@ -80,18 +88,17 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
       S <- 0
       for(j in (1:ncol(Y)))
       {
-        S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*(eig_init$vectors)[,j]^2)
+        S <- S + 1/(lambdaInit[j])*(sum((Y[l,] - moyennem)*(eig_init$vectors)[,j]))^2
       }
       
       #print(solve(Sigma[i,,]))
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
       distances[l] <- S
+      print(distances[l])
       
       
       }
-    minit=resoff$median
-    Vinit=resoff$covmedian
-    
+  
   }
   
   
@@ -127,9 +134,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
   
   mvrai <- rep(0,ncol(Y))
   
-  #Stockage des distances
-  
-  distances <- rep(0,nrow(Y))
+ 
   
   
   #Calcul de la vraie MCM par l'algorithme de Weiszfeld
@@ -436,7 +441,9 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
   sampsize = ncol(Y)
   lambda = lambdaInit
   lambdatilde = rep(1,ncol(Y))
-
+  #Stockage des distances
+  
+  distances <- rep(0,nrow(Y))
   
   #Si départ = 0, intialisation de U sur la sphère unité  
   if (depart == 0)
@@ -482,9 +489,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
 
   mvrai <- rep(0,ncol(Y))
 
-  #Stockage des distances
-  
-  distances <- rep(0,nrow(Y))
+ 
   
 
   #Calcul de la vraie MCM par l'algorithme de Weiszfeld
