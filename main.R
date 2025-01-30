@@ -44,10 +44,10 @@ for (i in 1:nbruns)
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
 ###Test fonction d'estimation online affichage des boxplots des erreurs
-pdf("Resultats_Erreurs_Sigma Toeplitzvar1sqrtd.pdf", width = 10, height = 7)
+pdf("Resultats_Erreurs_Sigma Toeplitzvar1.pdf", width = 10, height = 7)
 
 erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
-
+depart = 100
 for (i in seq_along(taux_contamination)) 
 {
   contamin = "moyenne"
@@ -66,13 +66,13 @@ for (i in seq_along(taux_contamination))
   
   #Estimation online
   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
-  depart = 100
-  resultats <- estimMV(Z,depart, c = sqrt(ncol(Z)))
-  SigmaEstimOnline <- resultats$Sigma
-  distances <- resultats$distances
+  
+  resultatsOnline <- detection(Z,depart, methodeEstimation = "online")
+  SigmaEstimOnline <- resultatsOnline$SigmaOnline[(nrow(Y) - 1),,]
+  distances <- resultatsOnline$distances
   #Estimation offline
-  resultsOffline <- RobVar(Z,mc_sample_size = nrow(Z),c=ncol(Z),w=2)
-  SigmaEstimOffline <- resultsOffline$variance
+  resultsOffline <- detection(Z,depart, methodeEstimation = "offline")
+  SigmaEstimOffline <- resultsOffline$SigmaOffline
   
   erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
   erreursSigmaBoxplot[i,] <- erreursonline

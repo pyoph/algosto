@@ -88,7 +88,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
       #S <- 0
       #for(j in (1:ncol(Y)))
       #{
-       # S <- S +   S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*(eig_init$vectors)[,j]^2)
+       # S <- S + 1/(lambdaInit[j])*(sum((Y[l,] - minit)*(eig_init$vectors)[,j]))^2
         #}
       
       
@@ -268,7 +268,11 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
          # S<- S + 1/(lambdaIter[i,j])*sum(t(Y[i+1,] - moyennem)*(VP[,j]))^2
           
         #}
-        
+      #S <- 0
+      #for(j in (1:ncol(Y)))
+      #{
+       # S <- S + 1/(lambdaIter[i,j])*(sum((Y[i,] - moyennem)*(eig_init$vectors)[,j]))^2
+      #}
         
       
       
@@ -400,7 +404,7 @@ detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize 
   if (methodeEstimation == "offline")
   {
    
-    results <- RobVar(Y)
+    results <- RobVar(Y,mc_sample_size = nrow(Z),c=ncol(Z),w=2)
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
     med <- results$median
@@ -411,16 +415,8 @@ detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize 
     distances <- calcule_vecteur_distances(Y, med, SigmaOffline)
   }
   else if (methodeEstimation == "online")
-  {#Y = Z
-    #depart_online = 100
-    #On fait d'abord tourner la méthode offline sur les depart_online premières données
-    init <- RobVar(Y[1:depart_online,])
-    minit <- init$m
-    Vinit <- init$covmedian
-    Uinit <- eigen(Vinit)$vectors
-    SigmaInit <- RobVar(Y)$variance
-    lambdaInit <- RobbinsMC2( 100,vp=eigen(Vinit)$values,samp=1:100)$lambda
-    results <- estimMV(Y, depart = depart_online, minit = t(minit), Vinit = Vinit, vpMCM = Uinit, lambdaInit = lambdaInit,SigmaInit =  SigmaInit)
+  { 
+    results <- estimMV(Y, depart = depart_online)
     #Retour des résultats
     med <- results$moyennem
     SigmaOnline <- results$Sigma
