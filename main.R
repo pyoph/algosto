@@ -35,7 +35,7 @@ source("~/work/algosto/computeOutliers.R")
 source("~/work/algosto/seuils.R")
 for (i in 1:nbruns)
 {
-  resultats_outliers <- calcule_outliers(contamin = "moyenne",cutoff = 45)
+  resultats_outliers <- calcule_outliers(contamin = "moyenne")
 }
 
 
@@ -44,6 +44,7 @@ for (i in 1:nbruns)
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
 ###Test fonction d'estimation online affichage des boxplots des erreurs
+pdf("Resultats_Erreurs_Sigma Toeplitzvar1sqrtd.pdf", width = 10, height = 7)
 
 erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 
@@ -75,7 +76,7 @@ for (i in seq_along(taux_contamination))
   erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
   erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
- affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
+ #affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
 
  #Affichage des SigmaEstim Online, Offline et théorique
  
@@ -89,7 +90,7 @@ plot_comparaison_sigma(Sigma1, SigmaEstimOffline = SigmaEstimOffline,SigmaEstimO
 }
 
 creer_boxplot_erreurs(erreursSigmaBoxplot,taux_contamination,methode= "online")
-
+dev.off()
 
 ###Calcul du meilleur AUC pour chaque méthode
 
