@@ -85,7 +85,7 @@ distances <- rep(0,n)
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  #delta <- 2
+  #delta <- 10
   contamin = "moyenne"
   p1 <- 1 - delta / 100
   
@@ -169,8 +169,8 @@ for (i in seq_along(taux_contamination)) {
       #r = 1.5,
       #k = 1
     #)
-    
-    results <- estimMV(Z,depart = 100, c = sqrt(ncol(Z)))
+    depart = 100
+    results <- estimMV(Z,depart, c = sqrt(ncol(Z)))
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
@@ -190,7 +190,7 @@ for (i in seq_along(taux_contamination)) {
   
   # Temps pour la méthode Offline
   temps_offline[i] <- system.time({
-    Rvar <- RobVar(Z)
+    Rvar <- RobVar(Z, ,mc_sample_size = nrow(Z),c=ncol(Z),w=2)
     
     
     m <- Rvar$median

@@ -66,7 +66,8 @@ for (i in seq_along(taux_contamination))
   
   #Estimation online
   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
-  resultats <- estimMV(Z,depart = 100, c = sqrt(ncol(Z)))
+  depart = 100
+  resultats <- estimMV(Z,depart, c = sqrt(ncol(Z)))
   SigmaEstimOnline <- resultats$Sigma
   distances <- resultats$distances
   #Estimation offline
