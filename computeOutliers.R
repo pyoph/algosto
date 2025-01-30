@@ -46,7 +46,7 @@ safe_access_tc <- function(tc, default = 0) {
 ######Boucle calcul outliers#####
 
 
-calcule_outliers <- function(n = 1e4, d = 10, c = sqrt(d),rho = 0.8, mu1 = rep(0,d),mu2 = 5*rep(1,d),Sigma1 = creerMatriceToeplitz(rho,d) ,Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2)),colonnes_a_permuter = c(1,2),cutoff = qchisq(p = 0.95,df = ncol(Z)),contamin = "student") 
+calcule_outliers <- function(n = 1e4, d = 10, c = sqrt(d),rho = 0.8, mu1 = rep(0,d),mu2 = 5*rep(1,d),Sigma1 = creerMatriceToeplitz(rho,d) ,Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter = c(1,2)),colonnes_a_permuter = c(1,2),cutoff = qchisq(p = 0.95,df = ncol(Z)),contamin = "moyenne") 
 {
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
@@ -85,7 +85,7 @@ distances <- rep(0,n)
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  #delta <- 10
+  #delta <- 2
   contamin = "moyenne"
   p1 <- 1 - delta / 100
   
@@ -169,8 +169,8 @@ for (i in seq_along(taux_contamination)) {
       #r = 1.5,
       #k = 1
     #)
-    depart = 100
-    results <- estimMV(Z,depart, c = sqrt(ncol(Z)))
+    #depart = 100
+    results <- estimMV(Z,depart = 100, c = sqrt(ncol(Z)))
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
