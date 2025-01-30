@@ -57,7 +57,7 @@ creerMatriceToeplitz <- function(rho,d)
   
   
   
-   # return(diag(sqrt(1:d))%*%toeplitz_matrix%*%diag(sqrt(1:d)))
+  #return(diag(sqrt(1:d))%*%toeplitz_matrix%*%diag(sqrt(1:d)))
   return(toeplitz_matrix)
 }
 

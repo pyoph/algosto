@@ -76,8 +76,13 @@ for (i in seq_along(taux_contamination))
   erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
  affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
- #plot(Sigma1, SigmaEstimOnline[9999,,], col=2); abline(0, 1)
- #plot(Sigma1,SigmaEstimOffline, col=4); abline(0, 1)
+
+ #Affichage des SigmaEstim Online, Offline et théorique
+ 
+plot_comparaison_sigma(Sigma1, SigmaEstimOffline = SigmaEstimOffline,SigmaEstimOnline = SigmaEstimOnline[(nrow(Z) - 1),,],delta)
+
+ 
+ 
  #points(Sigma1, SigmaEstimOffline, col=4); abline(0, 1)
  
   

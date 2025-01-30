@@ -102,34 +102,6 @@ affiche_erreursM <- function(erreurs_online, erreurs_offline = NULL, contaminati
 }
 
 
-#Affichage des boxplots des erreurs
-
-# Fonction pour créer un graphique des boxplots des erreurs pour une méthode
-creer_boxplot_erreurs <- function(erreurs_matrix, taux_contamination, methode) {
-  # Convertir la matrice en un format long pour ggplot
-  erreurs_df <- data.frame(
-    TauxContamination = rep(taux_contamination, each = ncol(erreurs_matrix)),
-    Erreur = as.vector(erreurs_matrix)
-  )
-  
-  # Créer le graphique
-  p <- ggplot(erreurs_df, aes(x = factor(TauxContamination), y = Erreur)) +
-    geom_boxplot(fill = "lightblue", alpha = 0.7, color = "darkblue") +
-    labs(
-      title = paste("Boxplot des erreurs - Méthode:", methode),
-      x = "Taux de contamination (%)",
-      y = "Erreur (norme de Frobenius)"
-    ) +
-    theme_minimal() +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      plot.title = element_text(hjust = 0.5)
-    )
-  
-  print(p)
-}
-
-
 # Fonction pour afficher les erreurs d'estimation de Sigma online et offline pour différents taux de contamination. 
 
 #Les erreurs offline seront par la suite ajoutées
@@ -186,5 +158,55 @@ affiche_erreursSigma <- function(erreurs_online, erreurs_offline = NULL, contami
 }
 
 
+#Affichage comparaison Sigma
+
+plot_comparaison_sigma <- function(Sigma1, SigmaEstimOnline, SigmaEstimOffline, delta) {
+  par(mfrow = c(1, 2))  # Afficher deux graphiques côte à côte
+  
+  # Comparaison Online
+  plot(Sigma1, SigmaEstimOnline, col = 2, 
+       main = paste("Comparaison Online (Contamination:", delta, "%)"), 
+       xlab = "Sigma réelle", ylab = "Estimations Online")
+  abline(0, 1)
+  points(Sigma1, SigmaEstimOnline, col=2)
+  
+  # Comparaison Offline
+  plot(Sigma1, SigmaEstimOffline, col = 4, 
+       main = paste("Comparaison Offline (Contamination:", delta, "%)"), 
+       xlab = "Sigma réelle", ylab = "Estimation Offline")
+  abline(0, 1)
+  
+  points(Sigma1, SigmaEstimOffline, col=2)
+  par(mfrow = c(1, 1))  # Réinitialisation du paramètre graphique
+}
 
 
+#Affichage boxplot des erreurs
+
+creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, methode) {
+  # Vérifier que la matrice d'erreurs a bien des lignes correspondant aux taux de contamination
+  if (length(taux_contamination) != nrow(erreursSigmaBoxplot)) {
+    stop("Le nombre de lignes de erreursSigmaBoxplot doit correspondre à la longueur de taux_contamination")
+  }
+  
+  # Transformer la matrice en un format long pour ggplot
+  library(ggplot2)
+  library(reshape2)
+  
+  # Conversion de la matrice en data frame long
+  df_erreurs <- data.frame(erreursSigmaBoxplot)
+  df_erreurs$taux_contamination <- factor(taux_contamination)  # Facteur pour l'axe X
+  df_long <- melt(df_erreurs, id.vars = "taux_contamination")
+  
+  # Création du boxplot avec ggplot2
+  p <- ggplot(df_long, aes(x = taux_contamination, y = value)) +
+    geom_boxplot(fill = "lightblue", color = "blue", outlier.color = "red") +
+    labs(
+      title = paste("Boxplots des erreurs - Méthode :", methode),
+      x = "Taux de contamination (%)",
+      y = "Erreur (norme de Frobenius)"
+    ) +
+    theme_minimal()
+  
+  print(p)
+}
