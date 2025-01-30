@@ -77,9 +77,21 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
     {
       U[l,,] <- eig_init$vectors
       Sigma[l,,] <- resoff$variance
-    }
+      S <- 0
+      for(j in (1:ncol(Y)))
+      {
+        S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*(eig_init$vectors)[,j]^2)
+      }
+      
+      #print(solve(Sigma[i,,]))
+      #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+      distances[l] <- S
+      
+      
+      }
     minit=resoff$median
     Vinit=resoff$covmedian
+    
   }
   
   

@@ -5,6 +5,7 @@
 #install.packages("rrcov")
 #install.packages("mvnfast")
 #install.packages("reshape")
+#install.packages("matlib")
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -25,13 +26,13 @@ library("bigutilsr")
 library("RGMM")
 library(ROCR)
 library(pROC)
-source("~/codeThese/algosto/parametres.R")
-source("~/codeThese/algosto/simulations.R")
-source("~/codeThese/algosto/algorithmes.R")
-source("~/codeThese/algosto/resultats.R")
-source("~/codeThese/algosto/Outliers.R")
-source("~/codeThese/algosto/computeOutliers.R")
-source("~/codeThese/algosto/seuils.R")
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
+source("~/work/algosto/resultats.R")
+source("~/work/algosto/Outliers.R")
+source("~/work/algosto/computeOutliers.R")
+source("~/work/algosto/seuils.R")
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne",cutoff = 45)
@@ -64,17 +65,21 @@ for (i in seq_along(taux_contamination))
   
   #Estimation online
   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
-  resultats <- estimMV(Z,depart = 100)
+  resultats <- estimMV(Z,depart = 100, c = sqrt(ncol(Z)))
   SigmaEstimOnline <- resultats$Sigma
   distances <- resultats$distances
   #Estimation offline
-  #resultsOffline <- RobVar(Z)
-  #SigmaEstimOffline <- resultsOffline$variance
+  resultsOffline <- RobVar(Z,mc_sample_size = nrow(Z),c=ncol(Z),w=2)
+  SigmaEstimOffline <- resultsOffline$variance
   
   erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
   erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
  affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
+ #plot(Sigma1, SigmaEstimOnline[9999,,], col=2); abline(0, 1)
+ #plot(Sigma1,SigmaEstimOffline, col=4); abline(0, 1)
+ #points(Sigma1, SigmaEstimOffline, col=4); abline(0, 1)
+ 
   
 }
 
