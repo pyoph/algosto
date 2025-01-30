@@ -32,13 +32,13 @@ calculErreursM <- function(miter,mvrai)
 
 calculErreursNormeFrobenius <- function (Estim,Vrai)
 {
-  nbiterations <- dim(Estim)[1]
+  nbiterations <- nrow(Estim)
   
   erreurs <- rep(0,nbiterations)
   
   for (i in (1:nbiterations))
   {
-    erreurs[i] <-  norm(Vrai - Estim[i,,],type = "F")
+    erreurs[i] <-  norm(Vrai - Estim,type = "F")
   }
   return (erreurs)
 }

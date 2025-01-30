@@ -433,25 +433,32 @@ detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize 
 }
 
 
-
-streaming <- function(Y,t,k,c,n,d,q,r)
+#Fonction streaming en paramètre matrice de données
+streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 1, 
+                      minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
+                      ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
+                      vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
+                      ,SigmaInit = diag(d),methode = "eigen",depart = 100/k,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
 {
 
-  sampsize = d
-
-
-
+  sampsize = ncol(Y)
+  
+  t <- nrow(Y)/k
+ 
+  print(t)  
+  
+  Sigma = array(0, dim = c(t, ncol(Y),ncol(Y)))
   #Initialisation de m
-  m = r*rnorm(d)
+  m = r*rnorm(ncol(Y))
 
-  V = diag(d)
+  V = diag(ncol(Y))
 
 
   #Stockage des estimations des valeurs propres de la matrice de covariance
-  lambdaIter = matrix(0,n,d)
+  lambdaIter = matrix(0,nrow(Y),ncol(Y))
   #lambda <- eigen(Vvrai)$values
-  lambda <- rep(1,d)
-  lambdatilde <- rep(1,d)
+  lambda <- rep(1,ncol(Y))
+  lambdatilde <- rep(1,ncol(Y))
 
   #vp2 <- eigen(Vvrai)$values
   slog <- 1
@@ -465,7 +472,7 @@ streaming <- function(Y,t,k,c,n,d,q,r)
 
   #Initialisation de m
 
-  m <- r*rnorm(d)
+  m <- r*rnorm(ncol(Y))
 
 
   #Sigma <- diag(d)
@@ -482,45 +489,94 @@ streaming <- function(Y,t,k,c,n,d,q,r)
 
   #Stockage des itérations de médiane géométrique
 
-  miter = matrix(0,t,d)
+  miter = matrix(0,t,ncol(Y))
 
-  stat <- rep(0,t-1)
-  phat <- rep(0,t-1)
+  stat <- rep(0,(t-1))
+  phat <- rep(0,(t-1))
   #Stockage des itérations de matrices dans un tableau
-  VIter <- array(0, dim = c(d, d, t))
+  VIter <- array(0, dim = c(ncol(Y), ncol(Y), t))
 
   #Stockage des vecteurs propres
 
-  U <- array(1, dim = c(t, q, q))
+  U <- array(1, dim = c(t, ncol(Y), ncol(Y)))
 
 
   #Valeurs propres de V
-  vpMCM <- matrix(0,t,d)
+  vpMCM <- matrix(0,t,ncol(Y))
 
 
   #Initialisation de U avec des vecteurs propres pas trop éloignés de ceux de cov(X)
 
-  U[1,,] <-  1.5*diag(q)
-
+  #U[1,,] <-  1.5*diag(ncol(Y))
+  #Si départ = 0, intialisation de U sur la sphère unité  
+  if (depart == 0)
+  {
+    
+    matrix_random <- matrix(0, ncol(Y), ncol(Y))
+    
+    #Générer chaque colonne aléatoire sur la sphère unité
+    for (i in (1:ncol(Y))) {
+      v <- rnorm(ncol(Y))  # Tirer un vecteur d composantes normales
+      matrix_random[, i] <- v / sqrt(sum(v^2))  # Normaliser
+    }
+    
+    U[1,,] <- matrix_random
+    
+  }
+  if (depart > 0)
+  {
+    print("depart > 0")
+    resoff=RobVar(Y[1:depart/k,],mc_sample_size = nrow(Y)/k,c=ncol(Y),w=2)
+    eig_init=eigen(resoff$variance)
+    lambdaInit=eig_init$values
+    lambdatilde=lambdaInit
+    lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart/k),byrow=T,nrow=depart/k)
+    minit=resoff$median
+    moyennem <- t(minit)
+    Vinit=resoff$covmedian
+    
+    for (l in 1 :(depart/k))
+    {
+      U[l,,] <- eig_init$vectors
+      Sigma[l,,] <- resoff$variance
+      #S <- 0
+      #for(j in (1:ncol(Y)))
+      #{
+      # S <- S + 1/(lambdaInit[j])*(sum((Y[l,] - minit)*(eig_init$vectors)[,j]))^2
+      #}
+      
+      
+      #print(solve(Sigma[i,,]))
+      distances[l] <- as.numeric(Y[l,] - minit) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - minit)))
+      #distances[l] <- S
+      #distances[l] <- calcule_vecteur_distances(Z,minit,Sigma[l,,])
+      print(distances[l])
+      
+      
+    }
+    
+  }
+  
+  
   # Vecteur pour stocker les labels des outliers
-  outlier_labels <- rep(0, t-1)
+  outlier_labels <- rep(0, (t-1))
 
   phat <- rep(0,t-1)
 
 
   finboucle = t - 1
 
-  for (i in (1:finboucle))
+  for (i in ((1+depart):finboucle))
   {
 
     #print(i)
 
     #Somme des médianes géométriques
-    S <- rep(0,d)
+    S <- rep(0,ncol(Y))
 
     #Somme matrices
 
-    Smatr <- matrix(0,d,d)
+    Smatr <- matrix(0,ncol(Y),ncol(Y))
 
     gamma = c/i^(0.75)
 
@@ -577,8 +633,54 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     VIter[,,i] <- moyenneV
 
     #Estimation des vecteurs propres de Vt et orthonormalisation
-
-    for (l in (1:d))
+if(methode == "eigen"){
+  VPropresV <- eigen(moyenneV)$vectors
+  #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+  
+  valPV <- eigen(V)$values  
+  lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+  #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
+  lambda <- lambdaResultat$vp
+  lambdatilde <- lambdaResultat$lambda
+  #print(lambda)
+  #lambdaIter[i,] <- lambdatilde
+  lambdaIter[i,] <- lambda
+  #Calcul de Sigma
+  #Sigma <- VPropresV %*% diag(valPV) %*% t(VPropresV)
+  #distances <- rep(0,nrow(Z))
+  #distances <- calcule_vecteur_distances(Z,m,Sigma)
+  #cutoff <- calcule_cutoff(distances,d)
+  #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
+  VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+  #print(lambdaIter[i,])
+  Sigma[i,,] <-  VP %*% diag(lambdaIter[i,]) %*% t(VP) 
+  #print(Sigma[i,,])
+  #Calcul de la distance i
+  #S <- 0
+  
+  # for(j in (1:ncol(Y)))
+  
+  #{
+  
+  # S<- S + 1/(lambdaIter[i,j])*sum(t(Y[i+1,] - moyennem)*(VP[,j]))^2
+  
+  #}
+  #S <- 0
+  #for(j in (1:ncol(Y)))
+  #{
+  # S <- S + 1/(lambdaIter[i,j])*(sum((Y[i,] - moyennem)*(eig_init$vectors)[,j]))^2
+  #}
+  
+  
+  
+  #print(solve(Sigma[i,,]))
+  distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+  #distances[i] <- S
+  
+}
+    
+    else{
+    for (l in (1:ncol(Y)))
     {
       Un =  U[i,,l]/sqrt(sum(U[i,,l]^2))
 
@@ -604,8 +706,6 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     #Orthogonalisation des vecteurs propres
     U[i+1,,] <- orthonormalization(U[i+1,,], basis=TRUE, norm=FALSE)
 
-    #Estimation des valeurs propres de la MCM
-    #vpMCM[i,] = apply(U[i,,], 2, function(col) sqrt(sum(col^2)))
     vpMCM[i,] = sqrt(colSums(U[i,,]^2))
     #Prendre norme de U[]
     #Z=Y[i,]
@@ -617,18 +717,21 @@ streaming <- function(Y,t,k,c,n,d,q,r)
     #E2=    (sum(( (vp)-lambda*(Z^2))^2) + sum((lambda * Z^2)%*%t((lambda * Z^2))) - sum(((lambda * Z^2)^2))  )^(-0.5)
     #lambda = lambda  - c*i^(-0.75)*lambda*E1 + c*i^(-0.75)* (vp)*E2
     #Convergence si initialisation à vpMCM[i,] (= delta) au lieu de lambda
-    lambdaResultat <- RobbinsMC2(sampsize,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1))
+    lambdaResultat <- RobbinsMC2(niterRMon,vp=vpMCM[i,],samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre = sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
     lambda <- lambdaResultat$vp
     lambdatilde <- lambdaResultat$lambda
     #print(lambda)
     lambdaIter[i,] <- lambdatilde
-
+    
+    
+    
+      }
     #Rédiger partie simulation
     #vp  = lambdaEstim (précédente valeur de lambda) sample 100
 
     #Récupération des résultats de la fonction Outlier
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
-    resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
+    #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
 
     # Vérifier si l'entrée est un outlier
     #if (resultatOutlier$outlier_label) {
@@ -647,8 +750,13 @@ streaming <- function(Y,t,k,c,n,d,q,r)
 
   }
 
-
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM))
+  
+  miter[t,] = miter[(t-1),]
+  VIter[,,t] = VIter[,,t-1]
+  Sigma[t,,] = Sigma[(t - 1),,]
+  
+  
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,Sigma = Sigma))
 }
 
 

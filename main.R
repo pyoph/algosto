@@ -44,7 +44,7 @@ for (i in 1:nbruns)
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
 ###Test fonction d'estimation online affichage des boxplots des erreurs
-pdf("Resultats_Erreurs_Sigma Toeplitzvar1.pdf", width = 10, height = 7)
+pdf("Resultats_Erreurs_Sigma Toeplitzvar1sqrtd.pdf", width = 10, height = 7)
 
 erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 depart = 100
@@ -68,7 +68,7 @@ for (i in seq_along(taux_contamination))
   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
   
   resultatsOnline <- detection(Z,depart, methodeEstimation = "online")
-  SigmaEstimOnline <- resultatsOnline$SigmaOnline[(nrow(Y) - 1),,]
+  SigmaEstimOnline <- resultatsOnline$SigmaOnline[(nrow(Z) - 1),,]
   distances <- resultatsOnline$distances
   #Estimation offline
   resultsOffline <- detection(Z,depart, methodeEstimation = "offline")
@@ -81,7 +81,7 @@ for (i in seq_along(taux_contamination))
 
  #Affichage des SigmaEstim Online, Offline et théorique
  
-plot_comparaison_sigma(Sigma1, SigmaEstimOffline = SigmaEstimOffline,SigmaEstimOnline = SigmaEstimOnline[(nrow(Z) - 1),,],delta)
+plot_comparaison_sigma(Sigma1, SigmaEstimOffline = SigmaEstimOffline,SigmaEstimOnline = SigmaEstimOnline,delta)
 
  
  
