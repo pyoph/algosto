@@ -61,6 +61,8 @@ faux_positifs_online <- numeric(length(taux_contamination))
 faux_negatifs_online <- numeric(length(taux_contamination))
 faux_positifs_offline <- numeric(length(taux_contamination))
 faux_negatifs_offline <- numeric(length(taux_contamination))
+faux_positifs_streaming <- numeric(length(taux_contamination))
+faux_negatifs_streaming <- numeric(length(taux_contamination))
 faux_positifs_comed <- numeric(length(taux_contamination))
 faux_negatifs_comed <- numeric(length(taux_contamination))
 faux_positifs_shrink <- numeric(length(taux_contamination))
@@ -73,6 +75,7 @@ temps_maha <- numeric(length(taux_contamination))
 temps_EPP <- numeric(length(taux_contamination))
 temps_online <- numeric(length(taux_contamination))
 temps_offline <- numeric(length(taux_contamination))
+temps_streaming <- numeric(length(taux_contamination))
 temps_comed <- numeric(length(taux_contamination))
 temps_shrink <- numeric(length(taux_contamination))
 temps_covEmp <- numeric(length(taux_contamination))
@@ -85,7 +88,7 @@ distances <- rep(0,n)
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  #delta <- 5
+  #delta <- 2
   contamin = "moyenne"
   p1 <- 1 - delta / 100
   
@@ -212,6 +215,32 @@ for (i in seq_along(taux_contamination)) {
     }
   })["elapsed"]
   
+  
+  # Temps pour la méthode Offline
+  temps_streaming[i] <- system.time({
+    
+    resultsStr <- detection(Z,methodeEstimation = "streaming")
+    
+    m <- resultsStr$med
+    SigmaEstim <- resultsStr$SigmaOffline
+    #distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
+    
+    #cutoff <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOutliers(resultsStr$distances,cutoff =  cutoff)
+    #auc <- courbeROCAUC (resultsSimul$labelsVrais,outliers_labels)
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
+    tc <- safe_access_tc(tc)
+    #tc
+    #print(i)
+    if((tc["0","1"] + tc["0","0"])!= 0)
+    {faux_positifs_offline[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
+    #else {faux_positifs_maha[i]   <- 0}
+    if((tc["1","0"] + tc["1","1"]) != 0){
+      faux_negatifs_offline[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)
+    }
+  })["elapsed"]
+  
+  
   # Temps pour la comédiane
   temps_comed[i] <- system.time({
     med <- covComed(Z)$center
@@ -280,6 +309,9 @@ results_outliers <- data.frame(
   FN_Offline = faux_negatifs_offline,
   FP_Offline = faux_positifs_offline,
   Tps_Offline = temps_offline,
+  FN_Streaming = faux_negatifs_streaming,
+  FP_Streaming = faux_positifs_streaming,
+  Tps_Streaming = temps_streaming,
   FN_Comed = faux_negatifs_comed,
   FP_Comed = faux_positifs_comed,
   Tps_Comed = temps_comed,

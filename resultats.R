@@ -210,3 +210,17 @@ creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, metho
   
   print(p)
 }
+
+
+#Fonction pour tracer les courbes ROC
+
+Performance <- function(score, class, thresh, add=FALSE, col=1){
+  perf <- performance(prediction(score, class), "tpr", "fpr")
+  tab <- cbind(unlist(perf@alpha.values), unlist(perf@x.values), unlist(perf@y.values))
+  numThresh <- min(which(unlist(perf@alpha.values) < thresh))
+  perfThresh <- tab[numThresh, -1]; 
+  names(perfThresh) <- c("tpr", "fpr")
+  plot(perf, add=add, col=col); abline(0, 1, col=8)
+  points(perfThresh[1], perfThresh[2], col=col, cex=2)
+  return(list(perf=perf, tab=tab, perfThresh=perfThresh))
+}
