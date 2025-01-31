@@ -173,7 +173,7 @@ for (i in seq_along(taux_contamination)) {
       #k = 1
     #)
     #depart = 100
-    results <- detection(Z,depart = depart,methodeEstimation = "online")
+    results <- detection(Z,depart = 100,methodeEstimation = "online")
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
@@ -227,16 +227,15 @@ for (i in seq_along(taux_contamination)) {
     
     #cutoff <- calcule_cutoff(distances,d)
     outliers_labels <- detectionOutliers(resultsStr$distances,cutoff =  cutoff)
-    #auc <- courbeROCAUC (resultsSimul$labelsVrais,outliers_labels)
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     tc <- safe_access_tc(tc)
     #tc
     #print(i)
     if((tc["0","1"] + tc["0","0"])!= 0)
-    {faux_positifs_offline[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
+    {faux_positifs_streaming[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
     #else {faux_positifs_maha[i]   <- 0}
     if((tc["1","0"] + tc["1","1"]) != 0){
-      faux_negatifs_offline[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)
+      faux_negatifs_streaming[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)
     }
   })["elapsed"]
   

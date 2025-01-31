@@ -35,7 +35,7 @@ source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 for (i in 1:nbruns)
 {
-  resultats_outliers <- calcule_outliers(contamin = "variance")
+  resultats_outliers <- calcule_outliers(contamin = "moyenne")
 }
 
 
