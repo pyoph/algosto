@@ -214,7 +214,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,
     
     #Mise à jour de moyenneV
     
-    moyenneV <- (i - depart)/(i - depart  +1)*moyenneV + 1/(i + 1)*V
+    moyenneV <- (i - depart)/(i - depart  +1)*moyenneV + 1/(i -depart + 1)*V
     
     
     VIter[,,i] = moyenneV
@@ -433,7 +433,7 @@ detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize 
 }
 
 
-#Fonction streaming en paramètre matrice de données
+#Fonction streaming en paramètre matrice de données renvoie les paramètres estimés et des distances
 streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 1, 
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                       ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
@@ -448,14 +448,10 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
   print(t)  
   
   Sigma = array(0, dim = c(t, ncol(Y),ncol(Y)))
-  #Initialisation de m
-  m = r*rnorm(ncol(Y))
-
-  V = diag(ncol(Y))
-
+  
 
   #Stockage des estimations des valeurs propres de la matrice de covariance
-  lambdaIter = matrix(0,nrow(Y),ncol(Y))
+  lambdaIter = matrix(0,t,ncol(Y))
   #lambda <- eigen(Vvrai)$values
   lambda <- rep(1,ncol(Y))
   lambdatilde <- rep(1,ncol(Y))
@@ -466,26 +462,7 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
 
   beta = 1/2
 
-  #Yv <- mvtnorm::rmvnorm(1000000,sigma=Sigma)
 
-  ##Estimation de mn
-
-  #Initialisation de m
-
-  m <- r*rnorm(ncol(Y))
-
-
-  #Sigma <- diag(d)
-
-
-
-
-  moyennem = m
-
-
-
-
-  moyenneV <- V
 
   #Stockage des itérations de médiane géométrique
 
@@ -508,7 +485,8 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
   #Initialisation de U avec des vecteurs propres pas trop éloignés de ceux de cov(X)
 
   #U[1,,] <-  1.5*diag(ncol(Y))
-  #Si départ = 0, intialisation de U sur la sphère unité  
+  #Si départ = 0, 
+  #intialisation de U et de m sur la sphère unité  
   if (depart == 0)
   {
     
@@ -520,20 +498,41 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
       matrix_random[, i] <- v / sqrt(sum(v^2))  # Normaliser
     }
     
+    
     U[1,,] <- matrix_random
+    #Initialisation de m
+    
+    m <- r*rnorm(ncol(Y))
+    
+    V = diag(ncol(Y))
+    
+    moyennem = m
+    
+    
+    
+    
+    moyenneV <- V
     
   }
   if (depart > 0)
   {
     print("depart > 0")
-    resoff=RobVar(Y[1:depart/k,],mc_sample_size = nrow(Y)/k,c=ncol(Y),w=2)
+    resoff=RobVar(Y[1:depart/k,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
     eig_init=eigen(resoff$variance)
     lambdaInit=eig_init$values
     lambdatilde=lambdaInit
-    lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart/k),byrow=T,nrow=depart/k)
+    print("test avec lambdaIter")
+    lambdaIter[1:(depart/k),]=matrix(rep(lambdaInit,(depart/k)),byrow=T,nrow=(depart/k))
     minit=resoff$median
     moyennem <- t(minit)
+    m <- t(minit)
     Vinit=resoff$covmedian
+    V <- Vinit
+  
+    moyennem = m
+  
+    moyenneV <- V
+    
     
     for (l in 1 :(depart/k))
     {
@@ -601,7 +600,7 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
     m <- m + gamma*k^(beta)*S/k
 
 
-    moyennem = moyennem*i/(i+1) + 1/(i+1)*m
+    moyennem = moyennem*(i-depart)/(i - depart +1) + 1/(i - depart +1)*m
 
     miter[i,] = moyennem
 
@@ -626,7 +625,7 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
 
     #Mise à jour de moyenneV
 
-    moyenneV <- i/(i+1)*moyenneV + 1/(i + 1)*V
+    moyenneV <- (i - depart)/(i - depart +1)*moyenneV + 1/(i - depart + 1)*V
 
 
     #Stockage des itérations de matrices dans un tableau
@@ -637,10 +636,11 @@ streaming <- function(Y,k = 1,c = sqrt(ncol(Y)),r = 1.5,exposantPas = 0.75,aa = 
 if(methode == "eigen"){
   VPropresV <- eigen(moyenneV)$vectors
   #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
-  valPV <- eigen(V)$values  
+  valPV <- eigen(moyenneV)$values  
   #print(VPropresV)
   
-  lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+  #lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+  lambdaResultat <- RobbinsMC2(niterRMon,vp=valPV,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1))
   #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
   lambda <- lambdaResultat$vp
   lambdatilde <- lambdaResultat$lambda
