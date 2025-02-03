@@ -162,34 +162,34 @@ for (i in seq_along(taux_contamination)) {
   #if ("1" %in% rownames(tc) && "0" %in% colnames(tc)) {faux_negatifs_EPP[i] <- tc["1","0"]}
   
   #  })["elapsed"]
-  
-  # Temps pour la méthode Online
-  # temps_online[i] <- system.time({
-  #   #params <- initialiser_parametres(
-  #     #Y = Z,
-  #    # c = sqrt(10),
-  #     #Sigma = Sigma1,
-  #     #r = 1.5,
-  #     #k = 1
-  #   #)
-  #   #depart = 100
-  #  results <- detection(Z,depart = depart,methodeEstimation = "online")
-  #   #miter <- results$miter
-  #   #U <- results$U
-  #   #lambda <- results$lambdaIter
-  #   distances <- results$distances
-  #   #c <- calcule_cutoff(distances,d)
-  #   outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
-  #   tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], outliers_labels[1:(nrow(Z) - 1)])
-  #   tc <- safe_access_tc(tc)
-  #   
-  #   if((tc["0","0"] + tc["0","1"]) != 0)
-  #   {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
-  #   else {faux_positifs_maha[i]   <- 0}
-  #   if((tc["1","0"] + tc["1","1"]) != 0){
-  #     faux_negatifs_online[i] <- round((tc["1", "0"]/(tc["1","0"] + tc["1","1"]))*100,2)
-  #   }
-  # })["elapsed"]
+
+#  Temps pour la méthode Online
+  temps_online[i] <- system.time({
+    #params <- initialiser_parametres(
+      #Y = Z,
+     # c = sqrt(10),
+      #Sigma = Sigma1,
+      #r = 1.5,
+      #k = 1
+    #)
+    #depart = 100
+   results <- detection(Z,depart = depart,methodeEstimation = "online")
+    #miter <- results$miter
+    #U <- results$U
+    #lambda <- results$lambdaIter
+    distances <- results$distances
+    #c <- calcule_cutoff(distances,d)
+    outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], outliers_labels[1:(nrow(Z) - 1)])
+    tc <- safe_access_tc(tc)
+
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
+    else {faux_positifs_maha[i]   <- 0}
+    if((tc["1","0"] + tc["1","1"]) != 0){
+      faux_negatifs_online[i] <- round((tc["1", "0"]/(tc["1","0"] + tc["1","1"]))*100,2)
+    }
+  })["elapsed"]
   # 
   # Temps pour la méthode Offline
   temps_offline[i] <- system.time({
