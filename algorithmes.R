@@ -415,6 +415,8 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
                         ,SigmaInit = diag(d),methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = batch)
 {
   compt=0
+  
+  niterr=0
   #print(nrow(Y))
   lambdatilde = rep(1,ncol(Y))
   lambdaIter = matrix(0,nrow(Y),ncol(Y))
@@ -460,6 +462,8 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
      for (l in 1 :depart)
     {
       U[l,,] <- eig_init$vectors
+      
+      #Faire calcul t(P) %*% diag(D) %*% P
       Sigma[l,,] <- resoff$variance
       
       S <- 0
@@ -486,7 +490,6 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   
   #V <- Vinit
   
-  niterr=0
   #Calcul de la vraie MCM par l'algorithme de Weiszfeld
   
   #moyennem = m
