@@ -35,9 +35,6 @@ source("~/algosto/resultats.R")
 source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
-source("~/algosto/fonctions_annexes_robust_gmm.R")
-source("~/algosto/Final_functions.R")
-source("~/algosto/RCppExports.R")
 
 #Création d'une liste vide 
 liste_resultats_outliers <- list()
