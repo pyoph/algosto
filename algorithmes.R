@@ -440,9 +440,15 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   if (depart > 0)
   {
     resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
-    eig_init=eigen(resoff$variance)
-    lambdaInit=eig_init$values
-    lambdatilde=lambdaInit
+    #resoff = WeiszfeldCov_init(Y[1:depart])
+    eig_init = eigen(resoff$covmedian)
+    #eig_init=eigen(resoff$variance)
+    valPV <- eig_init$values 
+    valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
+    lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
+    
+    #lambdaInit=eig_init$values
+    #lambdatilde=lambdaInit
     lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
     
     m <- minit

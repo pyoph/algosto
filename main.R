@@ -36,15 +36,16 @@ source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 source("~/algosto/fonctions_annexes_robust_gmm.R")
-
+source("~/algosto/Final_functions.R")
+source("~/algosto/RCppExports.R")
 
 #Création d'une liste vide 
-#liste_resultats_outliers <- list()
+liste_resultats_outliers <- list()
 
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne")
- # liste_resultats_outliers[[i]] <- resultats_outliers 
+  liste_resultats_outliers[[i]] <- resultats_outliers 
 }
 
 

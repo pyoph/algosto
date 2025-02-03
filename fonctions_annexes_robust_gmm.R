@@ -118,7 +118,7 @@ Weiszfeld_init <- function (X,init=rep(0,ncol(X)), weights = NULL, epsilon=1e-08
 {
   X <- as.matrix(X)
   if (is.null(weights)) weights <- rep(1,nrow(X))
-  
+
   return(Weiszfeld_init_rcpp(X,init=init, weights= weights, epsilon=epsilon, nitermax=nitermax))
 }
 
@@ -188,7 +188,7 @@ MCMrebuild=function(MCM,d,eigenvalues,eigenvectors)
   eigenvectors=eigenvectors[,1:d]
   eigenvaluesrebuilt=eigenvalues
   eigenvaluesrebuilt[(d+1):length(eigenvalues)] = rep(median(eigenvalues[(d+1):length(eigenvalues)]),length(eigenvalues) - d)
-  
+
   MCMrebuilt=matrix(0 ,  nrow=q,ncol=q)
   MCMrebuilt=  (eigenvectors[,1:d])%*% diag(eigenvaluesrebuilt[1:d]-eigenvaluesrebuilt[d+1]) %*% t(eigenvectors[,1:d])
   diag(MCMrebuilt)=diag(MCMrebuilt)+eigenvalues[d+1]
@@ -254,7 +254,7 @@ redMCM=function(X,K=1:20,par=T,method_MCM='Weiszfeld'){
       bestresult=MCMrebuild(MCM=MCM,d=K,eigenvalues=eigenvalues,eigenvectors=eigenvectors[,1:K])
       resultat=bestresult
     }
-    
+
     if (length(K)>1)
     {
       if (length(K)<10)
@@ -342,8 +342,8 @@ RobLassoOffline=function(X,Y,invSigma=diag(rep(1,ncol(Y))),niter=50,ridge=1,lamb
         mat=diag(rep(1,ncol(X)))
         #matinv=diag(rep(1,ncol(X)))
         grad=0
-        
-        
+
+
         for (j in 1:nrow(X))
         {
           norminv= as.numeric(sum((Y[j,] - X[j,]%*%betachap)^2))
@@ -383,8 +383,8 @@ RobLassoOffline=function(X,Y,invSigma=diag(rep(1,ncol(Y))),niter=50,ridge=1,lamb
         mat=diag(rep(1,ncol(X)))
         #matinv=diag(rep(1,ncol(X)))
         grad=0
-        
-        
+
+
         for (j in 1:nrow(X))
         {
           norminv=stats::mahalanobis(x = Y[j,] ,center = X[j,]%*%betachap,cov = invSigma,inverted = TRUE)
@@ -428,8 +428,8 @@ RobLassoOffline=function(X,Y,invSigma=diag(rep(1,ncol(Y))),niter=50,ridge=1,lamb
         mat=diag(rep(1,ncol(X)))
         #matinv=diag(rep(1,ncol(X)))
         grad=0
-        
-        
+
+
         for (j in 1:nrow(X))
         {
           norminv= as.numeric(sum((Y[j,] - X[j,]%*%betachap)^2))
@@ -489,8 +489,8 @@ RobLassoOffline=function(X,Y,invSigma=diag(rep(1,ncol(Y))),niter=50,ridge=1,lamb
         mat=diag(rep(1,ncol(X)))
         #matinv=diag(rep(1,ncol(X)))
         grad=0
-        
-        
+
+
         for (j in 1:nrow(X))
         {
           norminv=stats::mahalanobis(x = Y[j,] ,center = X[j,]%*%betachap,cov = invSigma,inverted = TRUE)
@@ -523,7 +523,7 @@ RobLassoOffline=function(X,Y,invSigma=diag(rep(1,ncol(Y))),niter=50,ridge=1,lamb
           hess=fastmatrix::kronecker.prod(invSigma,(mat))
           hess=solve(hess)
         }
-        
+
         betaold=betachap
         #        betalin= betalin+ hess%*%grad
         betalin= betalin+ grad%*%hess
@@ -547,6 +547,6 @@ RobLassoOffline=function(X,Y,invSigma=diag(rep(1,ncol(Y))),niter=50,ridge=1,lamb
       #  }
     }
   }
-  
+
   return( betachap )
 }
