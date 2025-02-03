@@ -73,6 +73,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, w=2,
   if (depart > 0)
   {
     resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
+    #print(det(resoff$variance))
     eig_init=eigen(resoff$variance)
     lambdaInit=eig_init$values
     lambdatilde=lambdaInit
@@ -388,7 +389,7 @@ detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize 
   }
   else if (methodeEstimation == "streaming")
   { 
-    results <- StreamingMV(Y,batch = 10,depart = 100)
+    results <- StreamingMV(Y,batch = 10,depart = depart_online)
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
@@ -414,6 +415,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
                         ,SigmaInit = diag(d),methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = batch)
 {
   compt=0
+  #print(nrow(Y))
   lambdatilde = rep(1,ncol(Y))
   lambdaIter = matrix(0,nrow(Y),ncol(Y))
   U = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
@@ -437,7 +439,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   }
   if (depart > 0)
   {
-    resoff=RobVar(Y[1:100,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
+    resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
     eig_init=eigen(resoff$variance)
     lambdaInit=eig_init$values
     lambdatilde=lambdaInit

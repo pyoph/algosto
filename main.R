@@ -6,6 +6,7 @@
 #install.packages("mvnfast")
 #install.packages("reshape")
 #install.packages("matlib")
+#install.packages("RobRegression")
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -21,6 +22,7 @@ library("corrplot")
 library("dplyr")
 library("easystats")
 library("bigutilsr")
+library("RobRegression")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
@@ -33,10 +35,18 @@ source("~/algosto/resultats.R")
 source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
+source("~/algosto/fonctions_annexes_robust_gmm.R")
+
+
+#Création d'une liste vide 
+#liste_resultats_outliers <- list()
+
 for (i in 1:nbruns)
 {
   resultats_outliers <- calcule_outliers(contamin = "moyenne")
+ # liste_resultats_outliers[[i]] <- resultats_outliers 
 }
+
 
 
 

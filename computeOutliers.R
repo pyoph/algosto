@@ -88,7 +88,7 @@ distances <- rep(0,n)
 
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
-  #delta <- 2
+  #delta <- 0
   contamin = "moyenne"
   p1 <- 1 - delta / 100
   
@@ -164,33 +164,33 @@ for (i in seq_along(taux_contamination)) {
   #  })["elapsed"]
   
   # Temps pour la méthode Online
-  temps_online[i] <- system.time({
-    #params <- initialiser_parametres(
-      #Y = Z,
-     # c = sqrt(10),
-      #Sigma = Sigma1,
-      #r = 1.5,
-      #k = 1
-    #)
-    #depart = 100
-    results <- detection(Z,depart = 100,methodeEstimation = "online")
-    #miter <- results$miter
-    #U <- results$U
-    #lambda <- results$lambdaIter
-    distances <- results$distances
-    #c <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
-    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], outliers_labels[1:(nrow(Z) - 1)])
-    tc <- safe_access_tc(tc)
-    
-    if((tc["0","0"] + tc["0","1"]) != 0)
-    {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
-    #else {faux_positifs_maha[i]   <- 0}
-    if((tc["1","0"] + tc["1","1"]) != 0){
-      faux_negatifs_online[i] <- round((tc["1", "0"]/(tc["1","0"] + tc["1","1"]))*100,2)
-    }
-  })["elapsed"]
-  
+  # temps_online[i] <- system.time({
+  #   #params <- initialiser_parametres(
+  #     #Y = Z,
+  #    # c = sqrt(10),
+  #     #Sigma = Sigma1,
+  #     #r = 1.5,
+  #     #k = 1
+  #   #)
+  #   #depart = 100
+  #  results <- detection(Z,depart = depart,methodeEstimation = "online")
+  #   #miter <- results$miter
+  #   #U <- results$U
+  #   #lambda <- results$lambdaIter
+  #   distances <- results$distances
+  #   #c <- calcule_cutoff(distances,d)
+  #   outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
+  #   tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], outliers_labels[1:(nrow(Z) - 1)])
+  #   tc <- safe_access_tc(tc)
+  #   
+  #   if((tc["0","0"] + tc["0","1"]) != 0)
+  #   {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
+  #   else {faux_positifs_maha[i]   <- 0}
+  #   if((tc["1","0"] + tc["1","1"]) != 0){
+  #     faux_negatifs_online[i] <- round((tc["1", "0"]/(tc["1","0"] + tc["1","1"]))*100,2)
+  #   }
+  # })["elapsed"]
+  # 
   # Temps pour la méthode Offline
   temps_offline[i] <- system.time({
     
@@ -216,15 +216,15 @@ for (i in seq_along(taux_contamination)) {
   })["elapsed"]
   
   
-  # Temps pour la méthode Offline
-  temps_streaming[i] <- system.time({
+  # Temps pour la méthode streaming
+ temps_streaming[i] <- system.time({
     
     resultsStr <- detection(Z,methodeEstimation = "streaming")
     
     m <- resultsStr$med
     SigmaEstim <- resultsStr$SigmaOffline
     #distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
-    
+    distances <- resultsStr$distances
     #cutoff <- calcule_cutoff(distances,d)
     outliers_labels <- detectionOutliers(resultsStr$distances,cutoff =  cutoff)
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
@@ -232,13 +232,13 @@ for (i in seq_along(taux_contamination)) {
     #tc
     #print(i)
     if((tc["0","1"] + tc["0","0"])!= 0)
-    {faux_positifs_streaming[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
-    #else {faux_positifs_maha[i]   <- 0}
-    if((tc["1","0"] + tc["1","1"]) != 0){
-      faux_negatifs_streaming[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)
-    }
-  })["elapsed"]
-  
+{faux_positifs_streaming[i]   <- round((tc["0", "1"]/(tc["0","1"] + tc["0","0"]))*100,2)}
+else {faux_positifs_maha[i]   <- 0}
+if((tc["1","0"] + tc["1","1"]) != 0){
+faux_negatifs_streaming[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*100,2)
+}
+ })["elapsed"]
+
   
   # Temps pour la comédiane
   temps_comed[i] <- system.time({
