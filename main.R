@@ -46,7 +46,11 @@ for (i in 1:nbruns)
 }
 
 
+# Calculer la moyenne de chaque colonne sur tous les dataframes
+moyenne_resultats <- Reduce("+", liste_resultats_outliers) / nbruns
 
+# Afficher la moyenne
+print(moyenne_resultats)
 
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
