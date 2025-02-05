@@ -45,6 +45,8 @@ for (i in 1:nbruns)
   liste_resultats_outliers[[i]] <- resultats_outliers 
 }
 
+#resultats_outliers <- round(resultats_outliers,2)
+
 
 # Calculer la moyenne de chaque colonne sur tous les dataframes
 moyenne_resultats <- Reduce("+", liste_resultats_outliers) / nbruns

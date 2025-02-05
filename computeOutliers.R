@@ -90,6 +90,7 @@ for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
   #delta <- 0
   #contamin = "moyenne"
+  print(contamin)
   p1 <- 1 - delta / 100
   
   p2 <- 1 - p1
