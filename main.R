@@ -49,7 +49,7 @@ for (i in 1:nbruns)
 
 
 # Calculer la moyenne de chaque colonne sur tous les dataframes
-moyenne_resultats <- Reduce("+", liste_resultats_outliers) / nbruns
+moyenne_resultats <- round(Reduce("+", liste_resultats_outliers) / nbruns,2)
 
 # Afficher la moyenne
 print(moyenne_resultats)
