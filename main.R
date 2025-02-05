@@ -28,16 +28,13 @@ library("RobRegression")
 library("RGMM")
 library(ROCR)
 library(pROC)
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/Outliers.R")
-source("~/algosto/computeOutliers.R")
-source("~/algosto/seuils.R")
-source("~/algosto/fonctions_annexes_robust_gmm.R")
-source("~/algosto/Final_functions.R")
-source("~/algosto/RCppExports.R")
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
+source("~/work/algosto/resultats.R")
+source("~/work/algosto/Outliers.R")
+source("~/work/algosto/computeOutliers.R")
+source("~/work/algosto/seuils.R")
 
 #Création d'une liste vide 
 liste_resultats_outliers <- list()
@@ -49,7 +46,11 @@ for (i in 1:nbruns)
 }
 
 
+# Calculer la moyenne de chaque colonne sur tous les dataframes
+moyenne_resultats <- Reduce("+", liste_resultats_outliers) / nbruns
 
+# Afficher la moyenne
+print(moyenne_resultats)
 
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)

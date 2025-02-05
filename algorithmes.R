@@ -446,9 +446,12 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     eig_init = eigen(resoff$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
+    #print(valPV)
     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
-    lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
-    
+    #print(valPV)
+    #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
+    lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon,cbarre =niterRMon)
+    lambdaInit <- lambdaResultat$vp
     #lambdaInit=eig_init$values
     #lambdatilde=lambdaInit
     lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
@@ -459,13 +462,19 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
    
     moyennem <- m
     moyenneV <- V
+    VPropresV <- eig_init$vectors
+    VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    #print(lambdaIter[i,])
+    #print(lambdaInit)
+    varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+    
      for (l in 1 :depart)
     {
       U[l,,] <- eig_init$vectors
       
       #Faire calcul t(P) %*% diag(D) %*% P
-      Sigma[l,,] <- resoff$variance
-      
+      #Sigma[l,,] <- resoff$variance
+      Sigma[l,,] <- varianc
       S <- 0
       for(j in (1:ncol(Y)))
       {
