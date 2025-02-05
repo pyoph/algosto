@@ -41,7 +41,7 @@ liste_resultats_outliers <- list()
 
 for (i in 1:nbruns)
 {
-  resultats_outliers <- calcule_outliers(contamin = "zero")
+  resultats_outliers <- calcule_outliers(contamin = "uniforme")
   liste_resultats_outliers[[i]] <- resultats_outliers 
 }
 
