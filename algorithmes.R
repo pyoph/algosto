@@ -73,30 +73,49 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, w=2,
   if (depart > 0)
   {
     resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
-    #print(det(resoff$variance))
-    eig_init=eigen(resoff$variance)
-    lambdaInit=eig_init$values
-    lambdatilde=lambdaInit
+    #resoff = WeiszfeldCov_init(Y[1:depart])
+    eig_init = eigen(resoff$covmedian)
+    #eig_init=eigen(resoff$variance)
+    valPV <- eig_init$values 
+    #print(valPV)
+    valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
+    #print(valPV)
+    #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
+    lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon,cbarre =niterRMon)
+    lambdaInit <- lambdaResultat$vp
+    #lambdaInit=eig_init$values
+    #lambdatilde=lambdaInit
     lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
+    
+    m <- minit
+    
+    V <- Vinit
+    
+    moyennem <- m
+    moyenneV <- V
+    VPropresV <- eig_init$vectors
+    VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    #print(lambdaIter[i,])
+    #print(lambdaInit)
+    varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+    
     for (l in 1 :depart)
     {
       U[l,,] <- eig_init$vectors
-      Sigma[l,,] <- resoff$variance
-      S <- 0
       
-      minit=resoff$median
-      Vinit=resoff$covmedian
-      m <- minit
-      V <- Vinit
-      moyennem <- m
+      #Faire calcul t(P) %*% diag(D) %*% P
+      #Sigma[l,,] <- resoff$variance
+      Sigma[l,,] <- varianc
+      S <- 0
       for(j in (1:ncol(Y)))
       {
         S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*(eig_init$vectors)[,j])^2
       }
       
       #print(solve(Sigma[i,,]))
-      #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+      #distances[l] <- as.numeric(Y[l,] - m) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - m)))
       distances[l] <- S
+      
     }
   }
   
@@ -355,7 +374,7 @@ estimMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, w=2,
 }
 
 #Fonction qui prend en paramètre une matrice de données, et une méthode d'estimation et renvoie les paramètres estimés, les distances et les outliers
-detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y), 
+detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y),  cMC=ncol(Y),w= 2,
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                       ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
                       vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = 100)
@@ -368,7 +387,35 @@ detection <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize 
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
     med <- results$median
-    SigmaOffline <- results$variance
+    resoff=RobVar(Y,mc_sample_size = nrow(Y),c=ncol(Y),w=2)
+    #resoff = WeiszfeldCov_init(Y[1:depart])
+    eig_init = eigen(resoff$covmedian)
+    #eig_init=eigen(resoff$variance)
+    valPV <- eig_init$values 
+    #print(valPV)
+    valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
+    #print(valPV)
+    #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
+    lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon,cbarre =niterRMon)
+    lambdaInit <- lambdaResultat$vp
+    #lambdaInit=eig_init$values
+    #lambdatilde=lambdaInit
+    #lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
+    
+    m <- minit
+    
+    V <- Vinit
+    
+    moyennem <- m
+    moyenneV <- V
+    VPropresV <- eig_init$vectors
+    VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    #print(lambdaIter[i,])
+    #print(lambdaInit)
+    varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+    
+    
+    SigmaOffline <- varianc
     V <- results$covmedian
     U <- eigen(V)$vectors
     #lambda <- RobbinsMC()

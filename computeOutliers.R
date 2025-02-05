@@ -4,24 +4,24 @@
 #install.packages("RGMM")
 #install.packages("rrcov")
 #install.packages("mvnfast")
-library(xtable)
-library(reshape2)
-library(RobRegression)
-library("robustbase")
-library(Gmedian)
-library(ggplot2)
-library(far)
-library(gridExtra)
-library(microbenchmark)
-#library("matlib")
-library("MASS")
-library("corrplot")
-library("dplyr")
-library("easystats")
-library("bigutilsr")
-#library("rJava")
-#library("REPPlab")
-library("RGMM")
+#library(xtable)
+#library(reshape2)
+#library(RobRegression)
+#library("robustbase")
+# library(Gmedian)
+# library(ggplot2)
+# library(far)
+# library(gridExtra)
+# library(microbenchmark)
+# #library("matlib")
+# library("MASS")
+# library("corrplot")
+# library("dplyr")
+# library("easystats")
+# library("bigutilsr")
+# #library("rJava")
+# #library("REPPlab")
+# library("RGMM")
 
 #Rajout de 0 dans les tables de contingence si les champs sont vides
 safe_access_tc <- function(tc, default = 0) {
@@ -89,7 +89,7 @@ distances <- rep(0,n)
 for (i in seq_along(taux_contamination)) {
   delta <- taux_contamination[i]
   #delta <- 0
-  contamin = "moyenne"
+  #contamin = "moyenne"
   p1 <- 1 - delta / 100
   
   p2 <- 1 - p1
@@ -103,7 +103,11 @@ for (i in seq_along(taux_contamination)) {
     #distances <- calcule_vecteur_distancesEmpiriqueVrai(Z,Sigma1)
     #distances
     distances <- calcule_vecteur_distances(Z,as.numeric(colMeans(Z)), cov(Z))
+    
     outliers <- detectionOutliers(distances,cutoff = cutoff)
+    print("ok Cov")
+    print(delta)
+    
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) -1)], as.numeric(outliers)[1:(nrow(Z) - 1)])
     tc <- safe_access_tc(tc)
     
@@ -128,9 +132,12 @@ for (i in seq_along(taux_contamination)) {
     med <- res$center
     distances <- calcule_vecteur_distances(Z,med,Sigma)
     #cutoff = calcule_cutoff(distances,d)
-    cutoff =  qchisq(p = 0.95, df = ncol(Z))
+    #cutoff =  qchisq(p = 0.95, df = ncol(Z))
     #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
     outliers_listMaha <- detectionOutliers(distances,cutoff)
+    print("ok OGK")
+    print(delta)
+    
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_listMaha)[1:(nrow(Z) - 1)])
     tc
     tc <- safe_access_tc(tc)
@@ -180,6 +187,9 @@ for (i in seq_along(taux_contamination)) {
     distances <- results$distances
     #c <- calcule_cutoff(distances,d)
     outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
+    print("ok online")
+    print(delta)
+    
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], outliers_labels[1:(nrow(Z) - 1)])
     tc <- safe_access_tc(tc)
 
@@ -198,10 +208,13 @@ for (i in seq_along(taux_contamination)) {
     
     m <- resultsOffline$med
     SigmaEstim <- resultsOffline$SigmaOffline
-    distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
+    #distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     
     #cutoff <- calcule_cutoff(distances,d)
-    outliers_labels <- detectionOutliers(distances,cutoff =  cutoff)
+    outliers_labels <- detectionOutliers(resultsOffline$distances,cutoff =  cutoff)
+    print("ok offline")
+    print(delta)
+    
     #auc <- courbeROCAUC (resultsSimul$labelsVrais,outliers_labels)
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     tc <- safe_access_tc(tc)
@@ -225,8 +238,12 @@ for (i in seq_along(taux_contamination)) {
     SigmaEstim <- resultsStr$SigmaOffline
     #distances <- calcule_vecteur_distances(Z,m,SigmaEstim)
     distances <- resultsStr$distances
+    
     #cutoff <- calcule_cutoff(distances,d)
     outliers_labels <- detectionOutliers(resultsStr$distances,cutoff =  cutoff)
+    print("ok streaming")
+    print(delta)
+    
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     tc <- safe_access_tc(tc)
     #tc
@@ -251,6 +268,9 @@ faux_negatifs_streaming[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*1
     #cutoff <- calcule_cutoff(distances,d)
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
+    print("ok comed")
+    print(delta)
+    
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z)- 1)]))
     tc <- safe_access_tc(tc)
     
@@ -276,6 +296,9 @@ faux_negatifs_streaming[i] <-  round((tc["1","0"]/(tc["1","0"] + tc["1","1"]))*1
     #cutoff <- calcule_cutoff(distances,d)
     cutoff <- qchisq(p = 0.95, df = ncol(Z))
     outliers_labels <- detectionOutliers(distances,cutoff)
+    print("ok shrink")
+    print(delta)
+    
     tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_labels[1:(nrow(Z) - 1)]))
     #tc
     tc <- safe_access_tc(tc)
