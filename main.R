@@ -26,6 +26,7 @@ library("RobRegression")
 #library("rJava")
 #library("REPPlab")
 library("RGMM")
+library("mvnfast")
 library(ROCR)
 library(pROC)
 source("~/work/algosto/parametres.R")
@@ -69,34 +70,14 @@ erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 
 somme_erreursOnline <- matrix(0,n,length(taux_contamination))
 somme_erreursStreaming <- matrix(0,n,length(taux_contamination))
-# Calcul de la moyenne des erreurs par taux de contamination
-moy_erreursOnline <- (somme_erreursOnline[100:1e4,])/nbruns
-moy_erreursStreaming <-(somme_erreursStreaming[100:1e4,])/nbruns
 
-
-# Création d'un dataframe pour ggplot
-df_erreurs <- data.frame(
-  Taux_Contamination = rep(taux_contamination, 2),
-  Erreur_Moyenne = c(moy_erreursOnline, moy_erreursStreaming),
-  Méthode = rep(c("Online", "Streaming"), each = length(taux_contamination))
-)
-
-# Tracer les courbes avec ggplot2 et faceting
-ggplot(df_erreurs, aes(x = Taux_Contamination, y = Erreur_Moyenne, color = Méthode)) +
-  geom_line(size = 1.2) +  # Ligne épaisse pour la clarté
-  geom_point(size = 3) +  # Points pour les valeurs précises
-  labs(title = "Erreur Moyenne par Taux de Contamination",
-       x = "Taux de Contamination (%)",
-       y = "Erreur Moyenne") +
-  theme_minimal() +
-  facet_wrap(~Méthode, scales = "free_y")  # Un graphique par méthode
 
 depart = 100
 for (i in seq_along(taux_contamination)) 
 {
   
   for (m in nbruns){
-  contamin = "moyenne"
+  contamin = "student"
   
   delta <- taux_contamination[i]
   #delta <- 0
@@ -153,58 +134,98 @@ for (i in seq_along(taux_contamination))
 creer_boxplot_erreurs(erreursSigmaBoxplot,taux_contamination,methode= "online")
 dev.off()
 
-###Calcul du meilleur AUC pour chaque méthode
 
-methodes <- c("Cov Empirique", "OGK", "Online", "Offline", "Comédiane", "Shrinkage")
+#Calcul des moyennes des erreurs 
 
-taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)
+# Calcul de la moyenne des erreurs par taux de contamination
+moy_erreursOnline <- (somme_erreursOnline[100:1e4,])/nbruns
+moy_erreursStreaming <-(somme_erreursStreaming[100:1e4,])/nbruns
 
-#Création d'un dataframe pour contenir les meilleurs AUC
-
-auc_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
-seuil_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
-
-rownames(auc_df) <- taux_contamination
-
-
-rownames(seuil_df) <- taux_contamination
-
-colnames(auc_df) <- methodes
-
-
-colnames(seuil_df) <- methodes
-
-
+# Créer une liste pour stocker les graphiques
+list_plots <- list()
+# Nombre d'itérations à considérer
+iterations <- seq(1, 9900)  
 for (i in seq_along(taux_contamination)) 
 {
-  contamin = "moyenne"
-  
   delta <- taux_contamination[i]
-  #delta <- 2
-  
-  #Génération des échantillons
-  p1 <- 1 - delta / 100
-  
-  p2 <- 1 - p1
-  
-  resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
-  Z <- resultsSimul$Z
-  
-  #Calcul du meilleur seuil selon l'AUC et de l'AUC selon chaque méthode
-  for (m in methodes)
-  {
-      
-         
-      distances <- calcule_distances_par_methode(Z,methode = m)
-      #print(distances)
-      resultats <- courbeROC(resultsSimul$labelsVrais,distances)
-      auc_df[i,m] <- resultats$auc_max
-      seuil_df[i,m] <- resultats$seuil_auc_max
-  }
-  
-}  
-  #Enregistrement dans un CSV
-  write.csv(auc_df,file = "auc.csv")
+# Transformer les données en format long pour ggplot
+df_erreurs <- data.frame(
+  Iteration = rep(iterations, 2),
+  Erreur_Moyenne = c(moy_erreursOnline[iterations,i], moy_erreursStreaming[iterations,i]),
+  Méthode = rep(c("Online", "Streaming"), each = length(iterations))
+)
 
-  write.csv(seuil_df,file = "seuil.csv")  
+# Tracer les courbes
+p <- ggplot(df_erreurs, aes(x = Iteration, y = Erreur_Moyenne, color = Méthode)) +
+  geom_line(size = 1.2) +  # Ligne plus épaisse
+  geom_point(size = 2) +   # Points pour les valeurs précises
+  scale_x_log10() +        # Échelle logarithmique pour les itérations
+  labs(title = paste("taux de contamination =  ",delta," %"),
+       x = "Nombre d'itérations",
+       y = "Erreur Moyenne (norme de Frobenius)") +
+  theme_minimal() +
+  theme(legend.position = "top")
+print(p)
+list_plots[[i]] <- p
+}
 
+grid.arrange(grobs = list_plots[1:4], ncol = 2, nrow = 2)
+grid.arrange(grobs = list_plots[5:9], ncol = 3, nrow = 3)
+
+
+# 
+# ###Calcul du meilleur AUC pour chaque méthode
+# 
+# methodes <- c("Cov Empirique", "OGK", "Online", "Offline", "Comédiane", "Shrinkage")
+# 
+# taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)
+# 
+# #Création d'un dataframe pour contenir les meilleurs AUC
+# 
+# auc_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
+# seuil_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
+# 
+# rownames(auc_df) <- taux_contamination
+# 
+# 
+# rownames(seuil_df) <- taux_contamination
+# 
+# colnames(auc_df) <- methodes
+# 
+# 
+# colnames(seuil_df) <- methodes
+# 
+# 
+# for (i in seq_along(taux_contamination)) 
+# {
+#   contamin = "moyenne"
+#   
+#   delta <- taux_contamination[i]
+#   #delta <- 2
+#   
+#   #Génération des échantillons
+#   p1 <- 1 - delta / 100
+#   
+#   p2 <- 1 - p1
+#   
+#   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
+#   Z <- resultsSimul$Z
+#   
+#   #Calcul du meilleur seuil selon l'AUC et de l'AUC selon chaque méthode
+#   for (m in methodes)
+#   {
+#       
+#          
+#       distances <- calcule_distances_par_methode(Z,methode = m)
+#       #print(distances)
+#       resultats <- courbeROC(resultsSimul$labelsVrais,distances)
+#       auc_df[i,m] <- resultats$auc_max
+#       seuil_df[i,m] <- resultats$seuil_auc_max
+#   }
+#   
+# }  
+#   #Enregistrement dans un CSV
+#   write.csv(auc_df,file = "auc.csv")
+# 
+#   write.csv(seuil_df,file = "seuil.csv")  
+# 
