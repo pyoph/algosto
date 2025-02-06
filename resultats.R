@@ -105,7 +105,7 @@ affiche_erreursM <- function(erreurs_online, erreurs_offline = NULL, contaminati
 # Fonction pour afficher les erreurs d'estimation de Sigma online et offline pour différents taux de contamination. 
 
 #Les erreurs offline seront par la suite ajoutées
-affiche_erreursSigma <- function(erreurs_online, erreurs_offline = NULL, contamination = 0) {
+affiche_erreursSigma <- function(erreurs_online, erreurs_offline = NULL, erreurs_Str = NULL,contamination = 0) {
   
   nberreurs_online <- length(erreurs_online)
   

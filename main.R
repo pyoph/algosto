@@ -54,6 +54,8 @@ moyenne_resultats <- round(Reduce("+", liste_resultats_outliers) / nbruns,2)
 # Afficher la moyenne
 print(moyenne_resultats)
 
+save(moyenne_resultats,"outliersUnif.Rdata")
+
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 
@@ -61,9 +63,19 @@ taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 pdf("Resultats_Erreurs_Sigma Toeplitzvar1sqrtd.pdf", width = 10, height = 7)
 
 erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
+
+
+#Somme des erreurs online et streaming pour les moyenner ensuite
+
+somme_erreursOnline <- matrix(0,n,length(taux_contamination))
+somme_erreursStreaming <- matrix(0,n,length(taux_contamination))
+
+
 depart = 100
 for (i in seq_along(taux_contamination)) 
 {
+  
+  for (m in nbruns){
   contamin = "moyenne"
   
   delta <- taux_contamination[i]
@@ -82,23 +94,37 @@ for (i in seq_along(taux_contamination))
   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
   
   resultatsOnline <- detection(Z,depart, methodeEstimation = "online")
-  SigmaEstimOnline <- resultatsOnline$SigmaOnline[(nrow(Z) - 1),,]
+  SigmaEstimOnline <- resultatsOnline$SigmaOnline
   distances <- resultatsOnline$distances
   #Estimation offline
   resultsOffline <- detection(Z,depart, methodeEstimation = "offline")
   SigmaEstimOffline <- resultsOffline$SigmaOffline
   
-  erreursonline <- calculErreursNormeFrobenius(SigmaEstimOnline,Sigma1)
+  #Estimation en streaming 
+  resultsStr <- detection(Z, depart, methodeEstimation = "streaming")
+  SigmaStr <- resultsStr$SigmaStreaming
+  
+  
+  #calcul des erreurs à chaque itération
+  for (k in (1: n)){
+  erreursonline[k] <- calculErreursNormeFrobenius(SigmaEstimOnline[k,,],Sigma1)
+  
+  erreursStr[k] <- calculErreursNormeFrobenius(SigmaStr[k,,],Sigma1)
+  }
   erreursSigmaBoxplot[i,] <- erreursonline
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
- #affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
-
+  #affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
+  
+  #affiche_erreursSigma(erreurs_online = erreursStr, contamination = delta)
+  #Stockage des erreurs :
+  somme_erreursOnline[,i] <- somme_erreursOnline[,i] + erreursonline
+  somme_erreursStreaming[,i] <- somme_erreursStreaming[,i] + erreursStr
  #Affichage des SigmaEstim Online, Offline et théorique
  
-plot_comparaison_sigma(Sigma1, SigmaEstimOffline = SigmaEstimOffline,SigmaEstimOnline = SigmaEstimOnline,delta)
+#plot_comparaison_sigma(Sigma1, SigmaEstimOffline = SigmaEstimOffline,SigmaEstimOnline = SigmaEstimOnline,delta)
 
  
- 
+  }
  #points(Sigma1, SigmaEstimOffline, col=4); abline(0, 1)
  
   
