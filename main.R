@@ -69,7 +69,27 @@ erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 
 somme_erreursOnline <- matrix(0,n,length(taux_contamination))
 somme_erreursStreaming <- matrix(0,n,length(taux_contamination))
+# Calcul de la moyenne des erreurs par taux de contamination
+moy_erreursOnline <- (somme_erreursOnline[100:1e4,])/nbruns
+moy_erreursStreaming <-(somme_erreursStreaming[100:1e4,])/nbruns
 
+
+# Création d'un dataframe pour ggplot
+df_erreurs <- data.frame(
+  Taux_Contamination = rep(taux_contamination, 2),
+  Erreur_Moyenne = c(moy_erreursOnline, moy_erreursStreaming),
+  Méthode = rep(c("Online", "Streaming"), each = length(taux_contamination))
+)
+
+# Tracer les courbes avec ggplot2 et faceting
+ggplot(df_erreurs, aes(x = Taux_Contamination, y = Erreur_Moyenne, color = Méthode)) +
+  geom_line(size = 1.2) +  # Ligne épaisse pour la clarté
+  geom_point(size = 3) +  # Points pour les valeurs précises
+  labs(title = "Erreur Moyenne par Taux de Contamination",
+       x = "Taux de Contamination (%)",
+       y = "Erreur Moyenne") +
+  theme_minimal() +
+  facet_wrap(~Méthode, scales = "free_y")  # Un graphique par méthode
 
 depart = 100
 for (i in seq_along(taux_contamination)) 
