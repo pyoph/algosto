@@ -118,7 +118,9 @@ for (i in seq_along(taux_contamination))
   
   #affiche_erreursSigma(erreurs_online = erreursStr, contamination = delta)
   #Stockage des erreurs :
+  print(somme_erreursOnline[1e4,i])
   somme_erreursOnline[,i] <- somme_erreursOnline[,i] + erreursonline
+  print(somme_erreursOnline[1e4,i])
   somme_erreursStreaming[,i] <- somme_erreursStreaming[,i] + erreursStr
  #Affichage des SigmaEstim Online, Offline et théorique
  
@@ -133,7 +135,6 @@ for (i in seq_along(taux_contamination))
 
 creer_boxplot_erreurs(erreursSigmaBoxplot,taux_contamination,methode= "online")
 dev.off()
-
 
 #Calcul des moyennes des erreurs 
 
