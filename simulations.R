@@ -43,7 +43,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       vecteurs_mu2 <- rmvt(n2, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
     } else if (contamin == "uniforme") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-      vecteurs_mu2 <- matrix(runif(n2 * d, min = -50, max = 50), nrow = n2, ncol = d)
+      vecteurs_mu2 <- matrix(runif(n2 * d, min = -10, max = 10), nrow = n2, ncol = d)
     } 
     else if (contamin == "zero") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
