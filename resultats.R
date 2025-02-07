@@ -189,25 +189,32 @@ creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, metho
     stop("Le nombre de lignes de erreursSigmaBoxplot doit correspondre à la longueur de taux_contamination")
   }
   
-  # Transformer la matrice en un format long pour ggplot
-  library(ggplot2)
-  library(reshape2)
-  
+
   # Conversion de la matrice en data frame long
   df_erreurs <- data.frame(erreursSigmaBoxplot)
+  
+  df_monte_carlo <- data.frame(
+    Taux_Contamination = as.factor(taux_contamination), 
+    MonteCarlo = erreurs_monte_carlo
+  )
+  
   df_erreurs$taux_contamination <- factor(taux_contamination)  # Facteur pour l'axe X
   df_long <- melt(df_erreurs, id.vars = "taux_contamination")
   
   # Création du boxplot avec ggplot2
   p <- ggplot(df_long, aes(x = taux_contamination, y = value)) +
     geom_boxplot(fill = "lightblue", color = "blue", outlier.color = "red") +
-    geom_hline(aes(yintercept = erreurs_monte_carlo, color = "Monte Carlo"), size = 1, linetype = "dashed") +  
-    labs(
-      title = paste("Boxplots des erreurs - Méthode :", methode),
-      x = "Taux de contamination (%)",
-      y = "Erreur (norme de Frobenius)"
-    ) +
-    theme_minimal()
+    #geom_jitter(width = 0.2, alpha = 0.2, color = "black") +  # Ajout de dispersion pour la visibilité
+    #geom_crossbar(data = df_monte_carlo, 
+                #  aes(y = MonteCarlo, ymin = MonteCarlo, ymax = MonteCarlo, color = "Monte Carlo"), 
+                 # width = 0.7, fatten = 2, size = 1.2, linetype = "dashed") +  # Une seule ligne par taux
+    labs(title = paste("Erreur de l'estimation de Sigma (", methode, ")"),
+         x = "Taux de contamination (%)",
+         y = "Erreur Frobenius ||S_{n_0} - V||_F^2 (log scale)") +
+    scale_y_log10() +  # Ajout de l'échelle log sur l'axe Y
+    theme_minimal() +
+    theme(legend.position = "top") +
+    scale_color_manual(name = "Estimation", values = c("Monte Carlo" = "red"))
   
   print(p)
 }
