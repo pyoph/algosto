@@ -195,7 +195,8 @@ creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, metho
   
   df_monte_carlo <- data.frame(
     Taux_Contamination = as.factor(taux_contamination),  
-    MonteCarlo = erreursMonteCarlo  
+    MonteCarlo = erreursMonteCarlo,
+    Type = "Erreur Monte Carlo" 
   )
   
   df_erreurs$taux_contamination <- factor(taux_contamination)  # Facteur pour l'axe X
@@ -211,14 +212,18 @@ creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, metho
     geom_line(data = df_monte_carlo, aes(x = Taux_Contamination, y = MonteCarlo, group = 1), 
               color = "red", size = 1.2) +   
     scale_y_log10() + 
+    scale_fill_manual(values = c("Boxplot Erreurs" = "lightblue")) +  # 
+    scale_color_manual(values = c("Boxplot Erreurs" = "blue", "Erreur Monte Carlo" = "red")) +  
     labs(title = paste("Erreur de l'estimation de Sigma (", methode, ")"),
          x = "Taux de contamination (%)",
-         y = "Erreur Frobenius ||S_{n_0} - V||_F^2 (log scale)") +
-    scale_y_log10() +  # Ajout de l'échelle log sur l'axe Y
+         y = "Erreur norme de Frobenius",
+         color = "Méthode",  # Légende des couleurs
+         fill = "Méthode") +  # Légende des boxplots
     theme_minimal() +
-    theme(legend.position = "top") +
-    scale_color_manual(name = "Estimation", values = c("Monte Carlo" = "red"))
-  
+    annotate("text", x = 5, y = max(erreursMonteCarlo, na.rm = TRUE) * 1.5, 
+             label = "Trait rouge =  E(||S_{n_0} - V||_F^2)",
+             color = "black", size = 5, hjust = 0)  + # 
+    theme(legend.position = "top")  
   print(p)
 }
 
