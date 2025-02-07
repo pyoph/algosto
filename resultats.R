@@ -183,7 +183,7 @@ plot_comparaison_sigma <- function(Sigma1, SigmaEstimOnline, SigmaEstimOffline, 
 
 #Affichage boxplot des erreurs
 
-creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, methode) {
+creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, methode,erreurs_monte_carlo ) {
   # Vérifier que la matrice d'erreurs a bien des lignes correspondant aux taux de contamination
   if (length(taux_contamination) != nrow(erreursSigmaBoxplot)) {
     stop("Le nombre de lignes de erreursSigmaBoxplot doit correspondre à la longueur de taux_contamination")
@@ -201,6 +201,7 @@ creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, metho
   # Création du boxplot avec ggplot2
   p <- ggplot(df_long, aes(x = taux_contamination, y = value)) +
     geom_boxplot(fill = "lightblue", color = "blue", outlier.color = "red") +
+    geom_hline(aes(yintercept = erreurs_monte_carlo, color = "Monte Carlo"), size = 1, linetype = "dashed") +  
     labs(
       title = paste("Boxplots des erreurs - Méthode :", methode),
       x = "Taux de contamination (%)",

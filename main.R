@@ -75,7 +75,16 @@ erreursVarOracle <- matrix(0,nbruns,length(taux_contamination))
 
 somme_erreursOnline <- matrix(0,n,length(taux_contamination))
 somme_erreursStreaming <- matrix(0,n,length(taux_contamination))
-
+for (i in seq_along(taux_contamination)) 
+  
+{
+  delta <- taux_contamination[i]
+  for (m in (1:nbruns))
+  {
+    erreursVarOracle[m,i] <- EstimVarMC(nbiter = 1e2, delta = delta, Sigma = Sigma1)
+    
+  }
+}
 
 depart = 100
 for (i in seq_along(taux_contamination)) 
@@ -121,7 +130,7 @@ for (i in seq_along(taux_contamination))
   }
   erreursSigmaBoxplotOnline[m,i,] <- erreursonline
   erreursSigmaBoxplotStreaming[m,i,] <- erreursStr
-  erreursVarOracle[i] <- EstimVarMC(nbiter = 1e2, delta = delta, Sigma = Sigma1)
+  erreursVarOracle[m,i] <- EstimVarMC(nbiter = 1e2, delta = delta, Sigma = Sigma1)
   
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
   #affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
@@ -143,7 +152,10 @@ for (i in seq_along(taux_contamination))
   
 }
 
-creer_boxplot_erreurs(erreursSigmaBoxplot,taux_contamination,methode= "online")
+creer_boxplot_erreurs(erreursSigmaBoxplotOnline[20,,],taux_contamination,methode= "online",erreursVarOracle[19,])
+creer_boxplot_erreurs(erreursSigmaBoxplotStreaming[20,,],taux_contamination,methode= "streaming",erreursVarOracle[20,])
+
+
 dev.off()
 
 #Calcul des moyennes des erreurs 
