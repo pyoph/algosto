@@ -224,3 +224,44 @@ Performance <- function(score, class, thresh, add=FALSE, col=1){
   points(perfThresh[1], perfThresh[2], col=col, cex=2)
   return(list(perf=perf, tab=tab, perfThresh=perfThresh))
 }
+
+
+#Estimation de E(||1/n_0 sum Xi Xi^T - V||_F^2) par Monte Carlo
+
+EstimVarMC <- function(nbiter,delta,Sigma)
+  
+{
+  erreurs_MC <- rep(0,nbiter)
+  
+  for (i in (1 : nbiter))
+  {
+    p1 <- 1 - delta / 100
+    
+    p2 <- 1 - p1
+    #mu1
+    
+    resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
+    
+    Z <- resultsSimul$Z
+    
+    n1 <- floor(p1*n)
+    
+    #Recherche des inliers
+    inliers <- Z[resultsSimul$labelsVrais == 0, , drop = FALSE]
+    
+   M <- matrix(0,d,d)
+   
+   for (k in (1:nrow(inliers)))
+   {
+     M <- M + (inliers[k,])%*%t(inliers[k,])
+   }
+    
+   
+   erreurs_MC[i] <- norm(M/n1 - Sigma,"F")^2
+   
+   
+   
+  }
+  return (mean(erreurs_MC))
+  
+}

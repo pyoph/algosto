@@ -63,8 +63,13 @@ taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
 ###Test fonction d'estimation online affichage des boxplots des erreurs
 pdf("Resultats_Erreurs_Sigma Toeplitzvar1sqrtd.pdf", width = 10, height = 7)
 
-erreursSigmaBoxplot <- matrix(0,length(taux_contamination),n)
 
+#Calcul des erreurs pour tracer les boxplots
+
+erreursSigmaBoxplotOnline <-array(0, dim = c(nbruns,length(taux_contamination),n))
+
+erreursSigmaBoxplotStreaming <- -array(0, dim = c(nbruns,length(taux_contamination),n))
+erreursVarOracle <- matrix(0,nbruns,length(taux_contamination))
 
 #Somme des erreurs online et streaming pour les moyenner ensuite
 
@@ -76,9 +81,11 @@ depart = 100
 for (i in seq_along(taux_contamination)) 
 {
   
-  for (m in nbruns){
+  for (m in (1:nbruns)){
   contamin = "student"
-  
+  #Initialisation des erreurs online et streaming
+  erreursonline <- rep(0,n)
+  erreursStr <- rep(0,n)
   delta <- taux_contamination[i]
   #delta <- 0
   
@@ -94,15 +101,15 @@ for (i in seq_along(taux_contamination))
   #Estimation online
   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
   
-  resultatsOnline <- detection(Z,depart, methodeEstimation = "online")
+  resultatsOnline <- estimation(Z,depart, methodeEstimation = "online")
   SigmaEstimOnline <- resultatsOnline$SigmaOnline
   distances <- resultatsOnline$distances
   #Estimation offline
-  resultsOffline <- detection(Z,depart, methodeEstimation = "offline")
+  resultsOffline <- estimation(Z,depart, methodeEstimation = "offline")
   SigmaEstimOffline <- resultsOffline$SigmaOffline
   
   #Estimation en streaming 
-  resultsStr <- detection(Z, depart, methodeEstimation = "streaming")
+  resultsStr <- estimation(Z, depart, methodeEstimation = "streaming")
   SigmaStr <- resultsStr$SigmaStreaming
   
   
@@ -112,7 +119,10 @@ for (i in seq_along(taux_contamination))
   
   erreursStr[k] <- calculErreursNormeFrobenius(SigmaStr[k,,],Sigma1)
   }
-  erreursSigmaBoxplot[i,] <- erreursonline
+  erreursSigmaBoxplotOnline[m,i,] <- erreursonline
+  erreursSigmaBoxplotStreaming[m,i,] <- erreursStr
+  erreursVarOracle[i] <- EstimVarMC(nbiter = 1e2, delta = delta, Sigma = Sigma1)
+  
   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
   #affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
   
@@ -172,6 +182,8 @@ list_plots[[i]] <- p
 
 grid.arrange(grobs = list_plots[1:4], ncol = 2, nrow = 2)
 grid.arrange(grobs = list_plots[5:9], ncol = 3, nrow = 3)
+
+
 
 
 # 

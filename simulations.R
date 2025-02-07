@@ -24,8 +24,8 @@
 
 genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne") {
   # Initialisation
-  n1 <- floor(p1 * n)  # Taille du groupe majoritaire
-  n2 <- n - n1         # Taille du groupe minoritaire
+  n1 <- floor(p1 * n)  # Taille du groupe non contaminé
+  n2 <- n - n1         # Taille du groupe contaminé
   
   labels_mu1 <- rep(0, n1)  # Labels pour les vecteurs avec moyenne mu1
   labels_mu2 <- rep(1, n2)  # Labels pour les vecteurs avec moyenne mu2
