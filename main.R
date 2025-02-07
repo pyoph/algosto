@@ -55,7 +55,11 @@ moyenne_resultats <- round(Reduce("+", liste_resultats_outliers) / nbruns,2)
 # Afficher la moyenne
 print(moyenne_resultats)
 
-save(moyenne_resultats,"outliersUnif.Rdata")
+save(moyenne_resultats,file = "outliersUnifhypercubeunite.Rdata")
+
+moyenne_resultatsEnreg <- moyenne_resultats  %>% select(-FN_Cov, -FP_Cov, -Tps_Cov)
+
+latex_table <- xtable(moyenne_resultatsEnreg)
 
 
 taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
