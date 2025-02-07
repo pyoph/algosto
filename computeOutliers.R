@@ -181,7 +181,7 @@ for (i in seq_along(taux_contamination)) {
       #k = 1
     #)
     #depart = 100
-   results <- detection(Z,depart = depart,methodeEstimation = "online")
+   results <- estimation(Z,depart = depart,methodeEstimation = "online")
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
@@ -205,7 +205,7 @@ for (i in seq_along(taux_contamination)) {
   # Temps pour la méthode Offline
   temps_offline[i] <- system.time({
     
-    resultsOffline <- detection(Z,methodeEstimation = "offline")
+    resultsOffline <- estimation(Z,methodeEstimation = "offline")
     
     m <- resultsOffline$med
     SigmaEstim <- resultsOffline$SigmaOffline
@@ -233,7 +233,7 @@ for (i in seq_along(taux_contamination)) {
   # Temps pour la méthode streaming
  temps_streaming[i] <- system.time({
     
-    resultsStr <- detection(Z,methodeEstimation = "streaming")
+    resultsStr <- estimation(Z,methodeEstimation = "streaming")
     
     m <- resultsStr$med
     SigmaEstim <- resultsStr$SigmaOffline
