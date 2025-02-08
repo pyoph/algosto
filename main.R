@@ -72,7 +72,8 @@ pdf("Resultats_Erreurs_Sigma Toeplitzvar1sqrtd.pdf", width = 10, height = 7)
 
 erreursSigmaBoxplotOnline <-array(0, dim = c(nbruns,length(taux_contamination),n))
 
-erreursSigmaBoxplotStreaming <- -array(0, dim = c(nbruns,length(taux_contamination),n))
+erreursSigmaBoxplotStreaming <- array(0, dim = c(nbruns,length(taux_contamination),n))
+
 erreursVarOracle <- matrix(0,nbruns,length(taux_contamination))
 
 #Somme des erreurs online et streaming pour les moyenner ensuite
@@ -88,7 +89,7 @@ for (i in seq_along(taux_contamination))
 {
   
 
-  contamin = "student"
+  contamin = "moyenne"
   #Initialisation des erreurs online et streaming
   erreursonline <- rep(0,n)
   erreursStr <- rep(0,n)
@@ -148,9 +149,15 @@ for (i in seq_along(taux_contamination))
  
   
 }
+#Calcul des moyennes de erreurs
 
-creer_boxplot_erreurs(erreursSigmaBoxplotOnline[20,,],taux_contamination,methode= "online",erreursVarOracle[19,])
-creer_boxplot_erreurs(erreursSigmaBoxplotStreaming[20,,],taux_contamination,methode= "streaming",erreursVarOracle[20,])
+moy_erreursSigmaBoxplotOnline <- round(apply(erreursSigmaBoxplotOnline, c(2,3), mean), 2)
+moy_erreursSigmaBoxplotStreaming <- round(apply(erreursSigmaBoxplotStreaming, c(2,3), mean), 2)
+
+moy_erreursVarOracle <- round(apply(erreursVarOracle, 2, mean), 2)
+
+creer_boxplot_erreurs(moy_erreursSigmaBoxplotOnline,taux_contamination,methode= "online",moy_erreursVarOracle)
+creer_boxplot_erreurs(moy_erreursSigmaBoxplotStreaming,taux_contamination,methode= "streaming",moy_erreursVarOracle)
 
 
 dev.off()
