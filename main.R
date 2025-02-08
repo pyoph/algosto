@@ -79,22 +79,15 @@ erreursVarOracle <- matrix(0,nbruns,length(taux_contamination))
 
 somme_erreursOnline <- matrix(0,n,length(taux_contamination))
 somme_erreursStreaming <- matrix(0,n,length(taux_contamination))
-for (i in seq_along(taux_contamination)) 
-  
-{
-  delta <- taux_contamination[i]
-  for (m in (1:nbruns))
-  {
-    erreursVarOracle[m,i] <- EstimVarMC(nbiter = 1e2, delta = delta, Sigma = Sigma1)
-    
-  }
-}
+
 
 depart = 100
+
+for (m in (1:nbruns)){
 for (i in seq_along(taux_contamination)) 
 {
   
-  for (m in (1:nbruns)){
+
   contamin = "student"
   #Initialisation des erreurs online et streaming
   erreursonline <- rep(0,n)
