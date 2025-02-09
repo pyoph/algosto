@@ -156,8 +156,8 @@ moy_erreursSigmaBoxplotStreaming <- round(apply(erreursSigmaBoxplotStreaming, c(
 
 moy_erreursVarOracle <- round(apply(erreursVarOracle, 2, mean), 2)
 
-creer_boxplot_erreurs(moy_erreursSigmaBoxplotOnline,taux_contamination,methode= "online",moy_erreursVarOracle)
-creer_boxplot_erreurs(moy_erreursSigmaBoxplotStreaming,taux_contamination,methode= "streaming",moy_erreursVarOracle)
+creer_boxplot_erreurs(moy_erreursSigmaBoxplotOnline,taux_contamination,methode= "online",erreursVarOracle[1,])
+creer_boxplot_erreurs(moy_erreursSigmaBoxplotStreaming,taux_contamination,methode= "streaming",erreursVarOracle[1,])
 
 
 dev.off()

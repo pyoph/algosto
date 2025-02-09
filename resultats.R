@@ -183,7 +183,7 @@ plot_comparaison_sigma <- function(Sigma1, SigmaEstimOnline, SigmaEstimOffline, 
 
 #Affichage boxplot des erreurs
 
-creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, methode,erreurs_monte_carlo ) {
+creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, methode,erreursMonteCarlo ) {
   # Vérifier que la matrice d'erreurs a bien des lignes correspondant aux taux de contamination
   if (length(taux_contamination) != nrow(erreursSigmaBoxplot)) {
     stop("Le nombre de lignes de erreursSigmaBoxplot doit correspondre à la longueur de taux_contamination")
