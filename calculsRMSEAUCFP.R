@@ -45,7 +45,15 @@ safe_access_tc <- function(tc, default = 0) {
 
 ################Boucle construction tableau#############
 
+calculeRMSEAUCFP <- function(data)
+{
 
+  
+  taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
+  
+  
+    
+}
 
 
 
