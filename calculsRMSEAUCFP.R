@@ -45,7 +45,7 @@ safe_access_tc <- function(tc, default = 0) {
 
 ################Boucle construction tableau#############
 
-calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol(data)),contamin ="moyenne")
+calculeRMSEAUCFP <- function(nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol(data)),contamin ="moyenne")
 {
 
   
@@ -262,8 +262,14 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
     rmse_med_comed = rmse_med_comed,
     FP_Comed = faux_positifs_comed,
     auc_comed = auc_comed,
-    
-    
+    rmse_Sigma_shrink = rmse_Sigma_shrink,
+    rmse_med_shrink = rmse_med_shrink,
+    FP_Shrink = faux_positifs_shrink,
+    auc_shrink = auc_shrink,
+    rmse_Sigma_Cov = rmse_Sigma_covEmp,
+    rmse_med_covEmp = rmse_med_covEmp,
+    FP_covEmp = faux_positifs_covEmp,
+    auc_covEmp = auc_covEmp,
     rmse_Sigma_Offline =  rmse_Sigma_offline ,
     rmse_med_offline = rmse_med_offline,
     auc_offline = auc_offline,
@@ -275,16 +281,16 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
     RMSE_Sigma_Streaming =  rmse_Sigma_streaming ,
     rmse_med_streaming = rmse_med_streaming,
     auc_streaming = auc_streaming,
-    FP_Streaming = faux_positifs_streaming,
+    FP_Streaming = faux_positifs_streaming
     
     
     
   )
   
   
-  row.names(results_outliers) <- taux_contamination
+  row.names(results_data) <- taux_contamination
   
-  return(results_outliers)
+  return(results_data)
     
   }
   
