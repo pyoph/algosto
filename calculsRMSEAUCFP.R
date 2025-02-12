@@ -156,13 +156,33 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
       outliers_Online <- detectionOutliers(distances,cutoff)
       
       
-      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z))], as.numeric(outliers_Offline)[1:(nrow(Z))])
+      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z))], as.numeric(outliers_Online)[1:(nrow(Z))])
       tc
       tc <- safe_access_tc(tc)
       if((tc["0","0"] + tc["0","1"]) != 0)
       {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
       auc_online <- round(auc(outliers_Online,resultsSimul$labelsVrais),2)*100
       
+      #Méthode Streaming
+      
+      resStreaming <- estimation(Z,methodeEstimation = "streaming")
+      SigmaStreaming<- resStreaming$Sigma
+      medStreaming <- resStreaming$med
+      rmse_Sigma_streaming[j,i] <- norm(SigmaStreaming[nrow(Z) -1,,] - Sigma1,"F")
+      rmse_med_streaming[j,i] <-  sqrt(sum((mu1 - medStreaming)^2))
+      distances <- calcule_vecteur_distances(Z,medStreaming,SigmaStreaming)
+      #cutoff = calcule_cutoff(distances,d)
+      #cutoff =  qchisq(p = 0.95, df = ncol(Z))
+      #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
+      outliers_Online <- detectionOutliers(distances,cutoff)
+      
+      
+      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z))], as.numeric(outliers_Online)[1:(nrow(Z))])
+      tc
+      tc <- safe_access_tc(tc)
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      auc_online <- round(auc(outliers_Online,resultsSimul$labelsVrais),2)*100
       
          
       #Méthode OGK
