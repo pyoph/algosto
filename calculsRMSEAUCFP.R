@@ -56,7 +56,7 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
   faux_positifs_offline <- matrix(0,nbruns,(length(taux_contamination)))
   faux_positifs_online <- matrix(0,nbruns,(length(taux_contamination)))
   faux_positifs_streaming <- matrix(0,nbruns,(length(taux_contamination)))
-  faux_negatifs_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
   faux_positifs_ogk <- matrix(0,nbruns,(length(taux_contamination)))
   faux_positifs_comed <- matrix(0,nbruns,(length(taux_contamination)))
   faux_positifs_shrink <- matrix(0,nbruns,(length(taux_contamination)))
@@ -230,6 +230,19 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
       
       #Covariance empirique
       
+      moyEmp <- as.numeric(colMeans(Z))
+      covEmp <- cov(Z)
+      
+      distances <- calcule_vecteur_distances(Z,moyEmp, covEmp)
+      
+      outliers_Cov <- detectionOutliers(distances,cutoff = cutoff)
+      
+      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_Cov)[1:(nrow(Z) - 1)])
+      tc
+      tc <- safe_access_tc(tc)
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs_covEmp[j,i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      auc_covEmp[j,i] <- auc(outliers_Cov,resultsSimul$labelsVrais)
       
       
     }
@@ -238,7 +251,40 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
       
       
     }
+  
+  results_data <- data.frame(
+    #Taux_Contamination = taux_contamination,
+    rmse_Sigma_ogk = rmse_Sigma_ogk,
+    rmse_med_ogk = rmse_med_ogk,
+    FP_OGK = faux_positifs_ogk,
+    auc_ogk = auc_ogk,
+    rmse_Sigma_comed = rmse_Sigma_comed,
+    rmse_med_comed = rmse_med_comed,
+    FP_Comed = faux_positifs_comed,
+    auc_comed = auc_comed,
     
+    
+    rmse_Sigma_Offline =  rmse_Sigma_offline ,
+    rmse_med_offline = rmse_med_offline,
+    auc_offline = auc_offline,
+    FP_Offline = faux_positifs_offline,
+    RMSE_Sigma_Online =  rmse_Sigma_online ,
+    rmse_med_online = rmse_med_online,
+    auc_online = auc_online,
+    FP_Online = faux_positifs_online,
+    RMSE_Sigma_Streaming =  rmse_Sigma_streaming ,
+    rmse_med_streaming = rmse_med_streaming,
+    auc_streaming = auc_streaming,
+    FP_Streaming = faux_positifs_streaming,
+    
+    
+    
+  )
+  
+  
+  row.names(results_outliers) <- taux_contamination
+  
+  return(results_outliers)
     
   }
   
