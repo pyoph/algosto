@@ -187,9 +187,9 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
          
       #Méthode OGK
       
-      res <- covOGK(Z, sigmamu = s_mad)
+      resOGK <- covOGK(Z, sigmamu = s_mad)
       SigmaOGK <- res$cov
-      med <- res$center
+      medOGK <- res$center
       rmse_Sigma_ogk <- norm(SigmaOGK - Sigma1,"F")
       
       distances <- calcule_vecteur_distances(Z,med,SigmaOGK)
@@ -205,6 +205,32 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
       if((tc["0","0"] + tc["0","1"]) != 0)
       {faux_positifs_ogk[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
       auc_ogk <- auc(outliers_OGK,resultsSimul$labelsVrais)
+      
+      #Comédiane
+      
+      resComed <-  covComed(Z)
+      SigmaComed <- resComed$cov
+      medComed <- resComed$center
+      distances <- calcule_vecteur_distances(Z, medComed, SigmaComed)
+      
+      rmse_Sigma_comed[j,i] <- norm(SigmaComed - Sigma1,"F")
+      rmse_med_comed[j,i] <-  sqrt(sum((mu1 - medComed)^2))
+      
+      
+      outliers_Comed <- detectionOutliers(distances,cutoff)
+      
+      
+      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_Comed)[1:(nrow(Z) - 1)])
+      tc
+      tc <- safe_access_tc(tc)
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs_comed[j,i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      auc_comed[j,i] <- auc(outliers_Comed,resultsSimul$labelsVrais)
+      
+      
+      #Covariance empirique
+      
+      
       
     }
     

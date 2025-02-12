@@ -28,6 +28,7 @@ calcule_distances_par_methode <- function(Z, methode) {
     SigmaShrink <- covCor(Z)
     distances <- calcule_vecteur_distances(Z, med, SigmaShrink)
     
+    
   } else if (methode == "Comédiane") {
     # Méthode Comédiane
     med <- covComed(Z)$center
