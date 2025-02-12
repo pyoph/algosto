@@ -427,6 +427,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     results <- estimMVOnline(Y, depart = depart_online)
     #Retour des résultats
     med <- results$moyennem
+    miter <- results$miter
     SigmaOnline <- results$Sigma
     U <- results$U
     lambda <- results$lambda
@@ -444,6 +445,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     lambda <- results$lambda
     V <- results$moyenneV
     distances <- results$distances
+    miter <- results$miter
     # results$Sigma[101,,]
   }
   

@@ -221,7 +221,7 @@ creer_boxplot_erreurs <- function(erreursSigmaBoxplot, taux_contamination, metho
          fill = "Méthode") +  # Légende des boxplots
     theme_minimal() +
     annotate("text", x = 5, y = max(erreursMonteCarlo, na.rm = TRUE) * 1.5, 
-             label = "Trait rouge =  E(||S_{n_0} - V||_F^2)",
+             label = "Trait rouge =  E(||S_{n_0} - V||_F^2) estimation par Monte Carlo",
              color = "black", size = 5, hjust = 0)  + # 
     theme(legend.position = "top")  
   print(p)

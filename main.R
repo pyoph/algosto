@@ -111,12 +111,15 @@ for (i in seq_along(taux_contamination))
   resultatsOnline <- estimation(Z,depart, methodeEstimation = "online")
   SigmaEstimOnline <- resultatsOnline$SigmaOnline
   distances <- resultatsOnline$distances
+  miterOn <- resultatsOnline$miter
+  
   #Estimation offline
   resultsOffline <- estimation(Z,depart, methodeEstimation = "offline")
   SigmaEstimOffline <- resultsOffline$SigmaOffline
   
   #Estimation en streaming 
   resultsStr <- estimation(Z, depart, methodeEstimation = "streaming")
+  miterStr <- estimation(Z, depart, methodeEstimation = "streaming")$miter
   SigmaStr <- resultsStr$SigmaStreaming
   
   
