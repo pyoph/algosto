@@ -53,26 +53,26 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
   
   #initialisation faux positifs 
 
-  faux_positifs_offline <- numeric(length(taux_contamination))
-  faux_positifs_online <- numeric(length(taux_contamination))
-  faux_positifs_streaming <- numeric(length(taux_contamination))
-  faux_negatifs_covEmp <- numeric(length(taux_contamination))
-  faux_positifs_ogk <- numeric(length(taux_contamination))
-  faux_positifs_comed <- numeric(length(taux_contamination))
-  faux_positifs_shrink <- numeric(length(taux_contamination))
+  faux_positifs_offline <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_online <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_streaming <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_negatifs_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_ogk <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_comed <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_shrink <- matrix(0,nbruns,(length(taux_contamination)))
   
   
   
   #initialisation RMSE médiane
   
   
-  rmse_med_offline <- numeric(length(taux_contamination))
-  rmse_med_online <- numeric(length(taux_contamination))
-  rmse_med_streaming <- numeric(length(taux_contamination))
-  rmse_med_covEmp <- numeric(length(taux_contamination))
-  rmse_med_ogk <- numeric(length(taux_contamination))
-  rmse_med_comed <- numeric(length(taux_contamination))
-  rmse_med_shrink <- numeric(length(taux_contamination))
+  rmse_med_offline <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_med_online <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_med_streaming <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_med_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_med_ogk <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_med_comed <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_med_shrink <- matrix(0,nbruns,(length(taux_contamination)))
   
   
   
@@ -81,32 +81,32 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
   #initialisation RMSE Sigma
       
   
-  rmse_Sigma_offline <- numeric(length(taux_contamination))
-  rmse_Sigma_online <- numeric(length(taux_contamination))
-  rmse_Sigma_streaming <- numeric(length(taux_contamination))
-  rmse_Sigma_covEmp <- numeric(length(taux_contamination))
-  rmse_Sigma_ogk <- numeric(length(taux_contamination))
-  rmse_Sigma_comed <- numeric(length(taux_contamination))
-  rmse_Sigma_shrink <- numeric(length(taux_contamination))
+  rmse_Sigma_offline <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_Sigma_online <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_Sigma_streaming <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_Sigma_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_Sigma_ogk <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_Sigma_comed <- matrix(0,nbruns,(length(taux_contamination)))
+  rmse_Sigma_shrink <- matrix(0,nbruns,(length(taux_contamination)))
   
   
   
   
   #initialisation AUC
   
-  auc_offline <- numeric(length(taux_contamination))
-  auc_online <- numeric(length(taux_contamination))
-  auc_streaming <- numeric(length(taux_contamination))
-  auc_covEmp <- numeric(length(taux_contamination))
-  auc_ogk <- numeric(length(taux_contamination))
-  auc_comed <- numeric(length(taux_contamination))
-  auc_shrink <- numeric(length(taux_contamination))
+  auc_offline <- matrix(0,nbruns,(length(taux_contamination)))
+  auc_online <- matrix(0,nbruns,(length(taux_contamination)))
+  auc_streaming <- matrix(0,nbruns,(length(taux_contamination)))
+  auc_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
+  auc_ogk <- matrix(0,nbruns,(length(taux_contamination)))
+  auc_comed <- matrix(0,nbruns,(length(taux_contamination)))
+  auc_shrink <- matrix(0,nbruns,(length(taux_contamination)))
   
   
   for (i in seq_along(taux_contamination))
   {
     delta <- taux_contamination[i]
-    #delta <- 0
+    #delta <- 10
     #contamin = "moyenne"
     print(contamin)
     p1 <- 1 - delta / 100
@@ -120,32 +120,83 @@ calculeRMSEAUCFP <- function(data,nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol
     for (j in (1:nbruns)){
     
       
+      #Méthode Offline
+   
+      resOffline <- estimation(Z,methodeEstimation = "offline")
+      SigmaOffline<- resOffline$Sigma
+      medOffline <- resOffline$med
+      rmse_Sigma_offline[j,i] <- norm(SigmaOffline - Sigma1,"F")
+      rmse_med_offline[j,i] <-  sqrt(sum((mu1 - medOffline)^2))
+      distances <- calcule_vecteur_distances(Z,medOffline,SigmaOffline)
+      #cutoff = calcule_cutoff(distances,d)
+      #cutoff =  qchisq(p = 0.95, df = ncol(Z))
+      #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
+      outliers_Offline <- detectionOutliers(distances,cutoff)
       
-    res <- covOGK(Z, sigmamu = s_mad)
-    SigmaOGK <- res$cov
-    med <- res$center
-    rmse_Sigma_ogk <- norm(SigmaOGK - Sigma1,"F")
+      
+      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z))], as.numeric(outliers_Offline)[1:(nrow(Z))])
+      tc
+      tc <- safe_access_tc(tc)
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs_offline[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      auc_offline <- round(auc(outliers_OGK,resultsSimul$labelsVrais),2)*100
+   
+      
+      #Méthode Online
+      
+      resOnline <- estimation(Z,methodeEstimation = "online")
+      SigmaOnline<- resOnline$Sigma
+      medOnline <- resOnline$med
+      rmse_Sigma_online[j,i] <- norm(SigmaOnline[nrow(Z) -1,,] - Sigma1,"F")
+      rmse_med_online[j,i] <-  sqrt(sum((mu1 - medOnline)^2))
+      distances <- calcule_vecteur_distances(Z,medOnline,SigmaOffline)
+      #cutoff = calcule_cutoff(distances,d)
+      #cutoff =  qchisq(p = 0.95, df = ncol(Z))
+      #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
+      outliers_Online <- detectionOutliers(distances,cutoff)
+      
+      
+      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z))], as.numeric(outliers_Offline)[1:(nrow(Z))])
+      tc
+      tc <- safe_access_tc(tc)
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs_online[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      auc_online <- round(auc(outliers_Online,resultsSimul$labelsVrais),2)*100
+      
+      
+         
+      #Méthode OGK
+      
+      res <- covOGK(Z, sigmamu = s_mad)
+      SigmaOGK <- res$cov
+      med <- res$center
+      rmse_Sigma_ogk <- norm(SigmaOGK - Sigma1,"F")
+      
+      distances <- calcule_vecteur_distances(Z,med,SigmaOGK)
+      #cutoff = calcule_cutoff(distances,d)
+      #cutoff =  qchisq(p = 0.95, df = ncol(Z))
+      #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
+      outliers_OGK <- detectionOutliers(distances,cutoff)
+      
+      
+      tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_OGK)[1:(nrow(Z) - 1)])
+      tc
+      tc <- safe_access_tc(tc)
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs_ogk[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      auc_ogk <- auc(outliers_OGK,resultsSimul$labelsVrais)
+      
+    }
     
-    distances <- calcule_vecteur_distances(Z,med,SigmaOGK)
-    #cutoff = calcule_cutoff(distances,d)
-    #cutoff =  qchisq(p = 0.95, df = ncol(Z))
-    #outliers_listMaha <- check_outliers(Z, method = "mahalanobis")
-    outliers_OGK <- detectionOutliers(distances,cutoff)
-    
-    
-    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z) - 1)], as.numeric(outliers_OGK)[1:(nrow(Z) - 1)])
-    tc
-    tc <- safe_access_tc(tc)
-    if((tc["0","0"] + tc["0","1"]) != 0)
-    {faux_positifs_ogk[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
-    
-    
+      
+      
+      
     }
     
     
   }
   
-}
+
 
 
 
