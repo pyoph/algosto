@@ -43,35 +43,75 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
   } else if (methode == "Comédiane") {
     # Méthode Comédiane
     med <- covComed(Z)$center
-    SigmaComed <- covComed(Z)$cov
-    distances <- calcule_vecteur_distances(Z, med, SigmaComed)
+    Sigma <- covComed(Z)$cov
+    distances <- calcule_vecteur_distances(Z, med, Sigma)
+    rmseSigma <- norm(Sigma - Sigma1,"F")
+    rmseMed <- sqrt(sum((mu1 - med)^2))
+    distances <- calcule_vecteur_distances(Z, med, Sigma)
+    outliers <- detectionOutliers(distances,cutoff)
+    
+    tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+    tc
+    tc <- safe_access_tc(tc)
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    auc <- round(auc(outliers,data$labelsVrais),2)*100
     
   } else if (methode == "OGK") {
     # Méthode OGK
     OGK_result <- covOGK(Z,sigmamu = s_mad)
     med <- OGK_result$center
-    SigmaOGK <- OGK_result$cov
-    distances <- calcule_vecteur_distances(Z, med, SigmaOGK)
+    Sigma <- OGK_result$cov
+    distances <- calcule_vecteur_distances(Z, med, Sigma)
+    outliers <- detectionOutliers(distances,cutoff)
+    
+    tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+    tc
+    tc <- safe_access_tc(tc)
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    auc <- round(auc(outliers,data$labelsVrais),2)*100
+    
     
   } else if (methode == "Cov Empirique") {
-    # Méthode Empirique
+    
     med <- colMeans(Z)
-    SigmaEmp <- cov(Z)
-    distances <- calcule_vecteur_distances(Z, med, SigmaEmp)
+    Sigma <- cov(Z)
+    distances <- calcule_vecteur_distances(Z, med, Sigma)
+    outliers <- detectionOutliers(distances,cutoff)
+    
+    tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+    tc
+    tc <- safe_access_tc(tc)
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    auc <- round(auc(outliers,data$labelsVrais),2)*100
     
   } else if (methode == "Offline") {
     # Méthode Offline
-    med <- RobVar(Z)$median
-    SigmaOffline <- RobVar(Z)$variance
-    distances <- calcule_vecteur_distances(Z, med, SigmaOffline)
+    #med <- RobVar(Z)$median
+    resultats <- estimation(Z,methodeEstimation = "offline")
+    med <- resultats$med
+    Sigma <- resultats$SigmaOffline
+    distances <- calcule_vecteur_distances(Z, med, Sigma)
+    outliers <- detectionOutliers(distances,cutoff)
+    
+    tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+    tc
+    tc <- safe_access_tc(tc)
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    auc <- round(auc(outliers,data$labelsVrais),2)*100
+    
     
   } else if (methode == "Online") {
     # Méthode Online
-    results <- estimMV(Z)
+    resultats <- estimation(Z,methodeEstimation = "online")
+    med <- resultats$med
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
-    distances <- results$distances
+    distances <- resultats$distances
 
   } 
   
