@@ -19,14 +19,25 @@
 
 #Calcule le vecteur distances selon la méthode choisie
 
-calcule_distances_par_methode <- function(Z, methode) {
+calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 = mu1, cutoff = qchisq(0.95, df = ncol(data$Z))) {
   distances <- NULL
-  
+  Z <- data$Z
   if (methode == "Shrinkage") {
     # Méthode Shrinkage
     med <- covComed(Z)$center
     SigmaShrink <- covCor(Z)
+    rmseSigma <- norm(SigmaShrink - Sigma1,"F")
+    rmseMed <- sqrt(sum((mu1 - medOffline)^2))
     distances <- calcule_vecteur_distances(Z, med, SigmaShrink)
+    outliers <- detectionOutliers(distances,cutoff)
+    
+    tc <- table(resultsSimul$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+    tc
+    tc <- safe_access_tc(tc)
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs[i]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    auc <- round(auc(outliers,data$labelsVrais),2)*100
+    
     
     
   } else if (methode == "Comédiane") {

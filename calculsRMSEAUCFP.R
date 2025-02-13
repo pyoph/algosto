@@ -43,6 +43,25 @@ safe_access_tc <- function(tc, default = 0) {
 }
 
 
+#########Calcul rmse, faux positifs et auc pour un dataset et toutes les méthodes
+
+
+calcRMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)))
+
+{
+  faux_positifs_offline <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_online <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_streaming <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_ogk <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_comed <- matrix(0,nbruns,(length(taux_contamination)))
+  faux_positifs_shrink <- matrix(0,nbruns,(length(taux_contamination)))
+  
+  
+}
+
+
+
 ################Boucle construction tableau#############
 
 calculeRMSEAUCFP <- function(nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol(data)),contamin ="moyenne")
@@ -249,39 +268,38 @@ calculeRMSEAUCFP <- function(nbruns = 20,cutoff = qchisq(p = 0.95,df = ncol(data
     
       
       
-      
     }
   
   results_data <- data.frame(
     #Taux_Contamination = taux_contamination,
-    rmse_Sigma_ogk = rmse_Sigma_ogk,
-    rmse_med_ogk = rmse_med_ogk,
-    FP_OGK = faux_positifs_ogk,
-    auc_ogk = auc_ogk,
-    rmse_Sigma_comed = rmse_Sigma_comed,
-    rmse_med_comed = rmse_med_comed,
-    FP_Comed = faux_positifs_comed,
-    auc_comed = auc_comed,
-    rmse_Sigma_shrink = rmse_Sigma_shrink,
-    rmse_med_shrink = rmse_med_shrink,
-    FP_Shrink = faux_positifs_shrink,
-    auc_shrink = auc_shrink,
-    rmse_Sigma_Cov = rmse_Sigma_covEmp,
-    rmse_med_covEmp = rmse_med_covEmp,
-    FP_covEmp = faux_positifs_covEmp,
-    auc_covEmp = auc_covEmp,
-    rmse_Sigma_Offline =  rmse_Sigma_offline ,
-    rmse_med_offline = rmse_med_offline,
-    auc_offline = auc_offline,
-    FP_Offline = faux_positifs_offline,
-    RMSE_Sigma_Online =  rmse_Sigma_online ,
-    rmse_med_online = rmse_med_online,
-    auc_online = auc_online,
-    FP_Online = faux_positifs_online,
-    RMSE_Sigma_Streaming =  rmse_Sigma_streaming ,
-    rmse_med_streaming = rmse_med_streaming,
-    auc_streaming = auc_streaming,
-    FP_Streaming = faux_positifs_streaming
+    rmse_Sigma_ogk = rmse_Sigma_ogk[1,],
+    rmse_med_ogk = rmse_med_ogk[1,],
+    FP_OGK = faux_positifs_ogk[1,],
+    auc_ogk = auc_ogk[1,],
+    rmse_Sigma_comed = rmse_Sigma_comed[1,],
+    rmse_med_comed = rmse_med_comed[1,],
+    FP_Comed = faux_positifs_comed[1,],
+    auc_comed = auc_comed[1,],
+    rmse_Sigma_shrink = rmse_Sigma_shrink[1,],
+    rmse_med_shrink = rmse_med_shrink[1,],
+    FP_Shrink = faux_positifs_shrink[1,],
+    auc_shrink = auc_shrink[1,],
+    rmse_Sigma_Cov = rmse_Sigma_covEmp[1,],
+    rmse_med_covEmp = rmse_med_covEmp[1,],
+    FP_covEmp = faux_positifs_covEmp[1,],
+    auc_covEmp = auc_covEmp[1,],
+    rmse_Sigma_Offline =  rmse_Sigma_offline[1,] ,
+    rmse_med_offline = rmse_med_offline[1,],
+    auc_offline = auc_offline[1,],
+    FP_Offline = faux_positifs_offline[1,],
+    RMSE_Sigma_Online =  rmse_Sigma_online[1,] ,
+    rmse_med_online = rmse_med_online[1,],
+    auc_online = auc_online[1,],
+    FP_Online = faux_positifs_online[1,],
+    RMSE_Sigma_Streaming =  rmse_Sigma_streaming[1,] ,
+    rmse_med_streaming = rmse_med_streaming[1,],
+    auc_streaming = auc_streaming[1,],
+    FP_Streaming = faux_positifs_streaming[1,]
     
     
     
