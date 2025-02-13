@@ -131,6 +131,36 @@ construction_tableau_resultats <- function(nbruns)
     auc[i,j] <- resultats$auc
   }
   }
+  # Créer les dataframes pour chaque métrique
+  df_rmseSigma <- data.frame(rmseSigma, row.names = taux_contamination)
+  colnames(df_rmseSigma) <- methodes
+  
+  df_faux_positifs <- data.frame(faux_positifs, row.names = taux_contamination)
+  colnames(df_faux_positifs) <- methodes
+  
+  df_auc <- data.frame(auc, row.names = taux_contamination)
+  colnames(df_auc) <- methodes
+  
+  # Afficher les dataframes
+  print("Dataframe rmseSigma :")
+  print(df_rmseSigma)
+  
+  print("Dataframe faux_positifs :")
+  print(df_faux_positifs)
+  
+  print("Dataframe auc :")
+  print(df_auc)
+  
+  # Ajouter une colonne "Metric" et combiner les dataframes
+  df_rmseSigma <- df_rmseSigma %>% mutate(Metric = "rmseSigma")
+  df_faux_positifs <- df_faux_positifs %>% mutate(Metric = "faux_positifs")
+  df_auc <- df_auc %>% mutate(Metric = "auc")
+  
+  # Combiner les dataframes
+  df_combined <- bind_rows(df_rmseSigma, df_faux_positifs, df_auc)
+  
+  # Afficher le dataframe combiné
+  print(df_combined)
   }
 
 # Fonction pour afficher les erreurs d'estimation de Sigma online et offline pour différents taux de contamination. 
