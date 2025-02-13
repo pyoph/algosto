@@ -111,14 +111,25 @@ construction_tableau_resultats <- function(nbruns)
   rmseSigma <- matrix(0,length(taux_contamination),length(methodes))
   faux_positifs <- matrix(0,length(taux_contamination),length(methodes))
   auc <- matrix(0,length(taux_contamination),length(methodes))
-  data <- genererEchantillon(n,d,mu1,mu2,p1 = 0.9,p2 = 0.1,Sigma1,Sigma2,contamin = "moyenne")
-  
-  for (m in methodes)
+  for (i in seq_along(taux_contamination)){
+  #Génération des données 
+    
+    delta <- taux_contamination[i]
+    p1 <- 1 - delta/100
+    p2 <- 1 - p1
+    data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = "moyenne")
+    
+    
+    for (j in seq_along(methodes))
   {
     #m = "Shrinkage"
-    resultats <- calcule_RMSE_FP_AUC_par_methode(data,methode = m)
-    rmseMed[1,1] <- resultats
-    rmseSigma[1,1] <- resultats$rmseSigma
+    methode <- methodes[j]
+    resultats <- calcule_RMSE_FP_AUC_par_methode(data,methode = methode)
+    rmseMed[i,j] <- resultats$rmseMed
+    rmseSigma[i,j] <- resultats$rmseSigma
+    faux_positifs[i,j] <- resultats$faux_positifs
+    auc[i,j] <- resultats$auc
+  }
   }
   }
 
