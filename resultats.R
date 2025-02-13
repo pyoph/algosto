@@ -132,7 +132,7 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns)
   }
   }
   
-  return(resultats)
+  return(list(resultats = resultats, rmseMed = rmseMed,rmseSigma = rmseSigma,faux_positifs = faux_positifs,auc =auc))
   }
 
 
@@ -238,7 +238,53 @@ RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
     auc_streaming[i] <- auc[i, 7] # Streaming
   }
   
+  # Créer le dataframe avec les champs RMSE_Sigma, RMSE_Med, AUC et FP pour chaque méthode
+  results_metrics <- data.frame(
+    # Taux_Contamination = taux_contamination,  # Décommentez si vous voulez inclure cette colonne
+    RMSE_Sigma_Cov = rmse_Sigma_covEmp,
+    RMSE_Med_Cov = rmse_med_covEmp,
+    AUC_Cov = auc_covEmp,
+    FP_Cov = faux_positifs_covEmp,
+    
+    RMSE_Sigma_OGK = rmse_Sigma_ogk,
+    RMSE_Med_OGK = rmse_med_ogk,
+    AUC_OGK = auc_ogk,
+    FP_OGK = faux_positifs_ogk,
+    
+    RMSE_Sigma_Online = rmse_Sigma_online,
+    RMSE_Med_Online = rmse_med_online,
+    AUC_Online = auc_online,
+    FP_Online = faux_positifs_online,
+    
+    RMSE_Sigma_Offline = rmse_Sigma_offline,
+    RMSE_Med_Offline = rmse_med_offline,
+    AUC_Offline = auc_offline,
+    FP_Offline = faux_positifs_offline,
+    
+    RMSE_Sigma_Streaming = rmse_Sigma_streaming,
+    RMSE_Med_Streaming = rmse_med_streaming,
+    AUC_Streaming = auc_streaming,
+    FP_Streaming = faux_positifs_streaming,
+    
+    RMSE_Sigma_Comed = rmse_Sigma_comed,
+    RMSE_Med_Comed = rmse_med_comed,
+    AUC_Comed = auc_comed,
+    FP_Comed = faux_positifs_comed,
+    
+    RMSE_Sigma_Shrink = rmse_Sigma_shrink,
+    RMSE_Med_Shrink = rmse_med_shrink,
+    AUC_Shrink = auc_shrink,
+    FP_Shrink = faux_positifs_shrink
+  )
   
+  row.names(results_metrics) <- taux_contamination
+  
+  # Afficher le dataframe
+  print(results_metrics)
+  
+  save(results_metrics,file = "results_metrics.RData")
+  
+  return(results_metrics)
 }
 
 
