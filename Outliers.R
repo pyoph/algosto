@@ -108,13 +108,40 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     # Méthode Online
     resultats <- estimation(Z,methodeEstimation = "online")
     med <- resultats$med
+    Sigma <- resultats$SigmaOnline
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
     distances <- resultats$distances
-
+    outliers <- detectionOutliers(distances,cutoff)
+    
+    tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+    tc
+    tc <- safe_access_tc(tc)
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    auc <- round(auc(outliers,data$labelsVrais),2)*100
+    
   } 
-  
+  else if (methode == "streaming") {
+    # Méthode streaming
+    resultats <- estimation(Z,methodeEstimation = "streaming")
+    med <- resultats$med
+    Sigma <- resultats$SigmaStreaming
+    #miter <- results$miter
+    #U <- results$U
+    #lambda <- results$lambdaIter
+    distances <- resultats$distances
+    outliers <- detectionOutliers(distances,cutoff)
+    
+    tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+    tc
+    tc <- safe_access_tc(tc)
+    if((tc["0","0"] + tc["0","1"]) != 0)
+    {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    auc <- round(auc(outliers,data$labelsVrais),2)*100
+    
+  } 
   return(distances)
 }
 

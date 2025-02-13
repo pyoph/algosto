@@ -450,10 +450,10 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   
   if (methodeEstimation  == "online") {
-    return(list(med = med, SigmaOnline = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
+    return(list(med = med, SigmaOnline = SigmaOnline[nrow(Z)- 1,,], SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
 }
   else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,V = V, distances = distances))}
-else {return(list(med = med, SigmaStreaming = SigmaStreaming ,V = V, distances = distances))}
+else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Z)-1,,] ,V = V, distances = distances))}
   }
 
 
