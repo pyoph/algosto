@@ -237,6 +237,8 @@ RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
     auc_online[i] <- auc[i, 6]  # Online
     auc_streaming[i] <- auc[i, 7] # Streaming
   }
+  
+  
 }
 
 
