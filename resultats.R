@@ -119,26 +119,29 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns)
     p2 <- 1 - p1
     data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = "moyenne")
     
-    
+    for (k in (1:nbrunsParam)){
     for (j in seq_along(methodes))
   {
+      
     #m = "Shrinkage"
     methode <- methodes[j]
     resultats <- calcule_RMSE_FP_AUC_par_methode(data,methode = methode)
-    rmseMed[i,j] <- resultats$rmseMed
-    rmseSigma[i,j] <- resultats$rmseSigma
-    faux_positifs[i,j] <- resultats$faux_positifs
-    auc[i,j] <- resultats$auc
-  }
+    rmseMed[i,j] <- resultats$rmseMed + rmseMed[i,j]
+    rmseSigma[i,j] <- resultats$rmseSigma +  rmseSigma[i,j]
+    faux_positifs[i,j] <- resultats$faux_positifs + faux_positifs[i,j]
+    auc[i,j] <- resultats$auc + auc[i,j]
+    }
+     
+    }
   }
   
-  return(list(resultats = resultats, rmseMed = rmseMed,rmseSigma = rmseSigma,faux_positifs = faux_positifs,auc =auc))
+  return(list(resultats = resultats, rmseMed = rmseMed/nbruns,rmseSigma = rmseSigma/nbruns,faux_positifs = faux_positifs/nbruns,auc =auc/nbruns))
   }
 
 
 #Construction du dataset
 
-RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
+RMSEAUCFPdataset<- function(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
 
 {
   
@@ -240,7 +243,6 @@ RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
   
   # Créer le dataframe avec les champs RMSE_Sigma, RMSE_Med, AUC et FP pour chaque méthode
   results_metrics <- data.frame(
-    # Taux_Contamination = taux_contamination,  # Décommentez si vous voulez inclure cette colonne
     RMSE_Sigma_Cov = rmse_Sigma_covEmp,
     RMSE_Med_Cov = rmse_med_covEmp,
     AUC_Cov = auc_covEmp,
@@ -250,6 +252,16 @@ RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
     RMSE_Med_OGK = rmse_med_ogk,
     AUC_OGK = auc_ogk,
     FP_OGK = faux_positifs_ogk,
+    
+    RMSE_Sigma_Comed = rmse_Sigma_comed,
+    RMSE_Med_Comed = rmse_med_comed,
+    AUC_Comed = auc_comed,
+    FP_Comed = faux_positifs_comed,
+    
+    RMSE_Sigma_Shrink = rmse_Sigma_shrink,
+    RMSE_Med_Shrink = rmse_med_shrink,
+    AUC_Shrink = auc_shrink,
+    FP_Shrink = faux_positifs_shrink,
     
     RMSE_Sigma_Online = rmse_Sigma_online,
     RMSE_Med_Online = rmse_med_online,
@@ -264,17 +276,8 @@ RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
     RMSE_Sigma_Streaming = rmse_Sigma_streaming,
     RMSE_Med_Streaming = rmse_med_streaming,
     AUC_Streaming = auc_streaming,
-    FP_Streaming = faux_positifs_streaming,
-    
-    RMSE_Sigma_Comed = rmse_Sigma_comed,
-    RMSE_Med_Comed = rmse_med_comed,
-    AUC_Comed = auc_comed,
-    FP_Comed = faux_positifs_comed,
-    
-    RMSE_Sigma_Shrink = rmse_Sigma_shrink,
-    RMSE_Med_Shrink = rmse_med_shrink,
-    AUC_Shrink = auc_shrink,
-    FP_Shrink = faux_positifs_shrink
+    FP_Streaming = faux_positifs_streaming
+   
   )
   
   row.names(results_metrics) <- taux_contamination
@@ -282,7 +285,29 @@ RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
   # Afficher le dataframe
   print(results_metrics)
   
-  save(results_metrics,file = "results_metrics.RData")
+  results_without_RMSE_Med <- results_metrics %>%
+    select(-contains("RMSE_Med")) %>%  # Supprimer toutes les colonnes RMSE_Med
+    select(-contains("Cov"))
+  
+  # 2. Dataframe sans RMSE_Sigma
+  results_without_RMSE_Sigma <- results_metrics %>%
+    select(-contains("RMSE_Sigma","Cov"))
+  
+  # Afficher les dataframes
+  print("Dataframe sans RMSE_Med :")
+  print(results_without_RMSE_Med)
+  
+  print("Dataframe sans RMSE_Sigma :")
+  print(results_without_RMSE_Sigma)
+  
+  results_metrics <- round(results_metrics,2)
+  latex_table_results_metrics <- xtable(results_metrics)
+  
+  latex_table_results_metrics_sansRMSESigma <- xtable( results_without_RMSE_Sigma)
+  latex_table_results_metrics_sansRMSEMed <- xtable( results_without_RMSE_Med)
+  
+  
+  #save(results_metrics,file = "results_metrics.RData")
   
   return(results_metrics)
 }
