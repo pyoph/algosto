@@ -46,21 +46,6 @@ safe_access_tc <- function(tc, default = 0) {
 #########Calcul rmse, faux positifs et auc pour un dataset et toutes les méthodes
 
 
-calcRMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)))
-
-{
-  faux_positifs_offline <- matrix(0,nbruns,(length(taux_contamination)))
-  faux_positifs_online <- matrix(0,nbruns,(length(taux_contamination)))
-  faux_positifs_streaming <- matrix(0,nbruns,(length(taux_contamination)))
-  faux_positifs_covEmp <- matrix(0,nbruns,(length(taux_contamination)))
-  faux_positifs_ogk <- matrix(0,nbruns,(length(taux_contamination)))
-  faux_positifs_comed <- matrix(0,nbruns,(length(taux_contamination)))
-  faux_positifs_shrink <- matrix(0,nbruns,(length(taux_contamination)))
-  
-  
-}
-
-
 
 ################Boucle construction tableau#############
 # 

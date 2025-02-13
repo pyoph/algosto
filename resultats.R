@@ -103,7 +103,7 @@ affiche_erreursM <- function(erreurs_online, erreurs_offline = NULL, contaminati
 
 #Boucle de construction du tableau de résultats
 
-construction_tableau_resultats <- function(nbruns)
+construction_tableau_resultats <- function(nbrunsParam = nbruns)
 {
   methodes = c("Comédiane","Shrinkage","OGK","Cov Empirique","offline","online","streaming")
   taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
@@ -131,37 +131,114 @@ construction_tableau_resultats <- function(nbruns)
     auc[i,j] <- resultats$auc
   }
   }
-  # Créer les dataframes pour chaque métrique
-  df_rmseSigma <- data.frame(rmseSigma, row.names = taux_contamination)
-  colnames(df_rmseSigma) <- methodes
   
-  df_faux_positifs <- data.frame(faux_positifs, row.names = taux_contamination)
-  colnames(df_faux_positifs) <- methodes
-  
-  df_auc <- data.frame(auc, row.names = taux_contamination)
-  colnames(df_auc) <- methodes
-  
-  # Afficher les dataframes
-  print("Dataframe rmseSigma :")
-  print(df_rmseSigma)
-  
-  print("Dataframe faux_positifs :")
-  print(df_faux_positifs)
-  
-  print("Dataframe auc :")
-  print(df_auc)
-  
-  # Ajouter une colonne "Metric" et combiner les dataframes
-  df_rmseSigma <- df_rmseSigma %>% mutate(Metric = "rmseSigma")
-  df_faux_positifs <- df_faux_positifs %>% mutate(Metric = "faux_positifs")
-  df_auc <- df_auc %>% mutate(Metric = "auc")
-  
-  # Combiner les dataframes
-  df_combined <- bind_rows(df_rmseSigma, df_faux_positifs, df_auc)
-  
-  # Afficher le dataframe combiné
-  print(df_combined)
+  return(resultats)
   }
+
+
+#Construction du dataset
+
+RMSEAUCFPdataset(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
+
+{
+  
+  #Initialisation faux positifs  
+  
+  faux_positifs_offline <- rep(0,(length(taux_contamination)))
+  faux_positifs_online <- rep(0,(length(taux_contamination)))
+  faux_positifs_streaming <- rep(0,(length(taux_contamination)))
+  faux_positifs_covEmp <- rep(0,(length(taux_contamination)))
+  faux_positifs_ogk <- rep(0,(length(taux_contamination)))
+  faux_positifs_comed <- rep(0,(length(taux_contamination)))
+  faux_positifs_shrink <- rep(0,(length(taux_contamination)))
+  
+  
+  
+  #   
+  #   #initialisation RMSE médiane
+  #   
+  #   
+  rmse_med_offline <- rep(0,(length(taux_contamination)))
+  rmse_med_online <- rep(0,(length(taux_contamination)))
+  rmse_med_streaming <- rep(0,(length(taux_contamination)))
+  rmse_med_covEmp <- rep(0,(length(taux_contamination)))
+  rmse_med_ogk <- rep(0,(length(taux_contamination)))
+  rmse_med_comed <- rep(0,(length(taux_contamination)))
+  rmse_med_shrink <- rep(0,(length(taux_contamination)))
+  
+  
+  
+  
+  
+  #   #initialisation RMSE Sigma
+  
+  
+  rmse_Sigma_offline <- rep(0,(length(taux_contamination)))
+  rmse_Sigma_online <- rep(0,(length(taux_contamination)))
+  rmse_Sigma_streaming <- rep(0,(length(taux_contamination)))
+  rmse_Sigma_covEmp <- rep(0,(length(taux_contamination)))
+  rmse_Sigma_ogk <- rep(0,(length(taux_contamination)))
+  rmse_Sigma_comed <- rep(0,(length(taux_contamination)))
+  rmse_Sigma_shrink <- rep(0,(length(taux_contamination)))
+  
+  
+  
+  
+  #   #initialisation AUC
+  
+  auc_offline <- rep(0,(length(taux_contamination)))
+  auc_online <- rep(0,(length(taux_contamination)))
+  auc_streaming <- rep(0,(length(taux_contamination)))
+  auc_covEmp <- rep(0,(length(taux_contamination)))
+  auc_ogk <- rep(0,(length(taux_contamination)))
+  auc_comed <- rep(0,(length(taux_contamination)))
+  auc_shrink <- rep(0,(length(taux_contamination)))
+  
+  # Appeler la fonction pour obtenir les résultats
+  resultats <- construction_tableau_resultats(nbrunsParam = nbruns)
+  
+  # Extraire les matrices des résultats
+  rmseMed <- resultats$rmseMed
+  rmseSigma <- resultats$rmseSigma
+  faux_positifs <- resultats$faux_positifs
+  auc <- resultats$auc
+  
+  # Remplir les vecteurs pour chaque méthode
+  for (i in seq_along(taux_contamination)) {
+    faux_positifs_comed[i] <- faux_positifs[i, 1]  # Comédiane
+    faux_positifs_shrink[i] <- faux_positifs[i, 2] # Shrinkage
+    faux_positifs_ogk[i] <- faux_positifs[i, 3]    # OGK
+    faux_positifs_covEmp[i] <- faux_positifs[i, 4] # Cov Empirique
+    faux_positifs_offline[i] <- faux_positifs[i, 5] # Offline
+    faux_positifs_online[i] <- faux_positifs[i, 6]  # Online
+    faux_positifs_streaming[i] <- faux_positifs[i, 7] # Streaming
+    
+    rmse_med_comed[i] <- rmseMed[i, 1]  # Comédiane
+    rmse_med_shrink[i] <- rmseMed[i, 2] # Shrinkage
+    rmse_med_ogk[i] <- rmseMed[i, 3]    # OGK
+    rmse_med_covEmp[i] <- rmseMed[i, 4] # Cov Empirique
+    rmse_med_offline[i] <- rmseMed[i, 5] # Offline
+    rmse_med_online[i] <- rmseMed[i, 6]  # Online
+    rmse_med_streaming[i] <- rmseMed[i, 7] # Streaming
+    
+    rmse_Sigma_comed[i] <- rmseSigma[i, 1]  # Comédiane
+    rmse_Sigma_shrink[i] <- rmseSigma[i, 2] # Shrinkage
+    rmse_Sigma_ogk[i] <- rmseSigma[i, 3]    # OGK
+    rmse_Sigma_covEmp[i] <- rmseSigma[i, 4] # Cov Empirique
+    rmse_Sigma_offline[i] <- rmseSigma[i, 5] # Offline
+    rmse_Sigma_online[i] <- rmseSigma[i, 6]  # Online
+    rmse_Sigma_streaming[i] <- rmseSigma[i, 7] # Streaming
+    
+    auc_comed[i] <- auc[i, 1]  # Comédiane
+    auc_shrink[i] <- auc[i, 2] # Shrinkage
+    auc_ogk[i] <- auc[i, 3]    # OGK
+    auc_covEmp[i] <- auc[i, 4] # Cov Empirique
+    auc_offline[i] <- auc[i, 5] # Offline
+    auc_online[i] <- auc[i, 6]  # Online
+    auc_streaming[i] <- auc[i, 7] # Streaming
+  }
+}
+
 
 # Fonction pour afficher les erreurs d'estimation de Sigma online et offline pour différents taux de contamination. 
 
