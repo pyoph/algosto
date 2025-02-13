@@ -141,7 +141,7 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns)
 
 #Construction du dataset
 
-RMSEAUCFPdataset<- function(data,cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
+RMSEAUCFPdataset<- function(cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
 
 {
   
@@ -299,7 +299,9 @@ RMSEAUCFPdataset<- function(data,cutoff = qchisq(p = 0.95,df = ncol(data)),metho
   
   print("Dataframe sans RMSE_Sigma :")
   print(results_without_RMSE_Sigma)
+  results_without_RMSE_Med <- round(results_without_RMSE_Med,2)
   
+  save(results_without_RMSE_Med,file = "results_without_RMSE_Med.RData")
   results_metrics <- round(results_metrics,2)
   latex_table_results_metrics <- xtable(results_metrics)
   
