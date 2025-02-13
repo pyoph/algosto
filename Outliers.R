@@ -19,15 +19,18 @@
 
 #Calcule le vecteur distances selon la méthode choisie
 
-calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 = mu1, cutoff = qchisq(0.95, df = ncol(data$Z))) {
+calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95, df = ncol(data$Z)),SigmaVrai = Sigma1,muVrai = mu1) {
   distances <- NULL
   Z <- data$Z
   if (methode == "Shrinkage") {
     # Méthode Shrinkage
     med <- covComed(Z)$center
     Sigma <- covCor(Z)
-    rmseSigma <- norm(Sigma - Sigma1,"F")
-    rmseMed <- sqrt(sum((mu1 - med)^2))
+    #print(Sigma)
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    #rmseSigma <- 0
+    print("OK Shrinkage")
+    rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- calcule_vecteur_distances(Z, med, Sigma)
     outliers <- detectionOutliers(distances,cutoff)
     
@@ -44,9 +47,13 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     # Méthode Comédiane
     med <- covComed(Z)$center
     Sigma <- covComed(Z)$cov
+    #print(Sigma)
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    print("OK Comed")
+    rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- calcule_vecteur_distances(Z, med, Sigma)
-    rmseSigma <- norm(Sigma - Sigma1,"F")
-    rmseMed <- sqrt(sum((mu1 - med)^2))
+    #rmseSigma <- norm(Sigma - Sigma1,"F")
+    #rmseMed <- sqrt(sum((mu1 - med)^2))
     distances <- calcule_vecteur_distances(Z, med, Sigma)
     outliers <- detectionOutliers(distances,cutoff)
     
@@ -62,6 +69,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     OGK_result <- covOGK(Z,sigmamu = s_mad)
     med <- OGK_result$center
     Sigma <- OGK_result$cov
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    print("OK OGK")
+    rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- calcule_vecteur_distances(Z, med, Sigma)
     outliers <- detectionOutliers(distances,cutoff)
     
@@ -78,6 +88,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     med <- colMeans(Z)
     Sigma <- cov(Z)
     distances <- calcule_vecteur_distances(Z, med, Sigma)
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    print("OK Cov Emp")
+    rmseMed <- sqrt(sum((muVrai - med)^2))
     outliers <- detectionOutliers(distances,cutoff)
     
     tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
@@ -87,12 +100,15 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
     auc <- round(auc(outliers,data$labelsVrais),2)*100
     
-  } else if (methode == "Offline") {
+  } else if (methode == "offline") {
     # Méthode Offline
     #med <- RobVar(Z)$median
     resultats <- estimation(Z,methodeEstimation = "offline")
     med <- resultats$med
     Sigma <- resultats$SigmaOffline
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    print("OK offline")
+    rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- calcule_vecteur_distances(Z, med, Sigma)
     outliers <- detectionOutliers(distances,cutoff)
     
@@ -104,11 +120,14 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     auc <- round(auc(outliers,data$labelsVrais),2)*100
     
     
-  } else if (methode == "Online") {
+  } else if (methode == "online") {
     # Méthode Online
     resultats <- estimation(Z,methodeEstimation = "online")
     med <- resultats$med
     Sigma <- resultats$SigmaOnline
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    print("OK online")
+    rmseMed <- sqrt(sum((muVrai - med)^2))
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
@@ -128,6 +147,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     resultats <- estimation(Z,methodeEstimation = "streaming")
     med <- resultats$med
     Sigma <- resultats$SigmaStreaming
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    print("OK Streaming")
+    rmseMed <- sqrt(sum((muVrai - med)^2))
     #miter <- results$miter
     #U <- results$U
     #lambda <- results$lambdaIter
@@ -142,7 +164,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, Sigma1 = Sigma1, mu1 
     auc <- round(auc(outliers,data$labelsVrais),2)*100
     
   } 
-  return(distances)
+  return(list(distances = distances,med = med,Sigma = Sigma,rmseMed = rmseMed,rmseSigma = rmseSigma,faux_positifs = faux_positifs,auc = auc))
 }
 
 

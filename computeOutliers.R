@@ -43,7 +43,6 @@ safe_access_tc <- function(tc, default = 0) {
 }
 
 
-################Boucle construction tableau#############
 
 
 

@@ -101,6 +101,26 @@ affiche_erreursM <- function(erreurs_online, erreurs_offline = NULL, contaminati
   print(p)
 }
 
+#Boucle de construction du tableau de résultats
+
+construction_tableau_resultats <- function(nbruns)
+{
+  methodes = c("Comédiane","Shrinkage","OGK","Cov Empirique","offline","online","streaming")
+  taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
+  rmseMed <- matrix(0,length(taux_contamination),length(methodes))
+  rmseSigma <- matrix(0,length(taux_contamination),length(methodes))
+  faux_positifs <- matrix(0,length(taux_contamination),length(methodes))
+  auc <- matrix(0,length(taux_contamination),length(methodes))
+  data <- genererEchantillon(n,d,mu1,mu2,p1 = 0.9,p2 = 0.1,Sigma1,Sigma2,contamin = "moyenne")
+  
+  for (m in methodes)
+  {
+    #m = "Shrinkage"
+    resultats <- calcule_RMSE_FP_AUC_par_methode(data,methode = m)
+    rmseMed[1,1] <- resultats
+    rmseSigma[1,1] <- resultats$rmseSigma
+  }
+  }
 
 # Fonction pour afficher les erreurs d'estimation de Sigma online et offline pour différents taux de contamination. 
 
