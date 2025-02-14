@@ -7,17 +7,17 @@
 #install.packages("devtools")
 #install.packages("usethis")
 
-library(reshape2)
-library(RobRegression)
-library(Gmedian)
-library(ggplot2)
-library(far)
-library(gridExtra)
-library(microbenchmark)
+#library(reshape2)
+#library(RobRegression)
+#library(Gmedian)
+#library(ggplot2)
+#library(far)
+#library(gridExtra)
+#library(microbenchmark)
 #library("matlib")
-library("MASS")
-library("corrplot")
-library("dplyr")
+#library("MASS")
+#library("corrplot")
+#library("dplyr")
 
 
 ###Initialisation des paramètres communs à toutes les simulations
@@ -67,8 +67,8 @@ creerMatriceToeplitz <- function(rho,d)
 
 #Initialisation des paramètres communs à toutes les simulations
 
-nbruns = 20
-n = 1e4
+nbruns = 1
+n = 1e5
 d = 10
 mu1 = rep(0,d)
 mu2 = 5*rep(1,d)

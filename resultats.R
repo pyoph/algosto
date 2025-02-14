@@ -103,7 +103,7 @@ affiche_erreursM <- function(erreurs_online, erreurs_offline = NULL, contaminati
 
 #Boucle de construction du tableau de résultats
 
-construction_tableau_resultats <- function(nbrunsParam = nbruns)
+construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moyenne")
 {
   methodes = c("Comédiane","Shrinkage","OGK","Cov Empirique","offline","online","streaming")
   taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
@@ -117,7 +117,7 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns)
     delta <- taux_contamination[i]
     p1 <- 1 - delta/100
     p2 <- 1 - p1
-    data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = "moyenne")
+    data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = "uniforme")
     
     for (k in (1:nbrunsParam)){
     for (j in seq_along(methodes))
@@ -141,9 +141,13 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns)
 
 #Construction du dataset
 
-RMSEAUCFPdataset<- function(cutoff = qchisq(p = 0.95,df = ncol(data)),methodes)
+RMSEAUCFPdataset<- function(nbrunsParam = nbruns)
 
 {
+  
+  #Initialisation des taux de contamination
+  taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
+  
   
   #Initialisation faux positifs  
   

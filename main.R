@@ -41,6 +41,17 @@ source("~/work/algosto/Outliers.R")
 source("~/work/algosto/computeOutliers.R")
 source("~/work/algosto/seuils.R")
 
+
+#Calcul RMSE AUC et FP 
+
+results_metrics <- RMSEAUCFPdataset()
+
+
+
+
+
+
+
 #Création d'une liste vide 
 liste_resultats_outliers <- list()
 
