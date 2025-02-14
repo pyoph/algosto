@@ -40,7 +40,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
                     minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
                     vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
-                    ,SigmaInit = diag(d),methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
+                    ,SigmaInit = diag(d),methode = "eigen",depart = 100,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
 {
   
   lambdatilde = rep(1,ncol(Y))
@@ -450,10 +450,10 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   
   if (methodeEstimation  == "online") {
-    return(list(med = med, SigmaOnline = SigmaOnline[nrow(Z)- 1,,], SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
+    return(list(med = med, SigmaOnline = SigmaOnline[nrow(Y)- 1,,], SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
 }
   else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,V = V, distances = distances))}
-else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Z)-1,,] ,V = V, distances = distances))}
+else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,] ,V = V, distances = distances))}
   }
 
 

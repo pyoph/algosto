@@ -288,32 +288,32 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns)
   
   # Afficher le dataframe
   print(results_metrics)
-  
-  results_without_RMSE_Med <- results_metrics %>%
-    select(-contains("RMSE_Med")) %>%  # Supprimer toutes les colonnes RMSE_Med
-    select(-contains("Cov"))
-  
-  # 2. Dataframe sans RMSE_Sigma
-  results_without_RMSE_Sigma <- results_metrics %>%
-    select(-contains("RMSE_Sigma","Cov"))
-  
-  # Afficher les dataframes
-  print("Dataframe sans RMSE_Med :")
-  print(results_without_RMSE_Med)
-  
-  print("Dataframe sans RMSE_Sigma :")
-  print(results_without_RMSE_Sigma)
-  results_without_RMSE_Med <- round(results_without_RMSE_Med,2)
-  
-  save(results_without_RMSE_Med,file = "results_without_RMSE_Med.RData")
-  results_metrics <- round(results_metrics,2)
-  latex_table_results_metrics <- xtable(results_metrics)
-  
-  latex_table_results_metrics_sansRMSESigma <- xtable( results_without_RMSE_Sigma)
-  latex_table_results_metrics_sansRMSEMed <- xtable( results_without_RMSE_Med)
-  
-  
-  #save(results_metrics,file = "results_metrics.RData")
+  # 
+  # results_without_RMSE_Med <- results_metrics %>%
+  #   select(-contains("RMSE_Med")) %>%  # Supprimer toutes les colonnes RMSE_Med
+  #   select(-contains("Cov"))
+  # 
+  # # 2. Dataframe sans RMSE_Sigma
+  # results_without_RMSE_Sigma <- results_metrics %>%
+  #   select(-contains("RMSE_Sigma"))
+  # 
+  # # Afficher les dataframes
+  # print("Dataframe sans RMSE_Med :")
+  # print(results_without_RMSE_Med)
+  # 
+  # print("Dataframe sans RMSE_Sigma :")
+  # print(results_without_RMSE_Sigma)
+  # results_without_RMSE_Med <- round(results_without_RMSE_Med,2)
+  # 
+  # save(results_without_RMSE_Med,file = "results_without_RMSE_Med.RData")
+  # results_metrics <- round(results_metrics,2)
+  # latex_table_results_metrics <- xtable(results_metrics)
+  # 
+  # latex_table_results_metrics_sansRMSESigma <- xtable( results_without_RMSE_Sigma)
+  # latex_table_results_metrics_sansRMSEMed <- xtable( results_without_RMSE_Med)
+  # 
+  # 
+  save(results_metrics,file = "results_metrics.RData")
   
   return(results_metrics)
 }
