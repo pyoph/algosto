@@ -117,7 +117,7 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
     delta <- taux_contamination[i]
     p1 <- 1 - delta/100
     p2 <- 1 - p1
-    data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = "uniforme")
+    data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = "moyenne")
     
     for (k in (1:nbrunsParam)){
     for (j in seq_along(methodes))
