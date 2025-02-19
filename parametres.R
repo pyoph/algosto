@@ -67,12 +67,12 @@ creerMatriceToeplitz <- function(rho,d)
 
 #Initialisation des paramètres communs à toutes les simulations
 
-nbruns = 1
-n = 1e5
+nbruns = 20
+n = 1e4
 d = 10
 mu1 = rep(0,d)
 mu2 = 5*rep(1,d)
-rho = 0.8
+rho = 0.9
 Sigma1 = creerMatriceToeplitz(rho,d)
 
 lignes_a_permuter = c(1, 2)

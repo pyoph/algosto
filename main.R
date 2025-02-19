@@ -7,6 +7,7 @@
 #install.packages("reshape")
 #install.packages("matlib")
 #install.packages("RobRegression")
+#install.packages("knitr")
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -31,6 +32,7 @@ library(ROCR)
 library(pROC)
 library(tidyr)
 library(dplyr)
+library(knitr)
 #install.packages("Metrics")
 #library(Metrics)
 source("~/work/algosto/parametres.R")
@@ -44,14 +46,24 @@ source("~/work/algosto/seuils.R")
 
 #Calcul RMSE AUC et FP 
 
-results_metrics <- RMSEAUCFPdataset()
+results_metrics <- RMSEAUCFPdataset(contamin = "zero")
+
+save(results_metrics,file = "results_metricsMoyenne.Rdata")
+
+results_metrics <- round(results_metrics,2)
+# latex_table_results_metrics <- xtable(results_metrics)
+# 
+results_without_RMSE_Med <- results_metrics %>%
+     select(-contains("RMSE_Med")) %>%  # Supprimer toutes les colonnes RMSE_Med
+     select(-contains("Cov"))
+
+latex_table <- kable(results_without_RMSE_Med, format = "latex", caption = "Résultats contamination en moyenne 20 runs", label = "tab:results")
+writeLines(latex_table, "resultats_contamination_moyenne.tex")
+
+latex_table_results_metrics_without_RMSE_Med <- xtable(results_without_RMSE_Med)
 
 
-
-
-
-
-
+  
 #Création d'une liste vide 
 liste_resultats_outliers <- list()
 

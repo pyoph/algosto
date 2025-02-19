@@ -117,7 +117,7 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
     delta <- taux_contamination[i]
     p1 <- 1 - delta/100
     p2 <- 1 - p1
-    data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = "moyenne")
+    data <- genererEchantillon(n,d,mu1,mu2,p1,p2 ,Sigma1,Sigma2,contamin = contamin)
     
     for (k in (1:nbrunsParam)){
     for (j in seq_along(methodes))
@@ -141,7 +141,7 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
 
 #Construction du dataset
 
-RMSEAUCFPdataset<- function(nbrunsParam = nbruns)
+RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
 
 {
   
@@ -202,7 +202,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns)
   auc_shrink <- rep(0,(length(taux_contamination)))
   
   # Appeler la fonction pour obtenir les résultats
-  resultats <- construction_tableau_resultats(nbrunsParam = nbruns)
+  resultats <- construction_tableau_resultats(nbrunsParam = nbruns,contamin = contamin)
   
   # Extraire les matrices des résultats
   rmseMed <- resultats$rmseMed
