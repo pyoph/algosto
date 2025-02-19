@@ -8,6 +8,8 @@
 #install.packages("matlib")
 #install.packages("RobRegression")
 #install.packages("knitr")
+install.packages("Rcpp")
+install.packages("RcppArmadillo")
 library(xtable)
 library(reshape2)
 library(RobRegression)
