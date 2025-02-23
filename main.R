@@ -48,11 +48,11 @@ source("~/work/algosto/seuils.R")
 
 #Calcul RMSE AUC et FP 
 
-results_metrics <- RMSEAUCFPdataset(contamin = "zero")
+results_metrics <- RMSEAUCFPdataset(contamin = "uniforme")
 
 results_metrics <- round(results_metrics,2)
 
-save(results_metrics,file = "results_metricsZero.Rdata")
+save(results_metrics,file = "results_metricsUniforme.Rdata")
 
 # latex_table_results_metrics <- xtable(results_metrics)
 # 
