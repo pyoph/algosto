@@ -8,6 +8,8 @@
 #install.packages("matlib")
 #install.packages("RobRegression")
 #install.packages("knitr")
+#install.packages("Rcpp")
+#install.packages("RcppArmadillo")
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -48,9 +50,10 @@ source("~/work/algosto/seuils.R")
 
 results_metrics <- RMSEAUCFPdataset(contamin = "zero")
 
-save(results_metrics,file = "results_metricsMoyenne.Rdata")
-
 results_metrics <- round(results_metrics,2)
+
+save(results_metrics,file = "results_metricsZero.Rdata")
+
 # latex_table_results_metrics <- xtable(results_metrics)
 # 
 results_without_RMSE_Med <- results_metrics %>%
@@ -58,7 +61,7 @@ results_without_RMSE_Med <- results_metrics %>%
      select(-contains("Cov"))
 
 latex_table <- kable(results_without_RMSE_Med, format = "latex", caption = "Résultats contamination en moyenne 20 runs", label = "tab:results")
-writeLines(latex_table, "resultats_contamination_moyenne.tex")
+writeLines(latex_table, "resultats_contamination_zero.tex")
 
 latex_table_results_metrics_without_RMSE_Med <- xtable(results_without_RMSE_Med)
 
