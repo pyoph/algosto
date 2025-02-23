@@ -26,13 +26,17 @@ editor_options:
         Y) par la fonction generer_echantillon du fichier simulations.R
         2 fonctions principales :
         
-          estimV (estimation en ligne) et streaming (pour une estimation par blocs)
-
+          estimMVOnline pour estimer en online m, V, les vecteurs propres, les valeurs propres de V et de Sigma
+          streamingMV pour estimer en streaming m, V les vecteurs propres, les valeurs propres de V et de Sigma
+          
+          estimation estimer les vecteurs propres, les valeurs propres de V et de Sigma en online, offline ou streaming
+          
 -   resultats.R : a comme fonctions principales :
 
     -   calculer les erreurs ;
     -   afficher les erreurs d'estimation des différentes quantités
         d'intérêt
+      
 
 -   Outliers.R : 
     - fonction qui calcule les distances de Mahalanobis pour différentes méthodes ;
