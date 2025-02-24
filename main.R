@@ -39,6 +39,8 @@ library(pROC)
 library(tidyr)
 library(dplyr)
 library(knitr)
+library(Rcpp)
+library(RcppArmadillo)
 #install.packages("Metrics")
 #library(Metrics)
 source("~/algosto/parametres.R")
@@ -50,6 +52,9 @@ source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
+
+###Tests CPP
+
 data <- genererEchantillon(n,d,mu1,mu2,0.98,0.02,Sigma1,Sigma2,"moyenne")
 
 temps_execution <- system.time({
@@ -58,8 +63,9 @@ temps_execution <- system.time({
 
 print(temps_execution)
 
+norm(results$Sigma[1e4-1,,]-Sigma1,"F")
 temps_execution <- system.time({
-  results <- estimMVOnline(data$Z,methode="eigen")
+  results <- estimation(data$Z,methodeOnline = "CPP",methodeEstimation = "online")
 })
 
 print(temps_execution)

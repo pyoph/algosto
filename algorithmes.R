@@ -260,10 +260,11 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       
       }}
     else if(methode == "CPP"){
-      VPropresV <- calculValeursEtVecteursPropres(moyenneV)$vecteurs_propres
+      elPropres <- calculValeursEtVecteursPropres(moyenneV)
+      VPropresV <- elPropres$vecteurs_propres
       #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
       
-      valPV <- calculValeursEtVecteursPropres(moyenneV)$valeurs_propres  
+      valPV <- elPropres$valeurs_propres  
       lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
@@ -457,7 +458,10 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   else if (methodeEstimation == "online")
   { 
-    results <- estimMVOnline(Y, depart = depart_online)
+    
+    if (methodeOnline == "eigen"){
+    results <- estimMVOnline(Y, depart = depart_online)}
+    else {results <- estimMVOnline(Y, depart = depart_online,methode = "CPP")}
     #Retour des résultats
     med <- results$moyennem
     miter <- results$miter
