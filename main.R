@@ -10,6 +10,10 @@
 #install.packages("knitr")
 #install.packages("Rcpp")
 #install.packages("RcppArmadillo")
+#install.packages("Rcpp")
+#install.packages("RcppEigen")
+library(Rcpp)
+library(RcppEigen)
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -37,15 +41,40 @@ library(dplyr)
 library(knitr)
 #install.packages("Metrics")
 #library(Metrics)
-source("~/work/algosto/parametres.R")
-source("~/work/algosto/simulations.R")
-source("~/work/algosto/algorithmes.R")
-source("~/work/algosto/resultats.R")
-source("~/work/algosto/Outliers.R")
-source("~/work/algosto/computeOutliers.R")
-source("~/work/algosto/seuils.R")
+source("~/algosto/parametres.R")
+source("~/algosto/simulations.R")
+source("~/algosto/algorithmes.R")
+source("~/algosto/resultats.R")
+source("~/algosto/Outliers.R")
+source("~/algosto/computeOutliers.R")
+source("~/algosto/seuils.R")
+sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
+data <- genererEchantillon(n,d,mu1,mu2,0.98,0.02,Sigma1,Sigma2,"moyenne")
 
+temps_execution <- system.time({
+  results <- estimMVOnline(data$Z,methode="CPP")
+})
+
+print(temps_execution)
+
+temps_execution <- system.time({
+  results <- estimMVOnline(data$Z,methode="eigen")
+})
+
+print(temps_execution)
+
+# Afficher les valeurs propres
+print("Valeurs propres :")
+print(resultats$valeurs_propres)
+
+# Afficher les vecteurs propres
+print("Vecteurs propres :")
+print(resultats$vecteurs_propres)
+
+# Afficher les vecteurs propres
+print("Vecteurs propres :")
+print(resultats$vecteurs_propres)
 #Calcul RMSE AUC et FP 
 
 results_metrics <- RMSEAUCFPdataset(contamin = "uniforme")

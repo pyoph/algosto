@@ -258,7 +258,40 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
       distances[i] <- S
       
-    }}
+      }}
+    else if(methode == "CPP"){
+      VPropresV <- calculValeursEtVecteursPropres(moyenneV)$vecteurs_propres
+      #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+      
+      valPV <- calculValeursEtVecteursPropres(moyenneV)$valeurs_propres  
+      lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
+      lambda <- lambdaResultat$vp
+      lambdatilde <- lambdaResultat$lambda
+      #print(lambda)
+      #lambdaIter[i,] <- lambdatilde
+      lambdaIter[i,] <- lambda
+      #Calcul de Sigma
+      #Sigma <- VPropresV %*% diag(valPV) %*% t(VPropresV)
+      #distances <- rep(0,nrow(Z))
+      #distances <- calcule_vecteur_distances(Z,m,Sigma)
+      #cutoff <- calcule_cutoff(distances,d)
+      #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = eigen(V)$vectors,m = moyennem,lambdatilde)
+      VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+      #print(lambdaIter[i,])
+      Sigma[i,,] <-  VP %*% diag(lambdaIter[i,]) %*% t(VP) 
+      #print(Sigma[i,,])
+      #Calcul de la distance i
+      S <- 0
+      for(j in (1:ncol(Y)))
+      {
+        S<- S + 1/(lambdaIter[i,j])*sum(t(Y[i,] - moyennem)*(VP[,j]))^2
+        
+        #print(solve(Sigma[i,,]))
+        #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+        distances[i] <- S
+        
+      }}
     else {
       
       print("méthode sans eigen")
