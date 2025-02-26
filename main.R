@@ -50,7 +50,7 @@ source("~/algosto/resultats.R")
 source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
-sourceCpp("~/algosto/valeursVecteursPropres.cpp")
+#sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
 ###Tests CPP
