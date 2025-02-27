@@ -24,8 +24,13 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
   Z <- data$Z
   if (methode == "Shrinkage") {
     # Méthode Shrinkage
-    med <- covComed(Z)$center
-    Sigma <- covCor(Z)
+    #med <- covComed(Z)$center
+    #Sigma <- covCor(Z)
+    
+    med <- shrinkage_med(Z)$muShrink
+    Sigma <- shrinkage_SCCM(Z,k = 1)$SCCM_shrinked
+    
+    
     #print(Sigma)
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
     #rmseSigma <- 0
@@ -48,6 +53,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     med <- covComed(Z)$center
     Sigma <- covComed(Z)$cov
     #print(Sigma)
+    
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
     print("OK Comed")
     rmseMed <- sqrt(sum((muVrai - med)^2))

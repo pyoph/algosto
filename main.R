@@ -51,6 +51,7 @@ source("~/work/algosto/resultats.R")
 source("~/work/algosto/Outliers.R")
 source("~/work/algosto/computeOutliers.R")
 source("~/work/algosto/seuils.R")
+source("~/work/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
@@ -82,16 +83,17 @@ print(resultats$vecteurs_propres)
 # Afficher les vecteurs propres
 print("Vecteurs propres :")
 print(resultats$vecteurs_propres)
-#Calcul RMSE AUC et FP 
 
-results_metrics <- RMSEAUCFPdataset(contamin = "uniforme")
+#######Calcul RMSE AUC et FP######
+
+results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
 
 results_metrics <- round(results_metrics,2)
 
 save(results_metrics,file = "results_metricsUniforme.Rdata")
 
 # latex_table_results_metrics <- xtable(results_metrics)
-# 
+
 results_without_RMSE_Med <- results_metrics %>%
      select(-contains("RMSE_Med")) %>%  # Supprimer toutes les colonnes RMSE_Med
      select(-contains("Cov"))
