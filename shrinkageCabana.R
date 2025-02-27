@@ -1,59 +1,4 @@
 
-#Paramètre dataset Z calcule la comédiane de Z
-comedianeSCCM <- function(Z)
-{
-  
-  COM <- matrix(0,ncol(Z),ncol(Z))
-  
-  for (i in 1:ncol(Z)){
-    for (j in 1:ncol(Z))
-    {
-      COM[i,j] <- median((Z[,i] - median(Z[,i])*(Z[,j] - median(Z[,j]))))
-    }
-  }
-  return(2.198*COM)
-}
-
-#Renvoie l'intensité de shrinkage et la target
-shrinkageIntensity <- function(Sccm,SigmaVrai = Sigma1)
-{
- 
-  nu <- sum(diag(Sccm))/ncol(Sccm) 
-  
-  target <- diag(ncol(Sccm))
-  
-  target <- nu*target
-  
-  print(target)
-  
-  etanum <- abs(sum(diag(Sccm^2)) - sum(diag(SigmaVrai^2)))
-  
-  etadenom <- nu^2*ncol(Sccm)^2 + sum(diag(Sigma1))^2 - 2*nu*sum(diag(SigmaVrai))
-  
-  eta <- etanum/etadenom
-  
- return (list(nu = nu,eta = eta, target = target))
-} 
-#Renvoie un estimateur de Sigma à partir d'un dataset Z
-
-SigmaShrink <- function(Z)
-{
- 
-  #Calcul de Sccm 
-  
-  Sccm <- comedianeSCCM(Z)
-  
-  #Calcul des paramètres du shrinkage
-  paramShrink <- shrinkageIntensity(Sccm) 
-  
-  nu <- paramShrink$nu
-  eta <- paramShrink$eta
-  target <- paramShrink$target
-  
-  sigmaHat <- (1 - eta)*Sccm + eta*diag(ncol(Z))
-  
-  return(sigmaHat)
-}
 
 #Reprise fonction package Michael Wolf changement de matrice de covariance empirique par SCCM
 
@@ -77,7 +22,7 @@ shrinkage_SCCM <- function(Y, k = -1) {
     }
   }
   
-  # ⃣ Ajustement SCCM
+  # Ajustement SCCM
   SCCM <- 2.198 * COM
   
   #  Calcul de la cible de shrinkage
@@ -92,14 +37,9 @@ shrinkage_SCCM <- function(Y, k = -1) {
   target <- nu*target
   
   # Estimation de pi (variance des éléments hors-diagonale)
-  COM2 <- matrix(0, p, p)
-  for (j in 1:p) {
-    for (t in 1:p) {
-      COM2[j, t] <- median((Y[, j] * Y[, t])^2)  # Produit élément par élément
-    }
-  }
-  SCCM2 <- 2.198 * COM2
-  piMat <- SCCM2 - SCCM^2
+
+  # SCCM2 <- 2.198 * COM2
+  piMat <- SCCM - SCCM^2
   pihat <- sum(piMat)
   
   #  Estimation de gamma (distance entre SCCM et la cible)
