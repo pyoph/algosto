@@ -90,6 +90,94 @@ results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
 
 results_metrics <- round(results_metrics,2)
 
+
+
+# Définir les valeurs en abscisse
+taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
+
+# Sélectionner uniquement les colonnes RMSE_Sigma_*
+rmse_df <- results_metrics[, c("RMSE_Sigma_Cov", "RMSE_Sigma_OGK", "RMSE_Sigma_Comed", 
+                               "RMSE_Sigma_Shrink", "RMSE_Sigma_Online", 
+                               "RMSE_Sigma_Offline", "RMSE_Sigma_Streaming")]
+
+# Ajouter la colonne des taux de contamination
+rmse_df$taux_contamination <- taux_contamination  
+
+# Conversion en format long pour ggplot
+df_long <- melt(rmse_df, id.vars = "taux_contamination", 
+                variable.name = "Méthode", value.name = "RMSE")
+
+# Supprimer le préfixe "RMSE_Sigma_" pour un affichage plus clair dans la légende
+df_long$Méthode <- gsub("RMSE_Sigma_", "", df_long$Méthode)
+
+# Tracer les courbes RMSE
+ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode)) +
+  geom_line(size = 1.2) +  # Courbes
+  geom_point(size = 2) +   # Points aux taux spécifiés
+  scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
+  labs(title = "Évolution du RMSE en fonction du taux de contamination",
+       x = "Taux de contamination (%)",
+       y = "RMSE",
+       color = "Méthode") +  # Nom de la légende
+  theme_minimal() +
+  theme(legend.position = "top")  # Légende en haut
+
+
+auc_df <- results_metrics[, c("AUC_Cov", "AUC_OGK", "AUC_Comed", 
+                               "AUC_Shrink", "AUC_Online", 
+                               "AUC_Offline", "AUC_Streaming")]
+
+auc_df$taux_contamination <- taux_contamination  
+
+# Conversion en format long pour ggplot
+df_long <- melt(auc_df, id.vars = "taux_contamination", 
+                variable.name = "Méthode", value.name = "AUC")
+
+# Supprimer le préfixe "RMSE_Sigma_" pour un affichage plus clair dans la légende
+df_long$Méthode <- gsub("AUC_", "", df_long$Méthode)
+
+# Tracer les courbes RMSE
+ggplot(df_long, aes(x = taux_contamination, y = AUC, color = Méthode)) +
+  geom_line(size = 1.2) +  # Courbes
+  geom_point(size = 2) +   # Points aux taux spécifiés
+  scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
+  labs(title = "Évolution de l'AUC en fonction du taux de contamination",
+       x = "Taux de contamination (%)",
+       y = "AUC",
+       color = "Méthode") +  # Nom de la légende
+  theme_minimal() +
+  theme(legend.position = "top")  # Légende en haut
+
+#faux positifs
+
+fp_df <- results_metrics[, c("FP_Cov", "FP_OGK", "FP_Comed", 
+                              "FP_Shrink", "FP_Online", 
+                              "FP_Offline", "FP_Streaming")]
+
+fp_df$taux_contamination <- taux_contamination  
+
+# Conversion en format long pour ggplot
+df_long <- melt(fp_df, id.vars = "taux_contamination", 
+                variable.name = "Méthode", value.name = "FP")
+
+# Supprimer le préfixe "RMSE_Sigma_" pour un affichage plus clair dans la légende
+df_long$Méthode <- gsub("FP_", "", df_long$Méthode)
+
+# Tracer les courbes FP
+ggplot(df_long, aes(x = taux_contamination, y = FP, color = Méthode)) +
+  geom_line(size = 1.2) +  # Courbes
+  geom_point(size = 2) +   # Points aux taux spécifiés
+  scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
+  labs(title = "Évolution des faux positifs en fonction du taux de contamination",
+       x = "Taux de contamination (%)",
+       y = "FP",
+       color = "Méthode") +  # Nom de la légende
+  theme_minimal() +
+  theme(legend.position = "top")  # Légende en haut
+
+
+
+
 save(results_metrics,file = "results_metricsUniforme.Rdata")
 
 # latex_table_results_metrics <- xtable(results_metrics)

@@ -40,7 +40,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
                     minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
                     vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
-                    ,SigmaInit = diag(d),methode = "eigen",depart = 100,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = ncol(Y))
+                    ,SigmaInit = diag(d),methode = "eigen",depart = 100,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = nrow(Y)*ncol(Y))
 {
   
   lambdatilde = rep(1,ncol(Y))
@@ -411,7 +411,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
 estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y),  cMC=ncol(Y),w= 2,
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                       ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
-                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = 100)
+                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = nrow(Y)*ncol(Y))
 {
   distances <- rep(0, nrow(Y))
   if (methodeEstimation == "offline")
@@ -430,7 +430,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
     #print(valPV)
     #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
-    lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon,cbarre =niterRMon)
+    lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = 0,cbarre =0)
     lambdaInit <- lambdaResultat$vp
     #lambdaInit=eig_init$values
     #lambdatilde=lambdaInit
@@ -460,8 +460,8 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   { 
     
     if (methodeOnline == "eigen"){
-    results <- estimMVOnline(Y, depart = depart_online)}
-    else {results <- estimMVOnline(Y, depart = depart_online,methode = "CPP")}
+    results <- estimMVOnline(Y, depart = depart_online,niterRMon = ncol(Y))}
+    else {results <- estimMVOnline(Y, depart = depart_online,methode = "CPP",niterRMon = ncol(Y))}
     #Retour des résultats
     med <- results$moyennem
     miter <- results$miter
@@ -474,7 +474,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   else if (methodeEstimation == "streaming")
   { 
-    results <- StreamingMV(Y,batch = 10,depart = depart_online)
+    results <- StreamingMV(Y,batch = 10,depart = depart_online,niterRMon = ncol(Y)^2)
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
