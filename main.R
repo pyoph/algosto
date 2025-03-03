@@ -90,8 +90,6 @@ results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
 
 results_metrics <- round(results_metrics,2)
 
-
-
 # Définir les valeurs en abscisse
 taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
 
