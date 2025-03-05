@@ -70,12 +70,12 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
   labelsVrais <- labelsVrais[indices]
   
   # Calcul des vraies valeurs pour la médiane géométrique
-  Vvrai <- WeiszfeldCov(Z, nitermax = 1000000)$covmedian
-  VcovVrai <- GmedianCov(Z, scores = 10)
-  VpvraiesV <- eigen(VcovVrai$covmedian)$values
+  #Vvrai <- WeiszfeldCov(Z, nitermax = 1000000)$covmedian
+  #VcovVrai <- GmedianCov(Z, scores = d)
+  #VpvraiesV <- eigen(VcovVrai$covmedian)$values
   
   # Retourner les résultats
-  return(list(Z = Z, Vvrai = Vvrai, VcovVrai = VcovVrai, VpvraiesV = VpvraiesV, labelsVrais = labelsVrais))
+  return(list(Z = Z, labelsVrais = labelsVrais))
 }
 
 

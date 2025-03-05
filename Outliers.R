@@ -22,6 +22,8 @@
 calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95, df = ncol(data$Z)),SigmaVrai = Sigma1,muVrai = mu1) {
   distances <- NULL
   Z <- data$Z
+  start_time <- Sys.time()  # Démarrage du chronomère
+  
   if (methode == "Shrinkage") {
     # Méthode Shrinkage
     #med <- covComed(Z)$center
@@ -44,6 +46,10 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs  <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
+    else faux_negatifs <- 0
+    
     #auc <- round(auc(outliers,data$labelsVrais),2)*100
     if (length(unique(outliers)) == 2) {
       auc <- round(auc(outliers, data$labelsVrais), 2) * 100
@@ -73,6 +79,10 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs  <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
+    else faux_negatifs <- 0
+    
     auc <- round(auc(outliers,data$labelsVrais),2)*100
     
   } else if (methode == "OGK") {
@@ -91,12 +101,15 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs  <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
+    else faux_negatifs <- 0
+    
     auc <- round(auc(outliers,data$labelsVrais),2)*100
     
     
   } else if (methode == "Cov Empirique") {
-    
-    med <- colMeans(Z)
+   med <- colMeans(Z)
     Sigma <- cov(Z)
     distances <- calcule_vecteur_distances(Z, med, Sigma)
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
@@ -109,6 +122,11 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs  <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
+    else faux_negatifs <- 0
+    
+    
     auc <- round(auc(outliers,data$labelsVrais),2)*100
     
   } else if (methode == "offline") {
@@ -128,6 +146,10 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs  <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
+    else faux_negatifs <- 0
+    
     #auc <- round(auc(outliers,data$labelsVrais),2)*100
     if (length(unique(outliers)) == 2) {
       auc <- round(auc(outliers, data$labelsVrais), 2) * 100
@@ -154,6 +176,10 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs  <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
+    else faux_negatifs <- 0
+    
     if (length(unique(outliers)) == 2) {
       auc <- round(auc(outliers, data$labelsVrais), 2) * 100
     } else {
@@ -179,10 +205,17 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     tc <- safe_access_tc(tc)
     if((tc["0","0"] + tc["0","1"]) != 0)
     {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+    if((tc["1","0"] + tc["1","1"]) != 0)
+    {faux_negatifs   <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
+    else faux_negatifs <- 0
     auc <- round(auc(outliers,data$labelsVrais),2)*100
     
   } 
-  return(list(distances = distances,med = med,Sigma = Sigma,rmseMed = rmseMed,rmseSigma = rmseSigma,faux_positifs = faux_positifs,auc = auc))
+  # Fin du chrono
+  end_time <- Sys.time()
+  temps_calcul <- as.numeric(difftime(end_time, start_time, units = "secs"))
+  
+  return(list(distances = distances,med = med,Sigma = Sigma,rmseMed = rmseMed,rmseSigma = rmseSigma,faux_positifs = faux_positifs,faux_negatifs = faux_negatifs,temps_calcul = temps_calcul,auc = auc))
 }
 
 

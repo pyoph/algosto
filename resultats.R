@@ -110,6 +110,8 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
   rmseMed <- matrix(0,length(taux_contamination),length(methodes))
   rmseSigma <- matrix(0,length(taux_contamination),length(methodes))
   faux_positifs <- matrix(0,length(taux_contamination),length(methodes))
+  faux_negatifs <- matrix(0,length(taux_contamination),length(methodes))
+  temps_calcul  <- matrix(0,length(taux_contamination),length(methodes))
   auc <- matrix(0,length(taux_contamination),length(methodes))
   for (i in seq_along(taux_contamination)){
   #Génération des données 
@@ -129,13 +131,16 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
     rmseMed[i,j] <- resultats$rmseMed + rmseMed[i,j]
     rmseSigma[i,j] <- resultats$rmseSigma +  rmseSigma[i,j]
     faux_positifs[i,j] <- resultats$faux_positifs + faux_positifs[i,j]
+    
+    faux_negatifs[i,j] <- resultats$faux_negatifs + faux_negatifs[i,j]
+    temps_calcul[i,j] <- resultats$temps_calcul + temps_calcul[i,j]
     auc[i,j] <- resultats$auc + auc[i,j]
     }
      
     }
   }
   
-  return(list(resultats = resultats, rmseMed = rmseMed/nbruns,rmseSigma = rmseSigma/nbruns,faux_positifs = faux_positifs/nbruns,auc =auc/nbruns))
+  return(list(resultats = resultats, rmseMed = rmseMed/nbruns,rmseSigma = rmseSigma/nbruns,faux_positifs = faux_positifs/nbruns,faux_negatifs = faux_negatifs/nbruns,auc =auc/nbruns,temps_calcul= temps_calcul/nb_runs))
   }
 
 
@@ -159,7 +164,25 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   faux_positifs_comed <- rep(0,(length(taux_contamination)))
   faux_positifs_shrink <- rep(0,(length(taux_contamination)))
   
+  #Intialisation faux négatifs
   
+  faux_negatifs_offline <- rep(0,(length(taux_contamination)))
+  faux_negatifs_online <- rep(0,(length(taux_contamination)))
+  faux_negatifs_streaming <- rep(0,(length(taux_contamination)))
+  faux_negatifs_covEmp <- rep(0,(length(taux_contamination)))
+  faux_negatifs_ogk <- rep(0,(length(taux_contamination)))
+  faux_negatifs_comed <- rep(0,(length(taux_contamination)))
+  faux_negatifs_shrink <- rep(0,(length(taux_contamination)))
+  
+  
+  # Initialisation des vecteurs pour les temps de calcul
+  temps_calcul_offline <- rep(0, length(taux_contamination))
+  temps_calcul_online <- rep(0, length(taux_contamination))
+  temps_calcul_streaming <- rep(0, length(taux_contamination))
+  temps_calcul_covEmp <- rep(0, length(taux_contamination))
+  temps_calcul_ogk <- rep(0, length(taux_contamination))
+  temps_calcul_comed <- rep(0, length(taux_contamination))
+  temps_calcul_shrink <- rep(0, length(taux_contamination))
   
   #   
   #   #initialisation RMSE médiane
@@ -220,6 +243,15 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     faux_positifs_online[i] <- faux_positifs[i, 6]  # Online
     faux_positifs_streaming[i] <- faux_positifs[i, 7] # Streaming
     
+    faux_negatifs_comed[i] <- faux_negatifs[i, 1]  # Comédiane
+    faux_negatifs_shrink[i] <- faux_negatifs[i, 2] # Shrinkage
+    faux_negatifs_ogk[i] <- faux_negatifs[i, 3]    # OGK
+    faux_negatifs_covEmp[i] <- faux_negatifs[i, 4] # Cov Empirique
+    faux_negatifs_offline[i] <- faux_negatifs[i, 5] # Offline
+    faux_negatifs_online[i] <- faux_negatifs[i, 6]  # Online
+    faux_negatifs_streaming[i] <- faux_negatifs[i, 7] # Streaming
+    
+    
     rmse_med_comed[i] <- rmseMed[i, 1]  # Comédiane
     rmse_med_shrink[i] <- rmseMed[i, 2] # Shrinkage
     rmse_med_ogk[i] <- rmseMed[i, 3]    # OGK
@@ -243,7 +275,16 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     auc_offline[i] <- auc[i, 5] # Offline
     auc_online[i] <- auc[i, 6]  # Online
     auc_streaming[i] <- auc[i, 7] # Streaming
-  }
+
+    
+    temps_calcul_comed[i] <- temps_calcul[i, 1]  # Comédiane
+    temps_calcul_shrink[i] <- temps_calcul[i, 2] # Shrinkage
+    temps_calcul_ogk[i] <- temps_calcul[i, 3]    # OGK
+    temps_calcul_covEmp[i] <- temps_calcul[i, 4] # Cov Empirique
+    temps_calcul_offline[i] <- temps_calcul[i, 5] # Offline
+    temps_calcul_online[i] <- temps_calcul[i, 6]  # Online
+    temps_calcul_streaming[i] <- temps_calcul[i, 7] # Streaming
+      }
   
   # Créer le dataframe avec les champs RMSE_Sigma, RMSE_Med, AUC et FP pour chaque méthode
   results_metrics <- data.frame(
@@ -251,37 +292,44 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     RMSE_Med_Cov = rmse_med_covEmp,
     AUC_Cov = auc_covEmp,
     FP_Cov = faux_positifs_covEmp,
-    
+    FN_Cov = faux_negatifs_covEmp,
+    TC_Cov = temps_calcul_covEmp,
     RMSE_Sigma_OGK = rmse_Sigma_ogk,
     RMSE_Med_OGK = rmse_med_ogk,
     AUC_OGK = auc_ogk,
     FP_OGK = faux_positifs_ogk,
-    
+    FN_OGK = faux_negatifs_ogk,
+    TC_OGK = temps_calcul_ogk,
     RMSE_Sigma_Comed = rmse_Sigma_comed,
     RMSE_Med_Comed = rmse_med_comed,
     AUC_Comed = auc_comed,
     FP_Comed = faux_positifs_comed,
-    
+    FN_Comed = faux_negatifs_comed,
+    TC_Comed = temps_calcul_comed,
     RMSE_Sigma_Shrink = rmse_Sigma_shrink,
     RMSE_Med_Shrink = rmse_med_shrink,
     AUC_Shrink = auc_shrink,
     FP_Shrink = faux_positifs_shrink,
-    
+    FN_Shrink = faux_negatifs_shrink,
+    TC_Shrink = temps_calcul_shrink,
     RMSE_Sigma_Online = rmse_Sigma_online,
     RMSE_Med_Online = rmse_med_online,
     AUC_Online = auc_online,
     FP_Online = faux_positifs_online,
-    
+    FN_Online = faux_negatifs_online,
+    TC_Online = temps_calcul_online,
     RMSE_Sigma_Offline = rmse_Sigma_offline,
     RMSE_Med_Offline = rmse_med_offline,
     AUC_Offline = auc_offline,
     FP_Offline = faux_positifs_offline,
-    
+    FN_Offline = faux_negatifs_offline,
+    TC_offline = temps_calcul_offline,
     RMSE_Sigma_Streaming = rmse_Sigma_streaming,
     RMSE_Med_Streaming = rmse_med_streaming,
     AUC_Streaming = auc_streaming,
-    FP_Streaming = faux_positifs_streaming
-   
+    FP_Streaming = faux_positifs_streaming,
+    FN_Streaming = faux_negatifs_streaming,
+    TC_Streaming = temps_calcul_streaming
   )
   
   row.names(results_metrics) <- taux_contamination

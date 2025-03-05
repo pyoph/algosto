@@ -411,7 +411,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
 estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y),  cMC=ncol(Y),w= 2,
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                       ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
-                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = nrow(Y)*ncol(Y))
+                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = nrow(Y)*ncol(Y)^2)
 {
   distances <- rep(0, nrow(Y))
   if (methodeEstimation == "offline")
