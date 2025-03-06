@@ -58,7 +58,35 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
       auc <- 50  # Valeur par défaut pour un cas non exploitable
     }
     
-    
+    else if (methode == "FMCD")
+    {
+      res <- covMcd(Z)
+      med <- res$center
+      Sigma <- res$cov
+      
+      #print(Sigma)
+      rmseSigma <- norm(Sigma - SigmaVrai,"F")
+      #rmseSigma <- 0
+      print("OK FastMCD")
+      rmseMed <- sqrt(sum((muVrai - med)^2))
+      distances <- calcule_vecteur_distances(Z, med, Sigma)
+      outliers <- detectionOutliers(distances,cutoff)
+      
+      tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+      tc
+      tc <- safe_access_tc(tc)
+      if((tc["0","0"] + tc["0","1"]) != 0)
+      {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      if((tc["1","0"] + tc["1","1"]) != 0)
+      {faux_negatifs   <- round((tc["1", "0"]/(tc["0", "1"] + tc["1", "1"]))*100,2)}
+      
+      if (length(unique(outliers)) == 2) {
+        auc <- round(auc(outliers, data$labelsVrais), 2) * 100
+      } else {
+        auc <- 50  # Valeur par défaut pour un cas non exploitable
+      }
+      
+    }
     
   } else if (methode == "Comédiane") {
     # Méthode Comédiane
