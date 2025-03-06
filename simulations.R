@@ -98,7 +98,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
   #VpvraiesV <- eigen(VcovVrai$covmedian)$values
   
   # Retourner les résultats
-  return(list(Z = Z, Vvrai = Vvrai, VcovVrai = VcovVrai, VpvraiesV = VpvraiesV, labelsVrais = labelsVrais))
+  return(list(Z = Z,labelsVrais = labelsVrais))
 }
 
 

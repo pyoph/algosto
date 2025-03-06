@@ -57,7 +57,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     } else {
       auc <- 50  # Valeur par défaut pour un cas non exploitable
     }
-    
+  }
     else if (methode == "FMCD")
     {
       res <- covMcd(Z)
@@ -86,8 +86,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
         auc <- 50  # Valeur par défaut pour un cas non exploitable
       }
       
-    }
-    
+   
   } else if (methode == "Comédiane") {
     # Méthode Comédiane
     med <- covComed(Z)$center

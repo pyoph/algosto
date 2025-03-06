@@ -12,8 +12,8 @@
 #install.packages("RcppArmadillo")
 #install.packages("Rcpp")
 #install.packages("RcppEigen")
-library(Rcpp)
-library(RcppEigen)
+#library(Rcpp)
+#library(RcppEigen)
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -40,8 +40,8 @@ library(pROC)
 library(tidyr)
 library(dplyr)
 library(knitr)
-library(Rcpp)
-library(RcppArmadillo)
+#library(Rcpp)
+#library(RcppArmadillo)
 #install.packages("Metrics")
 #library(Metrics)
 source("~/work/algosto/parametres.R")
@@ -57,7 +57,7 @@ source("~/work/algosto/shrinkageCabana.R")
 
 ###Tests CPP
 
-data <- genererEchantillon(n,d,mu1,mu2,0.98,0.02,Sigma1,Sigma2,"moyenne")
+data <- genererEchantillon(n,d,mu1,mu2,0.98,0.02,Sigma1,Sigma2,"MaronnaZamar")
 
 temps_execution <- system.time({
   results <- estimMVOnline(data$Z,methode="CPP")
@@ -86,7 +86,7 @@ print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 
-results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
+results_metrics <- RMSEAUCFPdataset(contamin = "MaronnaZamar")
 
 results_metrics <- round(results_metrics,2)
 

@@ -105,7 +105,7 @@ affiche_erreursM <- function(erreurs_online, erreurs_offline = NULL, contaminati
 
 construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moyenne")
 {
-  methodes = c("Comédiane","Shrinkage","OGK","Cov Empirique","offline","online","streaming")
+  methodes = c("Comédiane","Shrinkage","OGK","Cov Empirique","offline","online","streaming","FASTMCD")
   taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
   rmseMed <- matrix(0,length(taux_contamination),length(methodes))
   rmseSigma <- matrix(0,length(taux_contamination),length(methodes))
@@ -163,7 +163,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   faux_positifs_ogk <- rep(0,(length(taux_contamination)))
   faux_positifs_comed <- rep(0,(length(taux_contamination)))
   faux_positifs_shrink <- rep(0,(length(taux_contamination)))
-  
+  faux_positifs_fastmcd <- rep(0,(length(taux_contamination)))
   #Intialisation faux négatifs
   
   faux_negatifs_offline <- rep(0,(length(taux_contamination)))
@@ -173,6 +173,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   faux_negatifs_ogk <- rep(0,(length(taux_contamination)))
   faux_negatifs_comed <- rep(0,(length(taux_contamination)))
   faux_negatifs_shrink <- rep(0,(length(taux_contamination)))
+  faux_negatifs_fastmcd <- rep(0,(length(taux_contamination)))
   
   
   # Initialisation des vecteurs pour les temps de calcul
@@ -183,7 +184,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   temps_calcul_ogk <- rep(0, length(taux_contamination))
   temps_calcul_comed <- rep(0, length(taux_contamination))
   temps_calcul_shrink <- rep(0, length(taux_contamination))
-  
+  temps_calcul_fastmcd <- rep(0,(length(taux_contamination)))
   #   
   #   #initialisation RMSE médiane
   #   
@@ -195,7 +196,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   rmse_med_ogk <- rep(0,(length(taux_contamination)))
   rmse_med_comed <- rep(0,(length(taux_contamination)))
   rmse_med_shrink <- rep(0,(length(taux_contamination)))
-  
+  rmse_med_fastmcd <- rep(0,(length(taux_contamination)))
   
   
   
@@ -210,7 +211,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   rmse_Sigma_ogk <- rep(0,(length(taux_contamination)))
   rmse_Sigma_comed <- rep(0,(length(taux_contamination)))
   rmse_Sigma_shrink <- rep(0,(length(taux_contamination)))
-  
+  rmse_Sigma_fastmcd  <- rep(0,(length(taux_contamination)))
   
   
   
@@ -223,7 +224,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   auc_ogk <- rep(0,(length(taux_contamination)))
   auc_comed <- rep(0,(length(taux_contamination)))
   auc_shrink <- rep(0,(length(taux_contamination)))
-  
+  auc_fastmcd <- rep(0,(length(taux_contamination)))
   # Appeler la fonction pour obtenir les résultats
   resultats <- construction_tableau_resultats(nbrunsParam = nbruns,contamin = contamin)
   
@@ -244,6 +245,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     faux_positifs_offline[i] <- faux_positifs[i, 5] # Offline
     faux_positifs_online[i] <- faux_positifs[i, 6]  # Online
     faux_positifs_streaming[i] <- faux_positifs[i, 7] # Streaming
+    faux_positifs_fastmcd[i] <- faux_positifs[i, 8] # Fast MCD
     
     faux_negatifs_comed[i] <- faux_negatifs[i, 1]  # Comédiane
     faux_negatifs_shrink[i] <- faux_negatifs[i, 2] # Shrinkage
@@ -252,7 +254,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     faux_negatifs_offline[i] <- faux_negatifs[i, 5] # Offline
     faux_negatifs_online[i] <- faux_negatifs[i, 6]  # Online
     faux_negatifs_streaming[i] <- faux_negatifs[i, 7] # Streaming
-    
+    faux_negatifs_fastmcd[i] <- faux_negatifs[i, 8] # Fast MCD
     
     rmse_med_comed[i] <- rmseMed[i, 1]  # Comédiane
     rmse_med_shrink[i] <- rmseMed[i, 2] # Shrinkage
@@ -261,6 +263,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     rmse_med_offline[i] <- rmseMed[i, 5] # Offline
     rmse_med_online[i] <- rmseMed[i, 6]  # Online
     rmse_med_streaming[i] <- rmseMed[i, 7] # Streaming
+    rmse_med_fastmcd[i] <- rmseMed[i,8] # Fast MCD
     
     rmse_Sigma_comed[i] <- rmseSigma[i, 1]  # Comédiane
     rmse_Sigma_shrink[i] <- rmseSigma[i, 2] # Shrinkage
@@ -269,6 +272,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     rmse_Sigma_offline[i] <- rmseSigma[i, 5] # Offline
     rmse_Sigma_online[i] <- rmseSigma[i, 6]  # Online
     rmse_Sigma_streaming[i] <- rmseSigma[i, 7] # Streaming
+    rmse_Sigma_fastmcd[i] <- rmseSigma[i,8] # Fast MCD
     
     auc_comed[i] <- auc[i, 1]  # Comédiane
     auc_shrink[i] <- auc[i, 2] # Shrinkage
@@ -277,6 +281,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     auc_offline[i] <- auc[i, 5] # Offline
     auc_online[i] <- auc[i, 6]  # Online
     auc_streaming[i] <- auc[i, 7] # Streaming
+    auc_fastmcd[i] <- auc[i,8] #Fast MCD
 
     
     temps_calcul_comed[i] <- temps_calcul[i, 1]  # Comédiane
@@ -286,6 +291,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     temps_calcul_offline[i] <- temps_calcul[i, 5] # Offline
     temps_calcul_online[i] <- temps_calcul[i, 6]  # Online
     temps_calcul_streaming[i] <- temps_calcul[i, 7] # Streaming
+    temps_calcul_fastmcd[i] <- temps_calcul[i,8] #Fast MCD
       }
   
   # Créer le dataframe avec les champs RMSE_Sigma, RMSE_Med, AUC et FP pour chaque méthode
@@ -331,7 +337,13 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     AUC_Streaming = auc_streaming,
     FP_Streaming = faux_positifs_streaming,
     FN_Streaming = faux_negatifs_streaming,
-    TC_Streaming = temps_calcul_streaming
+    TC_Streaming = temps_calcul_streaming,
+    rmse_Sigma_fastmcd = rmse_Sigma_fastmcd,
+    RMSE_Med_fastmcd = rmse_med_fastmcd,
+    auc_fastmcd = auc_fastmcd,
+    FP_fastmcd = faux_positifs_fastmcd,
+    FN_fastmcd = faux_negatifs_fastmcd,
+    TC_fastmcd = temps_calcul_fastmcd
   )
   
   row.names(results_metrics) <- taux_contamination
