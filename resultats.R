@@ -338,7 +338,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
     FP_Streaming = faux_positifs_streaming,
     FN_Streaming = faux_negatifs_streaming,
     TC_Streaming = temps_calcul_streaming,
-    rmse_Sigma_fastmcd = rmse_Sigma_fastmcd,
+    RMSE_Sigma_fastmcd = rmse_Sigma_fastmcd,
     RMSE_Med_fastmcd = rmse_med_fastmcd,
     auc_fastmcd = auc_fastmcd,
     FP_fastmcd = faux_positifs_fastmcd,

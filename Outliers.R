@@ -58,7 +58,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
       auc <- 50  # Valeur par défaut pour un cas non exploitable
     }
   }
-    else if (methode == "FMCD")
+    else if (methode == "FASTMCD")
     {
       res <- covMcd(Z)
       med <- res$center
@@ -77,9 +77,10 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
       tc <- safe_access_tc(tc)
       if((tc["0","0"] + tc["0","1"]) != 0)
       {faux_positifs   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+      else faux_positifs <- 0
       if((tc["1","0"] + tc["1","1"]) != 0)
-      {faux_negatifs   <- round((tc["1", "0"]/(tc["0", "1"] + tc["1", "1"]))*100,2)}
-      
+      {faux_negatifs   <- round((tc["1", "0"]/(tc["1", "0"] + tc["1", "1"]))*100,2)}
+      else faux_negatifs <- 0
       if (length(unique(outliers)) == 2) {
         auc <- round(auc(outliers, data$labelsVrais), 2) * 100
       } else {
