@@ -22,6 +22,7 @@
 calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95, df = ncol(data$Z)),SigmaVrai = Sigma1,muVrai = mu1) {
   distances <- NULL
   Z <- data$Z
+  #faux_negatifs <- 0
   start_time <- Sys.time()  # Démarrage du chronomère
   
   if (methode == "Shrinkage") {

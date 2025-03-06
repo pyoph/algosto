@@ -21,8 +21,9 @@
 
 
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
+#Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 
-genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne") {
+genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 0.1, k = 2,rhomult = 0.9) {
   # Initialisation
   n1 <- floor(p1 * n)  # Taille du groupe non contaminé
   n2 <- n - n1         # Taille du groupe contaminé
@@ -49,7 +50,29 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
       vecteurs_mu2 <- matrix(0, nrow = n2, ncol = d)
     } 
-    
+    else if (contamin == "MaronnaZamar")
+    {
+      vecteurs_mu1 <- mvrnorm(n1, rep(0,d), diag(d)) #Non outliers
+      
+      #Calcul de a0
+      a0 <- rep(0,d)
+      for(i in 1:d)
+      {
+        a0[i] <- runif(1,0,1)
+      }
+      #Normalisation de a0
+      a0 <- a0/sqrt(sum(a0^2))
+      vecteurs_mu2 <- mvrnorm(n2,k*a0,deltacarre*diag(d)) #Outliers
+      
+      #Création de la matrice de Toeplitz pour introduire de la corrélation : 
+      
+      R <- creerMatriceToeplitz(rhomult,d)
+      #Calcul des nouvelles matrices corrélées
+      vecteurs_mu1 <- R %*% t(vecteurs_mu1)
+      vecteurs_mu1 <- t(vecteurs_mu1)
+      vecteurs_mu2 <- R %*% t(vecteurs_mu2)
+      vecteurs_mu2 <- t(vecteurs_mu2)
+    }
     else {
       stop("Type de contamination non reconnu.")
     }
@@ -71,11 +94,13 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
   
   # Calcul des vraies valeurs pour la médiane géométrique
   #Vvrai <- WeiszfeldCov(Z, nitermax = 1000000)$covmedian
-  #VcovVrai <- GmedianCov(Z, scores = d)
+  #VcovVrai <- GmedianCov(Z, scores = 10)
   #VpvraiesV <- eigen(VcovVrai$covmedian)$values
   
   # Retourner les résultats
-  return(list(Z = Z, labelsVrais = labelsVrais))
+  return(list(Z = Z, Vvrai = Vvrai, VcovVrai = VcovVrai, VpvraiesV = VpvraiesV, labelsVrais = labelsVrais))
 }
+
+
 
 

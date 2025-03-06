@@ -140,7 +140,7 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
     }
   }
   
-  return(list(resultats = resultats, rmseMed = rmseMed/nbruns,rmseSigma = rmseSigma/nbruns,faux_positifs = faux_positifs/nbruns,faux_negatifs = faux_negatifs/nbruns,auc =auc/nbruns,temps_calcul= temps_calcul/nb_runs))
+  return(list(resultats = resultats, rmseMed = rmseMed/nbruns,rmseSigma = rmseSigma/nbruns,faux_positifs = faux_positifs/nbruns,faux_negatifs = faux_negatifs/nbruns,auc =auc/nbruns,temps_calcul= temps_calcul/nbruns))
   }
 
 
@@ -231,6 +231,8 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   rmseMed <- resultats$rmseMed
   rmseSigma <- resultats$rmseSigma
   faux_positifs <- resultats$faux_positifs
+  faux_negatifs <- resultats$faux_negatifs
+  temps_calcul <- resultats$temps_calcul
   auc <- resultats$auc
   
   # Remplir les vecteurs pour chaque méthode
