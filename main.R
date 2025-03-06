@@ -96,7 +96,7 @@ taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
 # Sélectionner uniquement les colonnes RMSE_Sigma_*
 rmse_df <- results_metrics[, c("RMSE_Sigma_Cov", "RMSE_Sigma_OGK", "RMSE_Sigma_Comed", 
                                "RMSE_Sigma_Shrink", "RMSE_Sigma_Online", 
-                               "RMSE_Sigma_Offline", "RMSE_Sigma_Streaming","rmse_Sigma_fastmcd")]
+                               "RMSE_Sigma_Offline", "RMSE_Sigma_Streaming","RMSE_Sigma_fastmcd")]
 
 # Ajouter la colonne des taux de contamination
 rmse_df$taux_contamination <- taux_contamination  
