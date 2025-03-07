@@ -23,7 +23,7 @@
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 
-genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 0.1, k = 2,rhomult = 0.9) {
+genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 2, k = 5,rhomult = 0.9) {
   # Initialisation
   n1 <- floor(p1 * n)  # Taille du groupe non contaminé
   n2 <- n - n1         # Taille du groupe contaminé
@@ -61,7 +61,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
         a0[i] <- runif(1,0,1)
       }
       #Normalisation de a0
-      a0 <- a0/sqrt(sum(a0^2))
+      a0 <- (a0 - mean(a0))/sqrt(sum((a0 - mean(a0))^2))
       vecteurs_mu2 <- mvrnorm(n2,k*a0,deltacarre*diag(d)) #Outliers
       
       #Création de la matrice de Toeplitz pour introduire de la corrélation : 

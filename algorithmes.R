@@ -421,7 +421,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
     med <- results$median
-    resoff=RobVar(Y,mc_sample_size = nrow(Y),c=ncol(Y),w=2)
+    resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
     #resoff = WeiszfeldCov_init(Y[1:depart])
     eig_init = eigen(resoff$covmedian)
     #eig_init=eigen(resoff$variance)

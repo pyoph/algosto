@@ -57,7 +57,13 @@ source("~/work/algosto/shrinkageCabana.R")
 
 ###Tests CPP
 
-data <- genererEchantillon(n,d,mu1,mu2,0.98,0.02,Sigma1,Sigma2,"MaronnaZamar")
+data <- genererEchantillon(n,d,mu1,mu2,0.9,0.1,Sigma1,Sigma2,"moyenne")
+
+respcout <- pcout(data$Z,makeplot=FALSE)
+
+outl <- respcout$wfinal
+
+table(data$labelsVrais,outl)
 
 temps_execution <- system.time({
   results <- estimMVOnline(data$Z,methode="CPP")
@@ -86,7 +92,7 @@ print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 
-results_metrics <- RMSEAUCFPdataset(contamin = "MaronnaZamar")
+results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
 
 results_metrics <- round(results_metrics,2)
 
