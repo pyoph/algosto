@@ -66,7 +66,18 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       
       #Création de la matrice de Toeplitz pour introduire de la corrélation : 
       
-      R <- creerMatriceToeplitz(rhomult,d)
+      R <- matrix(0,d,d)
+      
+      for (i in 1:d) 
+      {
+        for (j in 1:d)
+        {
+          if (i == j) {R[i,i] = 1}
+          else R[i,j] = rhomult
+        }
+      }
+      
+      #R <- creerMatriceToeplitz(rhomult,d)
       #Calcul des nouvelles matrices corrélées
       vecteurs_mu1 <- R %*% t(vecteurs_mu1)
       vecteurs_mu1 <- t(vecteurs_mu1)

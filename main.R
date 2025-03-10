@@ -44,20 +44,20 @@ library(knitr)
 #library(RcppArmadillo)
 #install.packages("Metrics")
 #library(Metrics)
-source("~/work/algosto/parametres.R")
-source("~/work/algosto/simulations.R")
-source("~/work/algosto/algorithmes.R")
-source("~/work/algosto/resultats.R")
-source("~/work/algosto/Outliers.R")
-source("~/work/algosto/computeOutliers.R")
-source("~/work/algosto/seuils.R")
-source("~/work/algosto/shrinkageCabana.R")
+source("~/algosto/parametres.R")
+source("~/algosto/simulations.R")
+source("~/algosto/algorithmes.R")
+source("~/algosto/resultats.R")
+source("~/algosto/Outliers.R")
+source("~/algosto/computeOutliers.R")
+source("~/algosto/seuils.R")
+source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
 ###Tests CPP
 
-data <- genererEchantillon(n,d,mu1,mu2,0.9,0.1,Sigma1,Sigma2,"moyenne")
+data <- genererEchantillon(n,d,mu1,mu2,0.9,0.1,Sigma1,Sigma2,"MaronnaZamar")
 
 respcout <- pcout(data$Z,makeplot=FALSE)
 

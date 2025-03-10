@@ -411,19 +411,21 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
 estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y),  cMC=ncol(Y),w= 2,
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
                       ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
-                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = nrow(Y)*ncol(Y)^2)
+                      vpMCM = matrix(0,n,ncol(Y)),methodeOnline = "eigen", methodeEstimation = "offline",depart_online = 100,niterRMon = nrow(Y)*ncol(Y))
 {
   distances <- rep(0, nrow(Y))
   if (methodeEstimation == "offline")
   {
     #print(Y)
-    results <- RobVar(Y,mc_sample_size = nrow(Y),c=ncol(Y),w=2)
+    #results <- RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
-    med <- results$median
     resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
+    med <- resoff$median
+    
     #resoff = WeiszfeldCov_init(Y[1:depart])
-    eig_init = eigen(resoff$covmedian)
+    #eig_init = eigen(resoff$covmedian)
+    eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
     #print(valPV)
@@ -436,13 +438,14 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     #lambdatilde=lambdaInit
     #lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
     
-    m <- minit
+    #m <- minit
     
-    V <- Vinit
+    #V <- Vinit
     
-    moyennem <- m
-    moyenneV <- V
+    #moyennem <- m
+    #moyenneV <- V
     VPropresV <- eig_init$vectors
+    
     VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
     #print(lambdaIter[i,])
     #print(lambdaInit)
@@ -460,7 +463,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   { 
     
     if (methodeOnline == "eigen"){
-    results <- estimMVOnline(Y, depart = depart_online,niterRMon = ncol(Y))}
+    results <- estimMVOnline(Y, depart = depart_online,niterRMon = ncol(Y),c = 5)}
     else {results <- estimMVOnline(Y, depart = depart_online,methode = "CPP",niterRMon = ncol(Y))}
     #Retour des résultats
     med <- results$moyennem
