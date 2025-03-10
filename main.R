@@ -14,6 +14,8 @@
 #install.packages("RcppEigen")
 #library(Rcpp)
 #library(RcppEigen)
+#install.packages("mvoutlier")
+
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -40,6 +42,7 @@ library(pROC)
 library(tidyr)
 library(dplyr)
 library(knitr)
+library("mvoutlier")
 #library(Rcpp)
 #library(RcppArmadillo)
 #install.packages("Metrics")
@@ -61,7 +64,10 @@ data <- genererEchantillon(n,d,mu1,mu2,0.9,0.1,Sigma1,Sigma2,"MaronnaZamar")
 
 respcout <- pcout(data$Z,makeplot=FALSE)
 
-outl <- respcout$wfinal
+outl <- respcout$wfinal01
+
+outl <- (outl + 1) %% 2
+
 
 table(data$labelsVrais,outl)
 
@@ -92,7 +98,7 @@ print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 
-results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
+results_metrics <- RMSEAUCFPdataset(contamin = "MaronnaZamar")
 
 results_metrics <- round(results_metrics,2)
 

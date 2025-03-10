@@ -37,7 +37,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=length(
 }
 
 estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, w=2,cMC=ncol(Y),
-                    minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
+                    minit = r*rnorm(ncol(Y)),Vinit = diag(d)
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
                     vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
                     ,SigmaInit = diag(d),methode = "eigen",depart = 100,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = nrow(Y)*ncol(Y))
@@ -423,9 +423,9 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
     med <- resoff$median
     
-    #resoff = WeiszfeldCov_init(Y[1:depart])
-    #eig_init = eigen(resoff$covmedian)
-    eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
+    #resoff = WeiszfeldCov_init(Y)
+    eig_init = eigen(resoff$covmedian)
+    #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
     #print(valPV)
@@ -453,7 +453,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     
     SigmaOffline <- varianc
-    V <- results$covmedian
+    V <- resoff$covmedian
     U <- eigen(V)$vectors
     #lambda <- RobbinsMC()
     distances <- calcule_vecteur_distances(Y, med, SigmaOffline)
@@ -498,7 +498,7 @@ else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming 
 
 
 StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w=2, cMC=ncol(Y),
-                        minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))
+                        minit = r*rnorm(ncol(Y)),Vinit = diag(d)
                         ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))), batch=ncol(Y),
                         vpMCM = matrix(0,ncol(Y),ncol(Y)),lambdaInit =  rep(1,ncol(Y))
                         ,SigmaInit = diag(d),methode = "eigen",depart = 0,cutoff =qchisq(p = 0.95, df = ncol(Y)),niterRMon = batch)
