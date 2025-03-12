@@ -60,7 +60,7 @@ source("~/algosto/shrinkageCabana.R")
 
 ###Tests CPP
 
-data <- genererEchantillon(n,d,mu1,mu2,0.9,0.1,Sigma1,Sigma2,"MaronnaZamar")
+data <- genererEchantillon(n,d,mu1,mu2,0.6,0.4,Sigma1,Sigma2,"moyenne")
 
 respcout <- pcout(data$Z,makeplot=FALSE)
 
