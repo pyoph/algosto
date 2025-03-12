@@ -72,8 +72,8 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
   }
   if (depart > 0)
   {
-    resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
-    #resoff = WeiszfeldCov_init(Y[1:depart])
+    #resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
+    resoff = WeiszfeldCov_init(Y[1:depart,],init = r*rnorm(ncol(Y[1:depart,])),init_cov = covComed(Y[1:depart,])$cov)
     eig_init = eigen(resoff$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -420,10 +420,10 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     #results <- RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
-    resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
-    med <- resoff$median
+    #resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
     
-    #resoff = WeiszfeldCov_init(Y)
+    resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = covComed(Y)$cov)
+    med <- resoff$median
     eig_init = eigen(resoff$covmedian)
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
@@ -530,8 +530,8 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   }
   if (depart > 0)
   {
-    resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
-    #resoff = WeiszfeldCov_init(Y[1:depart])
+    #resoff=RobVar(Y[1:depart,],mc_sample_size = nrow(Y),c=ncol(Y),w=2)
+    resoff = WeiszfeldCov_init(Y[1:depart,],init = r*rnorm(ncol(Y[1:depart,])),init_cov = covComed(Y[1:depart,])$cov)
     eig_init = eigen(resoff$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
