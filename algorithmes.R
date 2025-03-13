@@ -25,6 +25,9 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=length(
     lambda =lambda  - c*(i+ctilde)^(-alpha)*lambda*E1 + c*(i+ctilde)^(-alpha)* (vp)*E2
     slog=slog+log(i+1+ cbarre)^w
     vp2=vp2+log(i+1+ cbarre)^w *((slog)^(-1)) *(lambda - vp2)
+    print(i)
+    print(" ")
+    print(vp2)
     eps=sqrt(sum((vp2-vp0)^2))
     if (length(which(samp==i) > 0))
     {
@@ -424,9 +427,9 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
     #resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
     
-    resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = diag(d))
+    resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = covComed(Y)$cov,nitermax = 100)
     med <- resoff$median
-    V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = niteRMon)$covmedian
+    V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
     eig_init = eigen(V)
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
@@ -436,8 +439,27 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
     #print(valPV)
     #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
-    lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = 0,cbarre =0)
-    lambdaInit <- lambdaResultat$vp
+    lambdaInit = valPV
+    lambdatilde = valPV
+    
+      for (i in 1:nrow(Y))
+      
+    {
+      sampsize = ncol(Y)
+      
+      lambda = lambdaInit
+      lambdatilde = lambdatilde
+      
+      lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
+      lambda <- lambdaResultat$vp
+      lambdatilde <- lambdaResultat$vp
+      
+    }
+    lambdaInit <- lambda
+    
+    #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = 0,cbarre =0)
+    #lambdaInit <- lambdaResultat$vp
     #lambdaInit=eig_init$values
     #lambdatilde=lambdaInit
     #lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
