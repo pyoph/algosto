@@ -45,7 +45,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
     } 
     else if (contamin == "studentTronquee") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-      vecteurs_mu2 <- rtrunc(n2, spec = "t", a = -2, b = 2, df = 1)
+      vecteurs_mu2 <- matrix(rtrunc(n2*d, spec = "t", a = -2, b = 2, df = 1),ncol =d)
     } 
     else if (contamin == "uniforme") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)

@@ -45,7 +45,6 @@ library(tidyr)
 library(dplyr)
 library(knitr)
 library("mvoutlier")
-library("distributions3")
 #library(Rcpp)
 #library(RcppArmadillo)
 #install.packages("Metrics")
@@ -63,7 +62,7 @@ source("~/work/algosto/shrinkageCabana.R")
 
 ###Tests CPP
 
-data <- genererEchantillon(n,d,mu1,mu2,0.6,0.4,Sigma1,Sigma2,"moyenne")
+data <- genererEchantillon(n,d,mu1,mu2,0.6,0.4,Sigma1,Sigma2,"studentTronquee")
 
 respcout <- pcout(data$Z,makeplot=FALSE)
 
