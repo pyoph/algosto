@@ -592,6 +592,8 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   lambdaIter = matrix(0,nrow(Y),ncol(Y))
   U = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
   Sigma = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
+  #V <- Vinit
+  
   distances <- rep(0,nrow(Y))
   #Initialisations 
   #Si départ = 0, intialisation de U sur la sphère unité  
@@ -639,6 +641,91 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     # #print(lambdaIter[i,])
     # #print(lambdaInit)
     # varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+# 
+#     resoff = WeiszfeldCov_init(Y[1:100,],r*rnorm(ncol(Y)),init_cov = covComed(Y[1:100,])$cov,nitermax = 100)
+#     minit <- resoff$median
+#     Vinit <- WeiszfeldCov_init(Y[1:100,],minit,init_cov = covComed(Y[1:100,])$cov,nitermax = 100)$covmedian
+#     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
+#     eig_init = eigen(Vinit)
+#     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
+#     #eig_init=eigen(resoff$variance)
+#     valPV <- eig_init$values 
+#     #print(valPV)
+#     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
+#     #print(valPV)
+#     #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
+#     lambdaInit = valPV
+#     lambdatilde = valPV
+#     
+#     for (i in 1:nrow(Y[1:100,]))
+#       
+#     {
+#       sampsize = ncol(Y)
+#       
+#       lambda = lambdaInit
+#       lambdatilde = lambdatilde
+#       
+#       lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+#       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
+#       lambda <- lambdaResultat$vp
+#       lambdatilde <- lambdaResultat$vp
+#       
+#     }
+#     lambdaInit <- lambda
+#     
+#     #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = 0,cbarre =0)
+#     #lambdaInit <- lambdaResultat$vp
+#     #lambdaInit=eig_init$values
+#     #lambdatilde=lambdaInit
+#     #lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
+#     
+#     m <- minit
+#     
+#     V <- Vinit
+#     
+#     #moyennem <- m
+#     #moyenneV <- V
+#     VPropresV <- eig_init$vectors
+#     
+#     VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+#     #print(lambdaIter[i,])
+#     #print(lambdaInit)
+#     varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+#     
+#     
+#     #SigmaOffline <- varianc
+#     #V <- resoff$covmedian
+#     U <- eigen(V)$vectors
+#     
+#     moyennem <- minit
+#     moyenneV <- Vinit
+#     VPropresV <- eig_init$vectors
+#     VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+#     #print(lambdaIter[i,])
+#     #print(lambdaInit)
+#     varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+#     
+#     
+#         
+#      for (l in 1 :depart)
+#     {
+#       U[l,,] <- eig_init$vectors
+#       
+#       #Faire calcul t(P) %*% diag(D) %*% P
+#       #Sigma[l,,] <- resoff$variance
+#       Sigma[l,,] <- varianc
+#       S <- 0
+#       for(j in (1:ncol(Y)))
+#       {
+#         S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*(eig_init$vectors)[,j])^2
+#       }
+#       
+#       #print(solve(Sigma[i,,]))
+#       #distances[l] <- as.numeric(Y[l,] - m) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - m)))
+#       distances[l] <- S
+#     }
+    #minit=resoff$median
+    #Vinit=resoff$covmedian
 
     resoff = WeiszfeldCov_init(Y[1:100,],r*rnorm(ncol(Y)),init_cov = covComed(Y[1:100,])$cov,nitermax = 100)
     minit <- resoff$median
@@ -694,9 +781,9 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     #SigmaOffline <- varianc
     #V <- resoff$covmedian
     #U <- eigen(V)$vectors
-    #m <- minit
+    m <- minit
     
-    #V <- Vinit
+    V <- Vinit
     
     moyennem <- minit
     moyenneV <- Vinit
@@ -706,9 +793,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     #print(lambdaInit)
     varianc= VP %*% diag(lambdaInit) %*% t(VP) 
     
-    
-        
-     for (l in 1 :depart)
+    for (l in 1 :depart)
     {
       U[l,,] <- eig_init$vectors
       
@@ -724,12 +809,14 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       #print(solve(Sigma[i,,]))
       #distances[l] <- as.numeric(Y[l,] - m) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - m)))
       distances[l] <- S
+      
+    
+    
+    
     }
-    #minit=resoff$median
-    #Vinit=resoff$covmedian
-  }
+      }
   
-  
+  print(V)
   sampsize = niterRMon
   lambda = lambdaInit
   lambdatilde = lambdatilde

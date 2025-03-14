@@ -62,7 +62,7 @@ source("~/algosto/shrinkageCabana.R")
 
 ###Tests CPP
 
-data <- genererEchantillon(n,d,mu1,mu2,0.6,0.4,Sigma1,Sigma2,"moyenne")
+data <- genererEchantillon(n,d,mu1,mu2,0.6,0.4,Sigma1,Sigma2,"MaronnaZamar")
 
 respcout <- pcout(data$Z,makeplot=FALSE)
 
@@ -100,7 +100,7 @@ print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 
-results_metrics <- RMSEAUCFPdataset(contamin = "studentTronquee")
+results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
 
 results_metrics <- round(results_metrics,2)
 
@@ -127,7 +127,8 @@ ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode)) +
   geom_line(size = 1.2) +  # Courbes
   geom_point(size = 2) +   # Points aux taux spécifiés
   scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
-  labs(title = "Évolution du RMSE en fonction du taux de contamination",
+  scale_y_log10() +  # Échelle logarithmique en base 10
+    labs(title = "Évolution du RMSE en fonction du taux de contamination",
        x = "Taux de contamination (%)",
        y = "RMSE",
        color = "Méthode") +  # Nom de la légende
