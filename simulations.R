@@ -23,7 +23,7 @@
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 
-genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 1.2, k = 5,rhomult = 0.9) {
+genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 1.2, k = 5,rhomult = 0.9, cutoff = qchisq(0.95, df = d)) {
   # Initialisation
   n1 <- floor(p1 * n)  # Taille du groupe non contaminé
   n2 <- n - n1         # Taille du groupe contaminé
@@ -45,19 +45,53 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
     } 
     else if (contamin == "studentTronquee") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-      vecteurs_mu2 <- rmvt(n2, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
-      vecteurs_mu2 <- ifelse(vecteurs_mu2 > -2 & vecteurs_mu2 < 2, 
-                             ifelse(vecteurs_mu2 < 0, -2, 2), 
-                             vecteurs_mu2)
-    } 
+      # vecteurs_mu2 <- rmvt(n2, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
+      # vecteurs_mu2 <- ifelse(vecteurs_mu2 > -2 & vecteurs_mu2 < 2, 
+      #                        ifelse(vecteurs_mu2 < 0, -2, 2), 
+      #                        vecteurs_mu2)
+      compt = 0
+      vecteurs_mu2 = matrix(0,0, d)
+      while (compt < n2) 
+      {
+        student <- rmvt(1, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
+        
+        if(((student) %*% solve(Sigma1) %*% t(student)) > cutoff)
+        {
+          vecteurs_mu2 = rbind(vecteurs_mu2,student)
+          compt = compt + 1
+        }
+      }
+      
+    }
+    else if (contamin == "UniformeTronquee") {
+      vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
+      # vecteurs_mu2 <- rmvt(n2, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
+      # vecteurs_mu2 <- ifelse(vecteurs_mu2 > -2 & vecteurs_mu2 < 2, 
+      #                        ifelse(vecteurs_mu2 < 0, -2, 2), 
+      #                        vecteurs_mu2)
+      compt = 0
+      vecteurs_mu2 = matrix(0,0, d)
+      while (compt < n2) 
+      {
+        uniforme = runif(d,-2,2)
+        
+        if(((uniforme) %*% solve(Sigma1) %*% t(uniforme)) > cutoff)
+        {
+          vecteurs_mu2 = rbind(vecteurs_mu2,uniforme)
+          compt = compt + 1
+        }
+      }
+      
+    }
     else if (contamin == "uniforme") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
       vecteurs_mu2 <- matrix(runif(n2 * d, min = -10, max = 10), nrow = n2, ncol = d)
-      #Suppression des valeurs comprises entre -2 : remplacement par -2  pour les valeurs et 2
-      vecteurs_mu2 <- ifelse(vecteurs_mu2 > -2 & vecteurs_mu2 < 2, 
-                             ifelse(vecteurs_mu2 < 0, -2, 2), 
-                             vecteurs_mu2)
-      
+      #Contamination avec des données hors de l'ellipse X^T Sigma^(-1) X > q_{1 - a}
+      # #Suppression des valeurs comprises entre -2 : remplacement par -2  pour les valeurs et 2
+      # vecteurs_mu2 <- ifelse(vecteurs_mu2 > -2 & vecteurs_mu2 < 2, 
+      #                        ifelse(vecteurs_mu2 < 0, -2, 2), 
+      #                        vecteurs_mu2)
+      # 
     } 
     else if (contamin == "zero") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
