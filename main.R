@@ -103,7 +103,7 @@ print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 
-results_metrics <- RMSEAUCFPdataset(contamin = "MaronnaZamar")
+results_metrics <- RMSEAUCFPdataset(contamin = "UniformeTronquee")
 
 results_metrics <- round(results_metrics,2)
 
@@ -194,7 +194,7 @@ ggplot(df_long, aes(x = taux_contamination, y = FP, color = Méthode)) +
 
 
 
-save(results_metrics,file = "results_metricsUniforme.Rdata")
+save(results_metrics,file = "results_metricsMaronnaZamar.Rdata")
 
 # latex_table_results_metrics <- xtable(results_metrics)
 
