@@ -484,7 +484,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = covComed(Y)$cov,nitermax = 100)
     med <- resoff$median
-    V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 100)$covmedian
+    V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 1e6)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
     eig_init = eigen(V)
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
@@ -496,14 +496,27 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
     lambdaInit = valPV
     lambdatilde = valPV
+    distances <- rep(0,nrow(Y))
+    lambda = lambdaInit
+    lambdatilde = lambdatilde
+    VPropresV <- eig_init$vectors
     
-      for (i in 1:nrow(Y))
+    VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    #print(lambdaIter[i,])
+    #print(lambdaInit)
+    varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+    
+    
+    SigmaOffline <- varianc
+    V <- resoff$covmedian
+    U <- eigen(V)$vectors
+    #lambda <- RobbinsMC()
+    #distances <- calcule_vecteur_distances(Y, med, SigmaOffline) 
+    for (i in 1:nrow(Y))
       
     {
       sampsize = ncol(Y)
       
-      lambda = lambdaInit
-      lambdatilde = lambdatilde
       
       lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
@@ -511,7 +524,25 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       lambdatilde <- lambdaResultat$vp
       
     }
-    lambdaInit <- lambda
+    
+    #Calcul des distances 
+    for (i in 1:nrow(Y))
+      
+    {
+      S <- 0
+      for(j in (1:ncol(Y)))
+      {
+        S <- S + 1/(lambda[j])*sum(t(Y[i,] - med)*eig_init$vectors[,j])^2
+      }
+      
+      #print(solve(Sigma[i,,]))
+      #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
+      distances[i] <- S
+      
+    }
+    
+    
+    #lambdaInit <- lambda
   
     #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = 0,cbarre =0)
     #lambdaInit <- lambdaResultat$vp
@@ -525,19 +556,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     #moyennem <- m
     #moyenneV <- V
-    VPropresV <- eig_init$vectors
-    
-    VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
-    #print(lambdaIter[i,])
-    #print(lambdaInit)
-    varianc= VP %*% diag(lambdaInit) %*% t(VP) 
-    
-    
-    SigmaOffline <- varianc
-    V <- resoff$covmedian
-    U <- eigen(V)$vectors
-    #lambda <- RobbinsMC()
-    distances <- calcule_vecteur_distances(Y, med, SigmaOffline)
+   
     
   }
   else if (methodeEstimation == "online")
@@ -558,7 +577,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   else if (methodeEstimation == "streaming")
   { 
-    results <- StreamingMV(Y,batch = 10,depart = depart_online,niterRMon = ncol(Y)^2)
+    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y)^2)
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
@@ -803,7 +822,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       S <- 0
       for(j in (1:ncol(Y)))
       {
-        S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*(eig_init$vectors)[,j])^2
+        S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*C)^2
       }
       
       #print(solve(Sigma[i,,]))

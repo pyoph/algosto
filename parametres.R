@@ -63,10 +63,10 @@ creerMatriceToeplitz <- function(rho,d)
 
 
 
-
+#Faire un boxplot des résultats enregistrer les résultats à chaque run
 
 #Initialisation des paramètres communs à toutes les simulations
-
+#d = 100 000 
 nbruns = 100
 n = 1e4
 d = 10

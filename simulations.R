@@ -51,6 +51,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       #                        vecteurs_mu2)
       compt = 0
       vecteurs_mu2 = matrix(0,0, d)
+      #Inverser Sigma1 avant
       while (compt < n2) 
       {
         student <- rmvt(1, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
