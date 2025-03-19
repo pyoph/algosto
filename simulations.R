@@ -52,11 +52,12 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       compt = 0
       vecteurs_mu2 = matrix(0,0, d)
       #Inverser Sigma1 avant
+      invSigma1 = solve(Sigma1)
       while (compt < n2) 
       {
         student <- rmvt(1, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
         
-        if(((student) %*% solve(Sigma1) %*% t(student)) > cutoff)
+        if(((student) %*% invSigma1 %*% t(student)) > cutoff)
         {
           vecteurs_mu2 = rbind(vecteurs_mu2,student)
           compt = compt + 1
@@ -72,11 +73,14 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       #                        vecteurs_mu2)
       compt = 0
       vecteurs_mu2 = matrix(0,0, d)
+      invSigma1 = solve(Sigma1)
+      
+      
       while (compt < n2) 
       {
         uniforme = runif(d,-2,2)
         
-        if(((uniforme) %*% solve(Sigma1) %*% t(uniforme)) > cutoff)
+        if((t(uniforme) %*% invSigma1 %*% (uniforme)) > cutoff)
         {
           vecteurs_mu2 = rbind(vecteurs_mu2,uniforme)
           compt = compt + 1

@@ -108,11 +108,18 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
   methodes = c("Comédiane","Shrinkage","OGK","Cov Empirique","offline","online","streaming","FASTMCD")
   taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
   rmseMed <- matrix(0,length(taux_contamination),length(methodes))
+  rmseMedBP = array(0, dim = c(nbrunsParam, length(taux_contamination),length(methodes)))
   rmseSigma <- matrix(0,length(taux_contamination),length(methodes))
+  rmseSigmaBP = array(0, dim = c(nbrunsParam, length(taux_contamination),length(methodes)))
   faux_positifs <- matrix(0,length(taux_contamination),length(methodes))
+  faux_positifsBP = array(0, dim = c(nbrunsParam, length(taux_contamination),length(methodes)))
   faux_negatifs <- matrix(0,length(taux_contamination),length(methodes))
+  faux_negatifsBP = array(0, dim = c(nbrunsParam, length(taux_contamination),length(methodes)))
   temps_calcul  <- matrix(0,length(taux_contamination),length(methodes))
+  temps_calculBP = array(0, dim = c(nbrunsParam, length(taux_contamination),length(methodes)))
   auc <- matrix(0,length(taux_contamination),length(methodes))
+  aucBP = array(0, dim = c(nbrunsParam, length(taux_contamination),length(methodes)))
+    
   for (i in seq_along(taux_contamination)){
   #Génération des données 
     
@@ -125,22 +132,27 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
     for (j in seq_along(methodes))
   {
       
-    #m = "Shrinkage"
+      
     methode <- methodes[j]
     resultats <- calcule_RMSE_FP_AUC_par_methode(data,methode = methode)
     rmseMed[i,j] <- resultats$rmseMed + rmseMed[i,j]
+    rmseMedBP[k,i,j] = rmseMed[i,j]
     rmseSigma[i,j] <- resultats$rmseSigma +  rmseSigma[i,j]
+    rmseSigmaBP[k,i,j] = rmseSigma[i,j]
     faux_positifs[i,j] <- resultats$faux_positifs + faux_positifs[i,j]
-    
+    faux_positifsBP[k,i,j] = faux_positifs[i,j]
     faux_negatifs[i,j] <- resultats$faux_negatifs + faux_negatifs[i,j]
+    faux_negatifsBP[k,i,j] = faux_negatifs[i,j]
     temps_calcul[i,j] <- resultats$temps_calcul + temps_calcul[i,j]
+    temps_calculBP[k,i,j] = temps_calcul[i,j]
     auc[i,j] <- resultats$auc + auc[i,j]
+    aucBP[k,i,j] = auc[i,j]
     }
      
     }
   }
   
-  return(list(resultats = resultats, rmseMed = rmseMed/nbruns,rmseSigma = rmseSigma/nbruns,faux_positifs = faux_positifs/nbruns,faux_negatifs = faux_negatifs/nbruns,auc =auc/nbruns,temps_calcul= temps_calcul/nbruns))
+  return(list(resultats = resultats, rmseMed = rmseMed/nbruns,rmseSigma = rmseSigma/nbruns,faux_positifs = faux_positifs/nbruns,faux_negatifs = faux_negatifs/nbruns,auc =auc/nbruns,temps_calcul= temps_calcul/nbruns,rmseSigmaBP = rmseSigmaBP,rmseMedBP = rmseMedBP,faux_positifsBP = faux_positifsBP,faux_negatifsBP = faux_negatifsBP,aucBP = aucBP,temps_calculBP = temps_calculBP))
   }
 
 

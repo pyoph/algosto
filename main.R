@@ -102,6 +102,7 @@ print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 
+
 results_metrics <- RMSEAUCFPdataset(contamin = "UniformeTronquee")
 
 results_metrics <- round(results_metrics,2)
