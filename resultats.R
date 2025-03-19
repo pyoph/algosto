@@ -247,6 +247,14 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   faux_negatifs <- resultats$faux_negatifs
   temps_calcul <- resultats$temps_calcul
   auc <- resultats$auc
+  rmseMedBP = resultats$rmseMedBP
+  rmseSigmaBP <- resultats$rmseSigmaBP
+  faux_positifsBP <- resultats$faux_positifsBP
+  faux_negatifsBP <- resultats$faux_negatifsBP
+  temps_calculBP <- resultats$temps_calculBP
+  aucBP <- resultats$aucBP
+  
+  
   
   # Remplir les vecteurs pour chaque méthode
   for (i in seq_along(taux_contamination)) {
@@ -389,7 +397,7 @@ RMSEAUCFPdataset<- function(nbrunsParam = nbruns,contamin = "moyenne")
   # 
   save(results_metrics,file = "results_metrics.RData")
   
-  return(results_metrics)
+  return(list(results_metrics = results_metrics,rmseMedBP = rmseMedBP,rmseSigmaBP = rmseSigmaBP,aucBP = aucBP,temps_calculBP= temps_calculBP,faux_negatifsBP = faux_negatifsBP, faux_positifsBP = faux_positifsBP))
 }
 
 
