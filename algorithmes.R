@@ -484,7 +484,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = covComed(Y)$cov,nitermax = 100)
     med <- resoff$median
-    V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 1e6)$covmedian
+    V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
     eig_init = eigen(V)
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
@@ -822,7 +822,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       S <- 0
       for(j in (1:ncol(Y)))
       {
-        S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*C)^2
+        S <- S + 1/(lambdaInit[j])*sum((Y[l,] - moyennem)*eig_init$vectors[,j])^2
       }
       
       #print(solve(Sigma[i,,]))
