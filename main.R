@@ -20,7 +20,7 @@
 
 library(xtable)
 library(reshape2)
-library(RobRegression)
+#library(RobRegression)
 library("robustbase")
 library(mvtnorm)
 library(Gmedian)
@@ -32,7 +32,7 @@ library(microbenchmark)
 library("MASS")
 library("corrplot")
 library("dplyr")
-library("easystats")
+#library("easystats")
 library("bigutilsr")
 library("RobRegression")
 #library("rJava")
@@ -57,12 +57,13 @@ source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 source("~/algosto/shrinkageCabana.R")
+#sourceCpp("~/algosto/RobbinsMCCpp")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
 ###Tests CPP
 #Tester sur batch = sqrt(d)
-data <- genererEchantillon(n,d,mu1,mu2,0.7,0.3,Sigma1,Sigma2,"moyenne")
+data <- genererEchantillon(n,d,mu1,mu2,1,0,Sigma1,Sigma2,"moyenne")
 
 Z <- data$Z
 

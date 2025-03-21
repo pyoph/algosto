@@ -25,9 +25,9 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=length(
     lambda =lambda  - c*(i+ctilde)^(-alpha)*lambda*E1 + c*(i+ctilde)^(-alpha)* (vp)*E2
     slog=slog+log(i+1+ cbarre)^w
     vp2=vp2+log(i+1+ cbarre)^w *((slog)^(-1)) *(lambda - vp2)
-    print(i)
-    print(" ")
-    print(vp2)
+    #print(i)
+    #print(" ")
+    #print(vp2)
     eps=sqrt(sum((vp2-vp0)^2))
     if (length(which(samp==i) > 0))
     {
@@ -492,7 +492,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     valPV <- eig_init$values 
     #print(valPV)
     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
-    #print(valPV)
+    #print(valPV)lam
     #lambdaInit <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
     lambdaInit = valPV
     lambdatilde = valPV
@@ -504,10 +504,10 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
     #print(lambdaIter[i,])
     #print(lambdaInit)
-    varianc= VP %*% diag(lambdaInit) %*% t(VP) 
+    #varianc= VP %*% diag(lambdaInit) %*% t(VP) 
     
     
-    SigmaOffline <- varianc
+    #SigmaOffline <- varianc
     V <- resoff$covmedian
     U <- eigen(V)$vectors
     #lambda <- RobbinsMC()
@@ -541,6 +541,10 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       
     }
     
+    varianc= VP %*% diag(lambda) %*% t(VP) 
+    
+    
+    SigmaOffline <- varianc
     
     #lambdaInit <- lambda
   
