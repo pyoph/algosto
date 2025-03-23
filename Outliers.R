@@ -60,7 +60,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
   }
     else if (methode == "FASTMCD")
     {
-      res <- covMcd(Z)
+      res <- covMcd(Z,raw.only = TRUE)
       med <- res$center
       Sigma <- res$cov
       
@@ -90,8 +90,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
    
   } else if (methode == "Comédiane") {
     # Méthode Comédiane
-    med <- covComed(Z)$center
-    Sigma <- covComed(Z)$cov
+    res <- covComed(Z,n.iter = 0)
+    med <- res$raw.center
+    Sigma <- res$raw.cov
     #print(Sigma)
     
     rmseSigma <- norm(Sigma - SigmaVrai,"F")

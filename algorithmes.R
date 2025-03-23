@@ -581,7 +581,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   else if (methodeEstimation == "streaming")
   { 
-    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y)^2)
+    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y))
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
@@ -773,7 +773,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       lambda = lambdaInit
       lambdatilde = lambdatilde
       
-      lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=lambda,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$vp
@@ -839,7 +839,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     }
       }
   
-  print(V)
+  #print(V)
   sampsize = niterRMon
   lambda = lambdaInit
   lambdatilde = lambdatilde
@@ -967,7 +967,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       valPV <- eigen(moyenneV)$values 
       valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
       lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = lambdatilde,initbarre = lambda,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
-      #      lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon*(floor(log(batch*niterr))+1),w=w,vp=valPV,init = lambdatilde,initbarre = lambda,ctilde = compt,cbarre =compt,slog=sum((log(1:(compt+1))^w)))
+        #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon*(floor(log(batch*niterr))+1),w=w,vp=valPV,init = lambdatilde,initbarre = lambda,ctilde = compt,cbarre =compt,slog=sum((log(1:(compt+1))^w)))
       compt=compt+niterRMon*(floor(log(batch*niterr))+1)
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp

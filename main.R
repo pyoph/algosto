@@ -63,7 +63,7 @@ source("~/work/algosto/shrinkageCabana.R")
 
 ###Tests CPP
 #Tester sur batch = sqrt(d)
-data <- genererEchantillon(n,d,mu1,mu2,1,0,Sigma1,Sigma2,"moyenne")
+data <- genererEchantillon(n,d,mu1,mu2,0.6,0.4,Sigma1,Sigma2,"studentTronquee")
 
 Z <- data$Z
 
@@ -104,7 +104,8 @@ print(resultats$vecteurs_propres)
 #######Calcul RMSE AUC et FP######
 
 
-results_metrics <- RMSEAUCFPdataset(contamin = "studentTronquee")$result_metrics
+#results_metrics <- RMSEAUCFPdataset(contamin = "studentTronquee")$result_metrics
+results_metrics <- RMSEAUCFPdataset(contamin = "UniformeTronquee")$result_metrics
 
 results_metrics <- round(results_metrics,2)
 
