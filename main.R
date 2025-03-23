@@ -49,14 +49,14 @@ library("mvoutlier")
 #library(RcppArmadillo)
 #install.packages("Metrics")
 #library(Metrics)
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
-source("~/algosto/resultats.R")
-source("~/algosto/Outliers.R")
-source("~/algosto/computeOutliers.R")
-source("~/algosto/seuils.R")
-source("~/algosto/shrinkageCabana.R")
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
+source("~/work/algosto/resultats.R")
+source("~/work/algosto/Outliers.R")
+source("~/work/algosto/computeOutliers.R")
+source("~/work/algosto/seuils.R")
+source("~/work/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/RobbinsMCCpp")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
@@ -104,7 +104,7 @@ print(resultats$vecteurs_propres)
 #######Calcul RMSE AUC et FP######
 
 
-results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")$result_metrics
+results_metrics <- RMSEAUCFPdataset(contamin = "studentTronquee")$result_metrics
 
 results_metrics <- round(results_metrics,2)
 
