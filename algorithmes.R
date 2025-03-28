@@ -570,7 +570,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       varianc= VP %*% diag(lambda) %*% t(VP) 
       
       SigmaIter[i,,] = varianc*poids[i]
-      sommepoids = sommepoids + poids[i]
+      #sommepoids = sommepoids + poids[i]
       
     }
     
@@ -578,7 +578,8 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     
     SigmaOffline <- varianc
-    SigmaOfflinePoids = sum(SigmaOffline)/sommepoids
+    if(sum(poids) != 0)
+    SigmaOfflinePoids = sum(SigmaOffline)/sum(poids)
     
     #SigmaOffline = SigmaOfflinePoids
 
