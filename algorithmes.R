@@ -54,7 +54,9 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
   #Initialisations
   m <- minit
   V <- Vinit
-  
+  poids = rep(0,nrow(Y))
+  SigmaPoids = matrix(0, ncol(Y),ncol(Y))
+  SigmaIterPoids = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
   #Si départ = 0, intialisation de U sur la sphère unité  
   if (depart == 0)
   {
@@ -175,6 +177,16 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       #print(solve(Sigma[i,,]))
       #distances[l] <- as.numeric(Y[l,] - m) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - m)))
       distances[l] <- S
+      
+      if (S <= cutoff)
+      {
+        poids[l] = 1
+        
+        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
+        SigmaIterPoids[l,,] = SigmaPoids
+        
+      }
+      
       
     }
   }
@@ -318,7 +330,18 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
       distances[i] <- S
       
-      }}
+      if (S <= cutoff)
+      {
+        poids[l] = 1
+        
+        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
+        SigmaIterPoids[l,,] = SigmaPoids
+        
+      }
+      }
+      if(sum(poids != 0))
+      {SigmaPoids = SigmaPoids/sum(poids)}
+      }
     else if(methode == "CPP"){
       elPropres <- calculValeursEtVecteursPropres(moyenneV)
       VPropresV <- elPropres$vecteurs_propres
@@ -462,7 +485,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
   
   
   
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,SigmaPoids = SigmaPoids,SigmaIterPoids =SigmaIterPoids))
 
 
 }
@@ -481,7 +504,8 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
     #resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
-    
+    poids = rep(0,nrow(Y))
+    SigmaIter =  array(0, dim = c(nrow(Y),ncol(Y), ncol(Y) ))
     resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = covComed(Y)$cov,nitermax = 100)
     med <- resoff$median
     V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 100)$covmedian
@@ -539,13 +563,25 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
       distances[i] <- S
       
+      if (S <= qchisq(0.95,ncol(Y))) 
+      {
+        poids[i] = 1
+      }
+      varianc= VP %*% diag(lambda) %*% t(VP) 
+      
+      SigmaIter[i,,] = varianc*poids[i]
+      sommepoids = sommepoids + poids[i]
+      
     }
     
     varianc= VP %*% diag(lambda) %*% t(VP) 
     
     
     SigmaOffline <- varianc
+    SigmaOfflinePoids = sum(SigmaOffline)/sommepoids
     
+    #SigmaOffline = SigmaOfflinePoids
+
     #lambdaInit <- lambda
   
     #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = 0,cbarre =0)
@@ -573,6 +609,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     med <- results$moyennem
     miter <- results$miter
     SigmaOnline <- results$Sigma
+    SigmaOnlinePoids <- results$SigmaPoids
     U <- results$U
     lambda <- results$lambda
     V <- results$moyenneV
@@ -594,9 +631,9 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   
   if (methodeEstimation  == "online") {
-    return(list(med = med, SigmaOnline = SigmaOnline[nrow(Y)- 1,,], SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
+    return(list(med = med, SigmaOnline = SigmaOnline[nrow(Y)- 1,,],SigmaOnlinePoids = SigmaOnlinePoids ,SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
 }
-  else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,V = V, distances = distances))}
+  else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,SigmaOfflinePoids = SigmaOfflinePoids,V = V, distances = distances))}
 else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,] ,V = V, distances = distances))}
   }
 
