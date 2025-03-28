@@ -192,7 +192,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     # Méthode Online
     resultats <- estimation(Z,methodeEstimation = "online")
     med <- resultats$med
-    Sigma <- resultats$SigmaOnline
+    Sigma <- resultats$SigmaOnlinePoids
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
     print("OK online")
     rmseMed <- sqrt(sum((muVrai - med)^2))
@@ -221,7 +221,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     # Méthode streaming
     resultats <- estimation(Z,methodeEstimation = "streaming")
     med <- resultats$med
-    Sigma <- resultats$SigmaStreaming
+    Sigma <- resultats$SigmaStreamingPoids
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
     print("OK Streaming")
     rmseMed <- sqrt(sum((muVrai - med)^2))

@@ -339,7 +339,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
         
       }
       }
-      if(sum(poids != 0))
+      if(sum(poids) != 0)
       {SigmaPoids = SigmaPoids/sum(poids)}
       }
     else if(methode == "CPP"){
@@ -621,7 +621,8 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y))
     #Retour des résultats
     med <- results$moyennem
-    SigmaStreaming <- results$Sigma
+    SigmaStreaming <- results$SigmaStreaming
+    SigmaStreamingPoids = results$SigmaPoids
     U <- results$U
     lambda <- results$lambda
     V <- results$moyenneV
@@ -634,7 +635,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     return(list(med = med, SigmaOnline = SigmaOnline[nrow(Y)- 1,,],SigmaOnlinePoids = SigmaOnlinePoids ,SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
 }
   else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,SigmaOfflinePoids = SigmaOfflinePoids,V = V, distances = distances))}
-else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,] ,V = V, distances = distances))}
+else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,],SigmaStreamingPoids = SigmaStreamingPoids ,V = V, distances = distances))}
   }
 
 
@@ -655,6 +656,10 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   #V <- Vinit
   
   distances <- rep(0,nrow(Y))
+  poids = rep(0,nrow(Y))
+  SigmaPoids = matrix(0, ncol(Y),ncol(Y))
+  SigmaIterPoids = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
+  
   #Initialisations 
   #Si départ = 0, intialisation de U sur la sphère unité  
   if (depart == 0)
@@ -870,7 +875,14 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       #distances[l] <- as.numeric(Y[l,] - m) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - m)))
       distances[l] <- S
       
-    
+      if (S <= cutoff)
+      {
+        poids[l] = 1
+        
+        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
+        SigmaIterPoids[l,,] = SigmaPoids
+        
+      }
     
     
     }
@@ -1035,7 +1047,20 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       #iterations <- depart + (niterr-1)*batch + l
       #print(l)
       distances[depart + (niterr-1)*batch + l] <- S
-    }}
+      
+      if (S <= cutoff)
+      {
+        poids[l] = 1
+        
+        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
+        SigmaIterPoids[l,,] = SigmaPoids
+        
+      }
+      }
+      if(sum(poids) != 0)
+      {SigmaPoids = SigmaPoids/sum(poids)}
+      
+      }
     else {
       
       print("méthode sans eigen")
@@ -1143,7 +1168,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   VIter[,,nrow(Y)] = VIter[,,nrow(Y)-1]
   Sigma[nrow(Y),,] = Sigma[(nrow(Y) - 1),,]
   
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,niter=niterr,VP=VP))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,niter=niterr,VP=VP,SigmaPoids = SigmaPoids,SigmaIterPoids =SigmaIterPoids))
 }
 
 
