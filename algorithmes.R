@@ -619,11 +619,13 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   else if (methodeEstimation == "streaming")
   { 
-    results <- StreamingMV(Y,batch = 2,depart = depart_online,niterRMon = ncol(Y))
+    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y)^2)
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
-    print(SigmaStreaming)
+    #print(SigmaStreaming)
+    poids = results$poids
+    
     SigmaStreamingPoids = results$SigmaPoids
     U <- results$U
     lambda <- results$lambda
@@ -637,7 +639,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     return(list(med = med, SigmaOnline = SigmaOnline[nrow(Y)- 1,,],SigmaOnlinePoids = SigmaOnlinePoids ,SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
 }
   else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,SigmaOfflinePoids = SigmaOfflinePoids,V = V, distances = distances))}
-else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,],SigmaStreamingPoids = SigmaStreamingPoids ,V = V, distances = distances))}
+else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,],SigmaStreamingPoids = SigmaStreamingPoids ,V = V, distances = distances,poids = poids))}
   }
 
 
@@ -879,9 +881,11 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       
       if (S <= cutoff)
       {
+        #print(S)
+        
         poids[l] = 1
         
-        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
+        SigmaPoids = SigmaPoids + poids[l]*varianc
         SigmaIterPoids[l,,] = SigmaPoids
         
       }
@@ -1049,13 +1053,13 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       #iterations <- depart + (niterr-1)*batch + l
       #print(l)
       distances[depart + (niterr-1)*batch + l] <- S
-      print(S)
       if (S <= cutoff)
       {
+        #print(S)
         
         poids[depart + (niterr-1)*batch + l] = 1
         
-        SigmaPoids = SigmaPoids + poids[depart + (niterr-1)*batch + l]*Sigma[depart + (niterr-1)*batch + l,,]
+        SigmaPoids = SigmaPoids + poids[depart + (niterr-1)*batch + l]*varian
         SigmaIterPoids[depart + (niterr-1)*batch + l,,] = SigmaPoids
         
       }
@@ -1171,7 +1175,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   VIter[,,nrow(Y)] = VIter[,,nrow(Y)-1]
   Sigma[nrow(Y),,] = Sigma[(nrow(Y) - 1),,]
   
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,niter=niterr,VP=VP,SigmaPoids = SigmaPoids,SigmaIterPoids =SigmaIterPoids))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,niter=niterr,VP=VP,SigmaPoids = SigmaPoids,SigmaIterPoids =SigmaIterPoids,poids = poids))
 }
 
 

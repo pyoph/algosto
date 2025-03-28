@@ -63,7 +63,8 @@ source("~/algosto/shrinkageCabana.R")
 
 ###Tests CPP
 #Tester sur batch = sqrt(d)
-data <- genererEchantillon(n,d,mu1,mu2,0.8,1-0.8,Sigma1,Sigma2,"moyenne")
+p1 = 0.6
+data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 
 
