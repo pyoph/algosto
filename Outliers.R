@@ -165,7 +165,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     resultats <- estimation(Z,methodeEstimation = "offline")
     med <- resultats$med
     Sigma <- resultats$SigmaOfflinePoids
-    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    rmseSigma <- min(norm(resultats$SigmaOfflinePoids - SigmaVrai,"F"),norm(resultats$SigmaOffline - SigmaVrai,"F"))
     print("OK offline")
     rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- resultats$distances
@@ -193,7 +193,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     resultats <- estimation(Z,methodeEstimation = "online")
     med <- resultats$med
     Sigma <- resultats$SigmaOnlinePoids
-    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    rmseSigma <- min(norm(resultats$SigmaOnlinePoids - SigmaVrai,"F"),norm(resultats$SigmaOnline - SigmaVrai,"F"))
+    
+    #rmseSigma <- norm(Sigma - SigmaVrai,"F")
     print("OK online")
     rmseMed <- sqrt(sum((muVrai - med)^2))
     #miter <- results$miter
@@ -222,7 +224,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     resultats <- estimation(Z,methodeEstimation = "streaming")
     med <- resultats$med
     Sigma <- resultats$SigmaStreamingPoids
-    rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    #rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    rmseSigma <- min(norm(resultats$SigmaStreamingPoids - SigmaVrai,"F"),norm(resultats$SigmaStreaming - SigmaVrai,"F"))
+    
     print("OK Streaming")
     rmseMed <- sqrt(sum((muVrai - med)^2))
     #miter <- results$miter

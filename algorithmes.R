@@ -506,6 +506,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     #resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
     poids = rep(0,nrow(Y))
     SigmaIter =  array(0, dim = c(nrow(Y),ncol(Y), ncol(Y) ))
+    SigmaPoids = matrix(0,ncol(Y),ncol(Y))
     resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = covComed(Y)$cov,nitermax = 100)
     med <- resoff$median
     V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 100)$covmedian
@@ -569,7 +570,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
         poids[i] = 1
       }
       
-      SigmaIter[i,,] = varianc*poids[i]
+      SigmaPoids = varianc*poids[i] + varianc
 
     }
     
@@ -578,7 +579,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     SigmaOffline <- varianc
     if(sum(poids) != 0)
-    SigmaOfflinePoids = sum(SigmaOffline)/sum(poids)
+    SigmaOfflinePoids = SigmaPoids/sum(poids)
     
     #SigmaOffline = SigmaOfflinePoids
 
@@ -621,7 +622,8 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     results <- StreamingMV(Y,batch = 2,depart = depart_online,niterRMon = ncol(Y))
     #Retour des résultats
     med <- results$moyennem
-    SigmaStreaming <- results$SigmaStreaming
+    SigmaStreaming <- results$Sigma
+    print(SigmaStreaming)
     SigmaStreamingPoids = results$SigmaPoids
     U <- results$U
     lambda <- results$lambda
@@ -1047,13 +1049,14 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       #iterations <- depart + (niterr-1)*batch + l
       #print(l)
       distances[depart + (niterr-1)*batch + l] <- S
-      
+      print(S)
       if (S <= cutoff)
       {
-        poids[l] = 1
         
-        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
-        SigmaIterPoids[l,,] = SigmaPoids
+        poids[depart + (niterr-1)*batch + l] = 1
+        
+        SigmaPoids = SigmaPoids + poids[depart + (niterr-1)*batch + l]*Sigma[depart + (niterr-1)*batch + l,,]
+        SigmaIterPoids[depart + (niterr-1)*batch + l,,] = SigmaPoids
         
       }
       }
