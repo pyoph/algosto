@@ -562,16 +562,15 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       #print(solve(Sigma[i,,]))
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
       distances[i] <- S
+      varianc= VP %*% diag(lambda) %*% t(VP) 
       
       if (S <= qchisq(0.95,ncol(Y))) 
       {
         poids[i] = 1
       }
-      varianc= VP %*% diag(lambda) %*% t(VP) 
       
       SigmaIter[i,,] = varianc*poids[i]
-      #sommepoids = sommepoids + poids[i]
-      
+
     }
     
     varianc= VP %*% diag(lambda) %*% t(VP) 
@@ -619,7 +618,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   else if (methodeEstimation == "streaming")
   { 
-    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y))
+    results <- StreamingMV(Y,batch = 2,depart = depart_online,niterRMon = ncol(Y))
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$SigmaStreaming

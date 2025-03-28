@@ -60,7 +60,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
   }
     else if (methode == "FASTMCD")
     {
-      res <- covMcd(Z,raw.only = TRUE)
+      res <- covMcd(Z)
       med <- res$center
       Sigma <- res$cov
       
