@@ -165,7 +165,8 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     resultats <- estimation(Z,methodeEstimation = "offline")
     med <- resultats$med
     Sigma <- resultats$SigmaOfflinePoids
-    rmseSigma <- min(norm(resultats$SigmaOfflinePoids - SigmaVrai,"F"),norm(resultats$SigmaOffline - SigmaVrai,"F"))
+    rmseSigma <- ifelse(norm(resultats$SigmaOfflinePoids,"F") < 0.001,norm(resultats$SigmaOffline - SigmaVrai,"F"),min(norm(resultats$SigmaOfflinePoids - SigmaVrai,"F"),norm(resultats$SigmaOffline- SigmaVrai,"F")))
+    
     print("OK offline")
     rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- resultats$distances
@@ -193,7 +194,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     resultats <- estimation(Z,methodeEstimation = "online")
     med <- resultats$med
     Sigma <- resultats$SigmaOnlinePoids
-    rmseSigma <- min(norm(resultats$SigmaOnlinePoids - SigmaVrai,"F"),norm(resultats$SigmaOnline - SigmaVrai,"F"))
+    rmseSigma <- ifelse(norm(resultats$SigmaOnlinePoids,"F") < 0.001,norm(resultats$SigmaOnline - SigmaVrai,"F"),min(norm(resultats$SigmaOnlinePoids - SigmaVrai,"F"),norm(resultats$SigmaOnline - SigmaVrai,"F")))
     
     #rmseSigma <- norm(Sigma - SigmaVrai,"F")
     print("OK online")
@@ -234,6 +235,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     #U <- results$U
     #lambda <- results$lambdaIter
     distances <- resultats$distances
+    #distances = calcule_vecteur_distances(Z,resultats$SigmaStreamingPoids,cutoff)
     outliers <- detectionOutliers(distances,cutoff)
     
     tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
@@ -244,7 +246,13 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     if((tc["1","0"] + tc["1","1"]) != 0)
     {faux_negatifs   <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
     else faux_negatifs <- 0
-    auc <- round(auc(outliers,data$labelsVrais),2)*100
+    
+    
+    if (length(unique(outliers)) == 2) {
+      auc <- round(auc(outliers, data$labelsVrais), 2) * 100
+    } else {
+      auc <- 50  
+    }
     
   } 
   # Fin du chrono
