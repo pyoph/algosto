@@ -67,8 +67,8 @@ creerMatriceToeplitz <- function(rho,d)
 
 #Initialisation des paramètres communs à toutes les simulations
 #d = 100 000 
-nbruns = 10
-n = 1e5
+nbruns = 100
+n = 1e4
 d = 10
 mu1 = rep(0,d)
 mu2 = 5*rep(1,d)

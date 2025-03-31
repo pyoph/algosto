@@ -197,9 +197,44 @@ ggplot(df_long, aes(x = taux_contamination, y = FP, color = Méthode)) +
   theme(legend.position = "top")  # Légende en haut
 
 
+# Sélectionner les colonnes FP et FN
+fp_fn_df <- results_metrics[, c("FP_Cov", "FP_OGK", "FP_Comed", 
+                                "FP_Shrink", "FP_Online", 
+                                "FP_Offline", "FP_Streaming",
+                                "FN_Cov", "FN_OGK", "FN_Comed", 
+                                "FN_Shrink", "FN_Online", 
+                                "FN_Offline", "FN_Streaming")]
 
+fp_fn_df$taux_contamination <- taux_contamination  
+
+# Conversion en format long pour ggplot
+df_long <- melt(fp_fn_df, id.vars = "taux_contamination", 
+                variable.name = "Méthode", value.name = "Valeur")
+
+# Ajouter une colonne pour distinguer FP et FN
+df_long$Type <- ifelse(grepl("FP_", df_long$Méthode), "FP", "FN")
+
+# Nettoyer les noms des méthodes en supprimant le préfixe FP_ ou FN_
+df_long$Méthode <- gsub("FP_|FN_", "", df_long$Méthode)
+
+# Tracer les courbes FP et FN
+ggplot(df_long, aes(x = taux_contamination, y = Valeur, 
+                    color = Méthode, linetype = Type)) +
+  geom_line(size = 1.2) +  # Courbes
+  geom_point(size = 2) +   # Points aux taux spécifiés
+  scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
+  labs(title = "False positives and false negatives rates",
+       x = "Contamination rate (%)",
+       y = "Rate",
+       color = "Method",
+       linetype = "Type") +  # Nom de la légende
+  theme_minimal() +
+  theme(legend.position = "top")  # Légende en haut
 
 save(results_metrics,file = "results_metricsMaronnaZamar.Rdata")
+
+
+
 
 # latex_table_results_metrics <- xtable(results_metrics)
 
