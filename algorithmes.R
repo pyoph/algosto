@@ -119,6 +119,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       lambdatilde = lambdatilde
       
       lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$vp
@@ -542,8 +543,10 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     {
       sampsize = ncol(Y)
       
+      #print(lambdatilde) 
+      #lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      lambdaResultat <- RobbinsMC2_cpp(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       
-      lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$vp

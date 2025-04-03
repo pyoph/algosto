@@ -45,7 +45,7 @@ library(tidyr)
 library(dplyr)
 library(knitr)
 library("mvoutlier")
-#library(Rcpp)
+library(Rcpp)
 #library(RcppArmadillo)
 #install.packages("Metrics")
 #library(Metrics)
@@ -57,12 +57,10 @@ source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 source("~/algosto/shrinkageCabana.R")
-#sourceCpp("~/algosto/RobbinsMCCpp")
+sourceCpp("~/algosto/RobinsMC2CPP.cpp")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-###Tests CPP
-#Tester sur batch = sqrt(d)
 p1 = 0.6
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
@@ -131,15 +129,15 @@ df_long <- melt(rmse_df, id.vars = "taux_contamination",
 df_long$Méthode <- gsub("RMSE_Sigma_", "", df_long$Méthode)
 
 # Tracer les courbes RMSE
-ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode)) +
+plot1 = ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode)) +
   geom_line(size = 1.2) +  # Courbes
   geom_point(size = 2) +   # Points aux taux spécifiés
   scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
   scale_y_log10() +  # Échelle logarithmique en base 10
-    labs(title = "Évolution du RMSE en fonction du taux de contamination",
-       x = "Taux de contamination (%)",
-       y = "RMSE",
-       color = "Méthode") +  # Nom de la légende
+    labs(title = "Evolution of Frobenius norm error",
+       x = "Contamination rate (%)",
+       y = "Frobenius norm error",
+       color = "Method") +  # Nom de la légende
   theme_minimal() +
   theme(legend.position = "top")  # Légende en haut
 
@@ -185,7 +183,7 @@ df_long <- melt(fp_df, id.vars = "taux_contamination",
 df_long$Méthode <- gsub("FP_", "", df_long$Méthode)
 
 # Tracer les courbes FP
-ggplot(df_long, aes(x = taux_contamination, y = FP, color = Méthode)) +
+ ggplot(df_long, aes(x = taux_contamination, y = FP, color = Méthode)) +
   geom_line(size = 1.2) +  # Courbes
   geom_point(size = 2) +   # Points aux taux spécifiés
   scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
@@ -218,7 +216,7 @@ df_long$Type <- ifelse(grepl("FP_", df_long$Méthode), "FP", "FN")
 df_long$Méthode <- gsub("FP_|FN_", "", df_long$Méthode)
 
 # Tracer les courbes FP et FN
-ggplot(df_long, aes(x = taux_contamination, y = Valeur, 
+plot2 = ggplot(df_long, aes(x = taux_contamination, y = Valeur, 
                     color = Méthode, linetype = Type)) +
   geom_line(size = 1.2) +  # Courbes
   geom_point(size = 2) +   # Points aux taux spécifiés
@@ -231,6 +229,7 @@ ggplot(df_long, aes(x = taux_contamination, y = Valeur,
   theme_minimal() +
   theme(legend.position = "top")  # Légende en haut
 
+plot1+plot2
 save(results_metrics,file = "results_metricsMaronnaZamar.Rdata")
 
 
