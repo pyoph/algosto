@@ -620,7 +620,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   else if (methodeEstimation == "streaming")
   { 
     #k = floor(sqrt(ncol(Y)))
-    results <- StreamingMV(Y,batch = 4,depart = depart_online,niterRMon = ncol(Y)*4)
+    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y)^2)
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
