@@ -472,3 +472,43 @@ grid.arrange(grobs = list_plots[5:9], ncol = 3, nrow = 3)
 # 
 #   write.csv(seuil_df,file = "seuil.csv")  
 # 
+# Supposons que rmseSigmaBP est déjà dans l'environnement
+# Dimensions : 100 x 9 x 9
+
+# Initialisation
+
+# Dimensions : [100, 9, 8]
+rmse_data <- data.frame()
+
+# Noms des méthodes
+methods <- c("Cov", "OGK", "Comed", "Shrink", 
+             "Online", "Offline", "Streaming", "FastMCD")
+
+# Noms des taux de contamination (à adapter si tu as les vrais)
+taux_contamination <- paste0("Taux_", 1:9)
+
+for (m in 1:8) {
+  for (c in 1:9) {
+    values <- rmseSigmaBP[, c, m]  # 100 valeurs
+    temp_df <- data.frame(
+      RMSE = values,
+      Méthode = methods[m],
+      Taux = taux_contamination[c]
+    )
+    rmse_data <- rbind(rmse_data, temp_df)
+  }
+}
+
+# 🎨 Plot : facettes par méthode, boxplots par taux
+library(ggplot2)
+
+ggplot(rmse_data, aes(x = Taux, y = RMSE)) +
+  geom_boxplot(fill = "lightblue", color = "darkblue") +
+  facet_wrap(~ Méthode, scales = "free_y") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "RMSE par Taux de Contamination et Méthode",
+    x = "Taux de contamination",
+    y = "RMSE"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))

@@ -136,17 +136,17 @@ construction_tableau_resultats <- function(nbrunsParam = nbruns,contamin = "moye
     methode <- methodes[j]
     resultats <- calcule_RMSE_FP_AUC_par_methode(data,methode = methode)
     rmseMed[i,j] <- resultats$rmseMed + rmseMed[i,j]
-    rmseMedBP[k,i,j] = rmseMed[i,j]
+    rmseMedBP[k,i,j] = resultats$rmseMed
     rmseSigma[i,j] <- resultats$rmseSigma +  rmseSigma[i,j]
-    rmseSigmaBP[k,i,j] = rmseSigma[i,j]
+    rmseSigmaBP[k,i,j] = resultats$rmseSigma
     faux_positifs[i,j] <- resultats$faux_positifs + faux_positifs[i,j]
-    faux_positifsBP[k,i,j] = faux_positifs[i,j]
+    faux_positifsBP[k,i,j] = resultats$faux_negatifs
     faux_negatifs[i,j] <- resultats$faux_negatifs + faux_negatifs[i,j]
     faux_negatifsBP[k,i,j] = faux_negatifs[i,j]
     temps_calcul[i,j] <- resultats$temps_calcul + temps_calcul[i,j]
-    temps_calculBP[k,i,j] = temps_calcul[i,j]
+    temps_calculBP[k,i,j] = resultats$temps_calcul
     auc[i,j] <- resultats$auc + auc[i,j]
-    aucBP[k,i,j] = auc[i,j]
+    aucBP[k,i,j] = resultats$auc
     }
      
     }
