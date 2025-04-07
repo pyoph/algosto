@@ -61,7 +61,7 @@ creerMatriceToeplitz <- function(rho,d)
   return(toeplitz_matrix)
 }
 
-
+  
 
 #Faire un boxplot des résultats enregistrer les résultats à chaque run
 
@@ -72,7 +72,7 @@ n = 1e4
 d = 10
 mu1 = rep(0,d)
 mu2 = 5*rep(1,d)
-rho = 0.99
+rho = 0.8
 Sigma1 = creerMatriceToeplitz(rho,d)
 
 lignes_a_permuter = c(1, 2)

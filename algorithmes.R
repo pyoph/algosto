@@ -496,6 +496,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
 
 }
 
+
 #Fonction qui prend en paramètre une matrice de données, et une méthode d'estimation et renvoie les paramètres estimés, les distances et les outliers
 estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y),  cMC=ncol(Y),w= 2,
                       minit = r*rnorm(ncol(Y)),Vinit = diag(ncol(Y))

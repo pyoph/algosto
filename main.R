@@ -57,11 +57,11 @@ source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 source("~/algosto/shrinkageCabana.R")
-sourceCpp("~/algosto/RobinsMC3CPP.cpp")
+sourceCpp("~/algosto/RobinsMC2CPP.cpp")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 0.6
+p1 = 0.98
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 
