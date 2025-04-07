@@ -99,7 +99,8 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
     minit <- resoff$median
     Vinit <- WeiszfeldCov_init(Y[1:100,],minit,init_cov = covComed(Y[1:100,])$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
-    eig_init = eigen(Vinit)
+    #eig_init = eigen(Vinit)
+    eig_init = eigs_sym(Y[1:100],)
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -300,11 +301,15 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
     #Récupération des résultats de la fonction Outlier
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
     if(methode == "eigen"){
-      VPropresV <- eigen(moyenneV)$vectors
-      #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
       
-      valPV <- eigen(moyenneV)$values  
-      lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      elpropres = eigs_sym(moyenneV,ncol(Y))
+      VPropresV = elpropres$vectors
+      valPV = elpropres$values
+      # VPropresV <- eigen(moyenneV)$vectors
+      # #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+      # 
+      # valPV <- eigen(moyenneV)$values  
+      # lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$lambda
@@ -512,7 +517,9 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     med <- resoff$median
     V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
-    eig_init = eigen(V)
+    eig_init = eigs_sym(V,ncol(Y))
+    #eig_init = eigen(V)
+    
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -535,7 +542,8 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     #SigmaOffline <- varianc
     V <- resoff$covmedian
-    U <- eigen(V)$vectors
+    #U <- eigen(V)$vectors
+    U = eigs_sym(V,ncol(Y))
     #lambda <- RobbinsMC()
     #distances <- calcule_vecteur_distances(Y, med, SigmaOffline) 
     for (i in 1:nrow(Y))
@@ -804,7 +812,8 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     minit <- resoff$median
     Vinit <- WeiszfeldCov_init(Y[1:100,],minit,init_cov = covComed(Y[1:100,])$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
-    eig_init = eigen(Vinit)
+    #eig_init = eigen(Vinit)
+    eig_init = eigs_sym(Vinit, k = ncol(Y))
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -1020,10 +1029,12 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     #Récupération des résultats de la fonction Outlier
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
     if(methode == "eigen"){
-      VPropresV <- eigen(moyenneV)$vectors
+      elpropresV = eigs_sym(moyenneV,k = ncol(Y))
+      VPropresV = elpropresV$vectors
+      #VPropresV <- eigen(moyenneV)$vectors
       #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
       
-      valPV <- eigen(moyenneV)$values 
+      valPV <- elpropresV$values 
       valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
       lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = lambdatilde,initbarre = lambda,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
         #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon*(floor(log(batch*niterr))+1),w=w,vp=valPV,init = lambdatilde,initbarre = lambda,ctilde = compt,cbarre =compt,slog=sum((log(1:(compt+1))^w)))

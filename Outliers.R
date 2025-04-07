@@ -164,9 +164,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     #med <- RobVar(Z)$median
     resultats <- estimation(Z,methodeEstimation = "offline")
     med <- resultats$med
-    Sigma <- resultats$SigmaOfflinePoids
-    rmseSigma <- ifelse(norm(resultats$SigmaOfflinePoids,"F") < 0.001,norm(resultats$SigmaOffline - SigmaVrai,"F"),min(norm(resultats$SigmaOfflinePoids - SigmaVrai,"F"),norm(resultats$SigmaOffline- SigmaVrai,"F")))
-    
+    Sigma <- resultats$SigmaOffline
+    #rmseSigma <- ifelse(norm(resultats$SigmaOfflinePoids,"F") < 0.001,norm(resultats$SigmaOffline - SigmaVrai,"F"),min(norm(resultats$SigmaOfflinePoids - SigmaVrai,"F"),norm(resultats$SigmaOffline- SigmaVrai,"F")))
+    rmseSigma = norm(Sigma - Sigma1,"F")
     print("OK offline")
     rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- resultats$distances
@@ -194,9 +194,9 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     resultats <- estimation(Z,methodeEstimation = "online")
     med <- resultats$med
     Sigma <- resultats$SigmaOnlinePoids
-    rmseSigma <- ifelse(norm(resultats$SigmaOnlinePoids,"F") < 0.001,norm(resultats$SigmaOnline - SigmaVrai,"F"),min(norm(resultats$SigmaOnlinePoids - SigmaVrai,"F"),norm(resultats$SigmaOnline - SigmaVrai,"F")))
+    #rmseSigma <- ifelse(norm(resultats$SigmaOnlinePoids,"F") < 0.001,norm(resultats$SigmaOnline - SigmaVrai,"F"),min(norm(resultats$SigmaOnlinePoids - SigmaVrai,"F"),norm(resultats$SigmaOnline - SigmaVrai,"F")))
     
-    #rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
     print("OK online")
     rmseMed <- sqrt(sum((muVrai - med)^2))
     #miter <- results$miter
