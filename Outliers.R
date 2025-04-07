@@ -224,10 +224,10 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     # Méthode streaming
     resultats <- estimation(Z,methodeEstimation = "streaming")
     med <- resultats$med
-    Sigma <- resultats$SigmaStreamingPoids
-    #rmseSigma <- norm(Sigma - SigmaVrai,"F")
+    Sigma <- resultats$SigmaStreaming
+    rmseSigma <- norm(Sigma - SigmaVrai,"F")
     
-    rmseSigma <- ifelse(norm(resultats$SigmaStreamingPoids,"F") < 0.01,norm(resultats$SigmaStreaming - SigmaVrai,"F"),min(norm(resultats$SigmaStreamingPoids - SigmaVrai,"F"),norm(resultats$SigmaStreaming - SigmaVrai,"F")))
+    #rmseSigma <- ifelse(norm(resultats$SigmaStreamingPoids,"F") < 0.01,norm(resultats$SigmaStreaming - SigmaVrai,"F"),min(norm(resultats$SigmaStreamingPoids - SigmaVrai,"F"),norm(resultats$SigmaStreaming - SigmaVrai,"F")))
        
     print("OK Streaming")
     rmseMed <- sqrt(sum((muVrai - med)^2))

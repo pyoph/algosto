@@ -574,7 +574,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       #print(solve(Sigma[i,,]))
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
       distances[i] <- S
-      varianc= VP %*% diag(lambda) %*% t(VP) 
+      varianc= VP %*% diag(as.vector(lambda)) %*% t(VP) 
       
       if (S <= qchisq(0.95,ncol(Y))) 
       {
@@ -585,7 +585,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
 
     }
     
-    varianc= VP %*% diag(lambda) %*% t(VP) 
+    varianc= VP %*% diag(as.vector(lambda)) %*% t(VP) 
     
     
     SigmaOffline <- varianc

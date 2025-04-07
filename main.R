@@ -57,7 +57,7 @@ source("~/algosto/Outliers.R")
 source("~/algosto/computeOutliers.R")
 source("~/algosto/seuils.R")
 source("~/algosto/shrinkageCabana.R")
-sourceCpp("~/algosto/RobinsMC2CPP.cpp")
+sourceCpp("~/algosto/RobinsMC3CPP.cpp")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
