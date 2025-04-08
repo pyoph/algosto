@@ -100,7 +100,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
     Vinit <- WeiszfeldCov_init(Y[1:100,],minit,init_cov = covComed(Y[1:100,])$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
     #eig_init = eigen(Vinit)
-    eig_init = eigs_sym(Y[1:100],)
+    eig_init = eigs_sym(Vinit,ncol(Y))
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -114,8 +114,8 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
     for (i in 1:nrow(Y[1:100,]))
       
     {
-      sampsize = ncol(Y)
-      
+      #sampsize = ncol(Y)
+      sampsize = floor(sqrt(ncol(Y)))
       lambda = lambdaInit
       lambdatilde = lambdatilde
       
@@ -309,7 +309,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       # #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
       # 
       # valPV <- eigen(moyenneV)$values  
-      # lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$lambda
@@ -550,11 +550,11 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     for (i in 1:nrow(Y))
       
     {
-      sampsize = ncol(Y)
-      
+      #sampsize = ncol(Y)
+      sampsize = floor(sqrt(ncol(Y)))
       #print(lambdatilde) 
-      #lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
-      lambdaResultat <- RobbinsMC2_cpp(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      #lambdaResultat <- RobbinsMC2_cpp(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
@@ -617,7 +617,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     if (methodeOnline == "eigen"){
     results <- estimMVOnline(Y, depart = depart_online,niterRMon = ncol(Y))}
-    else {results <- estimMVOnline(Y, depart = depart_online,methode = "CPP",niterRMon = ncol(Y))}
+    else {results <- estimMVOnline(Y, depart = depart_online,methode = "eigen",niterRMon = sqrt(ncol(Y)))}
     #Retour des résultats
     med <- results$moyennem
     miter <- results$miter
