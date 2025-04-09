@@ -196,14 +196,14 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     } else {
       auc <- 50  # Valeur par défaut pour un cas non exploitable
     }
-    #Vérification que loi du Khi-deux
-    # hist(distances, probability = TRUE, breaks = 30,
-    #      main = "Histogramme des distances de Mahalanobis",
-    #      xlab = "Distance", col = "lightblue", border = "white")
-    # 
-    # curve(dchisq(x, df = ncol(Z)), col = "red", lwd = 2, add = TRUE)
-    # legend("topright", legend = c("Empirique", "Théorique Chi²"),
-    #        fill = c("lightblue", NA), border = c("white", NA), lty = c(NA, 1), col = c(NA, "red"))
+    #Vérification que la distance de Mahalanobis suit la loi du Khi-deux
+#     hist(distances, probability = TRUE, breaks = 30,    ylim = c(0,.1),
+# 
+#          main = "Histogramme des distances de Mahalanobis",
+#          xlab = "Distance", col = "lightblue", border = "white")
+# curve(dchisq(x, df = ncol(Z)), col = "red", lwd = 2, add = TRUE)
+#     legend("topright", legend = c("Empirique", "Théorique Chi²"),
+#            fill = c("lightblue", NA), border = c("white", NA), lty = c(NA, 1), col = c(NA, "red"))
   } else if (methode == "online") {
     # Méthode Online
     resultats <- estimation(Z,methodeEstimation = "online")
