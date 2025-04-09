@@ -179,7 +179,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     #distances = calcule_vecteur_distances(Z,mu1,SigmaVrai)
     distancescorr = distances*correctionDistanceMahalanobis(distances,Z)
     #distances <- calcule_vecteur_distances(Z,med,Sigma)
-    outliers <- detectionOutliers(distancescorr,cutoff = qchisq(0.95,df = ncol(Z))) 
+    outliers <- detectionOutliers(distances,cutoff = qchisq(0.95,df = ncol(Z))) 
     
     tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
     tc
@@ -196,7 +196,14 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     } else {
       auc <- 50  # Valeur par défaut pour un cas non exploitable
     }
-    
+    #Vérification que loi du Khi-deux
+    # hist(distances, probability = TRUE, breaks = 30,
+    #      main = "Histogramme des distances de Mahalanobis",
+    #      xlab = "Distance", col = "lightblue", border = "white")
+    # 
+    # curve(dchisq(x, df = ncol(Z)), col = "red", lwd = 2, add = TRUE)
+    # legend("topright", legend = c("Empirique", "Théorique Chi²"),
+    #        fill = c("lightblue", NA), border = c("white", NA), lty = c(NA, 1), col = c(NA, "red"))
   } else if (methode == "online") {
     # Méthode Online
     resultats <- estimation(Z,methodeEstimation = "online")
@@ -228,7 +235,15 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     } else {
       auc <- 50  
     }
-  } 
+    # #Vérification qu'on a une Khi-Deux
+    # hist(distances, probability = TRUE, breaks = 30,
+    #      main = "Histogramme des distances de Mahalanobis",
+    #      xlab = "Distance", col = "lightblue", border = "white")
+    # 
+    # curve(dchisq(x, df = ncol(Z)), col = "red", lwd = 2, add = TRUE)
+    # legend("topright", legend = c("Empirique", "Théorique Chi²"),
+    #        fill = c("lightblue", NA), border = c("white", NA), lty = c(NA, 1), col = c(NA, "red"))
+    } 
   else if (methode == "streaming") {
     # Méthode streaming
     resultats <- estimation(Z,methodeEstimation = "streaming")
@@ -263,7 +278,14 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     } else {
       auc <- 50  
     }
-    
+    # #Vérification distance Khi-deux
+    # hist(distances, probability = TRUE, breaks = 30,
+    #      main = "Histogramme des distances de Mahalanobis",
+    #      xlab = "Distance", col = "lightblue", border = "white")
+    # 
+    # curve(dchisq(x, df = ncol(Z)), col = "red", lwd = 2, add = TRUE)
+    # legend("topright", legend = c("Empirique", "Théorique Chi²"),
+    #        fill = c("lightblue", NA), border = c("white", NA), lty = c(NA, 1), col = c(NA, "red"))
   } 
   # Fin du chrono
   end_time <- Sys.time()
