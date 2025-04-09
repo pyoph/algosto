@@ -39,6 +39,7 @@ RobbinsMC2=function(mc_sample_size=10000,vp,epsilon=10^(-8),alpha=0.75,c=length(
   return(list(vp=vp2,niter=i, lambdalist=lambdalist, vplist=vplist,lambda = lambda)) 
 }
 
+#Estimation online
 estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5, w=2,cMC=ncol(Y),
                     minit = r*rnorm(ncol(Y)),Vinit = diag(d)
                     ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))),
@@ -54,9 +55,8 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
   #Initialisations
   m <- minit
   V <- Vinit
-  poids = rep(0,nrow(Y))
-  SigmaPoids = matrix(0, ncol(Y),ncol(Y))
-  SigmaIterPoids = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
+  outlier_labels = rep(0,nrow(Y))
+  
   #Si départ = 0, intialisation de U sur la sphère unité  
   if (depart == 0)
   {
@@ -95,12 +95,12 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
     # lambdaIter[1:depart,]=matrix(rep(lambdaInit,depart),byrow=T,nrow=depart)
     # 
     
-    resoff = WeiszfeldCov_init(Y[1:100,],r*rnorm(ncol(Y)),init_cov = covComed(Y[1:100,])$cov,nitermax = 100)
+    resoff = WeiszfeldCov_init(Y[1:depart,],r*rnorm(ncol(Y)),init_cov = covComed(Y[1:100,])$cov,nitermax = 100)
     minit <- resoff$median
-    Vinit <- WeiszfeldCov_init(Y[1:100,],minit,init_cov = covComed(Y[1:100,])$cov,nitermax = 100)$covmedian
+    Vinit <- WeiszfeldCov_init(Y[1:depart,],minit,init_cov = covComed(Y[1:100,])$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
     #eig_init = eigen(Vinit)
-    eig_init = eigs_sym(Vinit,ncol(Y))
+    eig_init = eigs_sym(Vinit,k = ncol(Y))
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -114,13 +114,12 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
     for (i in 1:nrow(Y[1:100,]))
       
     {
-      #sampsize = ncol(Y)
-      sampsize = floor(sqrt(ncol(Y)))
+      sampsize = ncol(Y)
+      
       lambda = lambdaInit
       lambdatilde = lambdatilde
       
       lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
-      
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$vp
@@ -180,18 +179,9 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       #distances[l] <- as.numeric(Y[l,] - m) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - m)))
       distances[l] <- S
       
-      if (S <= cutoff)
-      {
-        poids[l] = 1
-        
-        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
-        SigmaIterPoids[l,,] = SigmaPoids
-        
-      }
-      
-      
     }
-  }
+  if (distances[l] > cutoff) {outlier_labels[l] = 1}
+    }
   
   
   sampsize = niterRMon
@@ -238,7 +228,7 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
   miter = matrix(0,nrow(Y),ncol(Y))
   
   # Vecteur pour stocker les labels des outliers
-  outlier_labels <- rep(0, nrow(Y)-1)
+  #outlier_labels <- rep(0, nrow(Y)-1)
   
   phat <- rep(0,nrow(Y)-1)
   
@@ -301,14 +291,11 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
     #Récupération des résultats de la fonction Outlier
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
     if(methode == "eigen"){
+      elpropresV = eigs_sym(moyenneV,k = ncol(Y))
+      VPropresV <- elpropresV$vectors
+      #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
       
-      elpropres = eigs_sym(moyenneV,ncol(Y))
-      VPropresV = elpropres$vectors
-      valPV = elpropres$values
-      # VPropresV <- eigen(moyenneV)$vectors
-      # #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
-      # 
-      # valPV <- eigen(moyenneV)$values  
+      valPV <- elpropresV$values  
       lambdaResultat <- RobbinsMC2(niterRMon,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
@@ -326,27 +313,19 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
       #print(lambdaIter[i,])
       Sigma[i,,] <-  VP %*% diag(lambdaIter[i,]) %*% t(VP) 
       #print(Sigma[i,,])
-      #Calcul de la distance i
+      #Calcul de la distance i+1 sur la donnée i+1
       S <- 0
       for(j in (1:ncol(Y)))
       {
-        S<- S + 1/(lambdaIter[i,j])*sum(t(Y[i,] - moyennem)*(VP[,j]))^2
         
+        S<- S + 1/(lambdaIter[i,j])*sum(t(Y[i+1,] - moyennem)*(VP[,j]))^2
       #print(solve(Sigma[i,,]))
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
-      distances[i] <- S
       
-      if (S <= cutoff)
-      {
-        poids[l] = 1
-        
-        SigmaPoids = SigmaPoids + poids[l]*Sigma[l,,]
-        SigmaIterPoids[l,,] = SigmaPoids
-        
-      }
-      }
-      if(sum(poids) != 0)
-      {SigmaPoids = SigmaPoids/sum(poids)}
+      }      
+      distances[i+1] <- S
+      if (distances[i+1] > cutoff) {outlier_labels[i+1] = 1}
+      
       }
     else if(methode == "CPP"){
       elPropres <- calculValeursEtVecteursPropres(moyenneV)
@@ -379,9 +358,12 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
         
         #print(solve(Sigma[i,,]))
         #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
-        distances[i] <- S
+       
         
-      }}
+      }
+      distances[i] <- S
+      if(distances[i] > cutoff) {outlier_labels[i] = 1}
+      }
     else {
       
       print("méthode sans eigen")
@@ -491,11 +473,10 @@ estimMVOnline <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5
   
   
   
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,SigmaPoids = SigmaPoids,SigmaIterPoids =SigmaIterPoids))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma))
 
 
 }
-
 
 #Fonction qui prend en paramètre une matrice de données, et une méthode d'estimation et renvoie les paramètres estimés, les distances et les outliers
 estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize = ncol(Y),  cMC=ncol(Y),w= 2,
@@ -511,16 +492,12 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     #Récupération de la médiane de Sigma des vecteurs propres (variable U), et des valeurs propres
     #resoff=RobVar(Y,mc_sample_size = nrow(Y)*ncol(Y),c=ncol(Y),w=2)
-    poids = rep(0,nrow(Y))
-    SigmaIter =  array(0, dim = c(nrow(Y),ncol(Y), ncol(Y) ))
-    SigmaPoids = matrix(0,ncol(Y),ncol(Y))
+    
     resoff = WeiszfeldCov_init(Y,r*rnorm(ncol(Y)),init_cov = covComed(Y)$cov,nitermax = 100)
     med <- resoff$median
     V <- WeiszfeldCov_init(Y,med,init_cov = covComed(Y)$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
-    eig_init = eigs_sym(V,ncol(Y))
-    #eig_init = eigen(V)
-    
+    eig_init = eigen(V)
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -543,19 +520,16 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     #SigmaOffline <- varianc
     V <- resoff$covmedian
-    #U <- eigen(V)$vectors
-    U = eigs_sym(V,ncol(Y))
+    U <- eigen(V)$vectors
     #lambda <- RobbinsMC()
     #distances <- calcule_vecteur_distances(Y, med, SigmaOffline) 
     for (i in 1:nrow(Y))
       
     {
-      #sampsize = ncol(Y)
-      sampsize = floor(sqrt(ncol(Y)))
-      #print(lambdatilde) 
-      lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
-      #lambdaResultat <- RobbinsMC2_cpp(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      sampsize = ncol(Y)
       
+      
+      lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$vp
@@ -575,26 +549,14 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       #print(solve(Sigma[i,,]))
       #distances[i] <- as.numeric(Y[i,] - m) %*% solve(Sigma[i,,]) %*% (as.numeric(t(Y[i,] - m)))
       distances[i] <- S
-      varianc= VP %*% diag(as.vector(lambda)) %*% t(VP) 
       
-      if (S <= qchisq(0.95,ncol(Y))) 
-      {
-        poids[i] = 1
-      }
-      
-      SigmaPoids = varianc*poids[i] + varianc
-
     }
     
-    varianc= VP %*% diag(as.vector(lambda)) %*% t(VP) 
+    varianc= VP %*% diag(lambda) %*% t(VP) 
     
     
     SigmaOffline <- varianc
-    if(sum(poids) != 0)
-    SigmaOfflinePoids = SigmaPoids/sum(poids)
     
-    #SigmaOffline = SigmaOfflinePoids
-
     #lambdaInit <- lambda
   
     #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = valPV,initbarre = valPV,ctilde = 0,cbarre =0)
@@ -617,45 +579,42 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     
     if (methodeOnline == "eigen"){
     results <- estimMVOnline(Y, depart = depart_online,niterRMon = ncol(Y))}
-    else {results <- estimMVOnline(Y, depart = depart_online,methode = "eigen",niterRMon = sqrt(ncol(Y)))}
+    else {results <- estimMVOnline(Y, depart = depart_online,methode = "CPP",niterRMon = ncol(Y))}
     #Retour des résultats
     med <- results$moyennem
     miter <- results$miter
     SigmaOnline <- results$Sigma
-    SigmaOnlinePoids <- results$SigmaPoids
     U <- results$U
     lambda <- results$lambda
     V <- results$moyenneV
     distances <- results$distances
-   # results$Sigma[101,,]
+    outliers = results$outlier_labels
+    # results$Sigma[101,,]
   }
   else if (methodeEstimation == "streaming")
   { 
-    #k = floor(sqrt(ncol(Y)))
-    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y)^2)
+    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y))
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
-    #print(SigmaStreaming)
-    poids = results$poids
-    
-    SigmaStreamingPoids = results$SigmaPoids
     U <- results$U
     lambda <- results$lambda
     V <- results$moyenneV
     distances <- results$distances
     miter <- results$miter
+    outliers = results$outlier_labels
+    
     # results$Sigma[101,,]
   }
   
   if (methodeEstimation  == "online") {
-    return(list(med = med, SigmaOnline = SigmaOnline[nrow(Y)- 1,,],SigmaOnlinePoids = SigmaOnlinePoids ,SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances))
+    return(list(med = med, SigmaOnline = SigmaOnline[nrow(Y)- 1,,], SigmaOnlineIter = SigmaOnline,U = U ,lambda = lambda,V = V, distances = distances,outliers = outliers))
 }
-  else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,SigmaOfflinePoids = SigmaOfflinePoids,V = V, distances = distances))}
-else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,],SigmaStreamingPoids = SigmaStreamingPoids ,V = V, distances = distances,poids = poids))}
+  else if (methodeEstimation  == "offline"){return(list(med = med, SigmaOffline = SigmaOffline ,V = V, distances = distances))}
+else {return(list(med = med, SigmaStreamingIter = SigmaStreaming,SigmaStreaming = SigmaStreaming[nrow(Y)-1,,] ,V = V, distances = distances,outliers = outliers))}
   }
 
-
+#Estimation streaming
 StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w=2, cMC=ncol(Y),
                         minit = r*rnorm(ncol(Y)),Vinit = diag(d)
                         ,U = array(1, dim = c(nrow(Y), ncol(Y),ncol(Y))), batch=ncol(Y),
@@ -673,10 +632,8 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   #V <- Vinit
   
   distances <- rep(0,nrow(Y))
-  poids = rep(0,nrow(Y))
-  SigmaPoids = matrix(0, ncol(Y),ncol(Y))
-  SigmaIterPoids = array(0, dim = c(nrow(Y), ncol(Y),ncol(Y)))
   
+  outlier_labels = rep(0,nrow(Y))
   #Initialisations 
   #Si départ = 0, intialisation de U sur la sphère unité  
   if (depart == 0)
@@ -813,8 +770,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     minit <- resoff$median
     Vinit <- WeiszfeldCov_init(Y[1:100,],minit,init_cov = covComed(Y[1:100,])$cov,nitermax = 100)$covmedian
     #V <-  GmedianCov(Y, init = med,scores = ncol(Y))$covmedian
-    #eig_init = eigen(Vinit)
-    eig_init = eigs_sym(Vinit, k = ncol(Y))
+    eig_init = eigen(Vinit)
     #eig_init = eigen( WeiszfeldCov(Y, nitermax = 1000)$covmedian)
     #eig_init=eigen(resoff$variance)
     valPV <- eig_init$values 
@@ -893,16 +849,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       #distances[l] <- as.numeric(Y[l,] - m) %*% solve(Sigma[l,,]) %*% (as.numeric(t(Y[l,] - m)))
       distances[l] <- S
       
-      if (S <= cutoff)
-      {
-        #print(S)
-        
-        poids[l] = 1
-        
-        SigmaPoids = SigmaPoids + poids[l]*varianc
-        SigmaIterPoids[l,,] = SigmaPoids
-        
-      }
+      if (S > cutoff) {outlier_labels[l] = 1}
     
     
     }
@@ -1030,12 +977,10 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
     #Récupération des résultats de la fonction Outlier
     #resultatOutlier <- Outlier(donnee = Y[i, ],seuil_p_value = 0.05,VP = U[i,,],m = moyennem,lambdatilde)
     if(methode == "eigen"){
-      elpropresV = eigs_sym(moyenneV,k = ncol(Y))
-      VPropresV = elpropresV$vectors
-      #VPropresV <- eigen(moyenneV)$vectors
+      VPropresV <- eigen(moyenneV)$vectors
       #VPropresV <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
       
-      valPV <- elpropresV$values 
+      valPV <- eigen(moyenneV)$values 
       valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
       lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon,w=w,vp=valPV,samp=1:niterRMon,init = lambdatilde,initbarre = lambda,ctilde = niterRMon*(niterr-1),cbarre =niterRMon*(niterr-1),slog=sum((log(1:((niterRMon*(niterr-1))+1))^w)))
         #lambdaResultat <- RobbinsMC2(c=cMC,mc_sample_size = niterRMon*(floor(log(batch*niterr))+1),w=w,vp=valPV,init = lambdatilde,initbarre = lambda,ctilde = compt,cbarre =compt,slog=sum((log(1:(compt+1))^w)))
@@ -1069,20 +1014,9 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
       #iterations <- depart + (niterr-1)*batch + l
       #print(l)
       distances[depart + (niterr-1)*batch + l] <- S
-      if (S <= cutoff)
-      {
-        #print(S)
-        
-        poids[depart + (niterr-1)*batch + l] = 1
-        
-        SigmaPoids = SigmaPoids + poids[depart + (niterr-1)*batch + l]*varian
-        SigmaIterPoids[depart + (niterr-1)*batch + l,,] = SigmaPoids
-        
-      }
-      }
-      if(sum(poids) != 0)
-      {SigmaPoids = SigmaPoids/sum(poids)}
+      if (distances[depart + (niterr-1)*batch + l] > cutoff) {outlier_labels[depart + (niterr-1)*batch + l] = 1}
       
+      }
       }
     else {
       
@@ -1191,7 +1125,7 @@ StreamingMV <- function(Y,c = sqrt(ncol(Y)), exposantPas = 0.75,aa = 1,r = 1.5,w
   VIter[,,nrow(Y)] = VIter[,,nrow(Y)-1]
   Sigma[nrow(Y),,] = Sigma[(nrow(Y) - 1),,]
   
-  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,niter=niterr,VP=VP,SigmaPoids = SigmaPoids,SigmaIterPoids =SigmaIterPoids,poids = poids))
+  return (list(m=m,V=V,lambdatilde = lambdatilde,lambdaIter = lambdaIter,moyennem=moyennem,moyenneV=moyenneV,miter = miter,VIter = VIter,U = U,vpMCM = vpMCM,outlier_labels = outlier_labels,distances = distances, Sigma = Sigma,niter=niterr,VP=VP))
 }
 
 
