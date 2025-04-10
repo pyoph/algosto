@@ -525,10 +525,13 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
     for (i in 1:nrow(Y))
       
     {
-      sampsize = ncol(Y)
-      
-      
-      lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
+      mc_sample_size = ncol(Y)
+      UU=matrix(rnorm(mc_sample_size*ncol(Y)),ncol=ncol(Y))
+      lambdaResultat <-   robbinsMC(U=UU, c=cMC, w=w,delta=valPV,init = lambdatilde,
+                                    init_bar = lambda,c_tilde = mc_sample_size*(i-1),
+                                    c_bar =mc_sample_size*(i-1), sumlog=sum((log(1:((mc_sample_size*(i-1))+1))^w)))
+      #lambdaResultat = robbinsMC(U = ,delta = valPV)
+      #lambdaResultat <- RobbinsMC2(sampsize,c = cMC, vp=valPV,w=w,samp=1:sampsize,init = lambdatilde,initbarre = lambda,ctilde = sampsize*(i-1),cbarre =sampsize*(i-1),slog=sum((log(1:((sampsize*(i-1))+1))^w)))
       #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
       lambda <- lambdaResultat$vp
       lambdatilde <- lambdaResultat$vp
@@ -551,7 +554,7 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
       
     }
     
-    varianc= VP %*% diag(lambda) %*% t(VP) 
+    varianc= VP %*% diag(as.vector(lambda)) %*% t(VP) 
     
     
     SigmaOffline <- varianc
@@ -577,7 +580,9 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   { 
     
     if (methodeOnline == "eigen"){
-    results <- estimMVOnline(Y, depart = depart_online,niterRMon = ncol(Y))}
+    #results <- estimMVOnline(Y, depart = depart_online,niterRMon = ncol(Y))
+    results = StreamingRobustVariance(Y,batch = 1,mc_sample_size = floor(sqrt(ncol(Y))))
+      }
     else {results <- estimMVOnline(Y, depart = depart_online,methode = "CPP",niterRMon = ncol(Y))}
     #Retour des résultats
     med <- results$moyennem
@@ -592,7 +597,9 @@ estimation <- function(Y,c = ncol(Y), exposantPas = 0.75,aa = 1,r = 1.5,sampsize
   }
   else if (methodeEstimation == "streaming")
   { 
-    results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y))
+    #results <- StreamingMV(Y,batch = ncol(Y),depart = depart_online,niterRMon = ncol(Y))
+    results = StreamingRobustVariance(Y,batch =ncol(Y) ,mc_sample_size = ncol(Y)*floor(sqrt(ncol(Y))))
+    
     #Retour des résultats
     med <- results$moyennem
     SigmaStreaming <- results$Sigma
