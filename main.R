@@ -503,7 +503,7 @@ for (m in 1:8) {
 }
 ggplot(rmse_data, aes(x = factor(Taux), y = RMSE)) +
   geom_boxplot(fill = "lightblue", color = "darkblue") +
-  facet_wrap(~ Méthode, scales = "free_y") +
+  facet_wrap(~ Méthode, scales = "fixed") +  # ou supprime scales complètement
   theme_minimal(base_size = 14) +
   labs(
     title = "Boxplot of Frobenius norm error",

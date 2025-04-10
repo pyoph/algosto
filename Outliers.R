@@ -177,7 +177,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- resultats$distances
     #distances = calcule_vecteur_distances(Z,mu1,SigmaVrai)
-    distancescorr = distances*correctionDistanceMahalanobis(distances,Z)
+    #distancescorr = distances*correctionDistanceMahalanobis(distances,Z)
     #distances <- calcule_vecteur_distances(Z,med,Sigma)
     outliers <- detectionOutliers(distances,cutoff = qchisq(0.95,df = ncol(Z))) 
     
@@ -271,10 +271,8 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     if((tc["1","0"] + tc["1","1"]) != 0)
     {faux_negatifs   <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
     else faux_negatifs <- 0
-    
-    
     if (length(unique(outliers)) == 2) {
-      auc <- round(auc(outliers, data$labelsVrais), 2) * 100
+      auc <- round(auc(outliers, data$labelsVrais[1:nrow(Z) -1]), 2) * 100
     } else {
       auc <- 50  
     }
