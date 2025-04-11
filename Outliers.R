@@ -168,19 +168,20 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
   } else if (methode == "offline") {
     # Méthode Offline
     #med <- RobVar(Z)$median
-    resultats <- estimation(Z,methodeEstimation = "offline")
-    med <- resultats$med
-    Sigma <- resultats$SigmaOffline
+    #resultats <- estimation(Z,methodeEstimation = "offline")
+    resultats = OfflineOutlierDetection(Z)
+    med <- resultats$median
+    Sigma <- resultats$variance
     #rmseSigma <- ifelse(norm(resultats$SigmaOfflinePoids,"F") < 0.001,norm(resultats$SigmaOffline - SigmaVrai,"F"),min(norm(resultats$SigmaOfflinePoids - SigmaVrai,"F"),norm(resultats$SigmaOffline- SigmaVrai,"F")))
     rmseSigma = norm(Sigma - SigmaVrai,"F")
     print("OK offline")
     rmseMed <- sqrt(sum((muVrai - med)^2))
     distances <- resultats$distances
     #distances = calcule_vecteur_distances(Z,mu1,SigmaVrai)
-    distancescorr = distances*correctionDistanceMahalanobis(distances,Z)
+    #distancescorr = distances*correctionDistanceMahalanobis(distances,Z)
     #distances <- calcule_vecteur_distances(Z,med,Sigma)
-    outliers <- detectionOutliers(distances,cutoff = qchisq(0.95,df = ncol(Z))) 
-    
+    #outliers <- detectionOutliers(distances,cutoff = qchisq(0.95,df = ncol(Z))) 
+    outliers <- resultats$outlier_labels
     tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
     tc
     tc <- safe_access_tc(tc)
@@ -206,9 +207,11 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
 #            fill = c("lightblue", NA), border = c("white", NA), lty = c(NA, 1), col = c(NA, "red"))
   } else if (methode == "online") {
     # Méthode Online
-    resultats <- estimation(Z,methodeEstimation = "online")
-    med <- resultats$med
-    Sigma <- resultats$SigmaOnline
+    #resultats <- estimation(Z,methodeEstimation = "online")
+    
+    resultats = StreamingOutlierDetection(Z,batch = 1,mc_sample_size = ncol(Z))
+    med <- resultats$median
+    Sigma <- resultats$Sigma[nrow(Z),,]
     #rmseSigma <- ifelse(norm(resultats$SigmaOnlinePoids,"F") < 0.001,norm(resultats$SigmaOnline - SigmaVrai,"F"),min(norm(resultats$SigmaOnlinePoids - SigmaVrai,"F"),norm(resultats$SigmaOnline - SigmaVrai,"F")))
     
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
@@ -218,7 +221,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     #U <- results$U
     #lambda <- results$lambdaIter
     distances <- resultats$distances
-    outliers = resultats$outliers
+    outliers = resultats$outlier_labels
     #outliers <- detectionOutliers(distances,cutoff)
     
     tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
@@ -246,9 +249,11 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     } 
   else if (methode == "streaming") {
     # Méthode streaming
-    resultats <- estimation(Z,methodeEstimation = "streaming")
-    med <- resultats$med
-    Sigma <- resultats$SigmaStreaming
+    #resultats <- estimation(Z,methodeEstimation = "streaming")
+    resultats = StreamingOutlierDetection(Z,batch = ncol(Z),mc_sample_size = ncol(Z))
+    
+    med <- resultats$median
+    Sigma <- resultats$Sigma[nrow(Z),,]
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
     
     #rmseSigma <- ifelse(norm(resultats$SigmaStreamingPoids,"F") < 0.01,norm(resultats$SigmaStreaming - SigmaVrai,"F"),min(norm(resultats$SigmaStreamingPoids - SigmaVrai,"F"),norm(resultats$SigmaStreaming - SigmaVrai,"F")))
@@ -260,7 +265,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     #lambda <- results$lambdaIter
     distances <- resultats$distances
     #distances = calcule_vecteur_distances(Z,resultats$SigmaStreamingPoids,cutoff)
-    outliers = resultats$outliers
+    outliers = resultats$outlier_labels
     #outliers <- detectionOutliers(distances,cutoff)
     
     tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
