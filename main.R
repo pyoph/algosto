@@ -61,12 +61,57 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 0.6
-data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"MaronnaZamar")
-
-
+p1 = 0.9
+data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 Z <- data$Z
+
+
+
+###Tracé en fonction de chaque donnée des faux négatifs
+
+resultats$outlier_labels
+data$labelsVrais
+
+# Initialiser un vecteur de faux négatifs (1 si FN, 0 sinon)
+faux_negatifs = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 0, 1, 0)
+
+
+# Initialiser un vecteur de faux positifs (1 si FN, 0 sinon)
+faux_positifs = ifelse(data$labelsVrais == 0 & resultats$outlier_labels == 1, 1, 0)
+
+#outliers détectés 
+
+outlier_detectes = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 1, 1, 0)
+
+
+# Calcul du cumul des faux négatifs
+faux_negatifs_cumules <- cumsum(faux_negatifs)
+
+
+# Calcul du cumul des faux positifs
+faux_positifs_cumules <- cumsum(faux_positifs)
+
+#Calcul du cumul des outliers détectés
+
+outlier_detectes_cumules = cumsum(outlier_detectes)
+
+# Tracer le nombre de faux négatifs cumulés
+plot(faux_negatifs_cumules, type = "l", col = "red", lwd = 2,
+     xlab = "Index des données", ylab = "Faux négatifs cumulés",
+     main = "Évolution des faux négatifs cumulés")
+
+# Tracer le nombre de faux positifs cumulés
+plot(faux_positifs_cumules, type = "l", col = "red", lwd = 2,
+     xlab = "Index des données", ylab = "Faux positifs cumulés",
+     main = "Évolution des faux positifs cumulés")
+
+plot(outlier_detectes_cumules, type = "l", col = "red", lwd = 2,
+     xlab = "Data index", ylab = "Cumulative detected outliers",
+     main = "Cumulative evolution of detected outliers online")
+
+
+
 
 respcout <- pcout(data$Z,makeplot=FALSE)
 
