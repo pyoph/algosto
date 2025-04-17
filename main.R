@@ -61,55 +61,46 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 0.9
+p1 = 0.8
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 Z <- data$Z
 
 
 
-###Tracé en fonction de chaque donnée des faux négatifs
+cumulativeOutlierDetection = function(resultats, data,pourcentage) {
+  # Détection correcte des outliers
+  outlier_detectes = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 1, 1, 0)
+  
+  # Pourcentages cumulés d'outliers détectés
+  outlier_detectes_cumules = cumsum(outlier_detectes) / sum(data$labelsVrais) * 100
+  
+  # Courbe de vérité (cumul des vrais outliers, en %)
+  outliers_vrais = cumsum(data$labelsVrais) / sum(data$labelsVrais) * 100
+  
+  # Tracé principal avec les deux courbes
+  plot(outliers_vrais, type = "l", col = "blue", lwd = 2, ylim = c(0, 100),
+       xlab = "Data index", ylab = "Cumulative percentage (%)",
+       main = paste("Cumulative evolution of detected outliers online\nMean contamination scenario -",pourcentage, " % of outliers") ,
+       axes = FALSE)
+  
+  lines(outlier_detectes_cumules, col = "red", lwd = 2)  # Ajout de la courbe des détectés
+  
+  # Axes personnalisés
+  axis(1)  # Axe des x
+  axis(2, at = seq(0, 100, by = 10))  # Axe des y tous les 10%
+  box()  # Cadre du graphique
+  
+  # Légende
+  legend("bottomright",
+         legend = c("True outliers", "Detected outliers"),
+         col = c("blue", "red"),
+         lwd = 2,
+         bty = "n")
+}
 
-resultats$outlier_labels
-data$labelsVrais
 
-# Initialiser un vecteur de faux négatifs (1 si FN, 0 sinon)
-faux_negatifs = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 0, 1, 0)
-
-
-# Initialiser un vecteur de faux positifs (1 si FN, 0 sinon)
-faux_positifs = ifelse(data$labelsVrais == 0 & resultats$outlier_labels == 1, 1, 0)
-
-#outliers détectés 
-
-outlier_detectes = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 1, 1, 0)
-
-
-# Calcul du cumul des faux négatifs
-faux_negatifs_cumules <- cumsum(faux_negatifs)
-
-
-# Calcul du cumul des faux positifs
-faux_positifs_cumules <- cumsum(faux_positifs)
-
-#Calcul du cumul des outliers détectés
-
-outlier_detectes_cumules = cumsum(outlier_detectes)
-
-# Tracer le nombre de faux négatifs cumulés
-plot(faux_negatifs_cumules, type = "l", col = "red", lwd = 2,
-     xlab = "Index des données", ylab = "Faux négatifs cumulés",
-     main = "Évolution des faux négatifs cumulés")
-
-# Tracer le nombre de faux positifs cumulés
-plot(faux_positifs_cumules, type = "l", col = "red", lwd = 2,
-     xlab = "Index des données", ylab = "Faux positifs cumulés",
-     main = "Évolution des faux positifs cumulés")
-
-plot(outlier_detectes_cumules, type = "l", col = "red", lwd = 2,
-     xlab = "Data index", ylab = "Cumulative detected outliers",
-     main = "Cumulative evolution of detected outliers online")
-
+cumulativeOutlierDetection(resultats,data,20)
 
 
 
@@ -122,30 +113,6 @@ outl <- (outl + 1) %% 2
 
 table(data$labelsVrais,outl)
 
-temps_execution <- system.time({
-  results <- estimMVOnline(data$Z,methode="CPP")
-})
-
-print(temps_execution)
-
-norm(results$Sigma[1e4-1,,]-Sigma1,"F")
-temps_execution <- system.time({
-  results <- estimation(data$Z,methodeOnline = "CPP",methodeEstimation = "online")
-})
-
-print(temps_execution)
-
-# Afficher les valeurs propres
-print("Valeurs propres :")
-print(resultats$valeurs_propres)
-
-# Afficher les vecteurs propres
-print("Vecteurs propres :")
-print(resultats$vecteurs_propres)
-
-# Afficher les vecteurs propres
-print("Vecteurs propres :")
-print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 

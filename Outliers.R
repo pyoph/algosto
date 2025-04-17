@@ -197,9 +197,10 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     } else {
       auc <- 50  # Valeur par défaut pour un cas non exploitable
     }
+    
+    
     #Vérification que la distance de Mahalanobis suit la loi du Khi-deux
-#     hist(distances, probability = TRUE, breaks = 30,    ylim = c(0,.1),
-# 
+#     hist(distances, probability = TRUE, breaks = sqrt(length(distances)),    ylim = c(0,.1),
 #          main = "Histogramme des distances de Mahalanobis",
 #          xlab = "Distance", col = "lightblue", border = "white")
 # curve(dchisq(x, df = ncol(Z)), col = "red", lwd = 2, add = TRUE)
@@ -250,7 +251,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
   else if (methode == "streaming") {
     # Méthode streaming
     #resultats <- estimation(Z,methodeEstimation = "streaming")
-    resultats = StreamingOutlierDetection(Z,batch = ncol(Z),mc_sample_size = ncol(Z))
+    resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
     
     med <- resultats$moyennem
     Sigma <- resultats$Sigma[nrow(Z),,]
@@ -277,7 +278,8 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     {faux_negatifs   <- round((tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100,2)}
     else faux_negatifs <- 0
     if (length(unique(outliers)) == 2) {
-      auc <- round(auc(outliers, data$labelsVrais), 2) * 100
+      auc <- round(auc(outliers, data$labelsVrais),2) * 100
+
     } else {
       auc <- 50  
     }
