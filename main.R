@@ -82,7 +82,7 @@ cumulativeOutlierDetection = function(resultats, data,pourcentage) {
   plot(outliers_vrais, type = "l", col = "blue", lwd = 2, ylim = c(0, 100),
        xlab = "Data index", ylab = "Cumulative percentage (%)",
        main = paste("Cumulative evolution of detected outliers online\nMean contamination scenario -",pourcentage, " % of outliers") ,
-       axes = FALSE)
+       axes = FALSE, log = "x")
   
   lines(outlier_detectes_cumules, col = "red", lwd = 2)  # Ajout de la courbe des détectés
   
