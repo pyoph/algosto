@@ -64,6 +64,27 @@ source("~/algosto/shrinkageCabana.R")
 p1 = 0.6
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
+temps_calcul = results_metrics$temps_calculBP
+
+
+methods <- c("Cov", "OGK", "Comed", "Shrink", 
+             "Online", "Offline", "Streaming", "FastMCD")
+
+# Aplatir le tableau
+df <- melt(temps_calcul)
+colnames(df) <- c("i", "j", "k", "temps")
+
+# Remplacer la colonne 'k' par le nom de méthode correspondant
+df$method <- factor(df$k, labels = methods)
+
+ggplot(df, aes(x = method, y = temps)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Boxplot of computation times by method",
+       x = "Method",
+       y = "Computation time") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 
 Z <- data$Z

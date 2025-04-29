@@ -46,6 +46,10 @@ source("~/work/algosto/shrinkageCabana.R")
 
 
 results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
+save(results_metrics,file = "results_metricsMoyenne100runs1e4d100.Rdata")
+
+temps_calcul = results_metrics$temps_calculBP
+
 
 results_metrics <- round(results_metrics$results_metrics,2)
 save(results_metrics,file = "results_metricsMaronnaZamar100runs1e4.Rdata")

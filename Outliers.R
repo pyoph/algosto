@@ -209,8 +209,8 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     # Méthode Online
     #resultats <- estimation(Z,methodeEstimation = "online")
     
-    resultats = StreamingOutlierDetection(Z,batch = 1)
-    med <- resultats$median
+    resultats = StreamingOutlierDetection(Z,batch = 1,mc_sample_size = 1)
+    med <- resultats$moyennem
     Sigma <- resultats$Sigma[nrow(Z),,]
     #rmseSigma <- ifelse(norm(resultats$SigmaOnlinePoids,"F") < 0.001,norm(resultats$SigmaOnline - SigmaVrai,"F"),min(norm(resultats$SigmaOnlinePoids - SigmaVrai,"F"),norm(resultats$SigmaOnline - SigmaVrai,"F")))
     
@@ -252,7 +252,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     #resultats <- estimation(Z,methodeEstimation = "streaming")
     resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
     
-    med <- resultats$median
+    med <- resultats$moyennem
     Sigma <- resultats$Sigma[nrow(Z),,]
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
     
