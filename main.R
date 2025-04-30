@@ -127,7 +127,7 @@ print(resultats$vecteurs_propres)
 
 
 #results_metrics <- RMSEAUCFPdataset(contamin = "studentTronquee")$result_metrics
-results_metrics <- RMSEAUCFPdataset(contamin = "UniformeTronquee")$result_metrics
+#results_metrics <- RMSEAUCFPdataset(contamin = "UniformeTronquee")$result_metrics
 
 results_metrics <- round(results_metrics,2)
 
@@ -135,7 +135,7 @@ results_metrics <- round(results_metrics,2)
 taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
 
 # Sélectionner uniquement les colonnes RMSE_Sigma_*
-rmse_df <- results_metrics[, c("RMSE_Sigma_Cov", "RMSE_Sigma_OGK", "RMSE_Sigma_Comed", 
+rmse_df <- rm[, c("RMSE_Sigma_Cov", "RMSE_Sigma_OGK", "RMSE_Sigma_Comed", 
                                "RMSE_Sigma_Shrink", "RMSE_Sigma_Online", 
                                "RMSE_Sigma_Offline", "RMSE_Sigma_Streaming","RMSE_Sigma_fastmcd")]
 
@@ -155,7 +155,7 @@ plot1 = ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode))
   geom_point(size = 2) +   # Points aux taux spécifiés
   scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
   scale_y_log10() +  # Échelle logarithmique en base 10
-    labs(title = "Evolution of Frobenius norm error",
+    labs(title = "Shifted Gaussian contamination scenario",
        x = "Contamination rate (%)",
        y = "Frobenius norm error",
        color = "Method") +  # Nom de la légende
@@ -163,7 +163,36 @@ plot1 = ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode))
   theme(legend.position = "top")  # Légende en haut
 
 
-auc_df <- results_metrics[, c("AUC_Cov", "AUC_OGK", "AUC_Comed", 
+
+# Tracer les courbes RMSE
+plot2 = ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode)) +
+  geom_line(size = 1.2) +  # Courbes
+  geom_point(size = 2) +   # Points aux taux spécifiés
+  scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
+  scale_y_log10() +  # Échelle logarithmique en base 10
+  labs(title = "Truncated Student contamination scenario",
+       x = "Contamination rate (%)",
+       y = "Frobenius norm error",
+       color = "Method") +  # Nom de la légende
+  theme_minimal() +
+  theme(legend.position = "top")  # Légende en haut
+
+# Tracer les courbes RMSE
+plot3 = ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode)) +
+  geom_line(size = 1.2) +  # Courbes
+  geom_point(size = 2) +   # Points aux taux spécifiés
+  scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
+  scale_y_log10() +  # Échelle logarithmique en base 10
+  labs(title = "Maronna Zamar contamination scenario",
+       x = "Contamination rate (%)",
+       y = "Frobenius norm error",
+       color = "Method") +  # Nom de la légende
+  theme_minimal() +
+  theme(legend.position = "top")  # Légende en haut
+
+grid.arrange(plot2, plot1, plot3, ncol = 2, nrow = 2)
+
+auc_df <- rm[, c("AUC_Cov", "AUC_OGK", "AUC_Comed", 
                                "AUC_Shrink", "AUC_Online", 
                                "AUC_Offline", "AUC_Streaming")]
 
@@ -182,9 +211,9 @@ ggplot(df_long, aes(x = taux_contamination, y = AUC, color = Méthode)) +
   geom_point(size = 2) +   # Points aux taux spécifiés
   scale_x_continuous(breaks = taux_contamination) +  # Spécifier les valeurs en abscisse
   labs(title = "Évolution de l'AUC en fonction du taux de contamination",
-       x = "Taux de contamination (%)",
+       x = "Contamnination rate (%)",
        y = "AUC",
-       color = "Méthode") +  # Nom de la légende
+       color = "Method") +  # Nom de la légende
   theme_minimal() +
   theme(legend.position = "top")  # Légende en haut
 
