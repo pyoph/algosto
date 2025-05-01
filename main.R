@@ -61,9 +61,62 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 0.6
-data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
+p1 = 0.8
+data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"MaronnaZamar")
 
+Z = data$Z
+
+cumulativeOutlierDetection = function(resultats, data, pourcentage) {
+  # Données
+  outlier_detectes_vrais = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 1, 1, 0)
+  outlier_detectes_faux = ifelse(data$labelsVrais == 0 & resultats$outlier_labels == 1, 1, 0)
+  outlier_detectes_cumules = cumsum(outlier_detectes_vrais) / sum(data$labelsVrais) * 100
+  outliers_vrais = cumsum(data$labelsVrais) /(pourcentage/100*nrow(Z))  * 100
+  #outliers_detectes_total = (cumsum(outlier_detectes_vrais) + cumsum(outlier_detectes_faux) ) / (pourcentage/100*nrow(Z)) * 100
+  df <- data.frame(
+    index = 1:nrow(Z),  # Crée un index allant de 1 à la longueur des données
+    True_outliers = outliers_vrais,
+    True_positives = outlier_detectes_cumules
+   # All_detected_outliers = outliers_detectes_total
+  )
+  
+  # Création du graphique avec ggplot2
+p=  ggplot(df, aes(x = index)) +
+    geom_line(aes(y = True_outliers, color = "True outliers", linetype = "True outliers"), size = 1.2) +
+    geom_line(aes(y = True_positives, color = "True positives", linetype = "True positives"), size = 1.2) +
+    #geom_line(aes(y = All_detected_outliers, color = "All detected outliers"), size = 1.2, linetype = "dashed") +
+    scale_color_manual(values = c("True outliers" = "blue", "True positives" = "red")) +
+    scale_linetype_manual(values = c("True outliers" = "solid", "True positives" = "solid", "All detected outliers" = "dashed")) +
+    scale_x_log10() +  # Logarithmic scale pour l'axe des X
+    labs(
+      title = paste("Truncated Student contamination scenario -", pourcentage, "% of outliers"),
+      x = "Data index", 
+      y = "Cumulative percentage (%)"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+  # Création du dataframe
+
+  return (p)
+  }
+
+
+plot_obj <- cumulativeOutlierDetection(resultats, data, 20)
+
+plot_objMarZam = cumulativeOutlierDetection(resultats, data, 20)
+
+plot_objTrSt = cumulativeOutlierDetection(resultats, data, 20)
+
+par(mfrow = c(2, 2))  # 2 lignes, 2 colonnes
+plot_objTrSt
+plot_obj
+plot_objMarZam
+plot.new()
+
+title("Comparaison des scénarios", line = -2, cex.main = 1.4)
+
+# Fermer le fichier pour sauvegarder
+dev.off()
 temps_calcul = results_metrics$temps_calculBP
 
 
