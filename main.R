@@ -68,25 +68,28 @@ Z = data$Z
 
 cumulativeOutlierDetection = function(resultats, data, pourcentage) {
   # Données
+  
   outlier_detectes_vrais = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 1, 1, 0)
   outlier_detectes_faux = ifelse(data$labelsVrais == 0 & resultats$outlier_labels == 1, 1, 0)
   outlier_detectes_cumules = cumsum(outlier_detectes_vrais) / sum(data$labelsVrais) * 100
   outliers_vrais = cumsum(data$labelsVrais) /(pourcentage/100*nrow(Z))  * 100
+  outliers_faux = cumsum(outlier_detectes_faux)/(nrow(Z)*(1 - pourcentage/100) )*100
   #outliers_detectes_total = (cumsum(outlier_detectes_vrais) + cumsum(outlier_detectes_faux) ) / (pourcentage/100*nrow(Z)) * 100
   df <- data.frame(
     index = 1:nrow(Z),  # Crée un index allant de 1 à la longueur des données
     True_outliers = outliers_vrais,
-    True_positives = outlier_detectes_cumules
+    True_positives = outlier_detectes_cumules,
+    False_positives = outliers_faux
    # All_detected_outliers = outliers_detectes_total
   )
   
   # Création du graphique avec ggplot2
 p=  ggplot(df, aes(x = index)) +
-    geom_line(aes(y = True_outliers, color = "True outliers", linetype = "True outliers"), size = 1.2) +
-    geom_line(aes(y = True_positives, color = "True positives", linetype = "True positives"), size = 1.2) +
-    #geom_line(aes(y = All_detected_outliers, color = "All detected outliers"), size = 1.2, linetype = "dashed") +
-    scale_color_manual(values = c("True outliers" = "blue", "True positives" = "red")) +
-    scale_linetype_manual(values = c("True outliers" = "solid", "True positives" = "solid", "All detected outliers" = "dashed")) +
+    geom_line(aes(y = True_outliers, color = "True outliers"), size = 1.2) +
+    geom_line(aes(y = True_positives, color = "True positives"), size = 1.2) +
+    geom_line(aes(y = False_positives, color = "False positives", size = 1.2), size = 1.2) +
+    scale_color_manual(values = c("True outliers" = "blue", "True positives" = "green","False positives" ="red") ) +
+    scale_linetype_manual(values = c("True outliers" = "solid", "True positives" = "solid", "False positives" = "solid")) +
     scale_x_log10() +  # Logarithmic scale pour l'axe des X
     labs(
       title = paste("Truncated Student contamination scenario -", pourcentage, "% of outliers"),
