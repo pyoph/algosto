@@ -617,3 +617,47 @@ ggplot(rmse_data, aes(x = factor(Taux), y = RMSE)) +
     y = "Frobenius norm"
   ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+####Représentation des contaminations
+
+# Fonction pour générer un échantillon
+preparer_donnees <- function(type) {
+  set.seed(123)
+  p1 = 0.9
+  resultat <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,type)
+  df <- as.data.frame(resultat$Z)
+  df$label <- factor(resultat$labelsVrais)
+  return(df)
+}
+
+# Génération des trois jeux de données
+donnees_moyenne  <- preparer_donnees("moyenne")
+donnees_student  <- preparer_donnees("studentTronquee")
+donnees_maronna  <- preparer_donnees("MaronnaZamar")
+
+# Fonction de tracé avec échelle log10 sur Y uniquement (données inchangées)
+tracer_plot <- function(df, titre) {
+  df_inliers <- df[df$label == 0, ]  # Sélection des inliers
+  
+  ggplot(df, aes(x = V1, y = V2, color = label)) +
+    geom_point(alpha = 0.7) +
+    stat_ellipse(data = df_inliers, aes(x = V1, y = V2),
+                 level = 0.95, size = 1, linetype = "dashed", inherit.aes = FALSE, color = "black") +    scale_x_log10() +
+    scale_y_log10() +  # Seulement l’échelle Y en log10 (pas les données)
+    theme_minimal() +
+    labs(title = titre,
+         x = "First composant",
+         y =  "Second composant",
+         color = "Group") +
+    scale_color_manual(values = c("blue", "red"),
+                       labels = c("Clean", "Contaminated"))
+}
+
+# Graphiques
+graph_moyenne  <- tracer_plot(donnees_moyenne,  "Contamination: Shifted Mean")
+graph_student  <- tracer_plot(donnees_student,  "Contamination: Truncated Student")
+graph_maronna  <- tracer_plot(donnees_maronna,  "Contamination: Maronna-Zamar")
+
+# Affichage
+grid.arrange(graph_moyenne, graph_student, graph_maronna, ncol = 3)

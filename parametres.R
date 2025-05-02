@@ -69,7 +69,7 @@ creerMatriceToeplitz <- function(rho,d)
 #d = 100 000 
 nbruns = 100
 n = 1e3
-d = 100
+d = 2
 mu1 = rep(0,d)
 mu2 = 5*rep(1,d)
 rho = 0.25
