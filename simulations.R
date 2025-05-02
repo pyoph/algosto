@@ -104,7 +104,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
     } 
     else if (contamin == "MaronnaZamar")
     {
-      vecteurs_mu1 <- mvrnorm(n1, rep(0,d), diag(d)) #Non outliers
+      vecteurs_mu1 <- mvrnorm(n1, mu_1, Sigma1) #Non outliers
       print(dim(vecteurs_mu1))
       #Calcul de a0
       a0 <- rep(0,d)

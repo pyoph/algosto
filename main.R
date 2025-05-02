@@ -642,8 +642,9 @@ tracer_plot <- function(df, titre) {
   
   ggplot(df, aes(x = V1, y = V2, color = label)) +
     geom_point(alpha = 0.7) +
-    stat_ellipse(data = df_inliers, aes(x = V1, y = V2),
-                 level = 0.95, size = 1, linetype = "dashed", inherit.aes = FALSE, color = "black") +    scale_x_log10() +
+    #stat_ellipse(data = df_inliers, aes(x = V1, y = V2),
+     #            level = 0.95, size = 1, linetype = "dashed", inherit.aes = FALSE, color = "black") +    
+    scale_x_log10() +
     scale_y_log10() +  # Seulement l’échelle Y en log10 (pas les données)
     theme_minimal() +
     labs(title = titre,
@@ -655,9 +656,9 @@ tracer_plot <- function(df, titre) {
 }
 
 # Graphiques
-graph_moyenne  <- tracer_plot(donnees_moyenne,  "Contamination: Shifted Mean")
-graph_student  <- tracer_plot(donnees_student,  "Contamination: Truncated Student")
-graph_maronna  <- tracer_plot(donnees_maronna,  "Contamination: Maronna-Zamar")
+graph_moyenne  <- tracer_plot(donnees_moyenne,  "Shifted Gaussian")
+graph_student  <- tracer_plot(donnees_student,  "Truncated Student")
+graph_maronna  <- tracer_plot(donnees_maronna,  "Maronna-Zamar")
 
 # Affichage
 grid.arrange(graph_moyenne, graph_student, graph_maronna, ncol = 3)
