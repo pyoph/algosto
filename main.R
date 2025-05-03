@@ -62,53 +62,78 @@ source("~/algosto/shrinkageCabana.R")
 
 
 p1 = 0.8
-data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"MaronnaZamar")
+data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
-
-cumulativeOutlierDetection = function(resultats, data, pourcentage) {
-  # Données
+cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
+  total_points <- nrow(data$Z)
+  total_outliers_theoriques <- pourcentage / 100 * total_points
   
-  outlier_detectes_vrais = ifelse(data$labelsVrais == 1 & resultats$outlier_labels == 1, 1, 0)
-  outlier_detectes_faux = ifelse(data$labelsVrais == 0 & resultats$outlier_labels == 1, 1, 0)
-  outlier_detectes_cumules = cumsum(outlier_detectes_vrais) / sum(data$labelsVrais) * 100
-  outliers_vrais = cumsum(data$labelsVrais) /(pourcentage/100*nrow(Z))  * 100
-  outliers_faux = cumsum(outlier_detectes_faux)/(nrow(Z)*(1 - pourcentage/100) )*100
-  #outliers_detectes_total = (cumsum(outlier_detectes_vrais) + cumsum(outlier_detectes_faux) ) / (pourcentage/100*nrow(Z)) * 100
+  nb_outliers_detectes <- 0
+  nb_outliers_detectes_vrais <- 0
+  nb_outliers_vrais <- 0
+  
+  taux_outliers_detectes <- numeric(total_points)
+  taux_outliers_vrais <- numeric(total_points)
+  
+  for (i in 1:total_points) {
+    if(data$labelsVrais[i] == 1) nb_outliers_vrais =  nb_outliers_vrais + 1
+    
+    if (data$labelsVrais[i] == 1 && resultats$outlier_labels[i] == 1) {
+      nb_outliers_detectes <- nb_outliers_detectes + 1
+      #nb_outliers_vrais <- nb_outliers_vrais + 1
+      nb_outliers_detectes_vrais = nb_outliers_detectes_vrais + 1
+      #taux_outliers_vrais[i] <- nb_outliers_detectes_vrais
+    } else if (data$labelsVrais[i] == 0 && resultats$outlier_labels[i] == 1) {
+      nb_outliers_detectes <- nb_outliers_detectes + 1}
+      if(nb_outliers_vrais != 0){
+        taux_outliers_detectes[i] <- nb_outliers_detectes / nb_outliers_vrais * 100
+        #taux_outliers_detectes[i] <- nb_outliers_detectes
+      }
+      else {taux_outliers_detectes[i] <- nb_outliers_detectes / (nb_outliers_vrais + 1)  * 100
+        #taux_outliers_detectes[i] <- nb_outliers_detectes
+      }
+      
+      taux_outliers_vrais[i] <- as.numeric(nb_outliers_detectes_vrais / nb_outliers_vrais) * 100
+      
+      print(paste("nb_outliers_detectes_vrais ",nb_outliers_detectes_vrais ))
+    print(paste("nb_outliers_vrais ",nb_outliers_vrais ))
+    print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
+    }
+    
+   
+
+  
   df <- data.frame(
-    index = 1:nrow(Z),  # Crée un index allant de 1 à la longueur des données
-    True_outliers = outliers_vrais,
-    True_positives = outlier_detectes_cumules,
-    False_positives = outliers_faux
-   # All_detected_outliers = outliers_detectes_total
+    index = 1:total_points,
+    Detected_rate = taux_outliers_detectes,
+    True_positive_rate = taux_outliers_vrais
   )
   
-  # Création du graphique avec ggplot2
-p=  ggplot(df, aes(x = index)) +
-    geom_line(aes(y = True_outliers, color = "True outliers"), size = 1.2) +
-    geom_line(aes(y = True_positives, color = "True positives"), size = 1.2) +
-    geom_line(aes(y = False_positives, color = "False positives", size = 1.2), size = 1.2) +
-    scale_color_manual(values = c("True outliers" = "blue", "True positives" = "green","False positives" ="red") ) +
-    scale_linetype_manual(values = c("True outliers" = "solid", "True positives" = "solid", "False positives" = "solid")) +
-    scale_x_log10() +  # Logarithmic scale pour l'axe des X
+  p <- ggplot(df, aes(x = index)) +
+    geom_line(aes(y = Detected_rate, color = "Cumulated true and false positive rate"), size = 1.2) +
+    geom_line(aes(y = True_positive_rate, color = "Cumulated true positives rate"), size = 1.2) +
+    scale_color_manual(values = c(
+      "Cumulated true and false positive rate" = "orange",
+      "Cumulated true positives rate" = "purple"
+    )) +
+    scale_x_log10() +
     labs(
-      title = paste("Truncated Student contamination scenario -", pourcentage, "% of outliers"),
-      x = "Data index", 
-      y = "Cumulative percentage (%)"
+      title = paste(titre, "-", pourcentage, "% of outliers"),
+      x = "Data index",
+      y = "Cumulative detection rate (%)",
+      color = "Legend"
     ) +
     theme_minimal() +
     theme(legend.position = "bottom")
-  # Création du dataframe
+  print(taux_outliers_vrais[1:10])
+  return(list(p = p,taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes))
+}
+plot_obj <- cumulativeOutlierDetection(resultats, data, 20, "Shifted gaussian")$p
 
-  return (p)
-  }
+plot_objMarZam = cumulativeOutlierDetection(resultats, data, 20,"Maronna Zamar")$p
 
-
-plot_obj <- cumulativeOutlierDetection(resultats, data, 20)
-
-plot_objMarZam = cumulativeOutlierDetection(resultats, data, 20)
-
-plot_objTrSt = cumulativeOutlierDetection(resultats, data, 20)
+plot_objTrSt = cumulativeOutlierDetection(resultats, data, 20,"Truncated Student")$p
 
 par(mfrow = c(2, 2))  # 2 lignes, 2 colonnes
 plot_objTrSt
@@ -124,7 +149,7 @@ temps_calcul = results_metrics$temps_calculBP
 
 
 methods <- c("Cov", "OGK", "Comed", "Shrink", 
-             "Online", "Offline", "Streaming", "FastMCD")
+             "Offline", "Online", "Streaming", "FastMCD")
 
 # Aplatir le tableau
 df <- melt(temps_calcul)
@@ -135,6 +160,7 @@ df$method <- factor(df$k, labels = methods)
 
 ggplot(df, aes(x = method, y = temps)) +
   geom_boxplot(fill = "lightblue") +
+  scale_y_log10()+
   labs(title = "Boxplot of computation times by method",
        x = "Method",
        y = "Computation time") +
@@ -153,31 +179,6 @@ outl <- (outl + 1) %% 2
 
 
 table(data$labelsVrais,outl)
-
-temps_execution <- system.time({
-  results <- estimMVOnline(data$Z,methode="CPP")
-})
-
-print(temps_execution)
-
-norm(results$Sigma[1e4-1,,]-Sigma1,"F")
-temps_execution <- system.time({
-  results <- estimation(data$Z,methodeOnline = "CPP",methodeEstimation = "online")
-})
-
-print(temps_execution)
-
-# Afficher les valeurs propres
-print("Valeurs propres :")
-print(resultats$valeurs_propres)
-
-# Afficher les vecteurs propres
-print("Vecteurs propres :")
-print(resultats$vecteurs_propres)
-
-# Afficher les vecteurs propres
-print("Vecteurs propres :")
-print(resultats$vecteurs_propres)
 
 #######Calcul RMSE AUC et FP######
 
