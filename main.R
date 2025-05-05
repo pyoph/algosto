@@ -75,6 +75,7 @@ cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
   
   taux_outliers_detectes <- numeric(total_points)
   taux_outliers_vrais <- numeric(total_points)
+  taux_outliers_detectes_vrais = numeric(total_points)
   
   for (i in 1:total_points) {
     if(data$labelsVrais[i] == 1) nb_outliers_vrais =  nb_outliers_vrais + 1
@@ -90,11 +91,20 @@ cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
         taux_outliers_detectes[i] <- nb_outliers_detectes / nb_outliers_vrais * 100
         #taux_outliers_detectes[i] <- nb_outliers_detectes
       }
-      else {taux_outliers_detectes[i] <- nb_outliers_detectes / (nb_outliers_vrais + 1)  * 100
+      else {taux_outliers_detectes[i] <-  100
         #taux_outliers_detectes[i] <- nb_outliers_detectes
       }
+    if(nb_outliers_vrais != 0){
+      taux_outliers_detectes_vrais[i] <- nb_outliers_detectes_vrais / nb_outliers_vrais * 100
+      #taux_outliers_detectes[i] <- nb_outliers_detectes
+    }
+    else {taux_outliers_detectes_vrais[i] <-  100
+    #taux_outliers_detectes[i] <- nb_outliers_detectes
+    }
+    
+    
       
-      taux_outliers_vrais[i] <- as.numeric(nb_outliers_detectes_vrais / nb_outliers_vrais) * 100
+      taux_outliers_vrais[i] <- 100
       
       print(paste("nb_outliers_detectes_vrais ",nb_outliers_detectes_vrais ))
     print(paste("nb_outliers_vrais ",nb_outliers_vrais ))
@@ -107,21 +117,24 @@ cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
   df <- data.frame(
     index = 1:total_points,
     Detected_rate = taux_outliers_detectes,
-    True_positive_rate = taux_outliers_vrais
+    True_outliers = taux_outliers_vrais,
+    True_positive_rate = taux_outliers_detectes_vrais
   )
   
   p <- ggplot(df, aes(x = index)) +
-    geom_line(aes(y = Detected_rate, color = "Cumulated true and false positive rate"), size = 1.2) +
-    geom_line(aes(y = True_positive_rate, color = "Cumulated true positives rate"), size = 1.2) +
+    geom_line(aes(y = Detected_rate, color = "True and false positive rate"), size = 1.2) +
+    geom_line(aes(y = True_positive_rate, color = "True positives rate"), size = 1.2) +
+    geom_line(aes(y = True_outliers, color = "True outliers rate"), size = 1.2) +
     scale_color_manual(values = c(
-      "Cumulated true and false positive rate" = "orange",
-      "Cumulated true positives rate" = "purple"
+      "True outliers rate" = "red",
+      "True and false positive rate" = "orange",
+      "True positives rate" = "purple"
     )) +
-    scale_x_log10() +
+    #scale_x_log10() +
     labs(
       title = paste(titre, "-", pourcentage, "% of outliers"),
       x = "Data index",
-      y = "Cumulative detection rate (%)",
+      y = "Cumulative rate (%)",
       color = "Legend"
     ) +
     theme_minimal() +
