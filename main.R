@@ -62,7 +62,7 @@ source("~/algosto/shrinkageCabana.R")
 
 
 p1 = 0.8
-data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
+data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"studentTronquee")
 
 Z = data$Z
 cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
@@ -148,6 +148,8 @@ plot_objMarZam = cumulativeOutlierDetection(resultats, data, 20,"Maronna Zamar")
 
 plot_objTrSt = cumulativeOutlierDetection(resultats, data, 20,"Truncated Student")$p
 
+grid.arrange(plot_obj,plot_objTrSt,plot_objMarZam,nrow = 2,ncol = 2)
+
 par(mfrow = c(2, 2))  # 2 lignes, 2 colonnes
 plot_objTrSt
 plot_obj
@@ -158,28 +160,31 @@ title("Comparaison des scénarios", line = -2, cex.main = 1.4)
 
 # Fermer le fichier pour sauvegarder
 dev.off()
-temps_calcul = results_metrics$temps_calculBP
 
+temps_calcul = results_metrics$temps_calculBP
 
 methods <- c("Cov", "OGK", "Comed", "Shrink", 
              "Offline", "Online", "Streaming", "FastMCD")
 
-# Aplatir le tableau
+# Aplatir le tableaugra
 df <- melt(temps_calcul)
 colnames(df) <- c("i", "j", "k", "temps")
 
 # Remplacer la colonne 'k' par le nom de méthode correspondant
 df$method <- factor(df$k, labels = methods)
 
+# Enlever les méthodes "Shrink" et "Offline"
+df <- subset(df, !method %in% c("Shrink", "Offline"))
+
+# Tracer le boxplot
 ggplot(df, aes(x = method, y = temps)) +
   geom_boxplot(fill = "lightblue") +
-  scale_y_log10()+
+  scale_y_log10() +
   labs(title = "Boxplot of computation times by method",
        x = "Method",
        y = "Computation time") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 
 
 Z <- data$Z
@@ -658,13 +663,15 @@ tracer_plot <- function(df, titre) {
     geom_point(alpha = 0.7) +
     #stat_ellipse(data = df_inliers, aes(x = V1, y = V2),
      #            level = 0.95, size = 1, linetype = "dashed", inherit.aes = FALSE, color = "black") +    
-    scale_x_log10() +
-    scale_y_log10() +  # Seulement l’échelle Y en log10 (pas les données)
+    #scale_x_log10() +
+    #scale_y_log10() +  # Seulement l’échelle Y en log10 (pas les données)
     theme_minimal() +
     labs(title = titre,
          x = "First composant",
          y =  "Second composant",
          color = "Group") +
+    xlim(-10,10) +
+    ylim(-10,10)+
     scale_color_manual(values = c("blue", "red"),
                        labels = c("Clean", "Contaminated"))
 }
@@ -676,3 +683,113 @@ graph_maronna  <- tracer_plot(donnees_maronna,  "Maronna-Zamar")
 
 # Affichage
 grid.arrange(graph_moyenne, graph_student, graph_maronna, ncol = 3)
+
+
+# Paramètres
+alpha <- 0.05
+conf_level <- 1 - alpha
+p_seq <- seq(0.6, 1, length.out = 200)
+N <- nrow(Z)  # N doit être défini au préalable
+
+# Calcul des n0 et des x théoriques
+n0 <- floor(p_seq * N)
+x <- round(n0 * alpha)
+
+# Librairie pour les intervalles de confiance
+library(binom)
+
+# Calcul de l’intervalle de confiance exact (Clopper-Pearson)
+conf <- binom.confint(x = x, n = n0, conf.level = conf_level, methods = "exact")
+
+# Tracé des bornes
+plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 0.2), xlab = "p (proportion pour n0 = p * N)",
+     ylab = "Intervalle de confiance de la proportion",
+     main = "IC à 95% pour Bin(n0, alpha = 0.05)")
+lines(p_seq, conf$upper, col = "red", lwd = 2)
+
+# Méthode Cov
+rm2 <- rm$FP_Cov
+fp_cov_values <- round(rm2 / 100, 4)
+fp_cov_positions <- c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
+points(fp_cov_positions, fp_cov_values, col = "black", pch = 19)
+text(fp_cov_positions, fp_cov_values + 0.005,
+     labels = paste0(round(rm2, 2), "%"), cex = 0.7, pos = 3, col = "black")
+
+# Méthode OGK
+rm3 <- rm$FP_OGK
+fp_ogk_values <- round(rm3 / 100, 4)
+fp_ogk_positions <- fp_cov_positions  # même positions
+points(fp_ogk_positions, fp_ogk_values, col = "green", pch = 19)
+text(fp_ogk_positions, fp_ogk_values + 0.005,
+     labels = paste0(round(rm3, 2), "%"), cex = 0.7, pos = 3, col = "green")
+
+# Méthode Comed
+rm4 <- rm$FP_Comed
+fp_comed_values <- round(rm4 / 100, 4)
+fp_comed_positions <- fp_cov_positions
+points(fp_comed_positions, fp_comed_values, col = "gray", pch = 19)
+text(fp_comed_positions, fp_comed_values + 0.005,
+     labels = paste0(round(rm4, 2), "%"), cex = 0.7, pos = 3, col = "gray")
+
+# Méthode Shrinkage
+rm5 <- rm$FP_Shrink
+fp_shrink_values <- round(rm5 / 100, 4)
+fp_shrink_positions <- fp_cov_positions
+points(fp_shrink_positions, fp_shrink_values, col = "orange", pch = 19)
+text(fp_shrink_positions, fp_shrink_values + 0.005,
+     labels = paste0(round(rm5, 2), "%"), cex = 0.7, pos = 3, col = "orange")
+
+
+rm9 = rm$FP_fastmcd
+
+fp_fastmcd_values <- round(rm9 / 100, 4)
+fp_fastmcd_positions <- fp_cov_positions
+points(fp_fastmcd_positions, fp_fastmcd_values, col = "lightblue", pch = 19)
+text(fp_fastmcd_positions, fp_fastmcd_values + 0.005,
+     labels = paste0(round(rm9, 2), "%"), cex = 0.7, pos = 3, col = "lightblue")
+
+
+rm6 = round(rm$FP_Online,2)
+
+fp_online_values <- round(rm6 / 100, 4)
+fp_online_positions <- fp_cov_positions
+
+points(fp_online_positions, fp_online_values, col = "darkblue", pch = 19)
+text(fp_shrink_positions, fp_shrink_values + 0.005,
+     labels = paste0(round(rm5, 2), "%"), cex = 0.7, pos = 3, col = "darkblue")
+
+
+
+rm7 = round(rm$FP_Offline,2)
+
+fp_offline_values <- round(rm7 / 100, 4)
+fp_offline_positions <- fp_cov_positions
+
+points(fp_offline_positions, fp_offline_values, col = "darkgreen", pch = 19)
+text(fp_offline_positions, fp_offline_values + 0.005,
+     labels = paste0(round(rm7, 2), "%"), cex = 0.7, pos = 3, col = "darkgreen")
+
+
+rm8 = round(rm$FP_Streaming,2)
+
+
+fp_streaming_values <- round(rm8 / 100, 4)
+fp_streaming_positions <- fp_cov_positions
+
+points(fp_streaming_positions, fp_streaming_values, col = "darkred", pch = 19)
+text(fp_offline_positions, fp_offline_values + 0.005,
+     labels = paste0(round(rm7, 2), "%"), cex = 0.7, pos = 3, col = "darkred")
+
+
+
+# Légende unique
+legend("topright",
+       legend = c("Borne inférieure", "Borne supérieure",
+                  "Cov", "OGK", "Comed", "Shrinkage","Online","Offline","Streaming"),
+       col = c("blue", "red", "black", "green", "gray", "orange","lightblue","darkblue","darkgreen","darkred"),
+       lwd = c(2, 2, NA, NA, NA, NA,NA,NA,NA),
+       pch = c(NA, NA, 19, 19, 19, 19,19,19,19),
+       cex = 0.35)  # Taille réduite
+
+
