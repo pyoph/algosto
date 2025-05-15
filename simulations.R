@@ -57,7 +57,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       {
         student <- rmvt(1, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
         
-        if(((student) %*% invSigma1 %*% t(student)) > cutoff)
+        if(((student - mu1) %*% invSigma1 %*% t(student - mu1)) > cutoff)
         {
           vecteurs_mu2 = rbind(vecteurs_mu2,student)
           compt = compt + 1
@@ -80,7 +80,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       {
         uniforme = runif(d,-2,2)
         
-        if((t(uniforme) %*% invSigma1 %*% (uniforme)) > cutoff)
+        if((t(uniforme - mu1) %*% invSigma1 %*% (uniforme - mu1)) > cutoff)
         {
           vecteurs_mu2 = rbind(vecteurs_mu2,uniforme)
           compt = compt + 1

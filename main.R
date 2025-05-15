@@ -61,7 +61,7 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 0.8
+p1 = 1
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"studentTronquee")
 
 Z = data$Z
@@ -703,7 +703,7 @@ conf <- binom.confint(x = x, n = n0, conf.level = conf_level, methods = "exact")
 
 # Tracé des bornes
 plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
-     ylim = c(0, 0.2), xlab = "p (proportion pour n0 = p * N)",
+     ylim = c(0, 0.15), xlab = "p (proportion pour n0 = p * N)",
      ylab = "Intervalle de confiance de la proportion",
      main = "IC à 95% pour Bin(n0, alpha = 0.05)")
 lines(p_seq, conf$upper, col = "red", lwd = 2)
