@@ -18,9 +18,18 @@
 
 #Facteur de correction de la distance de Mahalanobis
 
-correctionDistanceMahalanobis <- function(distances,Z)
+correctionDistanceMahalanobis <- function(distances,Z,methode = "offline")
 {
- return(sqrt(qchisq(0.5,df = ncol(Z)))/(median(distances))) 
+  if(methode == "offline"){
+ return(sqrt(qchisq(0.5,df = ncol(Z)))/(median(distances))) }
+  else {
+    facteur = rep(0,nrow(Z))
+    for (i in (1:nrow(Z)))
+    {
+      facteur[i] = sqrt(qchisq(0.5,df = ncol(Z)))/(median(distances[1:i]))
+    }
+    return (facteur)
+  }
 }
 
 #Calcule le vecteur distances selon la méthode choisie

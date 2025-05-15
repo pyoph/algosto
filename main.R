@@ -793,3 +793,129 @@ legend("topright",
        cex = 0.35)  # Taille réduite
 
 
+
+taux_contamination = c(0, 2, 5, 10, 15, 20, 25, 30, 40)
+
+fp_offline = rep(0,length(taux_contamination))
+fp_offline_corr = rep(0,length(taux_contamination))
+
+fp_online = rep(0,length(taux_contamination))
+fp_online_corr = rep(0,length(taux_contamination))
+
+fp_streaming = rep(0,length(taux_contamination))
+fp_streaming_corr = rep(0,length(taux_contamination))
+
+
+
+fp_cov = rep(0,length(taux_contamination))
+fp_cov_corr = rep(0,length(taux_contamination))
+
+
+compt = 1
+
+for (r in taux_contamination){
+data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
+
+Z = data$Z
+
+resultats = OfflineOutlierDetection(Z)
+distances <- resultats$distances
+outliers <- resultats$outlier_labels
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_offline[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100),2)
+dist = resultats$distances
+facteur_corr = correctionDistanceMahalanobis(dist,Z)
+facteur_corr = facteur_corr^2 
+distances_corr = facteur_corr*dist
+outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = ncol(Z)))
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_offline_corr[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100),2)
+}
+med <- colMeans(Z)
+Sigma <- cov(Z)
+distances <- calcule_vecteur_distances(Z, med, Sigma)
+
+outliers <- detectionOutliers(distances,cutoff= qchisq(0.95,df = ncol(Z)))
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_cov[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+distances_corr = facteur_corr*distances
+outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = ncol(Z)))
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+tc
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_cov_corr[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100),2)
+}
+
+
+resultats = StreamingOutlierDetection(Z,batch = 1)
+distances <- resultats$distances
+facteurs = correctionDistanceMahalanobis(distances,Z,methode = "online")
+distances_corr = hadamard.prod(facteurs,distances)
+outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_online_corr[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+
+
+resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+distances <- resultats$distances
+facteurs = correctionDistanceMahalanobis(distances,Z,methode = "streaming")
+distances_corr = hadamard.prod(facteurs,distances)
+outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_streaming_corr[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+
+
+
+compt = compt + 1
+}}
+
+
+
+# Paramètres
+alpha <- 0.05
+conf_level <- 1 - alpha
+p_seq <- seq(0.6, 1, length.out = 200)
+N <- nrow(Z)  # N doit être défini au préalable
+
+# Calcul des n0 et des x théoriques
+n0 <- floor(p_seq * N)
+x <- round(n0 * alpha)
+
+# Librairie pour les intervalles de confiance
+library(binom)
+
+# Calcul de l’intervalle de confiance exact (Clopper-Pearson)
+conf <- binom.confint(x = x, n = n0, conf.level = conf_level, methods = "exact")
+
+# Tracé des bornes
+plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
+     ylim = c(0.02, 0.1), xlab = "p (proportion pour n0 = p * N)",
+     ylab = "Intervalle de confiance de la proportion",
+     main = "IC à 95% pour Bin(n0, alpha = 0.05)")
+lines(p_seq, conf$upper, col = "red", lwd = 2)
+
+fp_offline_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
+
+fp_offline_values = round(fp_offline_corr/100,2)
+
+
+points(fp_offline_positions, fp_offline_values, col = "darkgreen", pch = 19)
+#text(fp_offline_positions, fp_offline_values + 0.005,
+     #labels = paste0(round(, 2), "%"), cex = 0.7, pos = 3, col = "darkgreen")
