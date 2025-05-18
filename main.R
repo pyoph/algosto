@@ -1007,9 +1007,9 @@ legend("topright",
        pch = c(NA, NA, 19, 19),
        bty = "n")
 
-
-res <- update_mean_cov(Z, rep(0,d), diag(d), n)
+Z
+res <- update_mean_Sigma2(Z)
 res$mean
-res$cov
-
+res$Sigma2
+Sigma1
 

@@ -4,18 +4,30 @@ using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 
 // [[Rcpp::export]]
-List update_mean_cov(const arma::vec& Xn1, 
-                     const arma::vec& mean_n, 
-                     const arma::mat& cov_n, 
-                     int n) {
-  // Mise à jour de la moyenne
-  arma::vec mean_n1 = mean_n + (1.0 / (n + 1)) * (Xn1 - mean_n);
+List update_mean_Sigma2(const arma::mat& X) {
+  int n_obs = X.n_rows;
+  int d = X.n_cols;
+  //Rcout << "X.n_rows = " << n_obs << ", X.n_cols = " << d << "\n";
   
-  // Mise à jour de la covariance non centrée (matrice des moments)
-  arma::mat cov_n1 = cov_n + (1.0 / (n + 1)) * (Xn1 * Xn1.t() - cov_n);
+  arma::vec mean = arma::zeros(d);       // moyenne empirique
+  arma::mat Sigma2 = arma::zeros(d, d);  // matrice des moments d'ordre 2
+ // Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
+ Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
+  for (int n = 0; n < 5; ++n) {
+    arma::vec x = X.row(n).t();  // vecteur colonne
+   
+    mean   = mean   + (1.0 / (n + 1)) * (x - mean);
+    Sigma2 = Sigma2  + (1.0 / (n + 1)) * (x * x.t() - Sigma2 );
+    //Rcout << "Étape " << n+1 << " :\n";
+    //Rcout << "x = " << x.t();
+    //Rcout << "mean = " << mean.t();
+    //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
+    Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
+    
+  }
   
   return List::create(
-    Named("mean") = mean_n1,
-    Named("cov") = cov_n1
+    Named("mean") = mean,
+    Named("Sigma2") = Sigma2
   );
 }
