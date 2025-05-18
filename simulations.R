@@ -104,7 +104,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
     } 
     else if (contamin == "MaronnaZamar")
     {
-      vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1) #Non outliers
+      vecteurs_mu1 <- mvrnorm(n1, mu1, diag(d)) #Non outliers
       print(dim(vecteurs_mu1))
       #Calcul de a0
       a0 <- rep(0,d)
@@ -128,7 +128,7 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
           else R[i,j] = rhomult
         }
       }
-      print(dim(R))
+      #print(dim(R))
       #R <- creerMatriceToeplitz(rhomult,d)
       #Calcul des nouvelles matrices corrélées
       vecteurs_mu1 <- R %*% t(vecteurs_mu1)

@@ -61,10 +61,11 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 1
-data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"studentTronquee")
+p1 = 0.8
+data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
+
 cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
   total_points <- nrow(data$Z)
   total_outliers_theoriques <- pourcentage / 100 * total_points
@@ -355,250 +356,6 @@ plot2 = ggplot(df_long, aes(x = taux_contamination, y = Valeur,
   theme(legend.position = "top")  # Légende en haut
 
 plot1+plot2
-# save(results_metrics,file = "results_metricsMaronnaZamar.Rdata")
-# 
-# 
-# 
-# 
-# # latex_table_results_metrics <- xtable(results_metrics)
-# 
-# results_without_RMSE_Med <- results_metrics %>%
-#      select(-contains("RMSE_Med")) %>%  # Supprimer toutes les colonnes RMSE_Med
-#      select(-contains("Cov"))
-# 
-# latex_table <- kable(results_without_RMSE_Med, format = "latex", caption = "Résultats contamination en moyenne 20 runs", label = "tab:results")
-# writeLines(latex_table, "resultats_contamination_zero.tex")
-# 
-# latex_table_results_metrics_without_RMSE_Med <- xtable(results_without_RMSE_Med)
-# 
-# 
-#   
-# #Création d'une liste vide 
-# liste_resultats_outliers <- list()
-# 
-# for (i in 1:nbruns)
-# {
-#   resultats_outliers <- calcule_outliers(contamin = "uniforme")
-#   liste_resultats_outliers[[i]] <- resultats_outliers 
-# }
-# 
-# #resultats_outliers <- round(resultats_outliers,2)
-# 
-# 
-# # Calculer la moyenne de chaque colonne sur tous les dataframes
-# moyenne_resultats <- round(Reduce("+", liste_resultats_outliers) / nbruns,2)
-# 
-# # Afficher la moyenne
-# print(moyenne_resultats)
-# 
-# save(moyenne_resultats,file = "outliersUnifhypercubeunite.Rdata")
-# 
-# moyenne_resultatsEnreg <- moyenne_resultats  %>% select(-FN_Cov, -FP_Cov, -Tps_Cov)
-# 
-# latex_table <- xtable(moyenne_resultatsEnreg)
-# 
-# 
-# taux_contamination <- c(0,2, 5, 10, 15, 20, 25, 30, 40)
-# 
-# ###Test fonction d'estimation online affichage des boxplots des erreurs
-# pdf("Resultats_Erreurs_Sigma Toeplitzvar1sqrtd.pdf", width = 10, height = 7)
-# 
-# 
-# #Calcul des erreurs pour tracer les boxplots
-# 
-# erreursSigmaBoxplotOnline <-array(0, dim = c(nbruns,length(taux_contamination),n))
-# 
-# erreursSigmaBoxplotStreaming <- array(0, dim = c(nbruns,length(taux_contamination),n))
-# 
-# erreursVarOracle <- matrix(0,nbruns,length(taux_contamination))
-# 
-# #Somme des erreurs online et streaming pour les moyenner ensuite
-# 
-# somme_erreursOnline <- matrix(0,n,length(taux_contamination))
-# somme_erreursStreaming <- matrix(0,n,length(taux_contamination))
-# 
-# 
-# depart = 100
-# 
-# for (m in (1:nbruns)){
-# for (i in seq_along(taux_contamination)) 
-# {
-#   
-# 
-#   contamin = "moyenne"
-#   #Initialisation des erreurs online et streaming
-#   erreursonline <- rep(0,n)
-#   erreursStr <- rep(0,n)
-#   delta <- taux_contamination[i]
-#   #delta <- 0
-#   
-#   #Génération des échantillons
-#   p1 <- 1 - delta / 100
-#   
-#   p2 <- 1 - p1
-#   
-#   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
-#   Z <- resultsSimul$Z
-#   
-#   
-#   #Estimation online
-#   #results <- estimMV(Z,Vinit = Sigma1,methode = "eigen")
-#   
-#   resultatsOnline <- estimation(Z,depart, methodeEstimation = "online")
-#   SigmaEstimOnline <- resultatsOnline$SigmaOnline
-#   distances <- resultatsOnline$distances
-#   miterOn <- resultatsOnline$miter
-#   
-#   #Estimation offline
-#   resultsOffline <- estimation(Z,depart, methodeEstimation = "offline")
-#   SigmaEstimOffline <- resultsOffline$SigmaOffline
-#   
-#   #Estimation en streaming 
-#   resultsStr <- estimation(Z, depart, methodeEstimation = "streaming")
-#   miterStr <- estimation(Z, depart, methodeEstimation = "streaming")$miter
-#   SigmaStr <- resultsStr$SigmaStreaming
-#   
-#   
-#   #calcul des erreurs à chaque itération
-#   for (k in (1: n)){
-#   erreursonline[k] <- calculErreursNormeFrobenius(SigmaEstimOnline[k,,],Sigma1)
-#   
-#   erreursStr[k] <- calculErreursNormeFrobenius(SigmaStr[k,,],Sigma1)
-#   }
-#   erreursSigmaBoxplotOnline[m,i,] <- erreursonline
-#   erreursSigmaBoxplotStreaming[m,i,] <- erreursStr
-#   erreursVarOracle[m,i] <- EstimVarMC(nbiter = 1e2, delta = delta, Sigma = Sigma1)
-#   
-#   #erreursoffline <- calculErreursNormeFrobenius(SigmaEstimOffline,Sigma1)
-#   #affiche_erreursSigma(erreurs_online = erreursonline, contamination = delta)
-#   
-#   #affiche_erreursSigma(erreurs_online = erreursStr, contamination = delta)
-#   #Stockage des erreurs :
-#   print(somme_erreursOnline[1e4,i])
-#   somme_erreursOnline[,i] <- somme_erreursOnline[,i] + erreursonline
-#   print(somme_erreursOnline[1e4,i])
-#   somme_erreursStreaming[,i] <- somme_erreursStreaming[,i] + erreursStr
-#  #Affichage des SigmaEstim Online, Offline et théorique
-#  
-# #plot_comparaison_sigma(Sigma1, SigmaEstimOffline = SigmaEstimOffline,SigmaEstimOnline = SigmaEstimOnline,delta)
-# 
-#  
-#   }
-#  #points(Sigma1, SigmaEstimOffline, col=4); abline(0, 1)
-#  
-#   
-# }
-# #Calcul des moyennes de erreurs
-# 
-# moy_erreursSigmaBoxplotOnline <- round(apply(erreursSigmaBoxplotOnline, c(2,3), mean), 2)
-# moy_erreursSigmaBoxplotStreaming <- round(apply(erreursSigmaBoxplotStreaming, c(2,3), mean), 2)
-# 
-# moy_erreursVarOracle <- round(apply(erreursVarOracle, 2, mean), 2)
-# 
-# creer_boxplot_erreurs(moy_erreursSigmaBoxplotOnline,taux_contamination,methode= "online",erreursVarOracle[1,])
-# creer_boxplot_erreurs(moy_erreursSigmaBoxplotStreaming,taux_contamination,methode= "streaming",erreursVarOracle[1,])
-# 
-# 
-# dev.off()
-# 
-# #Calcul des moyennes des erreurs 
-# 
-# # Calcul de la moyenne des erreurs par taux de contamination
-# moy_erreursOnline <- (somme_erreursOnline[100:1e4,])/nbruns
-# moy_erreursStreaming <-(somme_erreursStreaming[100:1e4,])/nbruns
-# 
-# # Créer une liste pour stocker les graphiques
-# list_plots <- list()
-# # Nombre d'itérations à considérer
-# iterations <- seq(1, 9900)  
-# for (i in seq_along(taux_contamination)) 
-# {
-#   delta <- taux_contamination[i]
-# # Transformer les données en format long pour ggplot
-# df_erreurs <- data.frame(
-#   Iteration = rep(iterations, 2),
-#   Erreur_Moyenne = c(moy_erreursOnline[iterations,i], moy_erreursStreaming[iterations,i]),
-#   Méthode = rep(c("Online", "Streaming"), each = length(iterations))
-# )
-# 
-# # Tracer les courbes
-# p <- ggplot(df_erreurs, aes(x = Iteration, y = Erreur_Moyenne, color = Méthode)) +
-#   geom_line(size = 1.2) +  # Ligne plus épaisse
-#   geom_point(size = 2) +   # Points pour les valeurs précises
-#   scale_x_log10() +        # Échelle logarithmique pour les itérations
-#   labs(title = paste("taux de contamination =  ",delta," %"),
-#        x = "Nombre d'itérations",
-#        y = "Erreur Moyenne (norme de Frobenius)") +
-#   theme_minimal() +
-#   theme(legend.position = "top")
-# print(p)
-# list_plots[[i]] <- p
-# }
-# 
-# grid.arrange(grobs = list_plots[1:4], ncol = 2, nrow = 2)
-# grid.arrange(grobs = list_plots[5:9], ncol = 3, nrow = 3)
-# 
-# 
-# 
-
-# 
-# ###Calcul du meilleur AUC pour chaque méthode
-# 
-# methodes <- c("Cov Empirique", "OGK", "Online", "Offline", "Comédiane", "Shrinkage")
-# 
-# taux_contamination <- c(2, 5, 10, 15, 20, 25, 30, 40)
-# 
-# #Création d'un dataframe pour contenir les meilleurs AUC
-# 
-# auc_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
-# seuil_df <- data.frame(matrix(ncol = length(methodes), nrow = length(taux_contamination)))
-# 
-# rownames(auc_df) <- taux_contamination
-# 
-# 
-# rownames(seuil_df) <- taux_contamination
-# 
-# colnames(auc_df) <- methodes
-# 
-# 
-# colnames(seuil_df) <- methodes
-# 
-# 
-# for (i in seq_along(taux_contamination)) 
-# {
-#   contamin = "moyenne"
-#   
-#   delta <- taux_contamination[i]
-#   #delta <- 2
-#   
-#   #Génération des échantillons
-#   p1 <- 1 - delta / 100
-#   
-#   p2 <- 1 - p1
-#   
-#   resultsSimul <- genererEchantillon(n, d, mu1, mu2, p1, p2, Sigma1 = Sigma1, Sigma2 = Sigma2,contamin = contamin)
-#   Z <- resultsSimul$Z
-#   
-#   #Calcul du meilleur seuil selon l'AUC et de l'AUC selon chaque méthode
-#   for (m in methodes)
-#   {
-#       
-#          
-#       distances <- calcule_distances_par_methode(Z,methode = m)
-#       #print(distances)
-#       resultats <- courbeROC(resultsSimul$labelsVrais,distances)
-#       auc_df[i,m] <- resultats$auc_max
-#       seuil_df[i,m] <- resultats$seuil_auc_max
-#   }
-#   
-# }  
-#   #Enregistrement dans un CSV
-#   write.csv(auc_df,file = "auc.csv")
-# 
-#   write.csv(seuil_df,file = "seuil.csv")  
-# 
-# Supposons que rmseSigmaBP est déjà dans l'environnement
-# Dimensions : 100 x 9 x 9
 
 # Initialisation
 
@@ -611,7 +368,7 @@ rmseSigmaBP = results_metrics$rmseSigmaBP
 methods <- c("Cov", "OGK", "Comed", "Shrink", 
              "Online", "Offline", "Streaming", "FastMCD")
 
-# Noms des taux de contamination (à adapter si tu as les vrais)
+# Noms des taux de contamination 
 #taux_contamination <- paste0("Taux_", 1:9)
 taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
 
@@ -641,9 +398,9 @@ ggplot(rmse_data, aes(x = factor(Taux), y = RMSE)) +
 ####Représentation des contaminations
 
 # Fonction pour générer un échantillon
-preparer_donnees <- function(type) {
+preparer_donnees <- function(type,p1 = 0.8) {
   set.seed(123)
-  p1 = 0.9
+  p1 = p1
   resultat <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,type)
   df <- as.data.frame(resultat$Z)
   df$label <- factor(resultat$labelsVrais)
@@ -651,9 +408,9 @@ preparer_donnees <- function(type) {
 }
 
 # Génération des trois jeux de données
-donnees_moyenne  <- preparer_donnees("moyenne")
-donnees_student  <- preparer_donnees("studentTronquee")
-donnees_maronna  <- preparer_donnees("MaronnaZamar")
+donnees_moyenne  <- preparer_donnees("moyenne",p1 = 0.8)
+donnees_student  <- preparer_donnees("studentTronquee",p1 = 0.8)
+donnees_maronna  <- preparer_donnees("MaronnaZamar",p1 =0.8)
 
 # Fonction de tracé avec échelle log10 sur Y uniquement (données inchangées)
 tracer_plot <- function(df, titre) {
@@ -807,8 +564,8 @@ fp_streaming_corr = rep(0,length(taux_contamination))
 
 
 
-fp_cov = rep(0,length(taux_contamination))
-fp_cov_corr = rep(0,length(taux_contamination))
+# fp_cov = rep(0,length(taux_contamination))
+# fp_cov_corr = rep(0,length(taux_contamination))
 
 
 compt = 1
@@ -873,10 +630,19 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 
 resultats = StreamingOutlierDetection(Z,batch = 1)
 distances <- resultats$distances
+outliers = resultats$outlier_labels
+
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_online[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+
+
 facteurs = correctionDistanceMahalanobis(distances,Z,methode = "online")
 distances_corr = hadamard.prod(facteurs,distances)
 outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
-
+  
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
 if((tc["0","0"] + tc["0","1"]) != 0)
@@ -885,7 +651,21 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 
 resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
 distances <- resultats$distances
+outliers = resultats$outlier_labels
+
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+tc <- safe_access_tc(tc)
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_streaming[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+
+
+
+
 facteurs = correctionDistanceMahalanobis(distances,Z,methode = "streaming")
+
+
+
 distances_corr = hadamard.prod(facteurs,distances)
 outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
 
@@ -970,7 +750,7 @@ points(fp_online_positions, fp_online_values, col = "green", pch = 19)
 legend("topright",
        legend = c("Borne inférieure (IC 95%)", 
                   "Borne supérieure (IC 95%)", 
-                  "Taux brut hors-ligne", 
+                  "Taux brut onlinr", 
                   "Taux corrigé onligne"),
        col = c("blue", "red", "green", "darkgreen"),
        lwd = c(2, 2, NA, NA),
@@ -1000,7 +780,7 @@ points(fp_streaming_positions, fp_streaming_values, col = "green", pch = 19)
 legend("topright",
        legend = c("Borne inférieure (IC 95%)", 
                   "Borne supérieure (IC 95%)", 
-                  "Taux brut hors-ligne", 
+                  "Taux brut streaming", 
                   "Taux corrigé streaming"),
        col = c("blue", "red", "green", "darkgreen"),
        lwd = c(2, 2, NA, NA),
@@ -1010,6 +790,7 @@ legend("topright",
 Z
 res <- update_mean_Sigma2(Z)
 res$mean
-res$Sigma2
+SigmaCovOnline = res$Sigma2
 Sigma1
 
+norm(SigmaCovOnline - Sigma1,"F")
