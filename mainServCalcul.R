@@ -1,4 +1,3 @@
-
 library(xtable)
 library(reshape2)
 library(RobRegression)
@@ -24,10 +23,13 @@ library(ROCR)
 library(pROC)
 library(tidyr)
 library(dplyr)
+library(binom)
+
 #library(knitr)
 library("RSpectra")
 library("mvoutlier")
 library("RMM")
+library("matrixcalc")
 #library(Rcpp)
 #library(RcppArmadillo)
 #install.packages("Metrics")
@@ -42,7 +44,7 @@ source("~/algosto/seuils.R")
 source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 #sourceCpp("~/algosto/RobinsMC2CPP.cpp")
-
+sourceCpp("~/algosto/update_mean_cov.cpp")
 
 
 results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")

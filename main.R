@@ -813,6 +813,19 @@ fp_cov_corr = rep(0,length(taux_contamination))
 
 compt = 1
 
+calcule_distances_vraies <- function(Z,Sigma,mu1)
+{
+  distances_vraies = rep(0,nrow(Z))
+  for (i in (1:nrow(Z)))
+  {
+    distances_vraies[i] = t(Z[i] - mu1) %*% solve(Sigma) %*% (Z[i] - mu1)
+  }
+  return(distances_vraies)
+}
+
+
+
+
 for (r in taux_contamination){
 data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
 
@@ -886,8 +899,6 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 compt = compt + 1
 }}
 
-
-
 # Paramètres
 alpha <- 0.05
 conf_level <- 1 - alpha
@@ -898,24 +909,107 @@ N <- nrow(Z)  # N doit être défini au préalable
 n0 <- floor(p_seq * N)
 x <- round(n0 * alpha)
 
-# Librairie pour les intervalles de confiance
-library(binom)
 
 # Calcul de l’intervalle de confiance exact (Clopper-Pearson)
 conf <- binom.confint(x = x, n = n0, conf.level = conf_level, methods = "exact")
 
+#Plot offline
+
 # Tracé des bornes
 plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
-     ylim = c(0.02, 0.1), xlab = "p (proportion pour n0 = p * N)",
+     ylim = c(0, 0.1), xlab = "p (proportion pour n0 = p * N)",
      ylab = "Intervalle de confiance de la proportion",
-     main = "IC à 95% pour Bin(n0, alpha = 0.05)")
+     main = "IC à 95% pour Bin(n0, alpha = 0.05) pour offline")
 lines(p_seq, conf$upper, col = "red", lwd = 2)
 
 fp_offline_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
 
-fp_offline_values = round(fp_offline_corr/100,2)
+fp_offline_values = round(fp_offline/100,2)
 
 
-points(fp_offline_positions, fp_offline_values, col = "darkgreen", pch = 19)
+fp_offline_values_corr = round(fp_offline_corr/100,2)
+
+
+points(fp_offline_positions, fp_offline_values_corr, col = "darkgreen", pch = 19)
+
+points(fp_offline_positions, fp_offline_values, col = "green", pch = 19)
 #text(fp_offline_positions, fp_offline_values + 0.005,
      #labels = paste0(round(, 2), "%"), cex = 0.7, pos = 3, col = "darkgreen")
+legend("topright",
+       legend = c("Borne inférieure (IC 95%)", 
+                  "Borne supérieure (IC 95%)", 
+                  "Taux brut hors-ligne", 
+                  "Taux corrigé offline"),
+       col = c("blue", "red", "green", "darkgreen"),
+       lwd = c(2, 2, NA, NA),
+       pch = c(NA, NA, 19, 19),
+       bty = "n")
+
+#Plot online
+
+# Tracé des bornes
+plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 0.1), xlab = "p (proportion pour n0 = p * N)",
+     ylab = "Intervalle de confiance de la proportion",
+     main = "IC à 95% pour Bin(n0, alpha = 0.05) pour online")
+lines(p_seq, conf$upper, col = "red", lwd = 2)
+
+fp_online_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
+
+fp_online_values = round(fp_online/100,2)
+
+
+fp_online_values_corr = round(fp_online_corr/100,2)
+
+
+points(fp_online_positions, fp_online_values_corr, col = "darkgreen", pch = 19)
+
+points(fp_online_positions, fp_online_values, col = "green", pch = 19)
+#text(fp_offline_positions, fp_offline_values + 0.005,
+#labels = paste0(round(, 2), "%"), cex = 0.7, pos = 3, col = "darkgreen")
+legend("topright",
+       legend = c("Borne inférieure (IC 95%)", 
+                  "Borne supérieure (IC 95%)", 
+                  "Taux brut hors-ligne", 
+                  "Taux corrigé onligne"),
+       col = c("blue", "red", "green", "darkgreen"),
+       lwd = c(2, 2, NA, NA),
+       pch = c(NA, NA, 19, 19),
+       bty = "n")
+
+#Plot streaming
+
+# Tracé des bornes
+plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 0.1), xlab = "p (proportion pour n0 = p * N)",
+     ylab = "Intervalle de confiance de la proportion",
+     main = "IC à 95% pour Bin(n0, alpha = 0.05) pour streaming")
+lines(p_seq, conf$upper, col = "red", lwd = 2)
+
+fp_streaming_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
+
+fp_streaming_values = round(fp_streaming/100,2)
+
+fp_streaming_values_corr = round(fp_streaming_corr/100,2)
+
+points(fp_streaming_positions, fp_streaming_values_corr, col = "darkgreen", pch = 19)
+
+points(fp_streaming_positions, fp_streaming_values, col = "green", pch = 19)
+#text(fp_offline_positions, fp_offline_values + 0.005,
+#labels = paste0(round(, 2), "%"), cex = 0.7, pos = 3, col = "darkgreen")
+legend("topright",
+       legend = c("Borne inférieure (IC 95%)", 
+                  "Borne supérieure (IC 95%)", 
+                  "Taux brut hors-ligne", 
+                  "Taux corrigé streaming"),
+       col = c("blue", "red", "green", "darkgreen"),
+       lwd = c(2, 2, NA, NA),
+       pch = c(NA, NA, 19, 19),
+       bty = "n")
+
+
+res <- update_mean_cov(Z, rep(0,d), diag(d), n)
+res$mean
+res$cov
+
+
