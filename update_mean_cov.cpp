@@ -34,7 +34,7 @@ List update_mean_Sigma2(const arma::mat& X) {
 
 
 // [[Rcpp::export]]
-
+  
 double mahalanobis_generalizedRcpp(const arma::rowvec& x,
                                    const arma::rowvec& moyennem,
                                    const arma::mat& eigvecs,

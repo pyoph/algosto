@@ -593,7 +593,7 @@ resultats = update_mean_Sigma2(Z)
 med <- resultats$mean
 Sigma <- resultats$Sigma2
 
-rmseSigma[r,compt_meth] = norm(Sigma - Sigma1,"F")
+#rmseSigma[r,compt_meth] = norm(Sigma - Sigma1,"F")
 compt_meth = compt_meth + 1
 
 #distances <- calcule_vecteur_distances(Z, med, Sigma)
@@ -604,7 +604,7 @@ ditances = rep(0, length(taux_contamination))
 for (i in (1:nrow(Z))){
 distances[i] = mahalanobis_generalizedRcpp(Z[i,],med,eigen(Sigma)$vectors, eigen(Sigma)$values)
 }
-outliers <- detectionOutliers(distances,cutoff= qchisq(0.95,df = ncol(Z)))
+outliers <- detectionOutliers(distances,cutoff= qchisq(0.975,df = ncol(Z)))
 
 
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
@@ -612,7 +612,8 @@ tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
 
 
-resultats = OfflineOutlierDetection(Z)
+resultats = OfflineOutlierDetection(Z, cutoff = qchisq(0.975,df = ncol(Z)))
+Sigma = resultats$variance
 distances <- resultats$distances
 outliers <- resultats$outlier_labels
 
@@ -623,9 +624,9 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 {fp_offline[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100),2)
 dist = resultats$distances
 facteur_corr = correctionDistanceMahalanobis(dist,Z)
-facteur_corr = facteur_corr^2 
+#facteur_corr = facteur_corr^2 
 distances_corr = facteur_corr*dist
-outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = ncol(Z)))
+outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.975,df = ncol(Z)))
 
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
@@ -636,14 +637,14 @@ med <- colMeans(Z)
 Sigma <- cov(Z)
 distances <- calcule_vecteur_distances(Z, med, Sigma)
 
-outliers <- detectionOutliers(distances,cutoff= qchisq(0.95,df = ncol(Z)))
+outliers <- detectionOutliers(distances,cutoff= qchisq(0.975,df = ncol(Z)))
 
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
 if((tc["0","0"] + tc["0","1"]) != 0)
 {fp_cov[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
 distances_corr = facteur_corr*distances
-outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = ncol(Z)))
+outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.975,df = ncol(Z)))
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc
 tc <- safe_access_tc(tc)
@@ -652,7 +653,7 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 }
 
 
-resultats = StreamingOutlierDetection(Z,batch = 1)
+resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = qchisq(0.975,df = ncol(Z)))
 distances <- resultats$distances
 outliers = resultats$outlier_labels
 
@@ -665,7 +666,7 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 
 facteurs = correctionDistanceMahalanobis(distances,Z,methode = "online")
 distances_corr = hadamard.prod(facteurs,distances)
-outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
+outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.975,df = d))
   
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
@@ -704,7 +705,7 @@ compt = compt + 1
 }}
 
 # Paramètres
-alpha <- 0.05
+alpha <- 0.025
 conf_level <- 1 - alpha
 p_seq <- seq(0.6, 1, length.out = 200)
 N <- nrow(Z)  # N doit être défini au préalable
@@ -723,7 +724,7 @@ conf <- binom.confint(x = x, n = n0, conf.level = conf_level, methods = "exact")
 plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
      ylim = c(0, 0.1), xlab = "p (proportion pour n0 = p * N)",
      ylab = "Intervalle de confiance de la proportion",
-     main = "IC à 95% pour Bin(n0, alpha = 0.05) pour offline")
+     main = "IC à 97,5% pour Bin(n0, alpha = 0.05) pour offline")
 lines(p_seq, conf$upper, col = "red", lwd = 2)
 
 fp_offline_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
@@ -811,10 +812,4 @@ legend("topright",
        pch = c(NA, NA, 19, 19),
        bty = "n")
 
-Z
-res <- update_mean_Sigma2(Z)
-res$mean
-SigmaCovOnline = res$Sigma2
-Sigma1
 
-norm(SigmaCovOnline - Sigma1,"F")
