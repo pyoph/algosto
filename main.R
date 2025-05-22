@@ -563,9 +563,8 @@ fp_streaming = rep(0,length(taux_contamination))
 fp_streaming_corr = rep(0,length(taux_contamination))
 
 
-
-# fp_cov = rep(0,length(taux_contamination))
-# fp_cov_corr = rep(0,length(taux_contamination))
+ fp_cov = rep(0,length(taux_contamination))
+fp_cov_corr = rep(0,length(taux_contamination))
 
 
 compt = 1
@@ -580,13 +579,38 @@ calcule_distances_vraies <- function(Z,Sigma,mu1)
   return(distances_vraies)
 }
 
-
-
+methodes = c("sample_cov_online","offline","online","batch")
+rmseSigma = matrix(0, length(taux_contamination),length(methodes))
 
 for (r in taux_contamination){
+compt_meth = 1  
 data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
+
+resultats = update_mean_Sigma2(Z)
+
+med <- resultats$mean
+Sigma <- resultats$Sigma2
+
+rmseSigma[r,compt_meth] = norm(Sigma - Sigma1,"F")
+compt_meth = compt_meth + 1
+
+#distances <- calcule_vecteur_distances(Z, med, Sigma)
+#eigen(Sigma1)$values
+
+ditances = rep(0, length(taux_contamination))
+
+for (i in (1:nrow(Z))){
+distances[i] = mahalanobis_generalizedRcpp(Z[i,],med,eigen(Sigma)$vectors, eigen(Sigma)$values)
+}
+outliers <- detectionOutliers(distances,cutoff= qchisq(0.95,df = ncol(Z)))
+
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+
+tc <- safe_access_tc(tc)
+
 
 resultats = OfflineOutlierDetection(Z)
 distances <- resultats$distances
