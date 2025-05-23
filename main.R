@@ -61,7 +61,7 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 0.8
+p1 = 0.6
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
@@ -553,6 +553,12 @@ legend("topright",
 
 taux_contamination = c(0, 2, 5, 10, 15, 20, 25, 30, 40)
 
+cutoff = qchisq(0.95,df = d)
+
+fp_vrai = rep(0,length(taux_contamination))
+fp_vrai_corr = rep(0,length(taux_contamination))
+
+
 fp_offline = rep(0,length(taux_contamination))
 fp_offline_corr = rep(0,length(taux_contamination))
 
@@ -569,15 +575,8 @@ fp_cov_corr = rep(0,length(taux_contamination))
 
 compt = 1
 
-calcule_distances_vraies <- function(Z,Sigma,mu1)
-{
-  distances_vraies = rep(0,nrow(Z))
-  for (i in (1:nrow(Z)))
-  {
-    distances_vraies[i] = t(Z[i] - mu1) %*% solve(Sigma) %*% (Z[i] - mu1)
-  }
-  return(distances_vraies)
-}
+
+
 
 methodes = c("sample_cov_online","offline","online","batch")
 rmseSigma = matrix(0, length(taux_contamination),length(methodes))
@@ -587,6 +586,30 @@ compt_meth = 1
 data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
+
+
+outliers = rep(0,nrow(Z))
+for(i in (1:nrow(Z))){
+  distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu1,eigen(Sigma1)$vectors,eigen(Sigma1)$values)
+  S = distances[i]
+  
+  if (S > cutoff) {outliers[i] = 1}
+  
+  
+}
+
+tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+
+tc <- safe_access_tc(tc)
+
+
+if((tc["0","0"] + tc["0","1"]) != 0)
+{fp_vrai[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100),2)}
+
+
+
+
+
 
 resultats = update_mean_Sigma2(Z)
 
@@ -599,52 +622,76 @@ compt_meth = compt_meth + 1
 #distances <- calcule_vecteur_distances(Z, med, Sigma)
 #eigen(Sigma1)$values
 
-ditances = rep(0, length(taux_contamination))
-
+distances = rep(0, nrow(Z))
+outliers = rep(0,nrow(Z))
 for (i in (1:nrow(Z))){
 distances[i] = mahalanobis_generalizedRcpp(Z[i,],med,eigen(Sigma)$vectors, eigen(Sigma)$values)
-}
-outliers <- detectionOutliers(distances,cutoff= qchisq(0.975,df = ncol(Z)))
+S = distances[i]
 
+if (S > cutoff) {outliers[i] = 1}
+
+}
 
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 
 tc <- safe_access_tc(tc)
 
+resultats = OfflineOutlierDetection(Z)
+Sigma = resultats$variance + best_lambda*diag(d)
 
-resultats = OfflineOutlierDetection(Z, cutoff = qchisq(0.975,df = ncol(Z)))
-Sigma = resultats$variance
+
 distances <- resultats$distances
 outliers <- resultats$outlier_labels
 
+
+
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 
 tc <- safe_access_tc(tc)
 if((tc["0","0"] + tc["0","1"]) != 0)
-{fp_offline[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100),2)
-dist = resultats$distances
-facteur_corr = correctionDistanceMahalanobis(dist,Z)
-#facteur_corr = facteur_corr^2 
-distances_corr = facteur_corr*dist
-outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.975,df = ncol(Z)))
+{fp_offline[compt]   <-(tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100)
+
+
+best_lambda = tune_lambda(Z,mu_hat = resultats$median,Sigma = resultats$variance)$lambda
+
+distances_corr = rep(0,nrow(Z))
+outliers = rep(0,nrow(Z))
+
+for(i in (1:nrow(Z))){
+  distances_corr[i] = mahalanobis_generalizedRcpp(Z[i,],resultats$median,eigen(Sigma)$vectors,eigen(Sigma)$values)
+  S = distances_corr[i]
+  
+  if (S > cutoff) {outliers[i] = 1}
+  
+  
+}
 
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
 if((tc["0","0"] + tc["0","1"]) != 0)
-{fp_offline_corr[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100),2)
+{fp_offline_corr[compt]   <- (tc["0", "1"]/(tc["0", "1"] + tc["0", "0"])*100)
 }
 med <- colMeans(Z)
 Sigma <- cov(Z)
-distances <- calcule_vecteur_distances(Z, med, Sigma)
 
-outliers <- detectionOutliers(distances,cutoff= qchisq(0.975,df = ncol(Z)))
+distances = rep(0, nrow(Z))
+outliers = rep(0,nrow(Z))
+for (i in (1:nrow(Z))){
+  distances[i] = mahalanobis_generalizedRcpp(Z[i,],med,eigen(Sigma)$vectors, eigen(Sigma)$values)
+  S = distances[i]
+  
+  if (S > cutoff) {outliers[i] = 1}
+  
+}
 
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+
 tc <- safe_access_tc(tc)
+
 if((tc["0","0"] + tc["0","1"]) != 0)
 {fp_cov[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
 distances_corr = facteur_corr*distances
-outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.975,df = ncol(Z)))
+outliers <- detectionOutliers(distances_corr,cutoff = cutoff)
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc
 tc <- safe_access_tc(tc)
@@ -653,7 +700,7 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 }
 
 
-resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = qchisq(0.975,df = ncol(Z)))
+resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = cutoff)
 distances <- resultats$distances
 outliers = resultats$outlier_labels
 
@@ -664,14 +711,26 @@ if((tc["0","0"] + tc["0","1"]) != 0)
 {fp_online[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
 
 
-facteurs = correctionDistanceMahalanobis(distances,Z,methode = "online")
-distances_corr = hadamard.prod(facteurs,distances)
-outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.975,df = d))
+best_lambda = tune_lambda(Z,resultats$moyennem,resultats$Sigma[nrow(Z),,])$lambda
+# facteurs = correctionDistanceMahalanobis(distances,Z,methode = "online")
+# distances_corr = hadamard.prod(facteurs,distances)
+# outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
+#
+Sigma = resultats$Sigma[nrow(Z) ,,] + best_lambda * diag(ncol(Z))
+distances = rep(0, nrow(Z))
+outliers = rep(0,nrow(Z))
+for (i in (1:nrow(Z))){
+  distances[i] = mahalanobis_generalizedRcpp(Z[i,],med,eigen(Sigma)$vectors, eigen(Sigma)$values)
+  S = distances[i]
   
+  if (S > cutoff) {outliers[i] = 1}
+  
+}
+
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
 if((tc["0","0"] + tc["0","1"]) != 0)
-{fp_online_corr[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+{fp_online_corr[compt]   <- (tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100}
 
 
 resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
@@ -682,30 +741,49 @@ outliers = resultats$outlier_labels
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
 if((tc["0","0"] + tc["0","1"]) != 0)
-{fp_streaming[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+{fp_streaming[compt]   <- (tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100}
+
+
+best_lambda = tune_lambda(Z,resultats$moyennem,resultats$Sigma[nrow(Z),,])$lambda
 
 
 
+# facteurs = correctionDistanceMahalanobis(distances,Z,methode = "online")
+# distances_corr = hadamard.prod(facteurs,distances)
+# outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
+#
+print("ok online")
+Sigma = resultats$Sigma[nrow(Z) ,,] + best_lambda * diag(d)
+distances = rep(0, nrow(Z))
+outliers = rep(0,nrow(Z))
+for (i in (1:nrow(Z))){
+  distances[i] = mahalanobis_generalizedRcpp(Z[i,],resultats$moyennem,eigen(Sigma)$vectors, eigen(Sigma)$values)
+  S = distances[i]
+  
+  if (S > cutoff) {outliers[i] = 1}
+  
+}
 
-facteurs = correctionDistanceMahalanobis(distances,Z,methode = "streaming")
-
-
-
-distances_corr = hadamard.prod(facteurs,distances)
-outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
+# facteurs = correctionDistanceMahalanobis(distances,Z,methode = "streaming")
+# 
+# 
+# 
+# distances_corr = hadamard.prod(facteurs,distances)
+# outliers <- detectionOutliers(distances_corr,cutoff = qchisq(0.95,df = d))
 
 tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
 tc <- safe_access_tc(tc)
 if((tc["0","0"] + tc["0","1"]) != 0)
-{fp_streaming_corr[compt]   <- round((tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100,2)}
+{fp_streaming_corr[compt]   <- (tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100}
 
 
+print("ok streaming")
 
 compt = compt + 1
 }}
 
 # Paramètres
-alpha <- 0.025
+alpha <- 0.05
 conf_level <- 1 - alpha
 p_seq <- seq(0.6, 1, length.out = 200)
 N <- nrow(Z)  # N doit être défini au préalable
@@ -713,6 +791,8 @@ N <- nrow(Z)  # N doit être défini au préalable
 # Calcul des n0 et des x théoriques
 n0 <- floor(p_seq * N)
 x <- round(n0 * alpha)
+
+
 
 
 # Calcul de l’intervalle de confiance exact (Clopper-Pearson)
@@ -724,12 +804,12 @@ conf <- binom.confint(x = x, n = n0, conf.level = conf_level, methods = "exact")
 plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
      ylim = c(0, 0.1), xlab = "p (proportion pour n0 = p * N)",
      ylab = "Intervalle de confiance de la proportion",
-     main = "IC à 97,5% pour Bin(n0, alpha = 0.05) pour offline")
+     main = "IC à 95% pour Bin(n0, alpha = 0.05) pour offline")
 lines(p_seq, conf$upper, col = "red", lwd = 2)
 
 fp_offline_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
 
-fp_offline_values = round(fp_offline/100,2)
+fp_offline_values = fp_offline/100
 
 
 fp_offline_values_corr = round(fp_offline_corr/100,2)
@@ -800,6 +880,31 @@ fp_streaming_values_corr = round(fp_streaming_corr/100,2)
 points(fp_streaming_positions, fp_streaming_values_corr, col = "darkgreen", pch = 19)
 
 points(fp_streaming_positions, fp_streaming_values, col = "green", pch = 19)
+
+fp_vrais_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
+
+fp_vrais = round(fp_vrai/100,2)
+
+fp_streaming_values_corr = round(fp_streaming_corr/100,2)
+
+points(fp_vrais_positions, fp_vrais, col = "darkgreen", pch = 19)
+
+
+points(fp_streaming_positions, fp_streaming_values_corr, col = "darkgreen", pch = 19)
+
+
+
+fp_cov_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
+
+fp_cov_values = round(fp_cov/100,2)
+
+
+points(fp_cov_positions, 1.1*fp_cov_values, col = "darkgreen", pch = 19)
+
+
+points(fp_streaming_positions, fp_streaming_values_corr, col = "darkgreen", pch = 19)
+
+
 #text(fp_offline_positions, fp_offline_values + 0.005,
 #labels = paste0(round(, 2), "%"), cex = 0.7, pos = 3, col = "darkgreen")
 legend("topright",
@@ -813,3 +918,125 @@ legend("topright",
        bty = "n")
 
 
+set.seed(123)
+tune_lambda <- function(Z,mu_hat,Sigma, n_grid = 1000, alpha = 0.05,epsilon = 1e-5) {
+  
+  
+  
+  eig <- eigen(Sigma)
+  eigvecs <- eig$vectors
+  eigvals <- eig$values
+  
+  lambda_min_allowed <- -min(eigvals) + epsilon
+  lambda_max <- 50
+  
+  grid_lambda <- seq(lambda_min_allowed, lambda_max, length.out = n_grid)
+  results <- data.frame(lambda = grid_lambda, false_pos_rate = NA)
+  
+  
+  for (i in seq_along(grid_lambda)) {
+    lambda <- grid_lambda[i]
+    eigvals_reg <- eigvals + lambda*rep(1,ncol(Z))
+    #print(lambda)
+    dists <- apply(Z, 1, function(x) {
+mahalanobis_generalizedRcpp(x,mu_hat,eigvecs,eigvals_reg)    })
+    
+    threshold <- qchisq(1 - alpha, df = ncol(Z))
+    #print(threshold)
+    false_pos_rate <- mean(dists > threshold)
+    
+    results$false_pos_rate[i] <- false_pos_rate
+  }
+  
+  # Choix de lambda le plus proche de 5 % de faux positifs
+  best <- results[which.min(abs(results$false_pos_rate - alpha)), ]
+  return(best)
+}
+
+
+best_lambda <- tune_lambda(Z,resultats$moyennem,resultats$Sigma[nrow(Z),,])
+print(best_lambda)
+
+
+fauxpositifs <- function(Z, data,alpha = 0.05,methode = "offline") {
+  d <- ncol(Z)
+  
+  
+  
+  
+  if (methode == "offline"){
+  resultats <- OfflineOutlierDetection(Z)
+  mu_hat = resultats$median
+  Sigma = resultats$variance
+  }
+  # Étape 2 : Détection initiale sans régularisation
+  cutoff <- qchisq(1 - alpha, df = d)
+  
+  outliers = resultats$outlier_labels
+  
+  tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers))
+  tc <- safe_access_tc(tc)
+  
+  if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+    fp_offline <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
+  }
+  
+  # Étape 3 : Recherche de lambda optimal
+  best_lambda <- tune_lambda(Z, mu_hat , Sigma, alpha = alpha)$lambda
+  Sigma_reg <- Sigma + best_lambda * diag(d)
+  
+  # Étape 4 : Détection régularisée
+  distances_corr <- rep(0, nrow(Z))
+  outliers_corr <- rep(0, nrow(Z))
+  
+  eig <- eigen(Sigma_reg)
+  
+  for (i in 1:nrow(Z)) {
+    distances_corr[i] <- mahalanobis_generalizedRcpp(
+      Z[i, ],
+      mu_hat,
+      eig$vectors,
+      eig$values
+    )
+    if (distances_corr[i] > cutoff) {
+      outliers_corr[i] <- 1
+    }
+  }
+  
+  tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_corr))
+  tc <- safe_access_tc(tc)
+    if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+    fp_offline_corr <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
+  }
+  
+  return(list(
+    variance = resultats$Sigma2,
+    median = resultats$mean,
+    distances = distances,
+    outlier_labels = outliers,
+    distances_reg = distances_corr,
+    outlier_labels_reg = outliers_corr,
+    lambda_opt = best_lambda,
+    fp_offline = fp_offline,
+    fp_offline_corr = fp_offline_corr
+  ))
+}
+
+fp_offline = rep(0,length(taux_contamination))
+
+fp_offline_corr = rep(0,length(taux_contamination))
+compt = 1
+for (r in taux_contamination){
+  
+  data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
+  
+  Z = data$Z
+  
+  res = fauxpositifs(Z,data)
+  fp_offline[compt] = res$fp_offline
+  fp_offline_corr[compt] = res$fp_offline_corr
+  #fp_offline_corr[compt]
+  compt = compt + 1
+}
+
+fp_offline

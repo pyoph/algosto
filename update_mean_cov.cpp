@@ -12,7 +12,7 @@ List update_mean_Sigma2(const arma::mat& X) {
   arma::vec mean = arma::zeros(d);       // moyenne empirique
   arma::mat Sigma2 = arma::zeros(d, d);  // matrice des moments d'ordre 2
  // Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
- Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
+ //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
   for (int n = 0; n < 5; ++n) {
     arma::vec x = X.row(n).t();  // vecteur colonne
    
@@ -22,7 +22,7 @@ List update_mean_Sigma2(const arma::mat& X) {
     //Rcout << "x = " << x.t();
     //Rcout << "mean = " << mean.t();
     //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
-    Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
+    //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
     
   }
   
