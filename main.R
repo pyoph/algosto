@@ -958,21 +958,22 @@ best_lambda <- tune_lambda(Z,resultats$moyennem,resultats$Sigma[nrow(Z),,])
 print(best_lambda)
 
 
-fauxpositifs <- function(Z, data,alpha = 0.05,methode = "offline",cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d)) {
-  d <- ncol(Z)
+fauxPositifs <- function(Z, data,alpha = 0.05,methode = "offline",cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d)) {
+
   
   
   
   
   if (methode == "offline"){
-  resultats <- OfflineOutlierDetection(Z)
+  resultats <- OfflineOutlierDetection(Z,cutoff)
   mu_hat = resultats$median
   Sigma = resultats$variance
+  outliers_labels = resultats$outlier_labels
   }
   # Étape 2 : Détection initiale sans régularisation
-  cutoff <- qchisq(1 - alpha, df = d)
+  #cutoff <- qchisq(1 - alpha, df = d)
   
-  outliers = resultats$outlier_labels
+  outliers = outlier_labels
   
   tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers))
   tc <- safe_access_tc(tc)
@@ -1054,41 +1055,73 @@ fp_offline = rep(0,length(taux_contamination))
 
 
 fp_offline_corr = rep(0,length(taux_contamination))
-compt = 1
 
 
-for (r in taux_contamination)
+fauxPositifs = function(methode = "offline",cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d)){
+
+  fp = rep(0,length(taux_contamination))
+  
+  
+  fp_corr = rep(0,length(taux_contamination))
+  compt = 1  
+  for (r in taux_contamination)
 {
+    
 data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
 
-resultats = OfflineOutlierDetection(Z,cutoff = cutoff)
+if (methode == "offline"){
+
+resultats = OfflineOutlierDetection(Z,cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d))
+mu_hat = resultats$median
+Sigma = resultats$variance
+outliers_labels = resultats$outlier_labels
+}
 
 
-tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(resultats$outlier_labels))
+
+if (methode == "online"){
+  
+  resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d))
+  mu_hat = resultats$moyennem
+  Sigma = resultats$Sigma[nrow(Z),,]
+  outliers_labels = resultats$outlier_labels
+}
+
+
+if (methode == "streaming"){
+  
+  resultats = StreamingOutlierDetection(Z,batch = ncol(Z),cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d))
+  mu_hat = resultats$moyennem
+  Sigma = resultats$Sigma[nrow(Z),,]
+  outliers_labels = resultats$outlier_labels
+}
+
+tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_labels))
 tc <- safe_access_tc(tc)
 if ((tc["0", "0"] + tc["0", "1"]) != 0) {
-  fp_offline[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
+  fp[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
 }
 
 # Étape 3 : Recherche de lambda optimal
-best_lambda <- tune_lambda(Z, mu_hat = resultats$median, Sigma, alpha = alpha)$lambda
+best_lambda <- tune_lambda(Z, mu_hat, Sigma, alpha = alpha)$lambda
+print("ok tune_lambda")
+
 Sigma_reg <- Sigma + best_lambda * diag(d)
+#print(Sigma_reg)
 
 # Étape 4 : Détection régularisée
 distances_corr <- rep(0, nrow(Z))
 outliers_corr <- rep(0, nrow(Z))
 
 eig <- eigen(Sigma_reg)
-mu_hat = resultats$median
-
 
 
 for (i in 1:nrow(Z)) {
   distances_corr[i] <- mahalanobis_generalizedRcpp(
     Z[i, ],
-    resultats$median,
+    mu_hat,
     eig$vectors,
     eig$values
   )
@@ -1096,14 +1129,43 @@ for (i in 1:nrow(Z)) {
     outliers_corr[i] <- 1
   }
 }
-
+#print("ok Mahalanobis")
 tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_corr))
 tc <- safe_access_tc(tc)
 if ((tc["0", "0"] + tc["0", "1"]) != 0) {
-  fp_offline_corr[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
+  fp_corr[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
 }
 
 compt = compt + 1
 
+  }
+  
+  return(list(fp = fp, fp_corr = fp_corr))
 }
-fp_offline
+res = fauxPositifs()
+
+res$fp
+
+methodes = c("offline","online","streaming")
+res$fp_corr
+
+
+for (m in methodes)
+{
+  
+  res = fauxPositifs(methode=m)
+  
+  if(m == "offline")
+  {fp_offline = res$fp
+  fp_offline_corr = res$fp_corr}
+  
+  if(m == "online")
+  {fp_online = res$fp
+  fp_online_corr = res$fp_corr}
+  
+  if(m == "streaming")
+  {fp_streaming = res$fp
+  fp_streaming_corr = res$fp_corr}
+  
+    
+}

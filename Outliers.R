@@ -154,7 +154,7 @@ calcule_RMSE_FP_AUC_par_methode <- function(data, methode, cutoff = qchisq(0.95,
     
     
   } else if (methode == "Cov Empirique") {
-   med <- colMeans(Z)
+    med <- colMeans(Z)
     Sigma <- cov(Z)
     distances <- calcule_vecteur_distances(Z, med, Sigma)
     rmseSigma <- norm(Sigma - SigmaVrai,"F")
