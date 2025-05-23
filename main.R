@@ -941,7 +941,7 @@ tune_lambda <- function(Z,mu_hat,Sigma, n_grid = 1000, alpha = 0.05,epsilon = 1e
     dists <- apply(Z, 1, function(x) {
 mahalanobis_generalizedRcpp(x,mu_hat,eigvecs,eigvals_reg)    })
     
-    threshold <- qchisq(1 - alpha, df = ncol(Z))
+    threshold <- cutoff
     #print(threshold)
     false_pos_rate <- mean(dists > threshold)
     
@@ -958,7 +958,7 @@ best_lambda <- tune_lambda(Z,resultats$moyennem,resultats$Sigma[nrow(Z),,])
 print(best_lambda)
 
 
-fauxpositifs <- function(Z, data,alpha = 0.05,methode = "offline") {
+fauxpositifs <- function(Z, data,alpha = 0.05,methode = "offline",cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d)) {
   d <- ncol(Z)
   
   
@@ -1039,4 +1039,71 @@ for (r in taux_contamination){
   compt = compt + 1
 }
 
+
+dcorr = resultats$distances*(nrow(Z) - ncol(Z))/((nrow(Z) - 1)*ncol(Z))
+
+outliers_corr <- rep(0, nrow(Z))
+
+if (distances_corr[i] > cutoff) {
+  outliers_corr[i] <- 1
+}
+
+
+cutoff = (n - 1)*d/(n - d)*qf(.95,d,n - d)
+fp_offline = rep(0,length(taux_contamination))
+
+
+fp_offline_corr = rep(0,length(taux_contamination))
+compt = 1
+
+
+for (r in taux_contamination)
+{
+data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
+
+Z = data$Z
+
+resultats = OfflineOutlierDetection(Z,cutoff = cutoff)
+
+
+tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(resultats$outlier_labels))
+tc <- safe_access_tc(tc)
+if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+  fp_offline[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
+}
+
+# Étape 3 : Recherche de lambda optimal
+best_lambda <- tune_lambda(Z, mu_hat = resultats$median, Sigma, alpha = alpha)$lambda
+Sigma_reg <- Sigma + best_lambda * diag(d)
+
+# Étape 4 : Détection régularisée
+distances_corr <- rep(0, nrow(Z))
+outliers_corr <- rep(0, nrow(Z))
+
+eig <- eigen(Sigma_reg)
+mu_hat = resultats$median
+
+
+
+for (i in 1:nrow(Z)) {
+  distances_corr[i] <- mahalanobis_generalizedRcpp(
+    Z[i, ],
+    resultats$median,
+    eig$vectors,
+    eig$values
+  )
+  if (distances_corr[i] > cutoff) {
+    outliers_corr[i] <- 1
+  }
+}
+
+tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_corr))
+tc <- safe_access_tc(tc)
+if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+  fp_offline_corr[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100
+}
+
+compt = compt + 1
+
+}
 fp_offline
