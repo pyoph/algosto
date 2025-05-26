@@ -1228,7 +1228,6 @@ mahalanobis_cutoff = function(Sigma,muhat){
   return(cutoff)
 }
 
-cutoff = mahalanobis_cutoff(Sigma,muhat)
 
 
 
@@ -1244,7 +1243,7 @@ for (r in taux_contamination)
 {
   
  
-  if(m == "ofline"){
+  if(m == "offline"){
   resultats = OfflineOutlierDetection(Z)
   
   mu_hat = resultats$median
