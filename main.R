@@ -61,7 +61,7 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 0.6
+p1 = 1
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
@@ -823,7 +823,7 @@ points(fp_offline_positions, fp_offline_values, col = "green", pch = 19)
 legend("topright",
        legend = c("Borne inférieure (IC 95%)", 
                   "Borne supérieure (IC 95%)", 
-                  "Taux brut hors-ligne", 
+                  "Taux brut offline", 
                   "Taux corrigé offline"),
        col = c("blue", "red", "green", "darkgreen"),
        lwd = c(2, 2, NA, NA),
@@ -855,7 +855,7 @@ points(fp_online_positions, fp_online_values, col = "green", pch = 19)
 legend("topright",
        legend = c("Borne inférieure (IC 95%)", 
                   "Borne supérieure (IC 95%)", 
-                  "Taux brut onlinr", 
+                  "Taux brut online", 
                   "Taux corrigé onligne"),
        col = c("blue", "red", "green", "darkgreen"),
        lwd = c(2, 2, NA, NA),
@@ -880,6 +880,17 @@ fp_streaming_values_corr = round(fp_streaming_corr/100,2)
 points(fp_streaming_positions, fp_streaming_values_corr, col = "darkgreen", pch = 19)
 
 points(fp_streaming_positions, fp_streaming_values, col = "green", pch = 19)
+
+legend("topright",
+       legend = c("Borne inférieure (IC 95%)", 
+                  "Borne supérieure (IC 95%)", 
+                  "Taux brut streaming", 
+                  "Taux corrigé streaming"),
+       col = c("blue", "red", "green", "darkgreen"),
+       lwd = c(2, 2, NA, NA),
+       pch = c(NA, NA, 19, 19),
+       bty = "n")
+
 
 fp_vrais_positions = c(1.00, 0.98, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.60)
 
@@ -1169,3 +1180,138 @@ for (m in methodes)
   
     
 }
+compt = 1
+fp_offline = rep(0,length(taux_contamination))
+fp_offline_corr = rep(0,length(taux_contamination))
+
+
+fp_online = rep(0,length(taux_contamination))
+fp_online_corr = rep(0,length(taux_contamination))
+
+
+fp_streaming = rep(0,length(taux_contamination))
+fp_streaming_corr = rep(0,length(taux_contamination))
+
+
+methodes = c("offline","online","streaming")
+
+
+
+mahalanobis_cutoff = function(Sigma,muhat){
+  
+  # Paramètres
+  n_sim <- 500        # Nombre de simulations Monte Carlo
+  taille_echantillon <- 100            # Taille de chaque échantillon
+  p <- 5              # Dimension
+  gamma <- 0.05       # Niveau de coupure (quantile 0.95)
+  
+  # Vecteur pour stocker toutes les distances
+  all_mahal_dists <- c()
+  
+  for (i in 1:n_sim) {
+    # Générer un échantillon depuis N(mu1, Sigma1)
+    X <- mvrnorm(n = taille_echantillon, mu = mu1, Sigma = Sigma1)
+    dists = rep(0,taille_echantillon)
+    for( i in (1:nrow(X))){
+      dists[i] = mahalanobis_generalizedRcpp(X[i,],muhat,eigen(Sigma)$vectors,eigen(Sigma)$values)
+    }
+    
+    # Stocker les distances
+    all_mahal_dists <- c(all_mahal_dists, dists)
+  }
+  
+  # Seuil empirique au quantile (1 - gamma)
+  cutoff <- quantile(all_mahal_dists, probs = 1 - gamma)
+  
+  # Affichage
+  cat("Seuil empirique des distances de Mahalanobis (quantile", 1 - gamma, ") :", round(cutoff, 4), "\n")
+  return(cutoff)
+}
+
+cutoff = mahalanobis_cutoff(Sigma,muhat)
+
+
+
+for (r in taux_contamination)
+{
+  
+  data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
+  
+  Z = data$Z
+  
+  
+  for (m in methodes) 
+{
+  
+ 
+  if(m == "ofline"){
+  resultats = OfflineOutlierDetection(Z)
+  
+  mu_hat = resultats$median
+  Sigma = resultats$variance
+  }
+  if (m == "online") {
+    resultats = StreamingOutlierDetection(Z,batch = 1)
+    
+    mu_hat = resultats$moyennem
+    Sigma = resultats$Sigma[nrow(Z),,]
+    
+  }
+  
+  if (m == "streaming")
+  {
+    resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+    
+    mu_hat = resultats$moyennem
+    Sigma = resultats$Sigma[nrow(Z),,]
+  }
+  outliers_labels = resultats$outlier_labels
+  distances = resultats$distances
+  
+  tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_labels))
+  tc <- safe_access_tc(tc)
+  
+  if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+    if (m == "offline"){fp_offline[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+    if (m == "online"){fp_online[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+    if (m == "streaming"){fp_streaming[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  }
+   
+ 
+
+    #print(fp[compt])
+  correction = qchisq(.5,df = d)/(median(sqrt(distances)))^2
+  
+  if(m == "offline"){
+  distances_corr = correction*distances}
+  if (m == "online" || m == "streaming"){
+    facteurs = correctionDistanceMahalanobis(distances,Z,methode = "streaming")
+   distances_corr = hadamard.prod(facteurs,distances)
+  }
+  outliers_corr = rep(0,nrow(Z))
+  #cutoff = qchisq(.95,df = d)
+  cutoff = mahalanobis_cutoff(Sigma,muhat)
+  distances_corr = resultats$distances
+  for (i in (1:nrow(Z))){
+  if(distances_corr[i] > cutoff) {outliers_corr[i] = 1}
+  }
+    #print("ok Mahalanobis")
+    tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_corr))
+    tc <- safe_access_tc(tc)
+    
+    
+    if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+      if (m == "offline")  {fp_offline_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+      if (m == "online")  {fp_online_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+      if (m == "streaming")  {fp_streaming_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+    } 
+    
+       
+    #print(fp_corr[compt])
+  
+  
+}
+  compt = compt + 1
+  
+}
+

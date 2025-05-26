@@ -26,7 +26,7 @@ correctionDistanceMahalanobis <- function(distances,Z,methode = "offline")
     facteur = rep(0,nrow(Z))
     for (i in (1:nrow(Z)))
     {
-      facteur[i] = sqrt(qchisq(0.5,df = ncol(Z)))/(median(distances[1:i]))
+      facteur[i] = qchisq(0.5,df = ncol(Z))/(median(sqrt(distances[1:i])))^2
     }
     return (facteur)
   }
