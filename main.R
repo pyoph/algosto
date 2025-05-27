@@ -1181,6 +1181,7 @@ for (m in methodes)
     
 }
 compt = 1
+
 fp_offline = rep(0,length(taux_contamination))
 fp_offline_corr = rep(0,length(taux_contamination))
 
@@ -1231,6 +1232,7 @@ mahalanobis_cutoff = function(Sigma,muhat){
 
 
 
+
 for (r in taux_contamination)
 {
   
@@ -1238,7 +1240,8 @@ for (r in taux_contamination)
   
   Z = data$Z
   
-  
+  for (i in 1:nbruns)
+  {  
   for (m in methodes) 
 {
   
@@ -1289,7 +1292,7 @@ for (r in taux_contamination)
   }
   outliers_corr = rep(0,nrow(Z))
   #cutoff = qchisq(.95,df = d)
-  cutoff = mahalanobis_cutoff(Sigma,muhat)
+  cutoff = mahalanobis_cutoff(Sigma,mu_hat)
   distances_corr = resultats$distances
   for (i in (1:nrow(Z))){
   if(distances_corr[i] > cutoff) {outliers_corr[i] = 1}
@@ -1308,9 +1311,15 @@ for (r in taux_contamination)
        
     #print(fp_corr[compt])
   
-  
+  }
 }
   compt = compt + 1
   
 }
+  
 
+
+library(pROC)
+roc_obj <- roc(data$labelsVrais, resultats$distances)
+auc = auc(roc_obj)  # Affiche l'AUC
+plot(roc_obj) # Tracé de la courbe ROC
