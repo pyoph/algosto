@@ -61,7 +61,7 @@ source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 
 
-p1 = 1
+p1 = 0.8
 data <- genererEchantillon(n,d,mu1,mu2,p1,1-p1,Sigma1,Sigma2,"moyenne")
 
 Z = data$Z
@@ -1323,3 +1323,7 @@ library(pROC)
 roc_obj <- roc(data$labelsVrais, resultats$distances)
 auc = auc(roc_obj)  # Affiche l'AUC
 plot(roc_obj) # Tracé de la courbe ROC
+
+mu_hat = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$mean
+
+Sigma2 = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$Sigma2
