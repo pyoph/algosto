@@ -48,7 +48,7 @@ double mahalanobis_generalizedRcpp(const arma::rowvec& x,
 
 // [[Rcpp::export]]
 
-
+//Calcule la covariance empirique en excluant les outliers
 List update_mean_Sigma2Trimmed(const arma::mat& X, double cutoff) {
   int n_obs = X.n_rows;
   int d = X.n_cols;
@@ -75,16 +75,25 @@ List update_mean_Sigma2Trimmed(const arma::mat& X, double cutoff) {
     //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
     //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
     
-     arma::eig_sym(eigvals,eigvecs,Sigma2);
-    //dist = mahalanobis_generalizedRcpp(x,mean,eigvecs,eigvals);
-    //if (dist > cutoff){Sigma2= Sigma2Old;
-      //mean = meanOld;}
-    //else {Sigma2Old = Sigma2;
-      //meanOld = mean;}
+     arma::eig_sym(eigvals, eigvecs,Sigma2);
+     //Rcout << "eigvecs = " << eigvecs;
+     //Rcout << "eigvals = " << eigvals;
+     arma::rowvec eigvals_row = eigvals.t();  // si t() plante, c'est un autre problème
+     arma::rowvec mean_row = mean.t();
+     arma::rowvec x_row = x.t();
+     
+     //arma::rowvec meanOld_row = meanOld.t();
+     //dist = 100;
+     dist = mahalanobis_generalizedRcpp(x_row,mean_row,eigvecs,eigvals_row);
+    
+    if (dist > cutoff){Sigma2= Sigma2Old;
+    mean = meanOld;}
+    else {Sigma2Old = Sigma2;
+    meanOld = mean;}
+    
+      Rcout << "eigvals = " << eigvals_row;
       
-      Rcout << "eigvals = " << eigvals;
-      
-      Rcout << "eigvecs = " << eigvecs;
+      //Rcout << "eigvecs = " << eigvecs;
   }
   
   return List::create(

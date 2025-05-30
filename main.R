@@ -1324,6 +1324,8 @@ roc_obj <- roc(data$labelsVrais, resultats$distances)
 auc = auc(roc_obj)  # Affiche l'AUC
 plot(roc_obj) # Tracé de la courbe ROC
 
-mu_hat = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$mean
+mu_hatEmp = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$mean
 
 Sigma2 = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$Sigma2
+
+
