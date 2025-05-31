@@ -1206,6 +1206,8 @@ mahalanobis_cutoff = function(Sigma,muhat){
   p <- 5              # Dimension
   gamma <- 0.05       # Niveau de coupure (quantile 0.95)
   
+  
+  
   # Vecteur pour stocker toutes les distances
   all_mahal_dists <- c()
   
@@ -1230,8 +1232,17 @@ mahalanobis_cutoff = function(Sigma,muhat){
 }
 
 
+rmseSigmaRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+rmseMedRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+temps_calcul = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+faux_positifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+faux_negatifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+aucRec = array(0, dim = c(nrow(Z), length(taux_contamination),length(methodes), nbruns))
 
 
+for (j in (1:nrow(Z)))
+  
+{
 
 for (r in taux_contamination)
 {
@@ -1278,11 +1289,11 @@ for (r in taux_contamination)
     if (m == "online"){fp_online[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
     if (m == "streaming"){fp_streaming[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
   }
-   
- 
-
+  roc_obj <- roc(data$labelsVrais, resultats$distances)   
+  auc = auc(roc_obj)
+  
     #print(fp[compt])
-  correction = qchisq(.5,df = d)/(median(sqrt(distances)))^2
+  #correction = qchisq(.5,df = d)/(median(sqrt(distances)))^2
   
   if(m == "offline"){
   distances_corr = correction*distances}
@@ -1316,7 +1327,7 @@ for (r in taux_contamination)
   compt = compt + 1
   
 }
-  
+} 
 
 
 library(pROC)
@@ -1327,5 +1338,4 @@ plot(roc_obj) # Tracé de la courbe ROC
 mu_hatEmp = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$mean
 
 Sigma2 = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$Sigma2
-
 
