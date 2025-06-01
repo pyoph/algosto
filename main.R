@@ -1239,7 +1239,7 @@ faux_positifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(
 faux_negatifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
 aucRec = array(0, dim = c(nrow(Z), length(taux_contamination),length(methodes), nbruns))
 
-
+methodes = c("samplecov","offline","online","streaming")
 for (j in (1:nrow(Z)))
   
 {
@@ -1255,19 +1255,37 @@ for (r in taux_contamination)
   {  
   for (m in methodes) 
 {
-  
+  if(m == "samplecov")
+  {
+    resultats = update_mean_Sigma2(Z)
+    
+    mu_hat = resultats$mean
+    Sigma = resultats$Sigma2  
+    
+    outliers_labels = resultats$outlier_labels
+    distances = resultats$distances
+    
+  }
  
   if(m == "offline"){
   resultats = OfflineOutlierDetection(Z)
   
   mu_hat = resultats$median
   Sigma = resultats$variance
+  
+  outliers_labels = resultats$outlier_labels
+  distances = resultats$distances
+  
   }
   if (m == "online") {
     resultats = StreamingOutlierDetection(Z,batch = 1)
     
     mu_hat = resultats$moyennem
     Sigma = resultats$Sigma[nrow(Z),,]
+    
+    outliers_labels = resultats$outlier_labels
+    distances = resultats$distances
+    
     
   }
   
@@ -1277,10 +1295,11 @@ for (r in taux_contamination)
     
     mu_hat = resultats$moyennem
     Sigma = resultats$Sigma[nrow(Z),,]
+    
+    outliers_labels = resultats$outlier_labels
+    distances = resultats$distances
+    
   }
-  outliers_labels = resultats$outlier_labels
-  distances = resultats$distances
-  
   tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_labels))
   tc <- safe_access_tc(tc)
   
