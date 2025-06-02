@@ -1241,6 +1241,8 @@ temps_calcul = array(0, dim = c( length(taux_contamination), length(methodes),nb
 faux_positifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
 faux_negatifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
 taux_OutliersVraisRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+taux_OutliersDetectesVraisRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+taux_OutliersDetectesRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
 aucRec = array(0, dim = c(length(taux_contamination),length(methodes), nbruns))
 
 
@@ -1256,10 +1258,10 @@ for (k in seq_along(taux_contamination))
   data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
   
   Z = data$Z
-compt = 1  
+#compt = 1  
   for (i in 1:nbruns)
   {  
-compt_meth = 1    
+#compt_meth = 1    
   for (l in seq_along(methodes))
 {
     m = methodes[l]
@@ -1271,6 +1273,11 @@ compt_meth = 1
     )
     mu_hat = resultats$mean
     Sigma = resultats$Sigma2  
+    
+    mu_hatIter = resultats$mean_iter
+    SigmaIter = resultats$Sigma2_iter
+    
+    
     
     distances = rep(0, nrow(Z))
     outliers_labels = rep(0,nrow(Z))
@@ -1303,6 +1310,8 @@ compt_meth = 1
     {resultats = StreamingOutlierDetection(Z,batch = 1)}
     )
     mu_hat = resultats$moyennem
+    mu_hatIter = resultats$miter
+    SigmaIter = resultats$Sigma
     Sigma = resultats$Sigma[nrow(Z),,]
     
     outliers_labels = resultats$outlier_labels
@@ -1336,6 +1345,13 @@ compt_meth = 1
   
   #faux_negatifsRec[,compt_meth,compt,j] = cumulativeOutlierDetection(resultats,data,r,"Shifted Gaussian contamination scenario")$taux_outliers_detectes_vraiss
   
+  if( m != "offline"){
+    for(i in (1:nrow(Z)))
+  {  rmseMedRec[i,k,l,j] = norm(mu_hatIter[i] - mu1,"2")
+    rmseSigmaRec[i,k,l,j] = norm(SigmaIter[i,  ,] - Sigma1,"F")}
+  }  
+    
+    
   faux_positifsRec[,k,l,j] = cumsum(outliers_labels == 1 & data$labelsVrais == 0)
    
   faux_negatifsRec[,k,l,j] = cumsum(outliers_labels == 0 & data$labelsVrais == 1)
@@ -1349,7 +1365,7 @@ compt_meth = 1
     auc <- 50  # Valeur par défaut pour un cas non exploitable
   }
   aucRec[k,l,j] = auc
-  taux_OutliersVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
+  taux_OutliersDetectesVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
   }
   
     #print(fp[compt])
@@ -1391,13 +1407,4 @@ compt_meth = 1
 }
 } 
 
-
-library(pROC)
-roc_obj <- roc(data$labelsVrais, resultats$distances)
-auc = auc(roc_obj)  # Affiche l'AUC
-plot(roc_obj) # Tracé de la courbe ROC
-
-mu_hatEmp = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$mean
-
-Sigma2 = update_mean_Sigma2Trimmed(Z,qchisq(.95,df  = d))$Sigma2
 

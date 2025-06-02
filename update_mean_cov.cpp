@@ -9,11 +9,15 @@ List update_mean_Sigma2(const arma::mat& X) {
   int d = X.n_cols;
   //Rcout << "X.n_rows = " << n_obs << ", X.n_cols = " << d << "\n";
   
-  arma::vec mean = arma::zeros(d);       // moyenne empirique
-  arma::mat Sigma2 = arma::zeros(d, d);  // matrice des moments d'ordre 2
+  arma::vec mean = arma::zeros(d);       
+  arma::mat Sigma2 = arma::zeros(d, d);  
+  arma::mat mean_iter(n_obs, d, arma::fill::zeros);          // n × d
+  arma::cube Sigma2_iter(n_obs, d, d, arma::fill::zeros);    // n × d × d
+  
+  
  // Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
  //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
-  for (int n = 0; n < 5; ++n) {
+  for (int n = 0; n < n_obs; ++n) {
     arma::vec x = X.row(n).t();  // vecteur colonne
    
     mean   = mean   + (1.0 / (n + 1)) * (x - mean);
@@ -23,12 +27,19 @@ List update_mean_Sigma2(const arma::mat& X) {
     //Rcout << "mean = " << mean.t();
     //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
     //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
+    mean_iter.row(n) = mean.t();          // enregistrer mean
+    Sigma2_iter.tube(n, 0) = Sigma2.row(0).t();  // remplir manuellement chaque ligne
+    for (int r = 1; r < d; ++r) {
+      Sigma2_iter.tube(n, r) = Sigma2.row(r).t();  // ligne r
+    }
     
   }
   
   return List::create(
     Named("mean") = mean,
-    Named("Sigma2") = Sigma2
+    Named("Sigma2") = Sigma2,
+    Named("mean_iter") = mean_iter,
+    Named("Sigma2_iter") = Sigma2_iter
   );
 }
 
@@ -61,10 +72,12 @@ List update_mean_Sigma2Trimmed(const arma::mat& X, double cutoff) {
   arma::mat Sigma2Old = arma::zeros(d, d);
   arma::mat eigvecs = arma::eye(d, d);
   arma::vec eigvals = arma::ones(d);
+  arma::mat mean_iter(n_obs, d, arma::fill::zeros);          // n × d
+  arma::cube Sigma2_iter(n_obs, d, d, arma::fill::zeros);    // n × d × d
   
   // Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
   //Rcout << "Sigma2 = \n" << Sigma2 << "\n\n";
-  for (int n = 0; n < 5; ++n) {
+  for (int n = 0; n < n_obs; ++n) {
     arma::vec x = X.row(n).t();  // vecteur colonne
     
     mean   = mean   + (1.0 / (n + 1)) * (x - mean);
@@ -90,8 +103,12 @@ List update_mean_Sigma2Trimmed(const arma::mat& X, double cutoff) {
     mean = meanOld;}
     else {Sigma2Old = Sigma2;
     meanOld = mean;}
-    
-      Rcout << "eigvals = " << eigvals_row;
+    mean_iter.row(n) = mean.t();          // enregistrer mean
+    Sigma2_iter.tube(n, 0) = Sigma2.row(0).t();  // remplir manuellement chaque ligne
+    for (int r = 1; r < d; ++r) {
+      Sigma2_iter.tube(n, r) = Sigma2.row(r).t();  // ligne r
+    }
+      //Rcout << "eigvals = " << eigvals_row;
       
       //Rcout << "eigvecs = " << eigvecs;
   }
