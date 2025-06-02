@@ -110,6 +110,7 @@ cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
       print(paste("nb_outliers_detectes_vrais ",nb_outliers_detectes_vrais ))
     print(paste("nb_outliers_vrais ",nb_outliers_vrais ))
     print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
+    print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
     }
     
    
@@ -141,7 +142,7 @@ cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
     theme_minimal() +
     theme(legend.position = "bottom")
   print(taux_outliers_vrais[1:10])
-  return(list(p = p,taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes))
+  return(list(p = p,taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes,taux_outliers_detectes_vrais = taux_outliers_detectes_vrais))
 }
 plot_obj <- cumulativeOutlierDetection(resultats, data, 20, "Shifted gaussian")$p
 
@@ -1348,7 +1349,7 @@ compt_meth = 1
     auc <- 50  # Valeur par défaut pour un cas non exploitable
   }
   aucRec[k,l,j] = auc
-  taux_OutliersVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_vrais  
+  taux_OutliersVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
   }
   
     #print(fp[compt])
