@@ -81,7 +81,7 @@ cumulativeOutlierDetection <- function(resultats, data, pourcentage,titre) {
   for (i in 1:total_points) {
     if(data$labelsVrais[i] == 1) nb_outliers_vrais =  nb_outliers_vrais + 1
     
-    if (data$labelsVrais[i] == 1 && resultats$outlier_labels[i] == 1) {
+    if (data$labelsVrais[i] == 1 & resultats$outlier_labels[i] == 1) {
       nb_outliers_detectes <- nb_outliers_detectes + 1
       #nb_outliers_vrais <- nb_outliers_vrais + 1
       nb_outliers_detectes_vrais = nb_outliers_detectes_vrais + 1
@@ -1231,45 +1231,65 @@ mahalanobis_cutoff = function(Sigma,muhat){
   return(cutoff)
 }
 
+methodes = c("samplecov","offline","online","streaming")
+
 
 rmseSigmaRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
 rmseMedRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-temps_calcul = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+temps_calcul = array(0, dim = c( length(taux_contamination), length(methodes),nbruns))
 faux_positifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
 faux_negatifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-aucRec = array(0, dim = c(nrow(Z), length(taux_contamination),length(methodes), nbruns))
+taux_OutliersVraisRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
+aucRec = array(0, dim = c(length(taux_contamination),length(methodes), nbruns))
 
-methodes = c("samplecov","offline","online","streaming")
-for (j in (1:nrow(Z)))
+
+
+for (j in (1:nbruns))
   
 {
 
-for (r in taux_contamination)
+for (k in seq_along(taux_contamination))
 {
   
+  r = taux_contamination[k]
   data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
   
   Z = data$Z
-  
+compt = 1  
   for (i in 1:nbruns)
   {  
-  for (m in methodes) 
+compt_meth = 1    
+  for (l in seq_along(methodes))
 {
+    m = methodes[l]
+    
   if(m == "samplecov")
   {
-    resultats = update_mean_Sigma2(Z)
-    
+    temps = system.time(
+    {resultats = update_mean_Sigma2(Z)}
+    )
     mu_hat = resultats$mean
     Sigma = resultats$Sigma2  
     
-    outliers_labels = resultats$outlier_labels
-    distances = resultats$distances
+    distances = rep(0, nrow(Z))
+    outliers_labels = rep(0,nrow(Z))
     
+    for (i in (1:nrow(Z))){
+      distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+      S = distances[i]
+      
+      if (S > cutoff) {outliers_labels[i] = 1}
+      
+    }
+    resultats$distances = distances
+    resultats$outlier_labels = outliers_labels
   }
  
   if(m == "offline"){
-  resultats = OfflineOutlierDetection(Z)
-  
+    
+  temps = system.time(
+   {   resultats = OfflineOutlierDetection(Z)}
+  )
   mu_hat = resultats$median
   Sigma = resultats$variance
   
@@ -1278,8 +1298,9 @@ for (r in taux_contamination)
   
   }
   if (m == "online") {
-    resultats = StreamingOutlierDetection(Z,batch = 1)
-    
+    temps = system.time(
+    {resultats = StreamingOutlierDetection(Z,batch = 1)}
+    )
     mu_hat = resultats$moyennem
     Sigma = resultats$Sigma[nrow(Z),,]
     
@@ -1291,59 +1312,80 @@ for (r in taux_contamination)
   
   if (m == "streaming")
   {
-    resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
-    
+    temps = system.time(
+    {resultats = StreamingOutlierDetection(Z,batch = ncol(Z))}
+    )
     mu_hat = resultats$moyennem
     Sigma = resultats$Sigma[nrow(Z),,]
     
     outliers_labels = resultats$outlier_labels
     distances = resultats$distances
-    
-  }
-  tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_labels))
-  tc <- safe_access_tc(tc)
+  }    
+  # }
+  # tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_labels))
+  # tc <- safe_access_tc(tc)
+  # 
+  # if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+  #   if (m == "offline"){fp_offline[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  #   if (m == "online"){fp_online[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  #   if (m == "streaming"){fp_streaming[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  # }
+  # 
+  #faux_positifsRec[,compt_meth,compt,j] = cumulativeOutlierDetection(resultats,data,r,"Shifted Gaussian contamination scenario")
   
-  if ((tc["0", "0"] + tc["0", "1"]) != 0) {
-    if (m == "offline"){fp_offline[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
-    if (m == "online"){fp_online[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
-    if (m == "streaming"){fp_streaming[compt] <- (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  #faux_negatifsRec[,compt_meth,compt,j] = cumulativeOutlierDetection(resultats,data,r,"Shifted Gaussian contamination scenario")$taux_outliers_detectes_vraiss
+  
+  faux_positifsRec[,k,l,j] = cumsum(outliers_labels == 1 & data$labelsVrais == 0)
+   
+  faux_negatifsRec[,k,l,j] = cumsum(outliers_labels == 0 & data$labelsVrais == 1)
+  temps_calcul[k,l,j] = temps["elapsed"] 
+  cat("k =", k, "l =", l, "j =", j, 
+      "-- temps_calcul =", temps_calcul[k, l, j], "secondes\n")  
+  
+  if (length(unique(outliers_labels)) == 2) {
+    auc <- round(auc(outliers_labels, distances), 2) * 100
+  } else {
+    auc <- 50  # Valeur par défaut pour un cas non exploitable
   }
-  roc_obj <- roc(data$labelsVrais, resultats$distances)   
-  auc = auc(roc_obj)
+  aucRec[k,l,j] = auc
+  taux_OutliersVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_vrais  
+  }
   
     #print(fp[compt])
   #correction = qchisq(.5,df = d)/(median(sqrt(distances)))^2
   
-  if(m == "offline"){
-  distances_corr = correction*distances}
-  if (m == "online" || m == "streaming"){
-    facteurs = correctionDistanceMahalanobis(distances,Z,methode = "streaming")
-   distances_corr = hadamard.prod(facteurs,distances)
+  # if(m == "offline"){
+  # distances_corr = correction*distances}
+  # if (m == "online" || m == "streaming"){
+  #   facteurs = correctionDistanceMahalanobis(distances,Z,methode = "streaming")
+  #  distances_corr = hadamard.prod(facteurs,distances)
+  # }
+  # outliers_corr = rep(0,nrow(Z))
+  # #cutoff = qchisq(.95,df = d)
+  # cutoff = mahalanobis_cutoff(Sigma,mu_hat)
+  # distances_corr = resultats$distances
+  # for (i in (1:nrow(Z))){
+  # if(distances_corr[i] > cutoff) {outliers_corr[i] = 1}
+  # }
+  #   #print("ok Mahalanobis")
+  #   tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_corr))
+  #   tc <- safe_access_tc(tc)
+  #   
+  #   
+  #   if ((tc["0", "0"] + tc["0", "1"]) != 0) {
+  #     if (m == "offline")  {fp_offline_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  #     if (m == "online")  {fp_online_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  #     if (m == "streaming")  {fp_streaming_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
+  #   } 
+  #   
+  #      
+  #   #print(fp_corr[compt])
+  # 
+  #compt_meth = compt_meth + 1
   }
-  outliers_corr = rep(0,nrow(Z))
-  #cutoff = qchisq(.95,df = d)
-  cutoff = mahalanobis_cutoff(Sigma,mu_hat)
-  distances_corr = resultats$distances
-  for (i in (1:nrow(Z))){
-  if(distances_corr[i] > cutoff) {outliers_corr[i] = 1}
-  }
-    #print("ok Mahalanobis")
-    tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_corr))
-    tc <- safe_access_tc(tc)
-    
-    
-    if ((tc["0", "0"] + tc["0", "1"]) != 0) {
-      if (m == "offline")  {fp_offline_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
-      if (m == "online")  {fp_online_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
-      if (m == "streaming")  {fp_streaming_corr[compt] = (tc["0", "1"] / (tc["0", "1"] + tc["0", "0"])) * 100}
-    } 
-    
-       
-    #print(fp_corr[compt])
-  
-  }
-}
-  compt = compt + 1
+
+
+  #compt = compt + 1
   
 }
 } 
