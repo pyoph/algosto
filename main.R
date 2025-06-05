@@ -1232,18 +1232,25 @@ mahalanobis_cutoff = function(Sigma,muhat){
   return(cutoff)
 }
 
-methodes = c("samplecov","offline","online","streaming")
 
 
-rmseSigmaRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-rmseMedRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-temps_calcul = array(0, dim = c( length(taux_contamination), length(methodes),nbruns))
-faux_positifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-faux_negatifsRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-taux_OutliersVraisRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-taux_OutliersDetectesVraisRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-taux_OutliersDetectesRec = array(0, dim = c(nrow(Z), length(taux_contamination), length(methodes),nbruns))
-aucRec = array(0, dim = c(length(taux_contamination),length(methodes), nbruns))
+calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns){
+
+
+methodes = c("sampleCovOnline","samplecovTrimmed","sampleCovOffline","comedianeOffline","comedianeOfflineShrinkage","OGK","FASTMCD","offline","online","streaming")
+
+taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
+
+
+rmseSigmaRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+rmseMedRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+temps_calcul = array(0, dim = c( length(taux_contamination), length(methodes),nb_runs))
+faux_positifsRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+faux_negatifsRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+taux_OutliersVraisRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+taux_OutliersDetectesVraisRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+taux_OutliersDetectesRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+aucRec = array(0, dim = c(length(taux_contamination),length(methodes), nb_runs))
 
 
 
@@ -1255,7 +1262,7 @@ for (k in seq_along(taux_contamination))
 {
   
   r = taux_contamination[k]
-  data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,"moyenne")
+  data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin)
   
   Z = data$Z
 #compt = 1  
@@ -1266,7 +1273,7 @@ for (k in seq_along(taux_contamination))
 {
     m = methodes[l]
     
-  if(m == "samplecov")
+  if(m == "samplecovOnline")
   {
     temps = system.time(
     {resultats = update_mean_Sigma2(Z)}
@@ -1293,6 +1300,162 @@ for (k in seq_along(taux_contamination))
     resultats$outlier_labels = outliers_labels
   }
  
+    
+    if(m == "samplecovOffline")
+    {
+  
+      resultats <- list()
+      mu_hat = colMeans(Z)
+      Sigma = cov(Z)  
+      
+      distances = rep(0, nrow(Z))
+      outliers_labels = rep(0,nrow(Z))
+      
+      for (i in (1:nrow(Z))){
+        distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+        S = distances[i]
+        
+        if (S > cutoff) {outliers_labels[i] = 1}
+        
+      }
+      resultats$distances = distances
+      resultats$outlier_labels = outliers_labels
+    }
+    
+    if(m == "samplecovTrimmed")
+    {
+      temps = system.time(
+        {resultats = update_mean_Sigma2Trimmed(Z,cutoff = qchisq(.95,df = d))}
+      )
+      mu_hat = resultats$mean
+      Sigma = resultats$Sigma2  
+      
+      mu_hatIter = resultats$mean_iter
+      SigmaIter = resultats$Sigma2_iter
+      
+      
+      
+      distances = rep(0, nrow(Z))
+      outliers_labels = rep(0,nrow(Z))
+      
+      for (i in (1:nrow(Z))){
+        distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+        S = distances[i]
+        
+        if (S > cutoff) {outliers_labels[i] = 1}
+        
+      }
+      resultats$distances = distances
+      resultats$outlier_labels = outliers_labels
+    }  
+    
+    if(m == "OGK")
+    {
+      
+      temps = system.time(
+      {resultats = covOGK(Z,sigmamu = s_mad)})
+      mu_hat <- resultats$center
+      Sigma <- resultats$cov
+      
+      
+      distances = rep(0, nrow(Z))
+      outliers_labels = rep(0,nrow(Z))
+      
+      for (i in (1:nrow(Z))){
+        distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+        S = distances[i]
+        
+        if (S > cutoff) {outliers_labels[i] = 1}
+        
+      }
+      resultats$distances = distances
+      resultats$outlier_labels = outliers_labels
+      
+    }
+    
+  if(m == "FASTMCD"){
+    temps = system.time({resultats = covMcd(Z)}
+    )
+    
+    mu_hat <- resultats$center
+    Sigma <- resultats$cov
+    
+  }
+    
+    
+  if(m == "comedianeOffline") {
+    temps = system.time(
+      {   resultats = covComed(Z,n.iter = 0)}
+    )
+    mu_hat = resultats$center
+    Sigma = resultats$cov
+    distances = rep(0, nrow(Z))
+    outliers_labels = rep(0,nrow(Z))
+    
+    for (i in (1:nrow(Z))){
+      distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+      S = distances[i]
+      
+      if (S > cutoff) {outliers_labels[i] = 1}
+      
+    }
+    resultats$distances = distances
+    resultats$outlier_labels = outliers_labels
+    
+    
+    
+    distances = rep(0, nrow(Z))
+    outliers_labels = rep(0,nrow(Z))
+    
+    for (i in (1:nrow(Z))){
+      distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+      S = distances[i]
+      
+      if (S > cutoff) {outliers_labels[i] = 1}
+      
+    }
+    resultats$distances = distances
+    resultats$outlier_labels = outliers_labels
+    
+    
+    outliers_labels = resultats$outlier_labels
+    distances = resultats$distances
+    
+    
+    
+  }  
+    
+    if(m == "comedianeOfflineShrinkage") {
+      resultats = list()
+      temps = system.time(
+        {   resultats = covComed(Z,n.iter = 0)}
+      )
+      mu_hat <- shrinkage_med(Z)$muShrink
+      Sigma <- shrinkage_SCCM(Z,k = 1)$SCCM_shrinked
+      
+      
+      
+      distances = rep(0, nrow(Z))
+      outliers_labels = rep(0,nrow(Z))
+      
+      for (i in (1:nrow(Z))){
+        distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+        S = distances[i]
+        
+        if (S > cutoff) {outliers_labels[i] = 1}
+        
+      }
+      resultats$distances = distances
+      resultats$outlier_labels = outliers_labels
+       
+      
+      
+      
+    } 
+    
+    
+    
+    
   if(m == "offline"){
     
   temps = system.time(
@@ -1314,8 +1477,8 @@ for (k in seq_along(taux_contamination))
     SigmaIter = resultats$Sigma
     Sigma = resultats$Sigma[nrow(Z),,]
     
-    outliers_labels = resultats$outlier_labels
     distances = resultats$distances
+    outliers_labels = resultats$outlier_labels
     
     
   }
@@ -1359,8 +1522,8 @@ for (k in seq_along(taux_contamination))
   cat("k =", k, "l =", l, "j =", j, 
       "-- temps_calcul =", temps_calcul[k, l, j], "secondes\n")  
   
-  if (length(unique(outliers_labels)) == 2) {
-    auc <- round(auc(outliers_labels, distances), 2) * 100
+  if (length(unique(data$labelsVrais)) == 2) {
+    auc <- as.numeric(pROC::auc(pROC::roc(data$labelsVrais, distances))) * 100
   } else {
     auc <- 50  # Valeur par défaut pour un cas non exploitable
   }
@@ -1405,6 +1568,8 @@ for (k in seq_along(taux_contamination))
   #compt = compt + 1
   
 }
-} 
+}
 
+ return (list(rmseSigmaRec= rmseSigmaRec,rmseMedRec = rmseMedRec,temps_calcul = temps_calcul,faux_positifsRec = faux_positifsRec, faux_negatifsRec = faux_negatifsRec,taux_OutliersVraisRec = taux_OutliersVraisRec,taux_OutliersDetectesVraisRec  = taux_OutliersDetectesVraisRec,taux_OutliersDetectesRec = taux_OutliersDetectesRec,aucRec = aucRec))
+}
 

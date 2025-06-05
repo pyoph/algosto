@@ -115,6 +115,8 @@ List update_mean_Sigma2Trimmed(const arma::mat& X, double cutoff) {
   
   return List::create(
     Named("mean") = mean,
-    Named("Sigma2") = Sigma2
+    Named("Sigma2") = Sigma2,
+    Named("mean_iter") = mean_iter,
+    Named("Sigma2_iter") = Sigma2_iter
   );
 }
