@@ -1244,6 +1244,9 @@ taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
 
 rmseSigmaRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
 rmseMedRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+distancesRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+outliersLabelsRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
+labelsVraisRec = array(0, dim = c(nbrows, length(taux_contamination)))
 temps_calcul = array(0, dim = c( length(taux_contamination), length(methodes),nb_runs))
 faux_positifsRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
 faux_negatifsRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
@@ -1254,9 +1257,6 @@ aucRec = array(0, dim = c(length(taux_contamination),length(methodes), nb_runs))
 
 
 
-for (j in (1:nbruns))
-  
-{
 
 for (k in seq_along(taux_contamination))
 {
@@ -1265,15 +1265,17 @@ for (k in seq_along(taux_contamination))
   data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin)
   
   Z = data$Z
-#compt = 1  
-  for (i in 1:nbruns)
+
+  labelsVraisRec[,k] = data$labelsVrais
+  #compt = 1  
+  for (j in 1:nbruns)
   {  
 #compt_meth = 1    
   for (l in seq_along(methodes))
 {
     m = methodes[l]
     
-  if(m == "samplecovOnline")
+  if(m == "sampleCovOnline")
   {
     temps = system.time(
     {resultats = update_mean_Sigma2(Z)}
@@ -1508,9 +1510,10 @@ for (k in seq_along(taux_contamination))
   
   #faux_negatifsRec[,compt_meth,compt,j] = cumulativeOutlierDetection(resultats,data,r,"Shifted Gaussian contamination scenario")$taux_outliers_detectes_vraiss
   
-  if( m != "offline"){
+  if( !m %in% c("sampleCovOffline","comedianeOffline","comedianeOfflineShrinkage","OGK","FASTMCD","offline")){
     for(i in (1:nrow(Z)))
-  {  rmseMedRec[i,k,l,j] = norm(mu_hatIter[i] - mu1,"2")
+  { print(m)
+    rmseMedRec[i,k,l,j] = norm(mu_hatIter[i] - mu1,"2")
     rmseSigmaRec[i,k,l,j] = norm(SigmaIter[i,  ,] - Sigma1,"F")}
   }  
     
@@ -1528,6 +1531,8 @@ for (k in seq_along(taux_contamination))
     auc <- 50  # Valeur par défaut pour un cas non exploitable
   }
   aucRec[k,l,j] = auc
+  distancesRec[,k,l,j] = distances
+  outliersLabelsRec[,k,l,j] = outliers_labels
   taux_OutliersDetectesVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
   }
   
@@ -1568,8 +1573,8 @@ for (k in seq_along(taux_contamination))
   #compt = compt + 1
   
 }
-}
 
- return (list(rmseSigmaRec= rmseSigmaRec,rmseMedRec = rmseMedRec,temps_calcul = temps_calcul,faux_positifsRec = faux_positifsRec, faux_negatifsRec = faux_negatifsRec,taux_OutliersVraisRec = taux_OutliersVraisRec,taux_OutliersDetectesVraisRec  = taux_OutliersDetectesVraisRec,taux_OutliersDetectesRec = taux_OutliersDetectesRec,aucRec = aucRec))
+
+ return (list(rmseSigmaRec= rmseSigmaRec,rmseMedRec = rmseMedRec,temps_calcul = temps_calcul,faux_positifsRec = faux_positifsRec, faux_negatifsRec = faux_negatifsRec,taux_OutliersVraisRec = taux_OutliersVraisRec,taux_OutliersDetectesVraisRec  = taux_OutliersDetectesVraisRec,taux_OutliersDetectesRec = taux_OutliersDetectesRec,aucRec = aucRec,distancesRec = distances,outliersLabelsRec = outliersLabelsRec,labelsVraisRec = labelsVraisRec))
 }
 
