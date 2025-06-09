@@ -1234,7 +1234,7 @@ mahalanobis_cutoff = function(Sigma,muhat){
 
 
 
-calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns){
+calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns,cluster = FALSE){
 
 
 methodes = c("sampleCovOnline","samplecovTrimmed","sampleCovOffline","comedianeOffline","comedianeOfflineShrinkage","OGK","FASTMCD","offline","online","streaming")
@@ -1262,7 +1262,7 @@ for (k in seq_along(taux_contamination))
 {
   
   r = taux_contamination[k]
-  data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin)
+  data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin,cluster)
   
   Z = data$Z
 
@@ -1533,7 +1533,7 @@ for (k in seq_along(taux_contamination))
   aucRec[k,l,j] = auc
   distancesRec[,k,l,j] = distances
   outliersLabelsRec[,k,l,j] = outliers_labels
-  taux_OutliersDetectesVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
+  #taux_OutliersDetectesVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
   }
   
     #print(fp[compt])
