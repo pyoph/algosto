@@ -23,7 +23,7 @@
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 
-genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 1.2, k = 5,rhomult = 0.9, cutoff = qchisq(0.95, df = d)) {
+genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 1.2, k = 5,rhomult = 0.9, cluster = FALSE,nclust = d,cutoff = qchisq(0.95, df = d)) {
   # Initialisation
   n1 <- floor(p1 * n)  # Taille du groupe non contaminé
   n2 <- n - n1         # Taille du groupe contaminé
@@ -148,13 +148,44 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
     Z <- mvrnorm(n, mu1, Sigma1)
     labelsVrais <- rep(0, n)
   }
-  
-  # Mélanger aléatoirement les données
-  set.seed(123)  # Pour garantir la reproductibilité
-  indices <- sample(nrow(Z))
-  Z <- Z[indices, ]
-  labelsVrais <- labelsVrais[indices]
-  
+  if(cluster == FALSE){
+    # Mélanger aléatoirement les données
+    set.seed(123)  # Pour garantir la reproductibilité
+    indices <- sample(nrow(Z))
+    Z <- Z[indices, ]
+    labelsVrais <- labelsVrais[indices]
+  }
+  else if (cluster == TRUE)
+  {
+    points_par_cluster <- d
+    nclust = n2/d
+    # Créer grappes d'outliers bien espacées
+    Z <- matrix(NA, nrow = n, ncol = d)  # assez de place
+    labelsVrais <- rep(NA, nrow(Z))
+    
+    # Placer les outliers à des indices spécifiques
+    debut_positions <- seq(5, by = 50, length.out = nclust)  # positions 1, 51, 201, ...
+    print(paste0("début positions",debut_positions))
+    #print(length(debut_positions))
+    compt = 1
+    for (i in 1:(nclust)) {
+      debut_indices = (compt - 1) * points_par_cluster + 1
+      indices <- debut_indices : (debut_indices + (points_par_cluster - 1))
+      # print(paste0("longueur indices ",length(indices)))
+      # print(paste0("indices ", indices))
+      # #print(debut_positions[i]:(debut_positions[i] + points_par_cluster))
+      # print(paste0("positions ",debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)))
+      # print(paste0("longueur positions "), length(debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)))
+      Z[debut_positions[i]:(debut_positions[i] + points_par_cluster - 1), ] <- vecteurs_mu2[indices, ]
+      labelsVrais[debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)] <- 1
+      compt = compt + 1
+    }
+    
+    # Remplir les trous restants avec les points "propres"
+    remaining_rows <- which(is.na(labelsVrais))
+    print(length(remaining_rows))
+    Z[remaining_rows, ] <- vecteurs_mu1
+    labelsVrais[remaining_rows] <- 0    }
   # Calcul des vraies valeurs pour la médiane géométrique
   #Vvrai <- WeiszfeldCov(Z, nitermax = 1000000)$covmedian
   #VcovVrai <- GmedianCov(Z, scores = 10)
