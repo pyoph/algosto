@@ -157,33 +157,40 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
   }
   else if (cluster == TRUE)
   {
-    points_par_cluster <- d
-    nclust = n2/d
+    points_par_cluster <- n2/d
+    nclust = d
     # Créer grappes d'outliers bien espacées
     Z <- matrix(NA, nrow = n, ncol = d)  # assez de place
     labelsVrais <- rep(NA, nrow(Z))
     
     # Placer les outliers à des indices spécifiques
-    debut_positions <- seq(5, by = 50, length.out = nclust)  # positions 1, 51, 201, ...
-    print(paste0("début positions",debut_positions))
+    debut_positions <- seq(5, by = n2/d, length.out = nclust)  # positions 5, 105, 205, ...
+    print(paste0("début positions ",debut_positions))
     #print(length(debut_positions))
     compt = 1
     for (i in 1:(nclust)) {
       debut_indices = (compt - 1) * points_par_cluster + 1
-      indices <- debut_indices : (debut_indices + (points_par_cluster - 1))
-      # print(paste0("longueur indices ",length(indices)))
-      # print(paste0("indices ", indices))
+      # print(paste0("points_par_cluster ",points_par_cluster))
+      # print(paste0("début indices + points_par_clusters ",(debut_indices + (points_par_cluster - 1))))
+       indices <- debut_indices : (debut_indices + (points_par_cluster - 1))
+      
+       print(paste0("longueur indices ",length(indices)))
+      #print(paste0("indices ", indices))
       # #print(debut_positions[i]:(debut_positions[i] + points_par_cluster))
-      # print(paste0("positions ",debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)))
+      #print(paste0("positions ",debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)))
       # print(paste0("longueur positions "), length(debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)))
-      Z[debut_positions[i]:(debut_positions[i] + points_par_cluster - 1), ] <- vecteurs_mu2[indices, ]
-      labelsVrais[debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)] <- 1
+      pos = debut_positions[i]:(debut_positions[i] + points_par_cluster - 1)
+      # print(paste0("positions ",pos))
+      # print(paste0("indices ",indices))
+      # 
+      Z[pos, ] <- vecteurs_mu2[indices, ]
+      labelsVrais[pos] <- 1
       compt = compt + 1
     }
     
     # Remplir les trous restants avec les points "propres"
     remaining_rows <- which(is.na(labelsVrais))
-    print(length(remaining_rows))
+    print(paste0("length remaining_rows ",length(remaining_rows)))
     Z[remaining_rows, ] <- vecteurs_mu1
     labelsVrais[remaining_rows] <- 0    }
   # Calcul des vraies valeurs pour la médiane géométrique
