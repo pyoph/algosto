@@ -50,7 +50,7 @@ source("~/algosto/shrinkageCabana.R")
 sourceCpp("~/algosto/update_mean_cov.cpp")
 sourceCpp("~/algosto/CodesRCpp.cpp")
 
-res = calcule_tout(nb_runs = 2,cluster = "TRUE")
+res = calcule_tout(nb_runs = 1)
 
 results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
 save(results_metrics,file = "results_metricsMoyenne100runs1e4d100.Rdata")

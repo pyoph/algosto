@@ -159,9 +159,107 @@ ggplot(df_temps, aes(x = Methode, y = Temps)) +
 
 outliers_labelsTout = resMoyenne$outliersLabelsRec
 
+# Fonction pour vote majoritaire
+majority_vote <- function(x, tie = c("first", "min", "all")) {
+  tie <- match.arg(tie)
+  
+  ux <- unique(x)
+  counts <- tabulate(match(x, ux))
+  max_count <- max(counts)
+  major_values <- ux[counts == max_count]
+  
+  if (length(major_values) == 1 || tie == "all") {
+    return(major_values)
+  } else if (tie == "first") {
+    return(major_values[1])
+  } else if (tie == "min") {
+    return(min(major_values))
+  }
+}
 
 
+# Appliquer vote majoritaire sur la 4e dimension
+outliers_majority <- apply(outliers_labelsTout, c(1, 2, 3), majority_vote)
 
 
+cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,titre) {
+  total_points <- length(labelsVrais)
+  total_outliers_theoriques <- pourcentage / 100 * total_points
+  
+  nb_outliers_detectes <- 0
+  nb_outliers_detectes_vrais <- 0
+  nb_outliers_vrais <- 0
+  
+  taux_outliers_detectes <- numeric(total_points)
+  taux_outliers_vrais <- numeric(total_points)
+  taux_outliers_detectes_vrais = numeric(total_points)
+  
+  for (i in 1:total_points) {
+    if(labelsVrais[i] == 1) nb_outliers_vrais =  nb_outliers_vrais + 1
+    
+    if (labelsVrais[i] == 1 & outlier_labels[i] == 1) {
+      nb_outliers_detectes <- nb_outliers_detectes + 1
+      #nb_outliers_vrais <- nb_outliers_vrais + 1
+      nb_outliers_detectes_vrais = nb_outliers_detectes_vrais + 1
+      #taux_outliers_vrais[i] <- nb_outliers_detectes_vrais
+    } else if (labelsVrais[i] == 0 && outlier_labels[i] == 1) {
+      nb_outliers_detectes <- nb_outliers_detectes + 1}
+    if(nb_outliers_vrais != 0){
+      taux_outliers_detectes[i] <- nb_outliers_detectes / nb_outliers_vrais * 100
+      #taux_outliers_detectes[i] <- nb_outliers_detectes
+    }
+    else {taux_outliers_detectes[i] <-  100
+    #taux_outliers_detectes[i] <- nb_outliers_detectes
+    }
+    if(nb_outliers_vrais != 0){
+      taux_outliers_detectes_vrais[i] <- nb_outliers_detectes_vrais / nb_outliers_vrais * 100
+      #taux_outliers_detectes[i] <- nb_outliers_detectes
+    }
+    else {taux_outliers_detectes_vrais[i] <-  100
+    #taux_outliers_detectes[i] <- nb_outliers_detectes
+    }
+    
+    
+    
+    taux_outliers_vrais[i] <- 100
+    
+    # print(paste("nb_outliers_detectes_vrais ",nb_outliers_detectes_vrais ))
+    # print(paste("nb_outliers_vrais ",nb_outliers_vrais ))
+    # print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
+    # print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
+  }
+  
+  
+  
+  
+  df <- data.frame(
+    index = 1:total_points,
+    Detected_rate = taux_outliers_detectes,
+    True_outliers = taux_outliers_vrais,
+    True_positive_rate = taux_outliers_detectes_vrais
+  )
+  
+  p <- ggplot(df, aes(x = index)) +
+    geom_line(aes(y = Detected_rate, color = "True and false positive rate"), size = 1.2) +
+    geom_line(aes(y = True_positive_rate, color = "True positives rate"), size = 1.2) +
+    geom_line(aes(y = True_outliers, color = "True outliers rate"), size = 1.2) +
+    scale_color_manual(values = c(
+      "True outliers rate" = "red",
+      "True and false positive rate" = "orange",
+      "True positives rate" = "purple"
+    )) +
+    #scale_x_log10() +
+    labs(
+      title = paste(titre, "-", pourcentage, "% of outliers"),
+      x = "Data index",
+      y = "Cumulative rate (%)",
+      color = "Legend"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+  # print(taux_outliers_vrais[1:10])
+  return(list(p = p,taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes,taux_outliers_detectes_vrais = taux_outliers_detectes_vrais))
+}
 
 
+cumulativeOutlierDetection(resMoyenne$labelsVraisRec[,4],outliers_majority[,9,9],40,"Shifted Gaussian contamination scenario")
