@@ -43,28 +43,29 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         if(m == "sampleCovOnline")
         {
           temps = system.time(
-            {resultats = SampleCovOnline(Z)}
+            {resultats = SampleCovOnline(Z)
+            mu_hat = resultats$mean
+            Sigma = resultats$Sigma  
+            mu_hatIter = resultats$meanIter
+            SigmaIter = resultats$SigmaIter
+            
+            
+            
+            distances = rep(0, nrow(Z))
+            outliers_labels = rep(0,nrow(Z))
+            
+            for (i in (1:nrow(Z))){
+              distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+              S = distances[i]
+              
+              if (S > cutoff) {outliers_labels[i] = 1}
+              
+            }
+            resultats$distances = distances
+            resultats$outlier_labels = outliers_labels
+            }
           )
-          mu_hat = resultats$mean
-          Sigma = resultats$Sigma  
-          mu_hatIter = resultats$meanIter
-          SigmaIter = resultats$SigmaIter
-          
-          
-          
-          distances = rep(0, nrow(Z))
-          outliers_labels = rep(0,nrow(Z))
-          
-          for (i in (1:nrow(Z))){
-            distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
-            S = distances[i]
-            
-            if (S > cutoff) {outliers_labels[i] = 1}
-            
-          }
-          resultats$distances = distances
-          resultats$outlier_labels = outliers_labels
-        }
+              }
         
         
         if(m == "samplecovOffline")
