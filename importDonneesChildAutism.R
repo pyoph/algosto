@@ -9,6 +9,8 @@ autism_data = read_dta("nsch_2020e_topical.dta")
 
 autism_data = as.data.frame(autism_data)
 
+save(autism_data,file = "autism_data.Rdata")
+
 dim(autism_data)
 
 

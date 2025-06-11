@@ -43,13 +43,12 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         if(m == "sampleCovOnline")
         {
           temps = system.time(
-            {resultats = update_mean_Sigma2(Z)}
+            {resultats = SampleCovOnline(Z)}
           )
           mu_hat = resultats$mean
-          Sigma = resultats$Sigma2  
-          
-          mu_hatIter = resultats$mean_iter
-          SigmaIter = resultats$Sigma2_iter
+          Sigma = resultats$Sigma  
+          mu_hatIter = resultats$meanIter
+          SigmaIter = resultats$SigmaIter
           
           
           
@@ -100,12 +99,11 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
           mu_hatIter = resultats$mean_iter
           SigmaIter = resultats$Sigma2_iter
           
-          
-          
           distances = rep(0, nrow(Z))
           outliers_labels = rep(0,nrow(Z))
           
           for (i in (1:nrow(Z))){
+            
             distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
             S = distances[i]
             
@@ -277,10 +275,13 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         #faux_negatifsRec[,compt_meth,compt,j] = cumulativeOutlierDetection(resultats,data,r,"Shifted Gaussian contamination scenario")$taux_outliers_detectes_vraiss
         
         if( !m %in% c("sampleCovOffline","comedianeOffline","comedianeOfflineShrinkage","OGK","FASTMCD","offline")){
-          for(i in (1:nrow(Z)))
-          { print(m)
+          print(paste("méthode ",m," "))
+          print(paste("rmseSigma ",rmseSigmaRec[nrow(Z),k,l,j]))
+           for(i in (1:nrow(Z)))
+          { 
             rmseMedRec[i,k,l,j] = norm(mu_hatIter[i] - mu1,"2")
             rmseSigmaRec[i,k,l,j] = norm(SigmaIter[i,  ,] - Sigma1,"F")}
+         
         }  
         
         

@@ -21,7 +21,7 @@ List update_mean_Sigma2(const arma::mat& X) {
     arma::vec x = X.row(n).t();  // vecteur colonne
    
     mean   = mean   + (1.0 / (n + 1)) * (x - mean);
-    Sigma2 = Sigma2  + (1.0 / (n + 1)) * (x * x.t() - Sigma2 );
+    Sigma2 = (n - 1)/n*Sigma2  + (1.0 / (n + 1)) * ((x - mean) * (x - mean).t() - Sigma2 );
     //Rcout << "Étape " << n+1 << " :\n";
     //Rcout << "x = " << x.t();
     //Rcout << "mean = " << mean.t();

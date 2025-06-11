@@ -15,19 +15,22 @@ dim(rmseSigma)
 
 rmseSigma = resMoyenne$rmseSigmaRec[,,,]
 
-
 rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 
+rmseSigma_moy = res$rmseSigmaRec[,,,1]
 
+rmseSigma_moy[nrow(Z),,] = rmseSigma_moy[(nrow(Z)-1),,]
 
+dim(rmseSigma_moy)
 
+#rmseSigma_moy = res$rmseSigmaRec[,,,1]
 
-
+dim(rmseSigma_moy)
 
 # On prépare les données en long format pour ggplot2
 # Extraire les méthodes et taux souhaités
 taux_indices <- c(1, 3, 5, 9)
-methodes <- c(9, 10)
+methodes <- c(1,9, 10)
 
 # Create long format data.frame
 data_list <- list()
@@ -44,29 +47,39 @@ for (j in taux_indices) {
 }
 df_long <- do.call(rbind, data_list)
 
-# Create plot with ggplot2
+# Create plot with simplified log scale
 gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   geom_line(size = 0.8) +
-  scale_color_manual(values = rainbow(length(unique(df_long$Methode)))) +
   facet_wrap(~ Rate, ncol = 2) +
   labs(title = "Frobenius Norm Error Across Different Contamination Rates",
-       subtitle = "Comparison of Robust Covariance Estimation Methods",
+       subtitle = "Comparison of Robust Covariance Estimation Methods (log scale)",
        x = "Observation Index", 
-       y = "Frobenius Norm Error (log scale)") +
+       y = "Frobenius Norm Error") +
   theme_minimal(base_size = 12) +
-  scale_y_log10() +
-  theme(legend.position = "bottom",
-        plot.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold")) +
-  scale_color_brewer(palette = "Set1")
+  
+  # Simplified log scale with whole numbers only
+  scale_y_log10(
+    breaks = 10^seq(0, 5, by = 1),  # Puissances entières seulement (1, 10, 100, etc.)
+    labels = c("1", "10", "100", "1000", "10000", "100000")
+  ) +
+  
+  scale_color_brewer(palette = "Set1") +
+  theme(
+    legend.position = "bottom",
+    #plot.title = element_text(face = "bold"),
+    #strip.text = element_text(face = "bold"),
+    #panel.grid.minor = element_line(color = "grey90", size = 0.25)
+  ) +
+  
+  # Add log ticks
+  annotation_logticks(sides = "l")
 
 # Display the plot
 print(gg)
 
 
-
 # #########################################
-# AUC
+#             AUC
 # ########################################
 
 
@@ -74,6 +87,8 @@ aucTout = resMoyenne$aucRec
 
 
 auc_moy <- apply(aucTout, c(1, 2), mean)
+
+#auc_moy = res$aucRec[,,1]
 
 methodes_sel <- c(1, 2, 9, 10)
 
@@ -181,6 +196,7 @@ majority_vote <- function(x, tie = c("first", "min", "all")) {
 # Appliquer vote majoritaire sur la 4e dimension
 outliers_majority <- apply(outliers_labelsTout, c(1, 2, 3), majority_vote)
 
+#outliers_majority = res$outliersLabelsRec[,,,1]
 
 cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,titre) {
   total_points <- length(labelsVrais)
@@ -262,4 +278,4 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
 }
 
 
-cumulativeOutlierDetection(resMoyenne$labelsVraisRec[,4],outliers_majority[,9,9],40,"Shifted Gaussian contamination scenario")
+cumulativeOutlierDetection(resMoyenne$labelsVraisRec[,4],outliers_majority[,4,1],20,"Shifted Gaussian contamination scenario")
