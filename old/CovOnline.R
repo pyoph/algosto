@@ -21,3 +21,4 @@ SampleCovOnline = function(Z)
   SigmaIter[nrow(Z),,] = Sigma
   return(list(mean = mean, Sigma = Sigma, meanIter = meanIter, SigmaIter = SigmaIter))
 }
+#Sigma = SampleCovOnline(Z)$Sigma
