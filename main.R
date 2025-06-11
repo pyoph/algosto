@@ -270,7 +270,7 @@ plot3 = ggplot(df_long, aes(x = taux_contamination, y = RMSE, color = Méthode))
 grid.arrange(plot2, plot1, plot3, ncol = 2, nrow = 2)
 
 auc_df <- rm[, c("AUC_Cov", "AUC_OGK", "AUC_Comed", 
-                               "AUC_Shrink", "AUC_Online", 
+                               "AUC_Shrink", "AUC_", 
                                "AUC_Offline", "AUC_Streaming")]
 
 auc_df$taux_contamination <- taux_contamination  
@@ -1491,8 +1491,9 @@ for (k in seq_along(taux_contamination))
     {resultats = StreamingOutlierDetection(Z,batch = ncol(Z))}
     )
     mu_hat = resultats$moyennem
+    mu_hatIter = resultats$miter
     Sigma = resultats$Sigma[nrow(Z),,]
-    
+    SigmaIter = resultats$Sigma
     outliers_labels = resultats$outlier_labels
     distances = resultats$distances
   }    

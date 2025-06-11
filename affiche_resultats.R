@@ -1,3 +1,12 @@
+
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(tidyr)
+library(patchwork)  # pour agencer les 4 graphiques
+
+
+
 rmseSigma = resMoyenne$rmseSigmaRec
 
 dim(resMoyenne$rmseSigmaRec)
@@ -14,46 +23,46 @@ rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 
 
 
-library(ggplot2)
-library(reshape2)
-library(dplyr)
-library(tidyr)
-library(patchwork)  # pour agencer les 4 graphiques
-
-# Supposons que rmseSigma_moy est un tableau [10000 x 9 x 10]
 
 # On prépare les données en long format pour ggplot2
 # Extraire les méthodes et taux souhaités
-taux_indices <- c(1, 4, 6, 9)
-methodes <- c(1, 2, 9, 10)
+taux_indices <- c(1, 3, 5, 9)
+methodes <- c(9, 10)
 
-# Création d'un data.frame long
+# Create long format data.frame
 data_list <- list()
 for (j in taux_indices) {
   for (k in methodes) {
     df <- data.frame(
-      index = 1:10000,
+      index = 1:n,
       RMSE = rmseSigma_moy[, j, k],
-      Methode = paste0("M", k),
-      Taux = paste0("Taux ", j)
+      Method = paste0("Method ", k),
+      Rate = paste0("Rate ", j)
     )
     data_list[[length(data_list) + 1]] <- df
   }
 }
 df_long <- do.call(rbind, data_list)
 
-# Plot avec ggplot2
-gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Methode)) +
+# Create plot with ggplot2
+gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   geom_line(size = 0.8) +
-  facet_wrap(~ Taux, ncol = 2) +
-  labs(title = "RMSE Sigma pour différents taux de contamination",
-       x = "Index des données", y = "RMSE Sigma") +
-  theme_minimal() +
+  scale_color_manual(values = rainbow(length(unique(df_long$Methode)))) +
+  facet_wrap(~ Rate, ncol = 2) +
+  labs(title = "Frobenius Norm Error Across Different Contamination Rates",
+       subtitle = "Comparison of Robust Covariance Estimation Methods",
+       x = "Observation Index", 
+       y = "Frobenius Norm Error (log scale)") +
+  theme_minimal(base_size = 12) +
   scale_y_log10() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        plot.title = element_text(face = "bold"),
+        strip.text = element_text(face = "bold")) +
+  scale_color_brewer(palette = "Set1")
 
-# Afficher le graphique
+# Display the plot
 print(gg)
+
 
 
 # #########################################
@@ -138,10 +147,21 @@ df_temps$Methode <- factor(df_temps$MethodeIndex,
 ggplot(df_temps, aes(x = Methode, y = Temps)) +
   geom_boxplot(fill = "lightblue", outlier.color = "red", outlier.shape = 1) +
   labs(
-    title = paste("Boxplot of computation times", taux_index),
+    title = "Boxplot of computation times",
     x = "Method",
     y = "Time (seconds)"
   ) +
   scale_y_log10() +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+######Outliers labels######################
+
+outliers_labelsTout = resMoyenne$outliersLabelsRec
+
+
+
+
+
+
+
