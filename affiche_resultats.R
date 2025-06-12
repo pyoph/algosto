@@ -209,7 +209,7 @@ ggplot(df_long, aes(x = ContaminationRate, y = AUC, color = Method)) +
 # Temps calculs
 # ##############################################
 
-temps_calculTout = resMoyenne$temps_calcul
+temps_calculTout = res$temps_calcul
   
 
 # Méthodes et indices souhaités
@@ -217,7 +217,7 @@ methodes <- c("sampleCovOnline", "samplecovTrimmed", "sampleCovOffline", "comedi
               "comedianeOfflineShrinkage", "OGK", "FASTMCD", "offline", "online", "streaming")
 
 # Indices à garder : 1, 2, 6 à 10
-indices_gardes <- c(1, 2, 6, 7, 8, 9, 10)
+indices_gardes <- c(1, 6, 7, 8, 9, 10)
 
 # Supposons que taux_index est défini
 taux_index <- 3  # par exemple

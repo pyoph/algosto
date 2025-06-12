@@ -49,6 +49,9 @@ source("~/work/algosto/mainNew.R")
 sourceCpp("~/work/algosto/CodesRCpp.cpp")
 
 res = calcule_tout(nb_runs = 100)
+
+save(res,file= "resMoyenne.Rdata")
+
 # 
 # results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
 # save(results_metrics,file = "results_metricsMoyenne100runs1e4d100.Rdata")

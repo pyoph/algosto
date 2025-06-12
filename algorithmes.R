@@ -1204,7 +1204,7 @@ SampleCovOnline = function(Z)
 {
   nblignes = nrow(Z)
   
-  mean = 1.5*rnorm(ncol(Z))
+  mean = rnorm(ncol(Z))
   Sigma = matrix(0,ncol(Z),ncol(Z))
   
   meanIter =   matrix(0,nrow(Z),ncol(Z))
@@ -1213,7 +1213,7 @@ SampleCovOnline = function(Z)
   for (i in (1:(nblignes-1)))
   {
     mean   = mean   + (1.0 / (i + 1)) * (Z[i+1,] - mean);
-    Sigma = (i + 1)/i*Sigma + 1/(i + 1)*((Z[i+1,] - meanIter[i,])%*%t(Z[i+1,] - meanIter[i,]) - Sigma)
+    Sigma = (i - 1)/i*Sigma + 1/(i + 1)*((Z[i+1,] - mean)%*%t(Z[i+1,] - mean) - Sigma)
     meanIter[i,] = mean
     SigmaIter[i,,] = Sigma
     
