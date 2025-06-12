@@ -43,6 +43,10 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
       vecteurs_mu2 <- rmvt(n2, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)
     } 
+    else if (contamin == "moyenne_variance") {
+      vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
+      vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma2)
+    } 
     else if (contamin == "studentTronquee") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
       # vecteurs_mu2 <- rmvt(n2, mu1, sigma = Sigma1, df = 1, ncores = 1, A = NULL)

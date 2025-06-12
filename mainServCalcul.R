@@ -45,10 +45,10 @@ source("~/work/algosto/mainNew.R")
 #source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 #sourceCpp("~/algosto/RobinsMC2CPP.cpp")
-#sourceCpp("~/algosto/update_mean_cov.cpp")
+sourceCpp("~/work/algosto/update_mean_cov.cpp")
 sourceCpp("~/work/algosto/CodesRCpp.cpp")
 
-res = calcule_tout(nb_runs = 100)
+res = calcule_tout(nb_runs = 100,contamin = "moyenne_variance" )
 
 save(res,file= "resMoyenne.Rdata")
 

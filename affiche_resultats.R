@@ -25,7 +25,7 @@ dim(rmseSigma_moy)
 #rmseSigma_moy = res$rmseSigmaRec[,,,1]
 
 dim(rmseSigma_moy)
-
+rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
 # On prépare les données en long format pour ggplot2
 # Extraire les méthodes et taux souhaités
 taux_indices <- c(1, 3, 5, 9)
@@ -128,7 +128,7 @@ taux_contamination <- seq(0, 40, length.out = 9)
 df_summary <- data.frame()
 for (j in 1:9) {
   for (k in methodes) {
-    rmse_value <- rmseSigma_moy[10000, j, k]
+    rmse_value <- rmseSigma_moy[1000, j, k]
     df_summary <- rbind(df_summary, data.frame(
       Taux = taux_contamination[j],
       Methode = method_labels[as.character(k)],
@@ -142,7 +142,7 @@ gg <- ggplot(df_summary, aes(x = Taux, y = RMSE, color = Methode)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   labs(
-    title = "Final Frobenius norm error vs. Contamination rate",
+    title = "Final Frobenius norm error vs. Contamination rate (shifted Gaussian contamination scenario)",
     x = "Contamination rate (%)",
     y = "Final Frobenius norm error"
   ) +
@@ -160,16 +160,16 @@ print(gg)
 
 aucTout = resMoyenne$aucRec
 
-
 auc_moy <- apply(aucTout, c(1, 2), mean)
 
+auc_moy = res$aucRec[,,1]
 #auc_moy = res$aucRec[,,1]
 
 methodes_sel <- c(1, 2, 9, 10)
 
 # Taux de contamination et méthodes à utiliser
 taux_indices <- 2:9
-methodes <- c(1, 2, 9, 10)
+methodes <- c(1, 9, 10)
 taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 40)
 
 # Construction du data frame long
