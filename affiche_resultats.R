@@ -7,19 +7,18 @@ library(patchwork)  # pour agencer les 4 graphiques
 
 
 
-rmseSigma = resMoyenne$rmseSigmaRec
+rmseSigma = res$rmseSigmaRec
 
 dim(resMoyenne$rmseSigmaRec)
 
 dim(rmseSigma)
 
-rmseSigma = resMoyenne$rmseSigmaRec[,,,]
 
 rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 
-rmseSigma_moy = res$rmseSigmaRec[,,,1]
+#rmseSigma_moy = res$rmseSigmaRec[,,,1]
 
-rmseSigma_moy[nrow(Z),,] = rmseSigma_moy[(nrow(Z)-1),,]
+rmseSigma_moy[n,,1] = rmseSigma_moy[(n-1),,1]
 
 dim(rmseSigma_moy)
 
@@ -76,6 +75,82 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
 
 # Display the plot
 print(gg)
+
+
+taux_indices <- c(1, 3, 5, 9)
+methodes <- c(1, 9, 10)
+
+# Mappage des taux et méthodes
+taux_labels <- c("1" = "0%", "3" = "5%", "5" = "15%", "9" = "40%")
+method_labels <- c("1" = "Sample covariance (online)",
+                   "9" = "Online method",
+                   "10" = "Streaming method")
+
+# Création du data.frame long
+data_list <- list()
+for (j in taux_indices) {
+  for (k in methodes) {
+    df <- data.frame(
+      index = 1:10000,
+      RMSE = rmseSigma_moy[, j, k],
+      Methode = factor(method_labels[as.character(k)], levels = method_labels),
+      Taux = factor(taux_labels[as.character(j)], levels = taux_labels)
+    )
+    data_list[[length(data_list) + 1]] <- df
+  }
+}
+df_long <- do.call(rbind, data_list)
+
+# Graphique
+gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Methode)) +
+  geom_line(size = 0.8) +
+  facet_wrap(~ Taux, ncol = 2) +
+  labs(title = "Frobenius norm error for different contamination rates",
+       x = "Data index", y = "Frobenius norm error") +
+  theme_minimal() +
+  scale_y_log10() +
+  theme(legend.position = "bottom")
+
+print(gg)
+
+
+methodes <- c(1, 9, 10)
+method_labels <- c(
+  "1" = "Sample covariance (online)",
+  "9" = "Online",
+  "10" = "Streaming"
+)
+
+# Taux de contamination correspondants à j = 1:9
+taux_contamination <- seq(0, 40, length.out = 9)
+
+# Extraction du dernier RMSE (ligne 10000) pour chaque taux et méthode
+df_summary <- data.frame()
+for (j in 1:9) {
+  for (k in methodes) {
+    rmse_value <- rmseSigma_moy[10000, j, k]
+    df_summary <- rbind(df_summary, data.frame(
+      Taux = taux_contamination[j],
+      Methode = method_labels[as.character(k)],
+      RMSE = rmse_value
+    ))
+  }
+}
+
+# Graphique
+gg <- ggplot(df_summary, aes(x = Taux, y = RMSE, color = Methode)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(
+    title = "Final Frobenius norm error vs. Contamination rate",
+    x = "Contamination rate (%)",
+    y = "Final Frobenius norm error"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+print(gg)
+
 
 
 # #########################################

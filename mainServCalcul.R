@@ -35,39 +35,39 @@ library("matrixcalc")
 #library(RcppArmadillo)
 #install.packages("Metrics")
 #library(Metrics)
-source("~/algosto/parametres.R")
-source("~/algosto/simulations.R")
-source("~/algosto/algorithmes.R")
+source("~/work/algosto/parametres.R")
+source("~/work/algosto/simulations.R")
+source("~/work/algosto/algorithmes.R")
 
 #source("~/algosto/seuils.R")
-source("~/algosto/mainNew.R")
+source("~/work/algosto/mainNew.R")
 
 #source("~/algosto/shrinkageCabana.R")
 #sourceCpp("~/algosto/valeursVecteursPropres.cpp")
 #sourceCpp("~/algosto/RobinsMC2CPP.cpp")
 #sourceCpp("~/algosto/update_mean_cov.cpp")
-sourceCpp("~/algosto/CodesRCpp.cpp")
+sourceCpp("~/work/algosto/CodesRCpp.cpp")
 
-res = calcule_tout(nb_runs = 1)
-
-results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
-save(results_metrics,file = "results_metricsMoyenne100runs1e4d100.Rdata")
-
-temps_calcul = results_metrics$temps_calculBP
-
-
-results_metrics <- round(results_metrics$results_metrics,2)
-save(results_metrics,file = "results_metricsMaronnaZamar100runs1e4.Rdata")
-
-
-results_metrics <- RMSEAUCFPdataset(contamin = "UniformeTronquee")
-
-results_metrics <- round(results_metrics$results_metrics,2)
-save(results_metrics,file = "results_metricsUniformeTronquee100runs1e4.Rdata")
-
-
-results_metrics <- RMSEAUCFPdataset(contamin = "studentTronquee")
-
-results_metrics <- round(results_metrics$results_metrics,2)
-save(results_metrics,file = "results_metricsstudentTronquee100runs1e4.Rdata")
-
+res = calcule_tout(nb_runs = 100)
+# 
+# results_metrics <- RMSEAUCFPdataset(contamin = "moyenne")
+# save(results_metrics,file = "results_metricsMoyenne100runs1e4d100.Rdata")
+# 
+# temps_calcul = results_metrics$temps_calculBP
+# 
+# 
+# results_metrics <- round(results_metrics$results_metrics,2)
+# save(results_metrics,file = "results_metricsMaronnaZamar100runs1e4.Rdata")
+# 
+# 
+# results_metrics <- RMSEAUCFPdataset(contamin = "UniformeTronquee")
+# 
+# results_metrics <- round(results_metrics$results_metrics,2)
+# save(results_metrics,file = "results_metricsUniformeTronquee100runs1e4.Rdata")
+# 
+# 
+# results_metrics <- RMSEAUCFPdataset(contamin = "studentTronquee")
+# 
+# results_metrics <- round(results_metrics$results_metrics,2)
+# save(results_metrics,file = "results_metricsstudentTronquee100runs1e4.Rdata")
+# 
