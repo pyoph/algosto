@@ -36,7 +36,9 @@ genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin 
     if (contamin == "moyenne") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
       vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma1)
-    } else if (contamin == "variance") {
+    } 
+    
+    else if (contamin == "variance") {
       vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
       vecteurs_mu2 <- mvrnorm(n2, mu1, Sigma2)
     } else if (contamin == "student") {

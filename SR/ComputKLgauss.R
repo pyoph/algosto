@@ -56,3 +56,71 @@ image.plot(rho1grid, log10(k1grid), log10(KLk1rho1))
 KLrho1l1 <- sapply(rho1grid, function(rho1){sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho1))})})
 KLrho1l1[KLrho1l1==0] <- NA
 image.plot(log10(l1grid), rho1grid, log10(KLrho1l1))
+
+
+##########################
+#Tests effets sur norme de Frobenius variation k
+#############################
+
+contamin_rate = seq(0,40,5)
+
+methodes = c("streaming","online")
+
+erreurNormeFrobenius = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid)))
+faux_positifs = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid)))
+faux_negatifs = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid)))
+
+for (i in seq_along(k1grid))
+{
+for (j in seq_along(contamin_rate))
+{
+  
+  r = contamin_rate[j]
+  print(paste("r ", r))
+  print(paste("k ",k))
+  k = k1grid[i]
+
+    data <- genererEchantillon(n,d,mu1,mu2 = k*mu1,p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin = "moyenne",cluster = FALSE)
+  Z = data$Z
+  compt = 1
+for (m in methodes)  
+{
+  
+  if(m == "online"){
+    print (m)
+    resultats = StreamingOutlierDetection(Z,batch = 1)
+  Sigma = resultats$Sigma[nrow(Z),,]
+  outliers = resultats$outlier_labels
+  }
+  if(m == "streaming"){
+    print (m)
+    resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+    Sigma = resultats$Sigma[nrow(Z),,]
+    outliers = resultats$outlier_labels
+  }
+  
+  
+  print(paste("i = ",i))
+  print(paste("compt = ",compt))
+  print(paste("j = ",j))
+  #print("m = ",m)
+  erreurNormeFrobenius[j,compt,i] = norm(Sigma - Sigma1,"F")  
+  
+  
+  
+  tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+  if ("0" %in% rownames(tc)){
+  if((tc["0","0"] + tc["0","1"]) != 0)
+  {faux_positifs[j,compt,i]   <-(tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100}
+  }
+  if ("1" %in% rownames(tc)){
+  if((tc["1","0"] + tc["1","1"]) != 0)
+  {faux_negatifs[j,compt,i]   <-(tc["1", "1"]/(tc["1", "1"] + tc["1", "0"]))*100}}
+  compt = compt + 1
+} 
+  
+}
+
+}
+
+

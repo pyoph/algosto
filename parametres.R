@@ -55,7 +55,7 @@ creerMatriceToeplitz <- function(rho,d)
     }
   }
   
-  
+   
   
   #return(diag(sqrt(1:d))%*%toeplitz_matrix%*%diag(sqrt(1:d)))
   return(toeplitz_matrix)
@@ -72,8 +72,12 @@ n = 1e4
 d = 10
 mu1 = rep(0,d)
 mu2 = 5*rep(1,d)
-rho = 0.8
-Sigma1 = creerMatriceToeplitz(rho,d) 
+rho = 0.3
+#Sigma1 = creerMatriceToeplitz(rho,d) 
+sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
+
+Sigma1 <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho0^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+
 #Sigma1 = diag(d)
 #Sigma1 = diag(c((1:d)))
 lignes_a_permuter = c(1, 2)
