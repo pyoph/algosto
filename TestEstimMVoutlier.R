@@ -14,7 +14,7 @@ library(ROCR)
 
 # Parms gene
 # seed <- 1; set.seed(seed)
-par(mfrow=c(1, 1), pch=20); palette('R3')
+par(mfrow=c(2, 2), pch=20); palette('R3')
 
 # Parms 
 n <- 5e3; d <- 10; p1 <- .01
