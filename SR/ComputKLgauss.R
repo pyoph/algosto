@@ -195,9 +195,9 @@ plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
      main = "IC à 95% pour Bin(n0, alpha = 0.05)")
 lines(p_seq, conf$upper, col = "red", lwd = 2)
 
-fp_positions = c(1.00, 0.95, 0.9,  0.85, 0.80, 0.75, 0.70, 0.65,0.60,0.55)
-
-fp_streaming_values = fp_seuil[2,]
-
-points(fp_offline_positions, fp_online_values_corr, col = "darkgreen", pch = 19)
+fp_positions = c(1.00, 0.95, 0.9,  0.85, 0.80, 0.75, 0.70, 0.65,0.60)
+length(fp_positions)
+fp_streaming_values = fp_seuil[,1]/100
+length(fp_seuil[,2])
+points(fp_positions, fp_streaming_values, col = "orange", pch = 19)
 
