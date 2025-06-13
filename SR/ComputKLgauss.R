@@ -64,7 +64,7 @@ image.plot(log10(l1grid), rho1grid, log10(KLrho1l1))
 
 contamin_rate = seq(0,40,5)
 
-methodes = c("streaming","online")
+methodes = c("streaming","online","offline")
 
 erreurNormeFrobenius = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid)))
 faux_positifs = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid)))
@@ -126,8 +126,10 @@ for (m in methodes)
 
 plot(k1grid,faux_positifs[,1,])
 
-fp_seuil =array(0,dim = c(length(contamin_rate), length(methodes)))
+calcule_fp = function(corr = TRUE){
 
+  fp_seuil =array(0,dim = c(length(contamin_rate), length(methodes)))
+  
 for (k in seq_along(contamin_rate))
 {
  r = 0 
@@ -135,25 +137,62 @@ for (k in seq_along(contamin_rate))
   data <- genererEchantillon(n,d,mu1,mu2 = k*mu1,p1 = 1- r/100,r/100,Sigma1,Sigma2 = Sigma1,contamin = "moyenne",cluster = FALSE)
   Z = data$Z
   for (m in methodes){
+    
+    if(m == "offline"){
+      
+      resultats = OfflineOutlierDetection(Z)
+      
+      mu_hat = resultats$median
+      Sigma = resultats$variance
+      distances = resultats$distances
+      if (corr == TRUE){
+      cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
+      
+      resultats = OfflineOutlierDetection(Z,cutoff = cutoffCorr)
+      }
+      outliers = resultats$outlier_labels
+      
+      
+    }
+    
   if(m == "online"){
     print (m)
-    resultats = StreamingOutlierDetection(Z,batch = 1)
+    resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = 1)
     Sigma = resultats$Sigma[nrow(Z),,]
-    outliers = resultats$outlier_labels
-    cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
-    resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = cutoffCorr)
+    distance = resultats$distances
     outliers = resultats$outlier_labels
     
+    if(corr == TRUE){
+    cutoffCorr = rep(0,nrow(Z))
+    outliers = rep(0,nrow(Z))
+    for (s in (1 : nrow(Z)))
+    {
+      cutoffCorr[s]  = qchisq(.95,df = d)*median(resultats$distances[1:s])/qchisq(.5,df = d)
+      if (distance[s] > cutoffCorr[s]) {outliers[s] = 1}
+    }}
+    #cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
+    #resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = cutoffCorr)
+    #outliers = resultats$outlier_labels
+   
   }
   if(m == "streaming"){
     print (m)
-    resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+    resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = ncol(Z))
     Sigma = resultats$Sigma[nrow(Z),,]
     outliers = resultats$outlier_labels
-    cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
-    resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = cutoffCorr)
-    outliers = resultats$outlier_labels
+    #cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
+    #resultats = StreamingOutlierDetection(Z,batch = 1,cutoff = cutoffCorr)
+    distance = resultats$distances
     
+    outliers = resultats$outlier_labels
+    if(corr == TRUE){
+    cutoffCorr = rep(0,nrow(Z))
+    outliers = rep(0,nrow(Z))
+    for (s in (1 : nrow(Z)))
+    {
+      cutoffCorr[s]  = qchisq(.95,df = d)*median(resultats$distances[1:s])/qchisq(.5,df = d)
+      if (distance[s] > cutoffCorr[s]) {outliers[s] = 1}
+    }}
     
   }
   
@@ -164,14 +203,16 @@ for (k in seq_along(contamin_rate))
     {fp_seuil[k,compt]   <-(tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100
     print(fp_seuil[k,compt])}
   }
-  if ("1" %in% rownames(tc)){
-    if((tc["1","0"] + tc["1","1"]) != 0)
-    {fp_seuil[k,compt]   <-(tc["1", "1"]/(tc["1", "1"] + tc["1", "0"]))*100
-    print(fp_seuil[k,compt])}}
-  compt = compt + 1}
+  # if ("1" %in% rownames(tc)){
+  #   if((tc["1","0"] + tc["1","1"]) != 0)
+  #   {fp_seuil[k,compt]   <-(tc["1", "1"]/(tc["1", "1"] + tc["1", "0"]))*100
+  #   print(fp_seuil[k,compt])}}
+   compt = compt + 1}
+}
+return(fp_seuil = fp_seuil)
 }  
   
-
+fp_seuil = calcule_fp(corr = FALSE)
 
 
 # Paramètres
@@ -197,7 +238,55 @@ lines(p_seq, conf$upper, col = "red", lwd = 2)
 
 fp_positions = c(1.00, 0.95, 0.9,  0.85, 0.80, 0.75, 0.70, 0.65,0.60)
 length(fp_positions)
-fp_streaming_values = fp_seuil[,1]/100
-length(fp_seuil[,2])
+fp_online_values = fp_seuil[,1]/100
+points(fp_positions, fp_online_values, col = "darkgreen", pch = 19)
+
+
+fp_streaming_values = fp_seuil[,2]/100
 points(fp_positions, fp_streaming_values, col = "orange", pch = 19)
+
+
+fp_offline_values = fp_seuil[,3]/100
+points(fp_positions, fp_offline_values, col = "black", pch = 19)
+
+
+# Configuration de la fenêtre graphique 
+par(mfrow = c(2, 2))
+
+# --- Graphique 1 : Online ---
+plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 0.15), 
+     xlab = "p (proportion pour n0 = p * N)",
+     ylab = "Taux de faux positifs",
+     main = "Online Streaming")
+lines(p_seq, conf$upper, col = "red", lwd = 2)
+points(fp_positions, fp_online_values, col = "darkgreen", pch = 19)
+#legend("topright", legend = c("IC inférieur", "IC supérieur", "Observé Online"),
+ #      col = c("blue", "red", "darkgreen"), lwd = c(2, 2, NA), pch = c(NA, NA, 19))
+
+# --- Graphique 2 : Streaming ---
+plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 0.15),
+     xlab = "p (proportion pour n0 = p * N)",
+     ylab = "Taux de faux positifs",
+     main = "Streaming")
+lines(p_seq, conf$upper, col = "red", lwd = 2)
+points(fp_positions, fp_streaming_values, col = "orange", pch = 19)
+# legend("topright", legend = c("IC inférieur", "IC supérieur", "Observé Streaming"),
+#        col = c("blue", "red", "orange"), lwd = c(2, 2, NA), pch = c(NA, NA, 19))
+
+# --- Graphique 3 : Offline ---
+plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, 0.15),
+     xlab = "p (proportion pour n0 = p * N)",
+     ylab = "Taux de faux positifs",
+     main = "Offline")
+lines(p_seq, conf$upper, col = "red", lwd = 2)
+points(fp_positions, fp_offline_values, col = "black", pch = 19)
+# legend("topright", legend = c("IC inférieur", "IC supérieur", "Observé Offline"),
+#        col = c("blue", "red", "black"), lwd = c(2, 2, NA), pch = c(NA, NA, 19))
+
+# Titre global
+mtext("Comparaison des taux de faux positifs - Streaming Online et Offline après correction", 
+      outer = TRUE, cex = 1.2, font = 2)
 

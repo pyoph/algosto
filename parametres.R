@@ -76,7 +76,7 @@ rho = 0.3
 #Sigma1 = creerMatriceToeplitz(rho,d) 
 sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
 
-Sigma1 <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho0^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+Sigma1 <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
 
 #Sigma1 = diag(d)
 #Sigma1 = diag(c((1:d)))
