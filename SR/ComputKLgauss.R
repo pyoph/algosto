@@ -120,13 +120,13 @@ for (m in methodes)
   
   if(m == "online"){
     print (m)
-  resultats = StreamingOutlierDetection(Z,batch = 1)
+  resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = 1)
   Sigma = resultats$Sigma[nrow(Z),,]
   outliers = resultats$outlier_labels
   }
   if(m == "streaming"){
     print (m)
-    resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+    resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = ncol(Z))
     Sigma = resultats$Sigma[nrow(Z),,]
     outliers = resultats$outlier_labels
   }
@@ -155,8 +155,11 @@ for (m in methodes)
 
 }
 
+save(erreurNormeFrobenius,file ="erreurNormeFrobeniusKGrid.Rdata") 
+save(faux_positifs,file ="faux_positifsKGrid.Rdata") 
+save(faux_negatifs,file ="faux_negatifsKGrid.Rdata") 
 
-plot(k1grid,faux_positifs[,1,])
+plot(k1grid,faux_negatifs[9,2,])
 
 ###########################################
 #Variation de l1grid
@@ -188,13 +191,13 @@ for (i in seq_along(l1grid))
       
       if(m == "online"){
         print (m)
-        resultats = StreamingOutlierDetection(Z,batch = 1)
+        resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = 1)
         Sigma = resultats$Sigma[nrow(Z),,]
         outliers = resultats$outlier_labels
       }
       if(m == "streaming"){
         print (m)
-        resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+        resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = ncol(Z))
         Sigma = resultats$Sigma[nrow(Z),,]
         outliers = resultats$outlier_labels
       }
@@ -254,13 +257,13 @@ for (i in seq_along(rho1grid))
       
       if(m == "online"){
         print (m)
-        resultats = StreamingOutlierDetection(Z,batch = 1)
+        resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = 1)
         Sigma = resultats$Sigma[nrow(Z),,]
         outliers = resultats$outlier_labels
       }
       if(m == "streaming"){
         print (m)
-        resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+        resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = ncol(Z))
         Sigma = resultats$Sigma[nrow(Z),,]
         outliers = resultats$outlier_labels
       }
@@ -289,8 +292,80 @@ for (i in seq_along(rho1grid))
   
 }
 
+#################################################
+#Variation de k1, de l1 et de rho
+#################################################
+
+erreurNormeFrobeniusk1l1rho1 = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid),length(l1grid),length(rho1grid)))
+faux_positifsk1l1rho1 = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid),length(l1grid),length(rho1grid)))
+faux_negatifsk1l1rho1 = array(0, dim = c(length(contamin_rate), length(methodes),length(k1grid),length(l1grid),length(rho1grid)))
 
 
+for (t in seq_along(rho1grid)){
+for (i in seq_along(k1grid))
+{
+  for (s in seq_along(l1grid)){
+    
+  for (j in seq_along(contamin_rate))
+  {
+    
+    r = contamin_rate[j]
+    print(paste("r ", r))
+    k = k1grid[i]
+    g = l1grid[s]
+    w = rho1grid[t]
+    print(paste("k ",k))
+    Sigma1 <- diag(sqrt(sigmaSq0)) %*% toeplitz(w^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+    data <- genererEchantillon(n,d,mu1,mu2 = m1*k,p1 = 1- r/100,r/100,Sigma1,Sigma2 = g*Sigma1,contamin = "moyenne_variance",cluster = FALSE)
+    Z = data$Z
+    compt = 1
+    for (m in methodes)  
+    {
+      
+      if(m == "online"){
+        print (m)
+        resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = 1)
+        Sigma = resultats$Sigma[nrow(Z),,]
+        outliers = resultats$outlier_labels
+      }
+      if(m == "streaming"){
+        print (m)
+        resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = ncol(Z))
+        Sigma = resultats$Sigma[nrow(Z),,]
+        outliers = resultats$outlier_labels
+      }
+      
+      
+      print(paste("i = ",i))
+      print(paste("compt = ",compt))
+      print(paste("j = ",j))
+      #print("m = ",m)
+      erreurNormeFrobeniusk1l1rho1[j,compt,i,s,t] = norm(Sigma - Sigma1,"F")  
+      
+      
+      
+      tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers)[1:(nrow(Z))])
+      if ("0" %in% rownames(tc)){
+        if((tc["0","0"] + tc["0","1"]) != 0)
+        {faux_positifsk1l1rho1[j,compt,i,s,t]   <-(tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100}
+      }
+      if ("1" %in% rownames(tc)){
+        if((tc["1","0"] + tc["1","1"]) != 0)
+        {faux_negatifsk1l1rho1[j,compt,i,s,t]   <-(tc["1", "1"]/(tc["1", "1"] + tc["1", "0"]))*100}}
+      compt = compt + 1
+    } 
+  }
+  }
+}
+}
+
+
+
+
+
+#########################################################
+#Seuil
+########################################################
 
 calcule_fp = function(corr = TRUE){
 
