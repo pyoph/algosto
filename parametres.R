@@ -69,10 +69,10 @@ creerMatriceToeplitz <- function(rho,d)
 #d = 100 000 
 nbruns = 1
 n = 1e4
-d = 10
+d = 30
 mu1 = rep(0,d)
-mu2 = 5*rep(1,d)
-rho = 0.3
+mu2 = rep(1/sqrt(d), d)
+rho = 0.8
 #Sigma1 = creerMatriceToeplitz(rho,d) 
 sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
 

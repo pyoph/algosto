@@ -16,12 +16,16 @@ rmseSigma_moy = rmseSigma[,,,1]
 
 rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 
-#rmseSigma_moy = res$rmseSigmaRec[,,,1]
+#rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
 
 
 #rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
 # On prépare les données en long format pour ggplot2
 # Extraire les méthodes et taux souhaités
+
+methodes = c(1,9,10)
+
+taux_indices = c(1,3,5,9)
 
 # Noms lisibles pour les méthodes
 method_labels <- c(
@@ -81,6 +85,10 @@ print(gg)
 
 
 methodes <- c(1, 9, 10)
+
+taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
+
+
 method_labels <- c(
   "1" = "Sample covariance (online)",
   "9" = "Online",
@@ -127,6 +135,8 @@ print(gg)
 aucTout = resMoyenne$aucRec
 
 aucTout = res$aucRec
+
+#aucTout = res1run$aucRec
 
 auc_moy <- apply(aucTout, c(1, 2), mean)
 

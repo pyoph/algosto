@@ -27,11 +27,14 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
   {
     
     r = taux_contamination[k]
-    data <- genererEchantillon(n,d,mu1,mu2,p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin,cluster)
+    print(paste("r = ",r))
+    data <- genererEchantillon(n,d,mu1,mu2 = 2.5*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin,cluster)
     
     Z = data$Z
     
     labelsVraisRec[,k] = data$labelsVrais
+    #lvc = labelsVraisRec[,k]
+    #print("nombre outliers =" ,sum(lvc == 1))
     #compt = 1  
     for (j in 1:nbruns)
     {  

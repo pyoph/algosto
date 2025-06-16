@@ -50,7 +50,7 @@ sourceCpp("~/algosto/CodesRCpp.cpp")
 
 res = calcule_tout(nb_runs = 100,contamin = "moyenne_variance" )
 
-res1run = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
+res1run = calcule_tout(nb_runs = 1,contamin = "moyenne")
 
 
 save(res,file= "resMoyenne.Rdata")
