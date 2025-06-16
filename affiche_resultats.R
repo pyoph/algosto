@@ -116,7 +116,7 @@ gg <- ggplot(df_summary, aes(x = Taux, y = RMSE, color = Methode)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   labs(
-    title = "Final Frobenius norm error vs. Contamination rate (shifted Gaussian with variance reduction)",
+    title = "Final Frobenius norm error vs. Contamination rate (shifted Gaussian)",
     x = "Contamination rate (%)",
     y = "Final Frobenius norm error"
   ) +
@@ -134,7 +134,7 @@ print(gg)
 
 aucTout = resMoyenne$aucRec
 
-aucTout = res$aucRec
+aucTout = res1run$aucRec
 
 #aucTout = res1run$aucRec
 
