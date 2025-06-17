@@ -368,7 +368,8 @@ for (i in seq_along(k1grid))
 ########################################################
 
 calcule_fp = function(corr = TRUE){
-
+  methodes= c("streaming","online","offline")
+  contamin_rate = c("0","2","5","10","15","20","25","30","40")
   fp_seuil =array(0,dim = c(length(contamin_rate), length(methodes)))
   
 for (k in seq_along(contamin_rate))
@@ -384,24 +385,24 @@ for (k in seq_along(contamin_rate))
     
     if(m == "offline"){
       
-      resultats = OfflineOutlierDetection(Z)
+      resultats = OfflineOutlierDetectionCorr(Z)
       
       mu_hat = resultats$median
       Sigma = resultats$variance
       distances = resultats$distances
-      if (corr == TRUE){
-      cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
-      
-      resultats = OfflineOutlierDetection(Z,cutoff = cutoffCorr)
-      }
-      outliers = resultats$outlier_labels
-      
+      # if (corr == TRUE){
+      # cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
+      # 
+      # resultats = OfflineOutlierDetectionCorr(Z,cutoff = cutoffCorr)
+      # }
+      # outliers = resultats$outlier_labels
+      # 
       
     }
     
   if(m == "online"){
     print (m)
-    resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = 1)
+    resultats = StreamingOutlierDetectionCorr(Z,batch = 1)
     Sigma = resultats$Sigma[nrow(Z),,]
     distance = resultats$distances
     outliers = resultats$outlier_labels
@@ -421,7 +422,7 @@ for (k in seq_along(contamin_rate))
   }
   if(m == "streaming"){
     print (m)
-    resultats = StreamingOutlierDetectionCorrectedThreshold(Z,batch = ncol(Z))
+    resultats = StreamingOutlierDetectionCorr(Z,batch = ncol(Z))
     Sigma = resultats$Sigma[nrow(Z),,]
     outliers = resultats$outlier_labels
     #cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
@@ -437,7 +438,7 @@ for (k in seq_along(contamin_rate))
       cutoffCorr[s]  = qchisq(.95,df = d)*median(resultats$distances[1:s])/qchisq(.5,df = d)
       if (distance[s] > cutoffCorr[s]) {outliers[s] = 1}
     }}
-    
+
   }
   
   
@@ -458,12 +459,11 @@ return(fp_seuil = fp_seuil)
   
 fp_seuil = calcule_fp(corr = FALSE)
 
-
 # Paramètres
 alpha <- 0.05
 conf_level <- 1 - alpha
 p_seq <- seq(0.6, 1, length.out = 200)
-N <- nrow(Z)  # N doit être défini au préalable
+N <- n  # N doit être défini au préalable
 
 # Calcul des n0 et des x théoriques
 n0 <- floor(p_seq * N)

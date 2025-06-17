@@ -10,17 +10,17 @@ using namespace Rcpp;
  //' \eqn{m_{t+1} = \frac{\sum_{k=1}{^n}X_k/\| X_k-m_t\|}{\sum_{k=1}{^n}1/\| X_k-m_t\|}}
  //'
  //' @param X A numerical matrix corresponding to the data of size \eqn{n\times p}. The rows are \eqn{n} observations in \eqn{\mathbf R^p}.
- //' @param init Initialisation of the median
+ //' @param init_median Initialisation of the median
  //' @param weights Weights
  //' @param epsilon Tolerance
  //' @param nitermax Maximum number of iterations
  //'
- //' @return A list with the median and the number of iterations
+ //' @return A list with the median estimator and the number of iterations
  //'
  //' @export
  // [[Rcpp::export]]
  Rcpp::List WeiszfeldMedianRcpp(const arma::mat& X,
-                                const arma::rowvec& init,
+                                const arma::rowvec& init_median,
                                 const arma::rowvec& weights,
                                 double epsilon = 1e-08,
                                 int nitermax = 100){
@@ -34,8 +34,8 @@ using namespace Rcpp;
    arma::rowvec medvec(p);
    double diffxn, normxm = 10;
    int iter = 0;
-   medvec = init;
-   meanvec = init;
+   medvec = init_median;
+   meanvec = init_median;
    /* Boucle Weiszfeld */
    while (iter < nitermax and normxm > epsilon)
    {
@@ -51,7 +51,7 @@ using namespace Rcpp;
    }
    // Returns ;
    Rcpp::List ret ;
-   ret["median"] = medvec ;
+   ret["estimator"] = medvec ;
    ret["iter"] = iter ;
    return Rcpp::wrap(ret);
  }
@@ -65,9 +65,9 @@ using namespace Rcpp;
     //' \eqn{V_{t+1} = \frac{\sum_{k=1}{^n}\| (X_k-m^*)(X_k-m^*)^T-V_t\|_F^{-1}(X_k-m^*)(X_k-m^*)^T}{\sum_{k=1}{^n}\| (X_k-m^*)(X_k-m^*)^T-V_t\|_F^{-1}}}
     //'
     //' @param X A numerical matrix corresponding to the data of size \eqn{n\times p}. The rows are \eqn{n} observations in \eqn{\mathbf R^p}.
-    //' @param init_cov Initialisation of the median covariation matrix
+    //' @param median_est Estimation of the median \eqn{m^*}, typically an output of \code{\link{WeiszfeldMedianRcpp}}
+    //' @param init_median_cov Initialisation of the median covariation matrix
     //' @param weights Weights
-    //' @param median_est Initial estimation of the median \eqn{m^*}, typically an output of \code{\link{WeiszfeldMedianRcpp}}
     //' @param epsilon Tolerance
     //' @param nitermax Maximum number of iterations
     //'
@@ -77,7 +77,7 @@ using namespace Rcpp;
     // [[Rcpp::export]]
     Rcpp::List WeiszfeldMedianCovarianceRcpp(const arma::mat& X,
                                              const arma::rowvec& median_est,
-                                             const arma::mat& init_cov,
+                                             const arma::mat& init_median_cov,
                                              const arma::rowvec& weights,
                                              double epsilon=1e-08,
                                              int nitermax=100)
@@ -93,9 +93,9 @@ using namespace Rcpp;
         Xcent.row(it) = X.row(it)-median_est;
       }
       // arma::mat medinit = arma::trans(Xcent) * Xcent/n;
-      arma::mat medinit = init_cov;
+      arma::mat medinit = init_median_cov;
       arma::mat  medest(p,p);
-      // medest = init_cov;
+      // medest = init_median_cov;
       arma::rowvec w(n);
       double diffxn, normxm = 1;
       int iter = 0;
@@ -118,7 +118,7 @@ using namespace Rcpp;
       }
       // Returns ;
       Rcpp::List ret ;
-      ret["median"] = medest ; // TODO plutot MCM ?
+      ret["estimator"] = medest ;
       ret["iter"] = iter ;
       ret["weights"] = w; // TODO wieghts, voir ou on l'utilise
       return Rcpp::wrap(ret);
@@ -134,19 +134,19 @@ using namespace Rcpp;
     //' \eqn{\bar m_{k+1} = \bar m_k + \frac 1 {k+1} (m_{k+1} − \bar m_k )}
     //'
     //' @param X  A numerical matrix corresponding to the data of size \eqn{n\times p}. The rows are n observations in \eqn{\mathbf R^p}.
-    //' @param init  Initialisation of the median
+    //' @param init_median  Initialisation of the median
     //' @param weights Weights TODO ?? dans quel algo ?
     //' @param gamma TODO
     //' @param alpha TODO --> gamma ds le papier
     //' @param nstart TODO
     //' @param epsilon TODO
     //'
-    //' @return A list with the computed median and the number of iterations
+    //' @return A list with the computed median
     //'
     //' @export
     // [[Rcpp::export]]
     Rcpp::List ASGMedianRcpp(const arma::mat& X,
-                             const arma::rowvec& init,
+                             const arma::rowvec& init_median,
                              const arma::rowvec& weights,
                              double gamma = 2,
                              double alpha = 0.75,
@@ -171,8 +171,8 @@ using namespace Rcpp;
       const int n = X.n_rows ;
       const int p = X.n_cols ;
       // Containers and intialisation of the algorithm
-      arma::rowvec medvec = init ;
-      arma::rowvec medrm = init;
+      arma::rowvec medvec = init_median ;
+      arma::rowvec medrm = init_median;
       double w, normxm ;
       // Number of replications of the algorithm
       for (int nbcomp = 0 ; nbcomp < nstart ; nbcomp++){
@@ -189,7 +189,7 @@ using namespace Rcpp;
       }
       // Returns ;
       Rcpp::List ret ;
-      ret["median"] = medvec ;
+      ret["estimator"] = medvec ;
       
       return Rcpp::wrap(ret);
     }
@@ -204,20 +204,20 @@ using namespace Rcpp;
     //' \eqn{\bar V_{k+1} = \bar V_k + \frac 1 {k+1} (V_{k+1} − \bar V_k )}
     //'
     //' @param X  A numerical matrix corresponding to the data of size \eqn{n\times p}. The rows are n observations in \eqn{\mathbf R^p}.
-    //' @param median_est  Initial estimation of the median \eqn{m^*}, typically an output of \code{\link{ASGMedianRcpp}}
-    //' @param init_cov  Initialisation of the median covariance matrix
+    //' @param median_est Estimation of the median \eqn{m^*}, typically an output of \code{\link{ASGMedianRcpp}}
+    //' @param init_median_cov  Initialisation of the median covariance matrix
     //' @param weights Weights TODO ?? dans quel algo ?
     //' @param gamma TODO
     //' @param alpha TODO --> gamma ds le papier
     //' @param nstart TODO
     //'
-    //' @return A list with the computed median and the number of iterations
+    //' @return A list with the computed median covariation matrix estimator
     //'
     //' @export
     // [[Rcpp::export]]
     Rcpp::List ASGMedianCovarianceRcpp(const arma::mat&  X,
                                        const arma::rowvec&  median_est,
-                                       const arma::mat&  init_cov,
+                                       const arma::mat&  init_median_cov,
                                        const arma::rowvec& weights,
                                        double gamma = 2,
                                        double alpha = 0.75,
@@ -228,16 +228,14 @@ using namespace Rcpp;
       const int p = X.n_cols ;
       // Containers
       arma::mat medav(p,p);
-      medav=init_cov;
+      medav=init_median_cov;
       arma::mat  diffmat(p,p), medrm(p,p),diffmed(p,p)  ;
       double nrmrm , w ;
       
-      
       // Initialization of the algorithm
       //    diffmed = X.row(0)-median_est ;
-      //    medav =   arma::mat init_cov;
+      //    medav =   arma::mat init_median_cov;
       medrm = medav ;
-      
       
       // Number of replications of the algorithm
       for (int nbcomp = 0 ; nbcomp < nstart ; nbcomp++){
@@ -256,11 +254,10 @@ using namespace Rcpp;
       }
       
       Rcpp::List ret ;
-      ret["median"] = medav ;
+      ret["estimator"] = medav ;
       
       return Rcpp::wrap(ret);
     }
-
 
 
 
@@ -608,10 +605,12 @@ List update_median_covarianceRcpp(const arma::mat& X,
 
 //' Internal
  //' To normalize vectors
+ //'
+ 
  // [[Rcpp::export]]
  arma::mat normalize_columnsRcpp(const arma::mat& V) {
    arma::mat Vnorm = V;
-   arma::rowvec norms = sqrt(sum(square(V), 0)); // Norme L2 colonne par colonne
+   arma::rowvec norms = sqrt(sum(square(V), 0));
    Vnorm.each_row() /= norms;
    return Vnorm;
  }

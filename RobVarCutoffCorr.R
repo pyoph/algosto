@@ -6,14 +6,16 @@
 #' @param X Matrix of size N*p corresponding to the data. The rows are the observations.
 #' @param c Stochastic gradient paramater (\eqn{\sqrt{ncol(X)}}) by default). Must be positive.
 #' @param gamma Stochastic gradient parameter (0.75 by default). Must belong to (0,1).
-#' @param batch Size of the batch. Default is {ncol(X)}.
 #' @param w A parameter of the function RobbinsMC.
+#' @param batch Size of the batch. Default is ncol(X).
 #' @param cMC A parameter of the function RobbinsMC.
 #' @param gammaMC A parameter of the function RobbinsMC.
-#' @param epsilon Stopping criterion: the algorithm stops when the difference between two iterations is less than epsilon, by default 1e-08
+#' @param Ninit Number of data use for initializing the algorithm. Default is 100.
 #' @param mc_sample_size Number of data generated in the Monte Carlo procedure to estimate the eigenvalues of the variance. Default is batch.
+#' @param epsilon Stopping criterion for RobbinsMC and Weisfeld algorithms: the algorithms stop when the difference between two iterations is less than epsilon, by default 1e-08
 #' @param nitermax Maximum number of iterations for first estimation of the median and the Median Covariation Matrix with the help of Weiszfeld algorithm. Default is 100.
 #' @param model Type of distribution: can be "Gaussian" (by default), "Student" or "Laplace"
+#' @param df Number of degrees of freedom if %pdem='Student'.
 #'
 #' @return A list containing ??? TO DO Antoine
 #'
@@ -28,8 +30,8 @@
 #' @export
 #'
 #'
-StreamingRobustVarianceCorrThreshold <- function(X,c = sqrt(ncol(X)), gamma = 0.75,w=2, batch = ncol(X), cMC=ncol(X),gammaMC=0.75,
-                                    Ninit = 100,mc_sample_size = batch,nitermax=100, model='Gaussian', df=3)
+StreamingRobustVariance <- function(X,c = sqrt(ncol(X)), gamma = 0.75,w=2, batch = ncol(X), cMC=ncol(X),gammaMC=0.75,
+                                    Ninit = 100,mc_sample_size = batch,epsilon=1e-8, nitermax=100, model='Gaussian', df=3)
 {
   checkmate::assertChoice(model, c("Gaussian", "Student", "Laplace"))
   checkmate::checkTRUE(nrow(X) > Ninit)
@@ -42,9 +44,9 @@ StreamingRobustVarianceCorrThreshold <- function(X,c = sqrt(ncol(X)), gamma = 0.
   U = array(0, dim = c(nrow(X), ncol(X),ncol(X)))  #Initialisation of an array contaiing all the estimates of the eigenvectors
   if (Ninit > 0)
   {
-    minit=WeiszfeldMedian(X[1:Ninit,],nitermax = nitermax)$median
+    minit=WeiszfeldMedian(X[1:Ninit,],nitermax = nitermax,epsilon=epsilon)$estimator
     init_cov = robustbase::covComed(X[1:Ninit,])$cov
-    Vinit <- WeiszfeldMedianCovariance(X[1:Ninit,],minit,nitermax = 100)$median
+    Vinit <- WeiszfeldMedianCovariance(X[1:Ninit,],median_est =  minit, init_median_cov = init_cov,nitermax = 100,epsilon=epsilon)$estimator
     eig_init = eigen(Vinit,symmetric = TRUE)
     valPV <- eig_init$values
     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
@@ -59,7 +61,7 @@ StreamingRobustVarianceCorrThreshold <- function(X,c = sqrt(ncol(X)), gamma = 0.
     else{ # model == 'Laplace'
       UU <- LaplacesDemon::rmvl(Ninit*10,mu=rep(0,ncol(X)),Sigma=diag(ncol(X)))
     }
-    lambdaResultat <- robbinsMC( U = UU ,  delta=valPV,  c = cMC,w=w , gamma = gammaMC)
+    lambdaResultat <- robbinsMC( U = UU ,  delta=valPV,  c = cMC,w=w , gamma = gammaMC,epsilon=epsilon)
     #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
     lambda <- c(lambdaResultat$vp)
     lambdatilde <- c(lambdaResultat$vp)
@@ -125,7 +127,7 @@ StreamingRobustVarianceCorrThreshold <- function(X,c = sqrt(ncol(X)), gamma = 0.
     else{ # model == 'Laplace'
       UU <- LaplacesDemon::rmvl(mc_sample_size,mu=rep(0,ncol(X)),Sigma=diag(ncol(X)))
     }
-    lambdaResultat <-   robbinsMC(U=UU, c=cMC, gamma = gammaMC, w=w,delta=valPV,init = lambdatilde,
+    lambdaResultat <-   robbinsMC(U=UU, c=cMC, gamma = gammaMC, w=w,delta=valPV,init = lambdatilde,epsilon=epsilon,
                                   init_bar = lambda,c_tilde = mc_sample_size*(niterr-1),
                                   c_bar =mc_sample_size*(niterr-1), sumlog=sum((log(1:((mc_sample_size*(niterr-1))+1))^w)))
     #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
@@ -158,13 +160,14 @@ StreamingRobustVarianceCorrThreshold <- function(X,c = sqrt(ncol(X)), gamma = 0.
 #' @param X Matrix of size N*p corresponding to the data. The rows are the observations.
 #' @param c Stochastic gradient paramater (\eqn{\sqrt{ncol(X)}}) by default). Must be positive.
 #' @param gamma Stochastic gradient parameter (0.75 by default). Must belong to (0,1).
-#' @param batch Size of the batch. Default is {ncol(X)}.
 #' @param w A parameter of the function RobbinsMC.
+#' @param batch Size of the batch. Default is {ncol(X)}.
 #' @param cMC A parameter of the function RobbinsMC.
 #' @param gammaMC A parameter of the function RobbinsMC.
+#' @param Ninit Number of data use for initializing the algorithm. Default is 100.
 #' @param cutoff Threshold at which a data item is considered contaminated. Defult is \eqn{qchisq(p = 0.95, df = ncol(X))}.
-#' @param epsilon Stopping criterion: the algorithm stops when the difference between two iterations is less than epsilon, by default 1e-08
 #' @param mc_sample_size Number of data generated in the Monte Carlo procedure to estimate the eigenvalues of the variance. Default is batch.
+#' @param epsilon Stopping criterion: the algorithm stops when the difference between two iterations is less than epsilon, by default 1e-08
 #' @param nitermax Maximum number of iterations for first estimation of the median and the Median Covariation Matrix with the help of Weiszfeld algorithm. Default is 100.
 #'
 #' @return A list containing ???
@@ -177,11 +180,12 @@ StreamingRobustVarianceCorrThreshold <- function(X,c = sqrt(ncol(X)), gamma = 0.
 #' X <- matrix(rnorm(N*p),ncol=p)
 #' StreamingOutlierDetection(X=X)
 #'
+#' @importFrom robustbase covComed
 #' @export
 #'
 #'
-StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gamma = 0.75,w=2, batch = ncol(X), cMC=ncol(X),gammaMC=0.75,
-                                      Ninit = 100,cutoff =qchisq(p = 0.95, df = ncol(X)),mc_sample_size = batch,
+StreamingOutlierDetectionCorr <- function(X,c = sqrt(ncol(X)), gamma = 0.75,w=2, batch = ncol(X), cMC=ncol(X),gammaMC=0.75,
+                                      Ninit = 100,cutoff =qchisq(p = 0.95,df=ncol(X)),mc_sample_size = batch,epsilon=1e-8,
                                       nitermax=100)
 {
   checkmate::checkTRUE(nrow(X) > Ninit)
@@ -195,16 +199,16 @@ StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gam
   U = array(0, dim = c(nrow(X), ncol(X),ncol(X)))  #Initialisation of an array contaiing all the estimates of the eigenvectors
   if (Ninit > 0)
   {
-    minit=WeiszfeldMedian(X[1:Ninit,],nitermax = nitermax)$median
+    minit=WeiszfeldMedian(X[1:Ninit,],nitermax = nitermax,epsilon=epsilon)$estimator
     init_cov = robustbase::covComed(X[1:Ninit,])$cov
-    Vinit <- WeiszfeldMedianCovariance(X[1:Ninit,],minit,nitermax = 100)$median
+    Vinit <- WeiszfeldMedianCovariance(X[1:Ninit,],minit,init_median_cov = init_cov,nitermax = 100,epsilon = epsilon)$estimator
     eig_init = eigen(Vinit,symmetric = TRUE)
     valPV <- eig_init$values
     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
     lambdaInit = valPV
     lambdatilde = valPV
     UU=matrix(rnorm(ncol(X)*Ninit*10),ncol=ncol(X))
-    lambdaResultat <- robbinsMC( U = UU ,  delta=valPV,  c = cMC,gamma=gammaMC, w=w)
+    lambdaResultat <- robbinsMC( U = UU ,  delta=valPV,  c = cMC,gamma=gammaMC, w=w,epsilon = epsilon)
     #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
     lambda <- c(lambdaResultat$vp)
     lambdatilde <- c(lambdaResultat$vp)
@@ -216,10 +220,10 @@ StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gam
     moyennem <- minit # initialisation of the averaged estimates
     moyenneV <- Vinit # initialisation of the averaged estimates
     VPropresV <- eig_init$vectors
-    #    VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
-    VP <- normalize_columnsRcpp(VPropresV)   #print(lambdaIter[i,])
-    #   varian= VP %*% diag(lambda) %*% t(VP)
-    varianc = reconstruct_covarianceRcpp(VP,lambda)
+        VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    #VP <- normalize_columnsRcpp(VPropresV)   #print(lambdaIter[i,])
+      varianc= VP %*% diag(lambda) %*% t(VP)
+    #varianc = reconstruct_covarianceRcpp(VP,lambda)
     
     for (l in 1 :Ninit) ####stocking the estimates of the variance, eigenvectors and calculating the Mahalonib distance of the first data
     {
@@ -228,11 +232,19 @@ StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gam
       lambdaIter[l,] = lambda
       S <-  mahalanobis_generalizedRcpp(X[l,],  moyennem, vpMCM,  lambda)
       distances[l] <- S
-      if (S > cutoff) {outlier_labels[l] = 1}
       
       
     }
+    #### outlier detection
+    meddist=median(distances[1:Ninit])
+    cutoffcor = cutoff*meddist/qchisq(.5,df = ncol(X))
+    for (i in 1:Ninit)
+    {
+      if (distances[i] > cutoffcor) {outlier_labels[i] = 1}
+    }
+    
   }
+  
   
   #Stockage des itérations de matrices dans un tableau
   VIter <- array(0, dim = c(nrow(X),ncol(X), ncol(X)))
@@ -266,7 +278,7 @@ StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gam
     valPV <- reseig$values
     valPV = apply(cbind(valPV,rep(10^(-4),length(valPV))),MARGIN=1, FUN=max)
     UU=matrix(rnorm(mc_sample_size*ncol(X)),ncol=ncol(X))
-    lambdaResultat <-   robbinsMC(U=UU, c=cMC,gamma=gammaMC, w=w,delta=valPV,init = lambdatilde,
+    lambdaResultat <-   robbinsMC(U=UU, c=cMC,gamma=gammaMC, w=w,delta=valPV,init = lambdatilde,epsilon = epsilon,
                                   init_bar = lambda,c_tilde = mc_sample_size*(niterr-1),
                                   c_bar =mc_sample_size*(niterr-1), sumlog=sum((log(1:((mc_sample_size*(niterr-1))+1))^w)))
     #ctilde = sampsize*(i-1),cbarre =sampsize*(i-1)
@@ -284,10 +296,14 @@ StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gam
     S <-  mahalanobis_generalizedRcpp(X[Ninit + (niterr-1)*batch + l,],  moyennem, vpMCM,  lambda)
     #iterations <- Ninit + (niterr-1)*batch + l
     #print(l)
+    #estimation online median distance
     distances[Ninit + (niterr-1)*batch + l] <- S
     ind = Ninit + (niterr-1)*batch + l
-    cutoff = qchisq(.95,df = ncol(X))*median(distances[1:ind])/qchisq(.5,df = ncol(X))
-    if (distances[Ninit + (niterr-1)*batch + l] > cutoff) {outlier_labels[Ninit + (niterr-1)*batch + l] = 1}
+    print(paste0("ind ",ind))
+    meddist=meddist - (Ninit + (niterr-1)*batch + l)^(-0.75)*( as.numeric(S <= meddist) - 0.5)
+    cutoffcorr = cutoff*meddist/qchisq(.5,df = ncol(X))
+    #cutoffcorr = cutoff*median(distances[1:ind])/qchisq(.5,df = ncol(X))
+    if (distances[Ninit + (niterr-1)*batch + l] > cutoffcorr) {outlier_labels[Ninit + (niterr-1)*batch + l] = 1}
     
     }
     
@@ -306,18 +322,20 @@ StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gam
 #' @param methodMCM Method for estimating the Median Covariation Matrix: can be "Weiszfeld" (by default) or "ASG".
 #' @param model Type of distribution: can be "Gaussian" (by default), "Student" or "Laplace"
 #' @param init A row vector for initializing the estimates of the median. Default is rep(0,ncol(X)).
+#' @param init_median_cov A matrix for initializing the estimates of the MCM. Default is Identity.
 #' @param epsMCM Stopping criterion for Weiszfeld algorithm: the algorithm stops when the difference between two iterations is less than epsilon, by default 1e-08
 #' @param niterWeisz The maximum number of iteration for the Weiszfeld algorithm. Default is 50.
 #' @param gammaMCM A positive constant if methodMCM='ASG'.
 #' @param alphaMCM A positive constant if methodMCM='ASG'. Must belong to (0,1).
 #' @param nstart Number of run if methodMCM='ASG'.
 #' @param mc_sample_size Number of data generated in the Monte Carlo procedure to estimate the eigenvalues of the variance. Default is batch.
-#' @param df Number of degress of freedom if %pdem='Student'.
+#' @param df Number of degrees of freedom if %pdem='Student'.
 #' @param epsilon Stopping criterion for MethodMC algorithm: the algorithm stops when the difference between two iterations is less than epsilon, by default 1e-08
 #' @param niterMC Maximum number of iterations is MethodMC='FixMC' or 'GradMC'.
 #' @param cMC A parameter of the function RobbinsMC.
 #' @param gammaMC A parameter of the function RobbinsMC.
 #' @param w A parameter of the function RobbinsMC.
+#'
 #'
 #' @return A list containing ??? TO DO Antoine
 #'
@@ -332,14 +350,10 @@ StreamingOutlierDetectionCorrectedThreshold <- function(X,c = sqrt(ncol(X)), gam
 #' @export
 #'
 OfflineRobustVariance <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld', model='Gaussian',
-                                  init=rep(0,ncol(X)),
-                                  init_cov=diag(ncol(X)),
-                                  epsMCM=1e-08,niterWeisz=50,
+                                  init=rep(0,ncol(X)), init_median_cov=diag(ncol(X)), epsMCM=1e-08,niterWeisz=50,
                                   gammaMCM=2, alphaMCM=0.75, nstart=1,
-                                  mc_sample_size=1000,
-                                  df=3, epsilon=1e-08,
-                                  niterMC=50,
-                                  cMC=2, gammaMC=0.75, w=2)
+                                  mc_sample_size=1000, df=3, epsilon=1e-08,
+                                  niterMC=50, cMC=2, gammaMC=0.75, w=2)
 {
   checkmate::assertChoice(methodMC, c("RobbinsMC", "GradMC", "FixMC"))
   checkmate::assertChoice(methodMCM, c("Weiszfeld",  "ASG"))
@@ -347,14 +361,14 @@ OfflineRobustVariance <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld',
   d <- ncol(X)
   if(methodMCM=='Weiszfeld'){
     median <- WeiszfeldMedian(X=X, init=init, epsilon=epsMCM, nitermax=niterWeisz)
-    medianCov <- WeiszfeldMedianCovariance(X=X, median_est=median$median, init_cov=init_cov, epsilon=epsMCM, nitermax=niterWeisz)
+    medianCov <- WeiszfeldMedianCovariance(X=X, median_est=median$esimtator, init_median_cov=init_cov, epsilon=epsMCM, nitermax=niterWeisz)
   }
   else if(methodMCM=='ASG')
   {
     median <- ASGMedian(X=X, init=init, gamma=gammaMCM, alpha=alphaMCM, nstart=nstart, epsilon=epsMCM)
-    medianCov <- ASGMedianCovariance(X=X, median_est=median$median, init_cov=init_cov, gamma=gammaMCM, alpha=alphaMCM, nstart=nstart)
+    medianCov <- ASGMedianCovariance(X=X, median_est=median$estimator, init_median_cov=init_cov, gamma=gammaMCM, alpha=alphaMCM, nstart=nstart)
   }
-  eig <- eigen(medianCov$median,symmetric = TRUE)
+  eig <- eigen(medianCov$esimator,symmetric = TRUE)
   eigenvec <- eig$vectors
   eigenval <- eig$values
   
@@ -384,7 +398,7 @@ OfflineRobustVariance <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld',
   
   lambda <- c(eigen_est$vp)
   variance <- t(matrix(eigenvec,ncol=d,byrow=TRUE))%*%diag(lambda)%*%(matrix(eigenvec,ncol=d,byrow=TRUE))
-  resultat <- list(median=median$median,variance=variance,covmedian=medianCov$median)
+  resultat <- list(median=median$estimator,variance=variance,covmedian=medianCov$estimator)
   return(resultat)
 }
 
@@ -399,20 +413,21 @@ OfflineRobustVariance <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld',
 #' @param methodMC Method to estimate the eigenvalues of the variance: can be "FixMC", "GradMC" and "RobbinsMC" (by default).
 #' @param methodMCM Method for estimating the Median Covariation Matrix: can be "Weiszfeld" (by default) or "ASG".
 #' @param cutoff Threshold at which a data item is considered contaminated. Defult is \eqn{qchisq(p = 0.95, df = ncol(X))}.
-#' @param model Type of distribution: can be "Gaussian" (by default), "Student" or "Laplace"
 #' @param init A row vector for initializing the estimates of the median. Default is rep(0,ncol(X)).
+#' @param init_median_cov A matrix for initializing the estimates of the MCM. Default is Identity.
 #' @param epsMCM Stopping criterion for Weiszfeld algorithm: the algorithm stops when the difference between two iterations is less than epsilon, by default 1e-08
 #' @param niterWeisz The maximum number of iteration for the Weiszfeld algorithm. Default is 50.
 #' @param gammaMCM A positive constant if methodMCM='ASG'.
 #' @param alphaMCM A positive constant if methodMCM='ASG'. Must belong to (0,1).
 #' @param nstart Number of run if methodMCM='ASG'.
 #' @param mc_sample_size Number of data generated in the Monte Carlo procedure to estimate the eigenvalues of the variance. Default is batch.
-#' @param df Number of degress of freedom if %pdem='Student'.
 #' @param epsilon Stopping criterion for MethodMC algorithm: the algorithm stops when the difference between two iterations is less than epsilon, by default 1e-08
 #' @param niterMC Maximum number of iterations is MethodMC='FixMC' or 'GradMC'.
-#' @param cMC A parameter of the function RobbinsMC.
-#' @param gammaMC A parameter of the function RobbinsMC.
-#' @param w A parameter of the function RobbinsMC.
+#' @param cMC A parameter of the function robbinsMC.
+#' @param gammaMC A parameter of the function robbinsMC.
+#' @param w A parameter of the function robbinsMC.
+#'
+#'
 #'
 #' @return A list containing ??? TO DO Antoine
 #'
@@ -426,15 +441,11 @@ OfflineRobustVariance <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld',
 #'
 #' @export
 #'
-OfflineOutlierDetection <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld',cutoff =qchisq(p = 0.95, df = ncol(X)),
-                                    init=rep(0,ncol(X)),
-                                    init_cov=diag(ncol(X)),
-                                    epsMCM=1e-08,niterWeisz=50,
+OfflineOutlierDetectionCorr <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld',cutoff =qchisq(p = 0.95,df=ncol(X)),
+                                    init=rep(0,ncol(X)), init_median_cov=diag(ncol(X)), epsMCM=1e-08,niterWeisz=50,
                                     gammaMCM=2, alphaMCM=0.75, nstart=1,
-                                    mc_sample_size=1000,
-                                    df=3, epsilon=1e-08,
-                                    niterMC=50,
-                                    cMC=2, gammaMC=0.75, w=2)
+                                    mc_sample_size=1000, epsilon=1e-08,
+                                    niterMC=50, cMC=2, gammaMC=0.75, w=2)
 {
   checkmate::assertChoice(methodMC, c("RobbinsMC", "GradMC", "FixMC"))
   checkmate::assertChoice(methodMCM, c("Weiszfeld",  "ASG"))
@@ -442,15 +453,17 @@ OfflineOutlierDetection <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld
   distances=rep(0,nrow(X))
   outlier_labels=rep(0,nrow(X))
   if(methodMCM=='Weiszfeld'){
+     
     median <- WeiszfeldMedian(X=X, init=init, epsilon=epsMCM, nitermax=niterWeisz)
-    medianCov <- WeiszfeldMedianCovariance(X=X, median_est=median$median, init_cov=init_cov, epsilon=epsMCM, nitermax=niterWeisz)
+    init_cov = robustbase::covComed(X[1:1e3,])$cov
+    medianCov <- WeiszfeldMedianCovariance(X=X, median_est=median$estimator, init_median_cov=init_cov, epsilon=epsMCM, nitermax=niterWeisz)
   }
   else if(methodMCM=='ASG')
   {
     median <- ASGMedian(X=X, init=init, gamma=gammaMCM, alpha=alphaMCM, nstart=nstart, epsilon=epsMCM)
-    medianCov <- ASGMedianCovariance(X=X, median_est=median$median, init_cov=init_cov, gamma=gammaMCM, alpha=alphaMCM, nstart=nstart)
+    medianCov <- ASGMedianCovariance(X=X, median_est=median$estimator, init_median_cov=init_cov, gamma=gammaMCM, alpha=alphaMCM, nstart=nstart)
   }
-  eig <- eigen(medianCov$median,symmetric = TRUE)
+  eig <- eigen(medianCov$estimator,symmetric = TRUE)
   eigenvec <- eig$vectors
   eigenval <- eig$values
   
@@ -472,14 +485,20 @@ OfflineOutlierDetection <- function(X,methodMC='RobbinsMC', methodMCM='Weiszfeld
   #### outlier detection
   #Calcul des distances
   for (i in 1:nrow(X))
-    
   {
-    S <-  mahalanobis_generalizedRcpp(X[i,], median$median, eigenvec,  lambda)
+    S <-  mahalanobis_generalizedRcpp(X[i,], median$estimator, eigenvec,  lambda)
     distances[i] <- S
-    if (distances[i] > cutoff) {outlier_labels[i] = 1}
+    
     
   }
-  return(list(median=median$median,variance=variance,covmedian=medianCov$median,outlier_labels=outlier_labels,distances=distances))
+  #### outlier detection
+  cutoffcor = cutoff*median(distances)/qchisq(.5,df = ncol(X))
+  for (i in 1:nrow(X))
+  {
+    if (distances[i] > cutoffcor) {outlier_labels[i] = 1}
+  }
+  
+  return(list(median=median$estimator,variance=variance,covmedian=medianCov$estimator,outlier_labels=outlier_labels,distances=distances))
   
 }
 
