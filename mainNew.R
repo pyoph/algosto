@@ -2,7 +2,7 @@
 calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns,cluster = FALSE){
   
   
-  methodes = c("sampleCovOnline","samplecovTrimmed","sampleCovOffline","comedianeOffline","comedianeOfflineShrinkage","OGK","FASTMCD","offline","online","streaming")
+  methodes = c("sampleCovOnline","online","streaming")
   
   taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
   
