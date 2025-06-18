@@ -220,10 +220,10 @@ StreamingOutlierDetectionCorr <- function(X,c = sqrt(ncol(X)), gamma = 0.75,w=2,
     moyennem <- minit # initialisation of the averaged estimates
     moyenneV <- Vinit # initialisation of the averaged estimates
     VPropresV <- eig_init$vectors
-        VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
-    #VP <- normalize_columnsRcpp(VPropresV)   #print(lambdaIter[i,])
-      varianc= VP %*% diag(lambda) %*% t(VP)
-    #varianc = reconstruct_covarianceRcpp(VP,lambda)
+      #  VP <- VPropresV %*% diag(1/sqrt(colSums(VPropresV^2)))
+    VP <- normalize_columnsRcpp(VPropresV)   #print(lambdaIter[i,])
+      #varianc= VP %*% diag(lambda) %*% t(VP)
+    varianc = reconstruct_covarianceRcpp(VP,lambda)
     
     for (l in 1 :Ninit) ####stocking the estimates of the variance, eigenvectors and calculating the Mahalonib distance of the first data
     {

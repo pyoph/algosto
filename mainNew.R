@@ -28,7 +28,7 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
     
     r = taux_contamination[k]
     print(paste("r = ",r))
-    data <- genererEchantillon(n,d,mu1,mu2 = 2.5*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2,contamin,cluster)
+    data <- genererEchantillon(n,d,mu1,mu2 = 30*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 0.01*Sigma1,contamin,cluster)
     
     Z = data$Z
     
