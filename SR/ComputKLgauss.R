@@ -75,24 +75,27 @@ parms0 <- list(mu=mu0, Sigma=Sigma0)
 m1 <- rep(1/sqrt(d), d)
 KL(parms1=parms0, parms2=ParmsF1(m1, 1, 1, 0.5))
 
-par(mfrow=c(3, 2))
-k1grid <- 2^seq(-4, 5, by=.1); k1val <- c(0, 2, 10)
+par(mfrow=c(3, 2)); KLval <- c(1, 10, 100)
+k1grid <- 2^seq(-4, 5, by=.1); k1val <- c(0, 2, 5, 10)
 plot(k1grid, sapply(k1grid, function(k1){KL(parms0, ParmsF1(m1, k1, 1, rho0))}), log='xy')
-abline(h=c(1, 1e2)); abline(v=k1val)
-l1grid <- 2^seq(-5, 5, .1); l1val <- c(1/20, .5, 1, 2)
+abline(h=KLval); abline(v=k1val)
+l1grid <- 2^seq(-5, 5, .1); l1val <- c(1/20, .2, .5, 1, 2, 20)
 plot(l1grid, sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))}), log='xy')
-abline(h=c(1, 1e2)); abline(v=l1val)
-rho1grid <- seq(0.005, 0.995, by=0.005); rho1val <- c(0, .3, .6, .95)
+abline(h=KLval); abline(v=l1val)
+rho1grid <- seq(0.005, 0.995, by=0.005); rho1val <- c(0, .3, .6, 0.8, .95)
 plot(rho1grid, sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))}), log='y')
-abline(h=c(1, 1e2)); abline(v=rho1val)
+abline(h=KLval); abline(v=rho1val)
 
 KLk1l1 <- sapply(k1grid, function(k1){sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, k1, l1, rho0))})})
-image.plot(log10(l1grid), log10(k1grid), log10(KLk1l1))
+image.plot(log10(l1grid), log10(k1grid), log10(KLk1l1)); 
+abline(v=log10(l1val), h=log10(k1val))
 KLk1rho1 <- sapply(k1grid, function(k1){sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, k1, 1, rho1))})})
 image.plot(rho1grid, log10(k1grid), log10(KLk1rho1))
+abline(v=(rho1val), h=log10(k1val))
 KLrho1l1 <- sapply(rho1grid, function(rho1){sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho1))})})
 KLrho1l1[KLrho1l1==0] <- NA
 image.plot(log10(l1grid), rho1grid, log10(KLrho1l1))
+abline(v=log10(l1val), h=(rho1val))
 
 
 ##########################
