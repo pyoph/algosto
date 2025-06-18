@@ -55,7 +55,7 @@ ParmsF1 <- function(m1, k1, l1, rho1){
 
 
 # Dims
-d <- 10
+d <- 100
 
 # Null parms: F0
 mu0 <- rep(0, d)
@@ -73,7 +73,7 @@ parms0 <- list(mu=mu0, Sigma=Sigma0)
 
 # Contamination
 m1 <- rep(1/sqrt(d), d)
-KL(parms1=parms0, parms2=ParmsF1(m1, 1, 1, 0.5))
+KL(parms1=parms0, parms2=ParmsF1(m1, 0.1, 1, 0.4))
 
 par(mfrow=c(3, 2)); KLval <- c(1, 10, 100)
 k1grid <- 2^seq(-4, 5, by=.1); k1val <- c(0, 2, 5, 10)
@@ -391,7 +391,7 @@ for (k in seq_along(contamin_rate))
     
     if(m == "offline"){
       
-      resultats = OfflineOutlierDetectionCorr(Z)
+      resultats = OfflineOutlierDetection(Z)
       
       mu_hat = resultats$median
       Sigma = resultats$variance
@@ -408,7 +408,7 @@ for (k in seq_along(contamin_rate))
     
   if(m == "online"){
     print (m)
-    resultats = StreamingOutlierDetectionCorr(Z,batch = 1)
+    resultats = StreamingOutlierDetection(Z,batch = 1)
     Sigma = resultats$Sigma[nrow(Z),,]
     distance = resultats$distances
     outliers = resultats$outlier_labels
@@ -428,7 +428,7 @@ for (k in seq_along(contamin_rate))
   }
   if(m == "streaming"){
     print (m)
-    resultats = StreamingOutlierDetectionCorr(Z,batch = ncol(Z))
+    resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
     Sigma = resultats$Sigma[nrow(Z),,]
     outliers = resultats$outlier_labels
     #cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)
@@ -464,79 +464,4 @@ return(fp_seuil = fp_seuil)
 }  
   
 fp_seuil = calcule_fp(corr = FALSE)
-
-# Paramètres
-alpha <- 0.05
-conf_level <- 1 - alpha
-p_seq <- seq(0.6, 1, length.out = 200)
-N <- n  # N doit être défini au préalable
-
-# Calcul des n0 et des x théoriques
-n0 <- floor(p_seq * N)
-x <- round(n0 * alpha)
-
-# Calcul de l’intervalle de confiance exact (Clopper-Pearson)
-conf <- binom.confint(x = x, n = n0, conf.level = conf_level, methods = "exact")
-
-
-# Tracé des bornes
-plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
-     ylim = c(0, 0.15), xlab = "p (proportion pour n0 = p * N)",
-     ylab = "Intervalle de confiance de la proportion",
-     main = "IC à 95% pour Bin(n0, alpha = 0.05)")
-lines(p_seq, conf$upper, col = "red", lwd = 2)
-
-fp_positions = c(1.00, 0.95, 0.9,  0.85, 0.80, 0.75, 0.70, 0.65,0.60)
-length(fp_positions)
-fp_online_values = fp_seuil[,1]/100
-points(fp_positions, fp_online_values, col = "darkgreen", pch = 19)
-
-
-fp_streaming_values = fp_seuil[,2]/100
-points(fp_positions, fp_streaming_values, col = "orange", pch = 19)
-
-
-fp_offline_values = fp_seuil[,3]/100
-points(fp_positions, fp_offline_values, col = "black", pch = 19)
-
-
-# Configuration de la fenêtre graphique 
-par(mfrow = c(2, 2))
-
-# --- Graphique 1 : Online ---
-plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
-     ylim = c(0, 0.15), 
-     xlab = "p (proportion pour n0 = p * N)",
-     ylab = "Taux de faux positifs",
-     main = "Online Streaming")
-lines(p_seq, conf$upper, col = "red", lwd = 2)
-points(fp_positions, fp_online_values, col = "darkgreen", pch = 19)
-#legend("topright", legend = c("IC inférieur", "IC supérieur", "Observé Online"),
- #      col = c("blue", "red", "darkgreen"), lwd = c(2, 2, NA), pch = c(NA, NA, 19))
-
-# --- Graphique 2 : Streaming ---
-plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
-     ylim = c(0, 0.15),
-     xlab = "p (proportion pour n0 = p * N)",
-     ylab = "Taux de faux positifs",
-     main = "Streaming")
-lines(p_seq, conf$upper, col = "red", lwd = 2)
-points(fp_positions, fp_streaming_values, col = "orange", pch = 19)
-# legend("topright", legend = c("IC inférieur", "IC supérieur", "Observé Streaming"),
-#        col = c("blue", "red", "orange"), lwd = c(2, 2, NA), pch = c(NA, NA, 19))
-
-# --- Graphique 3 : Offline ---
-plot(p_seq, conf$lower, type = "l", col = "blue", lwd = 2,
-     ylim = c(0, 0.15),
-     xlab = "p (proportion pour n0 = p * N)",
-     ylab = "Taux de faux positifs",
-     main = "Offline")
-lines(p_seq, conf$upper, col = "red", lwd = 2)
-points(fp_positions, fp_offline_values, col = "black", pch = 19)
-# legend("topright", legend = c("IC inférieur", "IC supérieur", "Observé Offline"),
-#        col = c("blue", "red", "black"), lwd = c(2, 2, NA), pch = c(NA, NA, 19))
-
-# Titre global
-mtext("Comparaison des taux de faux positifs - Streaming Online et Offline après correction", 
-      outer = TRUE, cex = 1.2, font = 2)
-
+ 
