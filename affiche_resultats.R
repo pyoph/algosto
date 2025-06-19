@@ -7,12 +7,12 @@ library(patchwork)  # pour agencer les 4 graphiques
 
 
 
-rmseSigma = res1run$rmseSigmaRec
+rmseSigma = res10run$rmseSigmaRec
 
-dim(resMoyenne$rmseSigmaRec)
+
 
 dim(rmseSigma)
-rmseSigma_moy = rmseSigma[,,,1]
+#rmseSigma_moy = rmseSigma[,,,1]
 
 rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 
@@ -22,19 +22,15 @@ rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 #rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
 # On prépare les données en long format pour ggplot2
 # Extraire les méthodes et taux souhaités
+methodes <- c(1, 9, 10)
+taux_indices <- c(1, 3, 5, 9)
 
-methodes = c(1,9,10)
-
-taux_indices = c(1,3,5,9)
-
-# Noms lisibles pour les méthodes
 method_labels <- c(
   "1" = "Sample covariance (online)",
   "9" = "Online",
   "10" = "Streaming"
 )
 
-# Noms lisibles pour les taux
 rate_labels <- c(
   "1" = "0%",
   "3" = "5%",
@@ -42,26 +38,28 @@ rate_labels <- c(
   "9" = "40%"
 )
 
-df_long = list()
-# Création des données en format long
+# Mappage des identifiants méthode à leur position dans le tableau (axe 3)
+method_position_map <- setNames(1:length(methodes), methodes)
+
 data_list <- list()
+n <- dim(rmseSigma_moy)[1]
+
 for (j in taux_indices) {
   for (k in methodes) {
+    k_pos <- method_position_map[as.character(k)]
     df <- data.frame(
       index = 1:n,
-      RMSE = rmseSigma_moy[, j, k],
+      RMSE = rmseSigma_moy[, j, k_pos],
       Method = method_labels[as.character(k)],
       Rate = rate_labels[as.character(j)]
     )
     data_list[[length(data_list) + 1]] <- df
   }
 }
-df_long <- do.call(rbind, data_list)
 
-# Forcer l’ordre d’affichage des taux
+df_long <- do.call(rbind, data_list)
 df_long$Rate <- factor(df_long$Rate, levels = c("0%", "5%", "15%", "40%"))
 
-# Graphique
 gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   geom_line(size = 0.8) +
   facet_wrap(~ Rate, ncol = 2) +
@@ -80,51 +78,7 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   theme(legend.position = "bottom") +
   annotation_logticks(sides = "l")
 
-# Affichage
 print(gg)
-
-
-methodes <- c(1, 9, 10)
-
-taux_contamination <- c(0, 2, 5, 10, 15, 20, 25, 30, 40)
-
-
-method_labels <- c(
-  "1" = "Sample covariance (online)",
-  "9" = "Online",
-  "10" = "Streaming"
-)
-
-# Taux de contamination correspondants à j = 1:9
-#taux_contamination <- seq(0, 40, length.out = 9)
-
-# Extraction du dernier RMSE (ligne 10000) pour chaque taux et méthode
-df_summary <- data.frame()
-for (j in 1:9) {
-  for (k in methodes) {
-    rmse_value <- rmseSigma_moy[1e4, j, k]
-    df_summary <- rbind(df_summary, data.frame(
-      Taux = taux_contamination[j],
-      Methode = method_labels[as.character(k)],
-      RMSE = rmse_value
-    ))
-  }
-}
-
-# Graphique
-gg <- ggplot(df_summary, aes(x = Taux, y = RMSE, color = Methode)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  labs(
-    title = "Final Frobenius norm error vs. Contamination rate (shifted Gaussian)",
-    x = "Contamination rate (%)",
-    y = "Final Frobenius norm error"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-print(gg)
-
 
 
 # #########################################
@@ -132,41 +86,42 @@ print(gg)
 # ########################################
 
 
-aucTout = resMoyenne$aucRec
+aucTout = res10run$aucRec
 
-aucTout = res1run$aucRec
 
 #aucTout = res1run$aucRec
 
 auc_moy <- apply(aucTout, c(1, 2), mean)
 
-auc_moy = res1run$aucRec[,,1]
+auc_moy = res10run$aucRec[,,1]
 #auc_moy = res$aucRec[,,1]
 #auc_moy = res$aucRec[,,1]
 
-methodes_sel <- c(1, 9, 10)
 
-# Taux de contamination et méthodes à utiliser
-taux_indices <- 2:9
 methodes <- c(1, 9, 10)
-taux_valeurs <- c(2, 5, 10, 20, 25, 40)
+method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
+method_pos_map <- setNames(1:3, methodes)  # map méthode → colonne
 
-# Construction du data frame long
+taux_indices <- 1:9
+taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
+
 data_list <- list()
 for (i in seq_along(taux_indices)) {
   j <- taux_indices[i]
   for (k in methodes) {
+    k_pos <- method_pos_map[as.character(k)]
     df <- data.frame(
       ContaminationRate = taux_valeurs[i],
-      AUC = auc_moy[j, k],
-      Method = factor(k, levels = c(1, 2, 9, 10),
-                      labels = c("Cov Online", "Cov Online Trimmed", "Online", "Streaming"))
+      AUC = auc_moy[j, k_pos],
+      Method = method_labels[as.character(k)]
     )
     data_list[[length(data_list) + 1]] <- df
   }
 }
 df_long <- do.call(rbind, data_list)
+df_long$Method <- factor(df_long$Method, levels = method_labels)
 
+# Graphique
 ggplot(df_long, aes(x = ContaminationRate, y = AUC, color = Method)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
@@ -177,16 +132,65 @@ ggplot(df_long, aes(x = ContaminationRate, y = AUC, color = Method)) +
     color = "Method"
   ) +
   scale_x_continuous(
-    #limits = c(2, max(df_long$ContaminationRate)),
-    breaks = c(2, 5,10, 15, 20, 25, 30,40)
+    breaks = taux_valeurs
   ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+
+dim(res10run$faux_positifsRec)
+
+#########################################
+#Faux négatifs moyenne
+########################################
+
+
+res10run$faux_negatifsRec[1e4,9,3,1]
+
+
+faux_neg_moy = apply(res10run$faux_negatifsRec, c(1, 2, 3), mean)
+
+faux_neg_10000 <- faux_negatifsRec_moyenne[10000, , ]
+
+
+methodes <- c(1, 9, 10)
+method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
+method_pos_map <- setNames(1:3, methodes)
+
+taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
+data_list <- list()
+for (i in seq_along(taux_valeurs)) {
+  total_outliers = taux_valeurs[i]/100*n
+    
+    for (k in methodes) {
+    k_pos <- method_pos_map[as.character(k)]
+    data_list[[length(data_list) + 1]] <- data.frame(
+      ContaminationRate = taux_valeurs[i],
+      FalseNegatives = faux_neg_10000[i, k_pos]/(total_outliers)*100,
+      Method = method_labels[as.character(k)]
+    )
+  }
+}
+df_long <- do.call(rbind, data_list)
+df_long$Method <- factor(df_long$Method, levels = method_labels)
+
+ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Faux Négatifs vs. Taux de Contamination",
+    x = "Taux de Contamination (%)",
+    y = "Faux Négatifs",
+    color = "Méthode"
+  ) +
+  scale_x_continuous(breaks = taux_valeurs) +
   theme_minimal() +
   theme(legend.position = "bottom")
 
 
 # ##############################################
 # Temps calculs
-# ##############################################
+# ################# #############################
 
 temps_calculTout = res$temps_calcul
   
@@ -228,28 +232,22 @@ ggplot(df_temps, aes(x = Methode, y = Temps)) +
 
 outliers_labelsTout = resMoyenne$outliersLabelsRec
 
-outliers_labelsTout = res$outliersLabelsRec
-outliers_labelsTout = res1run$outliersLabelsRec[,,,1]
+outliers_labelsTout = res10run$outliersLabelsRec
+#outliers_labelsTout = res1run$outliersLabelsRec[,,,1]
 
 # Fonction pour vote majoritaire
-majority_vote <- function(x, tie = c("first", "min", "all")) {
-  tie <- match.arg(tie)
-  
+majority_vote <- function(x) {
   ux <- unique(x)
   counts <- tabulate(match(x, ux))
   max_count <- max(counts)
   major_values <- ux[counts == max_count]
   
-  if (length(major_values) == 1 || tie == "all") {
+  if (length(major_values) == 1) {
     return(major_values)
-  } else if (tie == "first") {
-    return(major_values[1])
-  } else if (tie == "min") {
-    return(min(major_values))
+  } else {
+    return(1)
   }
 }
-
-
 # Appliquer vote majoritaire sur la 4e dimension
 outliers_majority <- apply(outliers_labelsTout, c(1, 2, 3), majority_vote)
 
@@ -334,8 +332,8 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
   return(list(p = p,taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes,taux_outliers_detectes_vrais = taux_outliers_detectes_vrais))
 }
 
-outliers_majority = outliers_labelsTout[,,1]
-res1run$faux_negatifsRec[9900:1e4]
-table(res1run$labelsVraisRec[,5],res1run$outliersLabelsRec[,5,9,1])
-
-cumulativeOutlierDetection(res1run$labelsVraisRec[,5],res1run$outliersLabelsRec[,5,9,1],15,"Shifted Gaussian contamination scenario")
+#outliers_majority = outliers_labelsTout[,,1]
+# res1run$faux_negatifsRec[9900:1e4]
+# table(res1run$labelsVraisRec[,5],res1run$outliersLabelsRec[,5,9,1])
+dim(res10run$outliersLabelsRec)
+cumulativeOutlierDetection(res10run$labelsVraisRec[,8],outliers_majority[,8,2],30,"Shifted Gaussian with variance reduction contamination scenario")

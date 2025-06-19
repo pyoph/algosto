@@ -50,6 +50,10 @@ source("~/algosto/mainNew.R")
 
 res = calcule_tout(nb_runs = 100,contamin = "moyenne_variance" )
 
+res10run = calcule_tout(nb_runs = 10,contamin = "moyenne" )
+
+
+
 res10run = calcule_tout(nb_runs = 10,contamin = "moyenne_variance")
 
 
