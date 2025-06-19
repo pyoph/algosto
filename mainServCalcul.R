@@ -50,7 +50,7 @@ source("~/algosto/mainNew.R")
 
 res = calcule_tout(nb_runs = 100,contamin = "moyenne_variance" )
 
-res1run = calcule_tout(nb_runs = 1,contamin = "moyenne_variance")
+res10run = calcule_tout(nb_runs = 10,contamin = "moyenne_variance")
 
 
 save(res,file= "resMoyenne.Rdata")

@@ -67,9 +67,9 @@ creerMatriceToeplitz <- function(rho,d)
 
 #Initialisation des paramètres communs à toutes les simulations
 #d = 100 000 
-nbruns = 1
+nbruns = 10
 n = 1e4
-d = 1e2
+d = 10
 mu1 = rep(0,d)
 mu2 = rep(1/sqrt(d), d)
 rho = 0.3
@@ -77,6 +77,9 @@ rho = 0.3
 sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
 
 Sigma1 <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+
+Sigma2 <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.995^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+
 
 #Sigma1 = diag(d)
 #Sigma1 = diag(c((1:d)))
