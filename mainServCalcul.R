@@ -48,11 +48,9 @@ source("~/algosto/mainNew.R")
 #sourceCpp("~/algosto/update_mean_cov.cpp")
 #sourceCpp("~/algosto/CodesRCpp.cpp")
 
-res = calcule_tout(nb_runs = 100,contamin = "moyenne_variance" )
+res1run = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 
 res10run = calcule_tout(nb_runs = 10,contamin = "moyenne" )
-
-
 
 res10run = calcule_tout(nb_runs = 10,contamin = "moyenne_variance")
 
