@@ -5,7 +5,66 @@ library(dplyr)
 library(tidyr)
 library(patchwork)  # pour agencer les 4 graphiques
 
+###################################################
+#Affiche contamination scenarios
+##################################################
 
+
+
+afficherContaminationScenarios = function(k,l,rho,contamination,rate){
+  
+  sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
+  SigmaContamin = diag(sqrt(sigmaSq0)) %*% toeplitz(rho^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+
+  data <- genererEchantillon(n,d,mu1,mu2 = k*rep(1/sqrt(d), d),p1 = 1- rate/100,rate/100,Sigma1,Sigma2 = l*Sigma2,contamin = contamination,cluster = FALSE)
+  
+ Z = data$Z
+ # Création d'un dataframe pour ggplot
+ df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                  Label = factor(data$labelsVrais, levels = c(0, 1)))
+ #Création du plot
+ # Create the plot (English version)
+ p <- ggplot(df, aes(x = X1, y = X2, color = Label)) +
+   geom_point() +
+   scale_color_manual(
+     values = c("0" = "blue", "1" = "red"),
+     labels = c("Inlier", "Outlier"),
+     name = "Status"  # Removed the empty second name
+   ) +
+   labs(
+     title = "Contamination Scenario: Mean and Variance",
+     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho =", rho),
+     x = "X1",  # Added axis labels
+     y = "X2"
+   ) +
+   theme_minimal() +
+   theme(
+     legend.position = "bottom",  # Optional: moves legend to bottom
+     plot.title = element_text(face = "bold")  # Optional: makes title bold
+   )
+  return(p)
+}
+
+p0 = afficherContaminationScenarios(0,1,0.3,"moyenne_variance",20)
+
+p1 = afficherContaminationScenarios(1,0.1,0.6,"moyenne_variance",20)
+
+p2 = afficherContaminationScenarios(30,0.01,0.995,"moyenne_variance",20)
+
+
+# Créer une disposition 2x2 avec les 3 plots et un espace vide
+
+library(cowplot)
+
+# Créer une grille 2x2 avec p0, p1, p2 et un espace vide
+plot_grid(
+  p0, p1,  # Première ligne (p0 et p1 côte à côte)
+  p2, NULL, # Deuxième ligne (p2 + case vide)
+  ncol = 2,
+  align = "hv",  # Alignement horizontal et vertical
+  rel_widths = c(1, 1),  # Largeurs égales
+  rel_heights = c(1, 1)   # Hauteurs égales
+)
 
 rmseSigma = res1run$rmseSigmaRec
 
