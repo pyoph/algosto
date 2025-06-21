@@ -66,7 +66,7 @@ plot_grid(
   rel_heights = c(1, 1)   # Hauteurs égales
 )
 
-rmseSigma = res1run$rmseSigmaRec
+rmseSigma = res100runNearesScenario$rmseSigmaRec
 
 
 
@@ -124,7 +124,7 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   facet_wrap(~ Rate, ncol = 2) +
   labs(
     title = "Frobenius Norm Error Across Different Contamination Rates",
-    subtitle = "Comparison of Covariance Estimation Methods (shifted Gaussian with reduction of variance)",
+    subtitle = "Comparison of Online Covariance Estimation Methods (nearest scenario)",
     x = "Observation Index",
     y = "Frobenius Norm Error"
   ) +
@@ -145,7 +145,7 @@ print(gg)
 # ########################################
 
 
-aucTout = res1run$aucRec
+aucTout = res100runNearesScenario$aucRec
 
 
 #aucTout = res1run$aucRec
@@ -252,17 +252,18 @@ ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) 
 ########################################
 
 
-fprec = res1run$faux_positifsRec
+fprec = res100runNearesScenario$faux_positifsRec
+fprec_moy <- apply(fprec, c(1, 2, 3), mean)
 
-fprec1run = res1run$faux_positifsRec[1e4,,,1]
+fprec100run = fprec_moy[1e4,,]
 
-dim(fprec1run)
+#dim(fprec1run)
 
 methodes <- c(1, 9, 10)
 method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
 method_pos_map <- setNames(1:3, methodes)
 
-taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
+taux_valeurs <- c(0,2, 5, 10, 15, 20, 25, 30,  40)
 data_list <- list()
 for (i in seq_along(taux_valeurs)) {
   total_inliers = (1 - taux_valeurs[i]/100)*n
@@ -271,7 +272,7 @@ for (i in seq_along(taux_valeurs)) {
     k_pos <- method_pos_map[as.character(k)]
     data_list[[length(data_list) + 1]] <- data.frame(
       ContaminationRate = taux_valeurs[i],
-      FalsePositives = fprec1run[i, k_pos]/(total_inliers)*100,
+      FalsePositives = fprec100run[i, k_pos]/(total_inliers)*100,
       Method = method_labels[as.character(k)]
     )
   }
@@ -279,11 +280,11 @@ for (i in seq_along(taux_valeurs)) {
 df_long <- do.call(rbind, data_list)
 df_long$Method <- factor(df_long$Method, levels = method_labels)
 
-ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, color = Method)) +
+pnearDist = ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, color = Method)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "False Positives vs. Contamination rate",
+    title = "False Positives (near distribution scenario) (k,l,rho) = (2,1,0.6)",
     x = "Contamination rates (%)",
     y = "False positives",
     color = "Methods"
@@ -292,8 +293,9 @@ ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, color = Method)) 
   theme_minimal() +
   theme(legend.position = "bottom")
 
+####Sauvegarde du graphique pour les faux positifs
 
-
+saveRDS(pnearDist, file = "pnearDistFP.rds")
 
 # ##############################################
 # Temps calculs
@@ -339,7 +341,7 @@ ggplot(df_temps, aes(x = Methode, y = Temps)) +
 
 outliers_labelsTout = resMoyenne$outliersLabelsRec
 
-outliers_labelsTout = res1run$outliersLabelsRec
+outliers_labelsTout = res100runNearesScenario$outliersLabelsRec
 #outliers_labelsTout = res1run$outliersLabelsRec[,,,1]
 
 # Fonction pour vote majoritaire
@@ -418,9 +420,9 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
   )
   
   p <- ggplot(df, aes(x = index)) +
-    geom_line(aes(y = Detected_rate, color = "True and false positive rate"), size = 1.2) +
-    geom_line(aes(y = True_positive_rate, color = "True positives rate"), size = 1.2) +
-    geom_line(aes(y = True_outliers, color = "True outliers rate"), size = 1.2) +
+    geom_line(aes(y = Detected_rate, color = "True and false positive rate"), size = 0.5) +
+    geom_line(aes(y = True_positive_rate, color = "True positives rate"), size = 0.5) +
+    geom_line(aes(y = True_outliers, color = "True outliers rate"), size = 0.5) +
     scale_color_manual(values = c(
       "True outliers rate" = "red",
       "True and false positive rate" = "orange",
@@ -428,7 +430,7 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
     )) +
     #scale_x_log10() +
     labs(
-      title = paste(titre, "-", pourcentage, "% of outliers"),
+      title = paste(pourcentage, "% of outliers"),
       x = "Data index",
       y = "Cumulative rate (%)",
       color = "Legend"
@@ -443,4 +445,33 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
 # res1run$faux_negatifsRec[9900:1e4]
 # table(res1run$labelsVraisRec[,5],res1run$outliersLabelsRec[,5,9,1])
 dim(res10run$outliersLabelsRec)
-cumulativeOutlierDetection(res1run$labelsVraisRec[,2],res1run$outliersLabelsRec[,2,1,1],2,"Shifted Gaussian with variance reduction contamination scenario")
+
+########Graphs
+
+pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,3],outliers_majority[,3,2],5,"")
+
+pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,4],outliers_majority[,4,2],10,"")
+
+pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,6],outliers_majority[,6,2],20,"")
+
+pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,8],outliers_majority[,8,2],30,"")
+
+pnearDist
+
+install.packages("cowplot")  # Une seule fois
+library(cowplot)
+
+# Crée des cases vides avec draw_plot(NULL)
+plot_grid(
+  pnearDist,
+  pCumOutDetRateNearScOnl5[[1]],
+  pCumOutDetRateNearScOnl10[[1]],
+  pCumOutDetRateNearScOnl20[[1]],
+  pCumOutDetRateNearScOnl30[[1]],
+  
+  ncol = 2
+  #labels = "AUTO"  # Optionnel : ajoute des lettres A, B, C...
+)
+
+
+pCumOutDetRateNearSStream5 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,3],outliers_majority[,3,3],5,"Cumulative streaming outlier detection rate (k,l,rho) = (2,1,0.6)")

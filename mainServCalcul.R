@@ -53,7 +53,9 @@ res1run = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 res10run = calcule_tout(nb_runs = 10,contamin = "moyenne" )
 
 res10run = calcule_tout(nb_runs = 10,contamin = "moyenne_variance")
+res100runNearesScenario = calcule_tout(nb_runs = 100,contamin = "moyenne_variance")
 
+save(res100runNearesScenario,file = "res100runNeasScenario.RData")
 
 save(res,file= "resMoyenne.Rdata")
 
