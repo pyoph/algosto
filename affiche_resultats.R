@@ -66,9 +66,15 @@ plot_grid(
   rel_heights = c(1, 1)   # Hauteurs égales
 )
 
+
+
+######################################################################
+#######RMSE Sigma Iter
+######################################################################
+
 rmseSigma = res100runNearesScenario$rmseSigmaRec
 
-
+rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
 
 dim(rmseSigma)
 #rmseSigma_moy = rmseSigma[,,,1]
@@ -82,7 +88,7 @@ rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 # On prépare les données en long format pour ggplot2
 # Extraire les méthodes et taux souhaités
 methodes <- c(1, 9, 10)
-taux_indices <- c(1, 3, 5, 9)
+taux_indices <- c(3, 4, 5, 8)
 
 method_labels <- c(
   "1" = "Sample covariance (online)",
@@ -91,10 +97,10 @@ method_labels <- c(
 )
 
 rate_labels <- c(
-  "1" = "0%",
   "3" = "5%",
-  "5" = "15%",
-  "9" = "40%"
+  "4" = "10%",
+  "5" = "20%",
+  "8" = "30%"
 )
 
 # Mappage des identifiants méthode à leur position dans le tableau (axe 3)
@@ -116,8 +122,12 @@ for (j in taux_indices) {
   }
 }
 
+########################################
+#Frobenius norm error iterations
+#######################################
+
 df_long <- do.call(rbind, data_list)
-df_long$Rate <- factor(df_long$Rate, levels = c("0%", "5%", "15%", "40%"))
+df_long$Rate <- factor(df_long$Rate, levels = c( "5%", "10%", "20%","30%"))
 
 gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   geom_line(size = 0.8) +
@@ -130,9 +140,9 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   ) +
   theme_minimal(base_size = 12) +
   scale_y_log10(
-    breaks = 10^seq(0, 5, by = 1),
-    labels = c("1", "10", "100", "1000", "10000", "100000")
-  ) +
+     breaks = 10^seq(0, 5, by = 1),
+     labels = c("1", "10", "100", "1000", "10000", "100000")
+   ) +
   scale_color_brewer(palette = "Set1") +
   theme(legend.position = "bottom") +
   annotation_logticks(sides = "l")
@@ -253,6 +263,7 @@ ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) 
 
 
 fprec = res100runNearesScenario$faux_positifsRec
+fprec = res1run$faux_positifsRec
 fprec_moy <- apply(fprec, c(1, 2, 3), mean)
 
 fprec100run = fprec_moy[1e4,,]
@@ -448,13 +459,13 @@ dim(res10run$outliersLabelsRec)
 
 ########Graphs
 
-pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,3],outliers_majority[,3,2],5,"")
+pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res1run$labelsVraisRec[,3],res1run$outliersLabelsRec[,3,2,1],5,"")
 
-pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,4],outliers_majority[,4,2],10,"")
+pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1run$labelsVraisRec[,4],res1run$outliersLabelsRec[,4,2,1],10,"")
 
-pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,6],outliers_majority[,6,2],20,"")
+pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1run$labelsVraisRec[,6]$labelsVraisRec[,6],res1run$outliersLabelsRec[,6,2,1],20,"")
 
-pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,8],outliers_majority[,8,2],30,"")
+pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res1run$labelsVraisRec[,8],outliers_majority[,8,2],30,"")
 
 pnearDist
 
@@ -468,10 +479,27 @@ plot_grid(
   pCumOutDetRateNearScOnl10[[1]],
   pCumOutDetRateNearScOnl20[[1]],
   pCumOutDetRateNearScOnl30[[1]],
-  
   ncol = 2
   #labels = "AUTO"  # Optionnel : ajoute des lettres A, B, C...
 )
 
 
-pCumOutDetRateNearSStream5 = cumulativeOutlierDetection(res100runNearesScenario$labelsVraisRec[,3],outliers_majority[,3,3],5,"Cumulative streaming outlier detection rate (k,l,rho) = (2,1,0.6)")
+pCumStrmDetRateNearSc5 = cumulativeOutlierDetection(res1run$labelsVraisRec[,3],res1run$outliersLabelsRec[,3,3,1],5,"")
+
+pCumStrmDetRateNearSc10 = cumulativeOutlierDetection(res1run$labelsVraisRec[,4],res1run$outliersLabelsRec[,4,3,1],10,"")
+
+pCumStrmDetRateNearSc20 = cumulativeOutlierDetection(res1run$labelsVraisRec[,6],res1run$outliersLabelsRec[,6,3,1],20,"")
+
+pCumOutDetRateNearSc30 = cumulativeOutlierDetection(res1run$labelsVraisRec[,8],res1run$outliersLabelsRec[,6,3,1],30,"")
+
+# Crée des cases vides avec draw_plot(NULL)
+plot_grid(
+  pnearDist,
+  pCumStrmDetRateNearSc5 [[1]],
+  pCumStrmDetRateNearSc10 [[1]],
+  pCumStrmDetRateNearSc20 [[1]],
+  pCumStrmDetRateNearSc30[[1]],
+  ncol = 2
+  #labels = "AUTO"  # Optionnel : ajoute des lettres A, B, C...
+)
+
