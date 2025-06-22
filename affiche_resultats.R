@@ -75,7 +75,7 @@ plot_grid(
 rmseSigma = res100runNearesScenario$rmseSigmaRec
 
 
-rmseSigma_moy = res1rund100FarScenario$rmseSigmaRec[,,,1]
+rmseSigma_moy = res1runFarScenario$rmseSigmaRec[,,,1]
 rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
 dim(rmseSigma)
 #rmseSigma_moy = rmseSigma[,,,1]
@@ -218,7 +218,7 @@ dim(res10run$faux_positifsRec)
 res1run$faux_negatifsRec[1e4,9,3,1]
 
 
-faux_neg_moy = apply(res1rund100FarScenario$faux_negatifsRec, c(1, 2, 3), mean)
+faux_neg_moy = apply(res1runFarScenario$faux_negatifsRec, c(1, 2, 3), mean)
 
 faux_neg_10000 <- faux_neg_moy[10000, , ]
 
@@ -244,7 +244,7 @@ for (i in seq_along(taux_valeurs)) {
 df_long <- do.call(rbind, data_list)
 df_long$Method <- factor(df_long$Method, levels = method_labels)
 
-ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) +
+pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
@@ -355,7 +355,7 @@ ggplot(df_temps, aes(x = Methode, y = Temps)) +
 ######Outliers labels######################
 
 outliers_labelsTout = resMoyenne$outliersLabelsRec
-outliers_labelsTout = res1rund100$outliersLabelsRec
+outliers_labelsTout = res1runFarScenario$outliersLabelsRec
 outliers_labelsTout = res100runNearesScenario$outliersLabelsRec
 #outliers_labelsTout = res1run$outliersLabelsRec[,,,1]
 
@@ -463,22 +463,22 @@ dim(res10run$outliersLabelsRec)
 
 ########Graphs
 
-pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,3],res1rund100$outliersLabelsRec[,3,2,1],5,"")
+pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,3],res1runFarScenario$outliersLabelsRec[,3,2,1],5,"")
 
-pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,4],res1rund100$outliersLabelsRec[,4,2,1],10,"")
+pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,4],res1runFarScenario$outliersLabelsRec[,4,2,1],10,"")
 
-pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,6],res1rund100$outliersLabelsRec[,6,2,1],20,"")
+pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,6],res1runFarScenario$outliersLabelsRec[,6,2,1],20,"")
 
-pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,8],res1rund100$outliersLabelsRec[,8,2,1],30,"")
+pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,7],res1runFarScenario$outliersLabelsRec[,7,2,1],30,"")
 
-pnearDist
+
 
 install.packages("cowplot")  # Une seule fois
 library(cowplot)
 
 # Crée des cases vides avec draw_plot(NULL)
 plot_grid(
-  pnearDist,
+  pfar,
   pCumOutDetRateNearScOnl5[[1]],
   pCumOutDetRateNearScOnl10[[1]],
   pCumOutDetRateNearScOnl20[[1]],
@@ -488,17 +488,17 @@ plot_grid(
 )
 
 
-pCumStrmDetRateNearSc5 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,3],res1rund100$outliersLabelsRec[,3,3,1],5,"")
+pCumStrmDetRateNearSc5 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,3],res1runFarScenario$outliersLabelsRec[,3,3,1],5,"")
 
-pCumStrmDetRateNearSc10 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,4],res1rund100$outliersLabelsRec[,4,3,1],10,"")
+pCumStrmDetRateNearSc10 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,4],res1runFarScenario$outliersLabelsRec[,4,3,1],10,"")
 
-pCumStrmDetRateNearSc20 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,6],res1rund100$outliersLabelsRec[,6,3,1],20,"")
+pCumStrmDetRateNearSc20 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,6],res1runFarScenario$outliersLabelsRec[,6,3,1],20,"")
 
-pCumOutDetRateNearSc30 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,8],res1rund100$outliersLabelsRec[,6,3,1],30,"")
+pCumOutDetRateNearSc30 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,7],res1runFarScenario$outliersLabelsRec[,7,3,1],30,"")
 
 # Crée des cases vides avec draw_plot(NULL)
 plot_grid(
-  pnearDist,
+  pfar,
   pCumStrmDetRateNearSc5 [[1]],
   pCumStrmDetRateNearSc10 [[1]],
   pCumStrmDetRateNearSc20 [[1]],
