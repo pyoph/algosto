@@ -241,9 +241,16 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
           
         }
         if (m == "online") {
-          temps = system.time(
-            {resultats = StreamingOutlierDetection(Z,batch = 1)}
-          )
+          if (d == 100) {
+            temps <- system.time(
+              resultats <- StreamingOutlierDetection(Z, batch = 1, cutoff = 1.27 * qchisq(0.95, df = d))
+              
+            )
+          } else {
+            temps <- system.time(
+              resultats <- StreamingOutlierDetection(Z, batch = 1)
+            )
+          }
           mu_hat = resultats$moyennem
           mu_hatIter = resultats$miter
           SigmaIter = resultats$Sigma
@@ -257,10 +264,15 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         
         if (m == "streaming")
         {
-          temps = system.time(
-            {if(d == 100){resultats = StreamingOutlierDetection(Z,batch = sqrt(ncol(Z)), cutoff = 1.38*qchisq(.95,df = d))}
-              }
+          if(d == 100){
+          temps <- system.time(
+            resultats <- StreamingOutlierDetection(Z, batch = sqrt(ncol(Z)),cutoff = 1.38*qchisq(0.95,df = d))
+          )}
+        } else {
+          temps <- system.time(
+            resultats <- StreamingOutlierDetection(Z, batch = ncol(Z))
           )
+          
           mu_hat = resultats$moyennem
           mu_hatIter = resultats$miter
           Sigma = resultats$Sigma[nrow(Z),,]

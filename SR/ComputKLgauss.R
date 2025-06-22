@@ -391,7 +391,7 @@ for (k in seq_along(contamin_rate))
     
     if(m == "offline"){
       
-      resultats = OfflineOutlierDetection(Z,cutoff =  1.285*qchisq(.95,df = d))
+      resultats = OfflineOutlierDetection(Z,cutoff =  1.27*qchisq(.95,df = d))
       
       mu_hat = resultats$median
       Sigma = resultats$variance
@@ -408,7 +408,7 @@ for (k in seq_along(contamin_rate))
     
   if(m == "online"){
     print (m)
-    resultats = StreamingOutlierDetection(Z,batch = 1, cutoff = 1.285*qchisq(.95,df = d))
+    resultats = StreamingOutlierDetection(Z,batch = 1, cutoff = 1.27*qchisq(.95,df = d))
     Sigma = resultats$Sigma[nrow(Z),,]
     distance = resultats$distances
     outliers = resultats$outlier_labels
