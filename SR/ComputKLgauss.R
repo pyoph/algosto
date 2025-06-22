@@ -428,7 +428,7 @@ for (k in seq_along(contamin_rate))
   }
   if(m == "streaming"){
     print (m)
-    resultats = StreamingOutlierDetection(Z,batch = sqrt(ncol(Z)), 6*qchisq(.95,df = d))
+    resultats = StreamingOutlierDetection(Z,batch = sqrt(ncol(Z)), cutoff = 1.38*qchisq(.95,df = d))
     Sigma = resultats$Sigma[nrow(Z),,]
     outliers = resultats$outlier_labels
     #cutoffCorr = qchisq(.95,df = d)*median(resultats$distances)/qchisq(.5,df = d)

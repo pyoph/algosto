@@ -258,7 +258,8 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         if (m == "streaming")
         {
           temps = system.time(
-            {resultats = StreamingOutlierDetection(Z,batch = sqrt(ncol(Z)))}
+            {if(d == 100){resultats = StreamingOutlierDetection(Z,batch = sqrt(ncol(Z)), cutoff = 1.38*qchisq(.95,df = d))}
+              }
           )
           mu_hat = resultats$moyennem
           mu_hatIter = resultats$miter
