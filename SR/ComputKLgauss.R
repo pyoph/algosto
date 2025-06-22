@@ -382,7 +382,7 @@ for (k in seq_along(contamin_rate))
 {
  r = 0 
  compt = 1
-  data <- genererEchantillon(n,d,mu1,mu2 = k*mu1,p1 = 1- r/100,r/100,Sigma1,Sigma2 = Sigma1,contamin = "moyenne",cluster = FALSE)
+  data <- genererEchantillon(n,d,mu1,mu2 = k*mu1,p1 = 1- r/100,r/100,Sigma1,Sigma2 = Sigma1,contamin = "moyenne_variance",cluster = FALSE)
   Z = data$Z
   for (m in methodes){
     

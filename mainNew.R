@@ -241,12 +241,12 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
           
         }
         if (m == "online") {
-          if (d == 100) {
+          if (ncol(Z) == 100) {
             temps <- system.time(
-              resultats <- StreamingOutlierDetection(Z, batch = 1, cutoff = 1.27 * qchisq(0.95, df = d))
+              resultats <- StreamingOutlierDetection(Z, batch = 1, cutoff = 1.27 * qchisq(0.95, df = ncol(Z)))
               
             )
-          } else {
+          } else if(ncol(Z) == 10){
             temps <- system.time(
               resultats <- StreamingOutlierDetection(Z, batch = 1)
             )
@@ -264,11 +264,12 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         
         if (m == "streaming")
         {
-          if(d == 100){
-          temps <- system.time(
+          if(ncol(Z)== 100){
+          print(paste0("d = ",ncol(Z)))
+            temps <- system.time(
             resultats <- StreamingOutlierDetection(Z, batch = sqrt(ncol(Z)),cutoff = 1.38*qchisq(0.95,df = d))
           )}
-        } else {
+        } else if(ncol(Z) == 10) {
           temps <- system.time(
             resultats <- StreamingOutlierDetection(Z, batch = ncol(Z))
           )
@@ -306,12 +307,20 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         
         
         faux_positifsRec[,k,l,j] = cumsum(outliers_labels == 1 & data$labelsVrais == 0)
-        
         faux_negatifsRec[,k,l,j] = cumsum(outliers_labels == 0 & data$labelsVrais == 1)
         temps_calcul[k,l,j] = temps["elapsed"] 
         cat("k =", k, "l =", l, "j =", j, 
             "-- temps_calcul =", temps_calcul[k, l, j], "secondes\n")  
+        print(paste0("k = ",k))
+        print(paste0("l = ",l))
+        tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers_labels)[1:(nrow(Z))])
+        if ("0" %in% rownames(tc)){
+          if((tc["0","0"] + tc["0","1"]) != 0)
+          {fp  <-(tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100
+          print(paste0("FP ",fp))}
+        }
         
+      #  print(paste0("FP ",faux_positifsRec[1e4,k,l,j]))    
         if (length(unique(data$labelsVrais)) == 2) {
           auc <- as.numeric(pROC::auc(pROC::roc(data$labelsVrais, distances))) * 100
         } else {
