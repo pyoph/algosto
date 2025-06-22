@@ -29,9 +29,9 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
     r = taux_contamination[k]
     print(paste("r = ",r))
     sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
-    SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.6^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+    SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.995^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
     
-    data <- genererEchantillon(n,d,mu1,mu2 = 2*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = SigmaContamin,contamin,cluster)
+    data <- genererEchantillon(n,d,mu1,mu2 = 30*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 0.01*SigmaContamin,contamin,cluster)
     
     Z = data$Z
     
@@ -61,7 +61,7 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
             outliers_labels = rep(0,nrow(Z))
             
             for (i in (1:nrow(Z))){
-              distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hat,eigen(Sigma)$vectors, eigen(Sigma)$values)
+              distances[i] = mahalanobis_generalizedRcpp(Z[i,],mu_hatIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
               S = distances[i]
               
               if (S > cutoff) {outliers_labels[i] = 1}

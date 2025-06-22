@@ -48,9 +48,9 @@ source("~/algosto/mainNew.R")
 #sourceCpp("~/algosto/update_mean_cov.cpp")
 sourceCpp("~/algosto/CodesRCpp.cpp")
 
-res1run = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
+res1runFarScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 
-res1rund100 = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
+res1rund100FarScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 
 save(res1rund100,file = "res1rund100.RData")
 

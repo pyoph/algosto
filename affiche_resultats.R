@@ -74,7 +74,8 @@ plot_grid(
 
 rmseSigma = res100runNearesScenario$rmseSigmaRec
 
-rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
+
+rmseSigma_moy = res1rund100FarScenario$rmseSigmaRec[,,,1]
 rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
 dim(rmseSigma)
 #rmseSigma_moy = rmseSigma[,,,1]
@@ -134,7 +135,7 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   facet_wrap(~ Rate, ncol = 2) +
   labs(
     title = "Frobenius Norm Error Across Different Contamination Rates",
-    subtitle = "Comparison of Online Covariance Estimation Methods ((k,l,rho) = (2,1,0.6))",
+    subtitle = "Comparison of Online Covariance Estimation Methods ((k,l,rho) = (30,0.01,0.995))",
     x = "Observation Index",
     y = "Frobenius Norm Error"
   ) +
@@ -217,7 +218,7 @@ dim(res10run$faux_positifsRec)
 res1run$faux_negatifsRec[1e4,9,3,1]
 
 
-faux_neg_moy = apply(res1run$faux_negatifsRec, c(1, 2, 3), mean)
+faux_neg_moy = apply(res1rund100FarScenario$faux_negatifsRec, c(1, 2, 3), mean)
 
 faux_neg_10000 <- faux_neg_moy[10000, , ]
 
@@ -247,10 +248,10 @@ ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) 
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "Faux Négatifs vs. Taux de Contamination",
-    x = "Taux de Contamination (%)",
-    y = "Faux Négatifs",
-    color = "Méthode"
+    title = "False negatives",
+    x = "Contamination rate (%)",
+    y = "False negatives",
+    color = "Method"
   ) +
   scale_x_continuous(breaks = taux_valeurs) +
   theme_minimal() +
@@ -462,13 +463,13 @@ dim(res10run$outliersLabelsRec)
 
 ########Graphs
 
-pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res1run$labelsVraisRec[,3],res1run$outliersLabelsRec[,3,2,1],5,"")
+pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,3],res1rund100$outliersLabelsRec[,3,2,1],5,"")
 
-pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1run$labelsVraisRec[,4],res1run$outliersLabelsRec[,4,2,1],10,"")
+pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,4],res1rund100$outliersLabelsRec[,4,2,1],10,"")
 
-pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1run$labelsVraisRec[,6]$labelsVraisRec[,6],res1run$outliersLabelsRec[,6,2,1],20,"")
+pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,6],res1rund100$outliersLabelsRec[,6,2,1],20,"")
 
-pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res1run$labelsVraisRec[,8],outliers_majority[,8,2],30,"")
+pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,8],res1rund100$outliersLabelsRec[,8,2,1],30,"")
 
 pnearDist
 
@@ -487,13 +488,13 @@ plot_grid(
 )
 
 
-pCumStrmDetRateNearSc5 = cumulativeOutlierDetection(res1run$labelsVraisRec[,3],res1run$outliersLabelsRec[,3,3,1],5,"")
+pCumStrmDetRateNearSc5 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,3],res1rund100$outliersLabelsRec[,3,3,1],5,"")
 
-pCumStrmDetRateNearSc10 = cumulativeOutlierDetection(res1run$labelsVraisRec[,4],res1run$outliersLabelsRec[,4,3,1],10,"")
+pCumStrmDetRateNearSc10 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,4],res1rund100$outliersLabelsRec[,4,3,1],10,"")
 
-pCumStrmDetRateNearSc20 = cumulativeOutlierDetection(res1run$labelsVraisRec[,6],res1run$outliersLabelsRec[,6,3,1],20,"")
+pCumStrmDetRateNearSc20 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,6],res1rund100$outliersLabelsRec[,6,3,1],20,"")
 
-pCumOutDetRateNearSc30 = cumulativeOutlierDetection(res1run$labelsVraisRec[,8],res1run$outliersLabelsRec[,6,3,1],30,"")
+pCumOutDetRateNearSc30 = cumulativeOutlierDetection(res1rund100$labelsVraisRec[,8],res1rund100$outliersLabelsRec[,6,3,1],30,"")
 
 # Crée des cases vides avec draw_plot(NULL)
 plot_grid(
