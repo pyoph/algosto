@@ -75,7 +75,7 @@ plot_grid(
 rmseSigma = res100runNearesScenario$rmseSigmaRec
 
 rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
-
+rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
 dim(rmseSigma)
 #rmseSigma_moy = rmseSigma[,,,1]
 
@@ -134,7 +134,7 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   facet_wrap(~ Rate, ncol = 2) +
   labs(
     title = "Frobenius Norm Error Across Different Contamination Rates",
-    subtitle = "Comparison of Online Covariance Estimation Methods (nearest scenario)",
+    subtitle = "Comparison of Online Covariance Estimation Methods ((k,l,rho) = (2,1,0.6))",
     x = "Observation Index",
     y = "Frobenius Norm Error"
   ) +
@@ -264,6 +264,9 @@ ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) 
 
 fprec = res100runNearesScenario$faux_positifsRec
 fprec = res1run$faux_positifsRec
+
+fprec = res1rund100$faux_positifsRec
+
 fprec_moy <- apply(fprec, c(1, 2, 3), mean)
 
 fprec100run = fprec_moy[1e4,,]
@@ -351,7 +354,7 @@ ggplot(df_temps, aes(x = Methode, y = Temps)) +
 ######Outliers labels######################
 
 outliers_labelsTout = resMoyenne$outliersLabelsRec
-
+outliers_labelsTout = res1rund100$outliersLabelsRec
 outliers_labelsTout = res100runNearesScenario$outliersLabelsRec
 #outliers_labelsTout = res1run$outliersLabelsRec[,,,1]
 
@@ -498,7 +501,7 @@ plot_grid(
   pCumStrmDetRateNearSc5 [[1]],
   pCumStrmDetRateNearSc10 [[1]],
   pCumStrmDetRateNearSc20 [[1]],
-  pCumStrmDetRateNearSc30[[1]],
+  pCumOutDetRateNearSc30[[1]],
   ncol = 2
   #labels = "AUTO"  # Optionnel : ajoute des lettres A, B, C...
 )
