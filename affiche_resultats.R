@@ -75,7 +75,7 @@ plot_grid(
 rmseSigma = res100runNearesScenario$rmseSigmaRec
 
 
-rmseSigma_moy = res1runFarScenario$rmseSigmaRec[,,,1]
+rmseSigma_moy = res1runNearScenario$rmseSigmaRec[,,,1]
 rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
 dim(rmseSigma)
 #rmseSigma_moy = rmseSigma[,,,1]
@@ -265,7 +265,7 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
 
 fprec = res100runNearesScenario$faux_positifsRec
 fprec = res1run$faux_positifsRec
-
+fprec = res1runNearScenario$faux_negatifsRec
 fprec = res1rund100$faux_positifsRec
 
 fprec_moy <- apply(fprec, c(1, 2, 3), mean)
@@ -356,6 +356,7 @@ ggplot(df_temps, aes(x = Methode, y = Temps)) +
 
 outliers_labelsTout = resMoyenne$outliersLabelsRec
 outliers_labelsTout = res1runFarScenario$outliersLabelsRec
+#outliers_labelsTout = res1runNearScenario$outliersLabelsRec
 outliers_labelsTout = res100runNearesScenario$outliersLabelsRec
 #outliers_labelsTout = res1run$outliersLabelsRec[,,,1]
 
@@ -466,10 +467,20 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
 library(ggplot2)
 library(cowplot)
 
+pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,3],res1runNearScenario$outliersLabelsRec[,3,2,1],5,"")
+
+pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,4],res1runNearScenario$outliersLabelsRec[,4,2,1],10,"")
+
+pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,6],res1runNearScenario$outliersLabelsRec[,6,2,1],20,"")
+
+pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,7],res1runNearScenario$outliersLabelsRec[,7,2,1],30,"")
+
+
+
 # 1. Supprimer titres et légendes de chaque sous-plot
-p1 <- pCumOutDetRateNearScOnl5[[1]] + theme(axis.title = element_blank())
+p1 <- pCumOutDetRateNearScOnl5[[1]] + theme(legend.position = "none",axis.title = element_blank())
 p2 <- pCumOutDetRateNearScOnl10[[1]] + theme(legend.position = "none", axis.title = element_blank())
-p3 <- pCumOutDetRateNearScOnl20[[1]] + theme(legend.position = "none", axis.title = element_blank())
+p3 <- pCumOutDetRateNearScOnl20[[1]] + theme( axis.title = element_blank())
 p4 <- pCumOutDetRateNearScOnl30[[1]] + theme(legend.position = "none", axis.title = element_blank())
 
 # 2. Créer une légende en dur personnalisée
@@ -525,7 +536,7 @@ plots_with_x <- plot_grid(
 
 # 6. Ajouter le titre global en haut
 final_plot <- plot_grid(
-  ggdraw() + draw_label("Cumulative Outlier Detection Rates farest Contamination Scenarios",
+  ggdraw() + draw_label("Cumulative Outlier Detection Rates nearest Contamination Scenarios",
                         fontface = "bold", x = 0.5, hjust = 0.5, size = 14),
   plots_with_x,
   ncol = 1,
