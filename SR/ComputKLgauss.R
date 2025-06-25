@@ -73,7 +73,7 @@ parms0 <- list(mu=mu0, Sigma=Sigma0)
 
 # Contamination
 m1 <- rep(1/sqrt(d), d)
-KL(parms1=parms0, parms2=ParmsF1(m1, 0.1, 1, 0.4))
+KL(parms1=parms0, parms2=ParmsF1(m1, 30, 0.01, 0.8))
 
 par(mfrow=c(3, 2)); KLval <- c(1, 10, 100)
 k1grid <- 2^seq(-4, 5, by=.1); k1val <- c(0, 2, 5, 10)

@@ -16,7 +16,7 @@ afficherContaminationScenarios = function(k,l,rho,contamination,rate){
   sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
   SigmaContamin = diag(sqrt(sigmaSq0)) %*% toeplitz(rho^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
 
-  data <- genererEchantillon(n,d,mu1,mu2 = k*rep(1/sqrt(d), d),p1 = 1- rate/100,rate/100,Sigma1,Sigma2 = l*Sigma2,contamin = contamination,cluster = FALSE)
+  data <- genererEchantillon(n,d,mu1,mu2 = k*rep(1/sqrt(d), d),p1 = 1- rate/100,rate/100,Sigma1,Sigma2 = l*SigmaContamin,contamin = contamination,cluster = FALSE)
   
  Z = data$Z
  # Création d'un dataframe pour ggplot
@@ -24,49 +24,73 @@ afficherContaminationScenarios = function(k,l,rho,contamination,rate){
                   Label = factor(data$labelsVrais, levels = c(0, 1)))
  #Création du plot
  # Create the plot (English version)
- p <- ggplot(df, aes(x = X1, y = X2, color = Label)) +
-   geom_point() +
+ p <- ggplot(df, aes(x = X1, y = X2, color = Label, alpha = Label)) +
+   geom_point(size = 3) +
    scale_color_manual(
      values = c("0" = "blue", "1" = "red"),
      labels = c("Inlier", "Outlier"),
-     name = "Status"  # Removed the empty second name
+     name = "Status"
+   ) +
+   scale_alpha_manual(
+     values = c("0" = 0.1, "1" = 1),  # 0.2 transparency for blue, 1 for red
+     guide = "none"  # Hide alpha from legend
    ) +
    labs(
      title = "Contamination Scenario: Mean and Variance",
      subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho =", rho),
-     x = "X1",  # Added axis labels
+     x = "X1",
      y = "X2"
    ) +
    theme_minimal() +
    theme(
-     legend.position = "bottom",  # Optional: moves legend to bottom
-     plot.title = element_text(face = "bold")  # Optional: makes title bold
+     legend.position = "bottom",
+     plot.title = element_text(face = "bold")
    )
   return(p)
 }
 
-p0 = afficherContaminationScenarios(0,1,0.3,"moyenne_variance",20)
+p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20)
 
-p1 = afficherContaminationScenarios(1,0.1,0.6,"moyenne_variance",20)
+p1 = afficherContaminationScenarios(2,1,0.6,"Near scenario",20)
 
-p2 = afficherContaminationScenarios(30,0.01,0.995,"moyenne_variance",20)
+p2 = afficherContaminationScenarios(30,0.01,0.8,"Far scenario",20)
 
 
 # Créer une disposition 2x2 avec les 3 plots et un espace vide
 
 library(cowplot)
+library(cowplot)
+library(ggplot2)
+library(cowplot)
+library(ggplot2)
 
-# Créer une grille 2x2 avec p0, p1, p2 et un espace vide
-plot_grid(
-  p0, p1,  # Première ligne (p0 et p1 côte à côte)
-  p2, NULL, # Deuxième ligne (p2 + case vide)
-  ncol = 2,
-  align = "hv",  # Alignement horizontal et vertical
-  rel_widths = c(1, 1),  # Largeurs égales
-  rel_heights = c(1, 1)   # Hauteurs égales
-)
+# 1. Créer les plots sans légendes
+p0 <- p0 + theme(axis.title = element_blank(), legend.position = "none")
+p1 <- p1 + theme(axis.title = element_blank(), legend.position = "none")
+p2 <- p2 + theme(axis.title = element_blank(), legend.position = "none")
 
+# 2. Créer la grille 2x2
+main_grid <- plot_grid(p0, p1, p2, NULL, 
+                       ncol = 2, align = "hv")
 
+# 3. Créer la légende manuellement (version "en dur")
+legend_plot <- ggplot() +
+  annotate("point", x = 1, y = 1, color = "blue", size = 3) +
+  annotate("point", x = 2, y = 1, color = "red", size = 3) +
+  annotate("text", x = 1.2, y = 1, label = "Inlier", hjust = 0, size = 4) +
+  annotate("text", x = 2.2, y = 1, label = "Outlier", hjust = 0, size = 4) +
+  theme_void() +
+  xlim(0.5, 3) +
+  labs(title = "Status") +
+  theme(plot.title = element_text(hjust = 0.5, size = 11),
+        plot.margin = margin(0,0,0,0))
+
+# 4. Assembler le tout
+final_plot <- plot_grid(main_grid, legend_plot,
+                        ncol = 1,
+                        rel_heights = c(10, 1))  # 90% pour la grille, 10% pour la légende
+
+print(final_plot)
 
 ######################################################################
 #######RMSE Sigma Iter
@@ -74,6 +98,7 @@ plot_grid(
 
 rmseSigma = res100runNearesScenario$rmseSigmaRec
 
+rmseSigma_moy = res1runFarScenario$rmseSigmaRec[,,,1]
 
 rmseSigma_moy = res1runNearScenario$rmseSigmaRec[,,,1]
 rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
@@ -135,7 +160,7 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   facet_wrap(~ Rate, ncol = 2) +
   labs(
     title = "Frobenius Norm Error Across Different Contamination Rates",
-    subtitle = "Comparison of Online Covariance Estimation Methods ((k,l,rho) = (30,0.01,0.995))",
+    subtitle = "Comparison of Online Covariance Estimation Methods ((k,l,rho) = (30,0.01,0.8))",
     x = "Observation Index",
     y = "Frobenius Norm Error"
   ) +

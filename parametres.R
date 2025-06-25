@@ -69,7 +69,7 @@ creerMatriceToeplitz <- function(rho,d)
 #d = 100 000 
 nbruns = 1
 n = 1e4
-d = 100
+d = 2
 mu1 = rep(0,d)
 mu2 = rep(1/sqrt(d), d)
 rho = 0.3
@@ -86,4 +86,4 @@ Sigma2 <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.6^(0:(d-1))) %*% diag(sqrt(sigmaSq
 lignes_a_permuter = c(1, 2)
 colonnes_a_permuter = c(1, 2)
 #Sigma2 = permuterLignesColonnes(Sigma1,lignes_a_permuter , colonnes_a_permuter)
-Sigma2 = 0.1* Sigma1
+#Sigma2 = 0.1* Sigma1
