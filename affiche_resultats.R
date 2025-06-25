@@ -273,7 +273,7 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "False negatives",
+    title = "False negatives (k,l,rho) = (30,0.01,0.8), d = 10",
     x = "Contamination rate (%)",
     y = "False negatives",
     color = "Method"
