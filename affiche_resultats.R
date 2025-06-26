@@ -273,14 +273,14 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "False negatives (k,l,rho) = (30,0.01,0.8), d = 10",
+    title = "False negatives (k,l,rho) = (30,2,0.8), d = 10",
     x = "Contamination rate (%)",
     y = "False negatives",
     color = "Method"
   ) +
   scale_x_continuous(breaks = taux_valeurs) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
+  # theme_minimal() +
+  # theme(legend.position = "bottom")
 
 
 #########################################
@@ -290,7 +290,7 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
 
 fprec = res100runNearesScenario$faux_positifsRec
 fprec = res1run$faux_positifsRec
-fprec = res1runNearScenario$faux_negatifsRec
+fprec = res1runNearScenario$faux_positifsRec
 fprec = res1rund100$faux_positifsRec
 
 fprec_moy <- apply(fprec, c(1, 2, 3), mean)
@@ -324,17 +324,48 @@ pnearDist = ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, color
   geom_line(size = 1) +
   geom_point(size = 2) +
   labs(
-    title = "False Positives (near distribution scenario) (k,l,rho) = (2,1,0.6)",
+    title = "False Positives (k,l,rho) = (2,1,0.6)",
     x = "Contamination rates (%)",
     y = "False positives",
     color = "Methods"
   ) +
   scale_x_continuous(breaks = taux_valeurs) +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "none")
 
-####Sauvegarde du graphique pour les faux positifs
+method_colors <- c(
+  "Sample covariance (online)" = "blue",
+  "Online" = "red",
+  "Streaming" = "green"
+)
+# 1. Retirer la légende des deux graphes
+pnearDist <- pnearDist + theme(legend.position = "none")
+pfar <- pfar + theme(legend.position = "none")
 
+# 2. Créer une légende manuelle ("en dur")
+legend_plot <- ggplot() +
+  annotate("point", x = 1, y = 1, color = method_colors[1], size = 3) +
+  annotate("point", x = 2, y = 1, color = method_colors[2], size = 3) +
+  annotate("point", x = 3, y = 1, color = method_colors[3], size = 3) +
+  annotate("text", x = 1.2, y = 1, label = names(method_colors)[1], hjust = 0, size = 4) +
+  annotate("text", x = 2.2, y = 1, label = names(method_colors)[2], hjust = 0, size = 4) +
+  annotate("text", x = 3.2, y = 1, label = names(method_colors)[3], hjust = 0, size = 4) +
+  theme_void() +
+  xlim(0.5, 4.2) +
+  labs(title = "Method") +
+  theme(plot.title = element_text(hjust = 0.5, size = 11),
+        plot.margin = margin(0, 0, 0, 0))
+
+# 3. Assembler les graphiques côte à côte
+main_grid <- plot_grid(pnearDist, pfar, ncol = 2, align = "hv")
+
+# 4. Combiner avec la légende manuelle
+final_plot <- plot_grid(main_grid, legend_plot,
+                        ncol = 1,
+                        rel_heights = c(10, 1))  # 90% graphes, 10% légende
+
+# Afficher
+print(final_plot)
 saveRDS(pnearDist, file = "pnearDistFP.rds")
 
 # ##############################################
@@ -492,102 +523,73 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
 library(ggplot2)
 library(cowplot)
 
-pCumOutDetRateNearScOnl5 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,3],res1runNearScenario$outliersLabelsRec[,3,2,1],5,"")
+pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,3],res1runNearScenario$outliersLabelsRec[,3,2,1],5,"")
 
 pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,4],res1runNearScenario$outliersLabelsRec[,4,2,1],10,"")
 
 pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,6],res1runNearScenario$outliersLabelsRec[,6,2,1],20,"")
 
-pCumOutDetRateNearScOnl30 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,7],res1runNearScenario$outliersLabelsRec[,7,2,1],30,"")
+pCumOutDetRateNearScOnl35 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,8],res1runNearScenario$outliersLabelsRec[,8,2,1],35,"")
 
+library(ggplot2)
+library(cowplot)
 
-
-# 1. Supprimer titres et légendes de chaque sous-plot
-p1 <- pCumOutDetRateNearScOnl5[[1]] + theme(legend.position = "none",axis.title = element_blank())
-p2 <- pCumOutDetRateNearScOnl10[[1]] + theme(legend.position = "none", axis.title = element_blank())
-p3 <- pCumOutDetRateNearScOnl20[[1]] + theme( axis.title = element_blank())
-p4 <- pCumOutDetRateNearScOnl30[[1]] + theme(legend.position = "none", axis.title = element_blank())
-
-# 2. Créer une légende en dur personnalisée
-legend_data <- data.frame(
-  rate_type = factor(c("True outliers rate", "True + false positive rate", "True positive rates"),
-                     levels = c("True outliers rate", "True + false positive rate", "True positive rates")),
-  x = 1:3, y = 1:3
+# Couleurs des lignes
+rate_colors <- c(
+  "True outliers rate" = "red",
+  "True + false positive rate" = "orange",
+  "True positive rates" = "purple"
 )
 
-legend_plot <- ggplot(legend_data, aes(x = x, y = y, color = rate_type)) +
-  geom_point(size = 4) +
-  scale_color_manual(
-    values = c(
-      "True outliers rate" = "red",
-      "True + false positive rate" = "orange",
-      "True positive rates" = "purple"
+# Fonction de nettoyage : enlever la légende et le titre de l'axe Y
+clean_plot <- function(p) {
+  p +
+    theme(
+      legend.position = "none",
+      axis.title.y = element_blank()  # Enlever uniquement le titre
     )
-  ) +
-  theme_void() +
-  theme(legend.position = "bottom",
-        legend.title = element_blank(),
-        legend.text = element_text(size = 10))
+}
 
-shared_legend <- get_legend(legend_plot)
+# Appliquer à chaque graphe
+p1 <- clean_plot(pCumOutDetRateNearScOnl5[[1]])
+p2 <- clean_plot(pCumOutDetRateNearScOnl10[[1]])
+p3 <- clean_plot(pCumOutDetRateNearScOnl20[[1]])
+p4 <- clean_plot(pCumOutDetRateNearScOnl35[[1]])
 
-# Plot vide pour la place vide sous p4
-empty_plot <- ggplot() + theme_void()
-
-# 3. Créer la grille 3x2 : 2 lignes de plots + 1 ligne légende (en 1ère colonne) + vide (2e colonne)
-plots_grid_3x2 <- plot_grid(
+# Grille 2x2 de graphes
+main_grid <- plot_grid(
   p1, p2,
   p3, p4,
-   empty_plot,shared_legend,
   ncol = 2,
-  rel_heights = c(1,1, 0.2)  # la ligne légende est plus petite
+  align = "hv"
 )
 
-# 4. Ajouter un axe Y partagé (sur toute la hauteur des 3 lignes)
-plots_with_y <- plot_grid(
-  ggdraw() + draw_text("Cumulative rate (%)", angle = 90, x = 0.5, y = 0.5, size = 12),
-  plots_grid_3x2,
-  ncol = 2,
-  rel_widths = c(0.05, 0.95)
-)
+# Légende personnalisée
+legend_plot <- ggplot() +
+  annotate("point", x = 1, y = 1, color = rate_colors[1], size = 3) +
+  annotate("point", x = 2, y = 1, color = rate_colors[2], size = 3) +
+  annotate("point", x = 3, y = 1, color = rate_colors[3], size = 3) +
+  annotate("text", x = 1.2, y = 1, label = names(rate_colors)[1], hjust = 0, size = 4) +
+  annotate("text", x = 2.2, y = 1, label = names(rate_colors)[2], hjust = 0, size = 4) +
+  annotate("text", x = 3.2, y = 1, label = names(rate_colors)[3], hjust = 0, size = 4) +
+  theme_void() +
+  xlim(0.5, 4)
 
-# 5. Ajouter label axe X sous toute la grille (centré)
-plots_with_x <- plot_grid(
-  plots_with_y,
-  ggdraw() + draw_text("Index", x = 0.5, y = 0.5, size = 12),
+# Combiner graphiques + légende
+body_with_legend <- plot_grid(
+  main_grid,
+  legend_plot,
   ncol = 1,
-  rel_heights = c(0.95, 0.05)
+  rel_heights = c(10, 1)
 )
 
-# 6. Ajouter le titre global en haut
+# Titre principal
 final_plot <- plot_grid(
-  ggdraw() + draw_label("Cumulative Outlier Detection Rates nearest Contamination Scenarios",
-                        fontface = "bold", x = 0.5, hjust = 0.5, size = 14),
-  plots_with_x,
+  ggdraw() + draw_label("Near contamination scenario", fontface = "bold", size = 14, hjust = 0.5),
+  body_with_legend,
   ncol = 1,
-  rel_heights = c(0.1, 0.9)
+  rel_heights = c(0.08, 0.92)
 )
 
+# Affichage
 print(final_plot)
-
-
-
-pCumStrmDetRateNearSc5 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,3],res1runFarScenario$outliersLabelsRec[,3,3,1],5,"")
-
-pCumStrmDetRateNearSc10 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,4],res1runFarScenario$outliersLabelsRec[,4,3,1],10,"")
-
-pCumStrmDetRateNearSc20 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,6],res1runFarScenario$outliersLabelsRec[,6,3,1],20,"")
-
-pCumOutDetRateNearSc30 = cumulativeOutlierDetection(res1runFarScenario$labelsVraisRec[,7],res1runFarScenario$outliersLabelsRec[,7,3,1],30,"")
-
-# Crée des cases vides avec draw_plot(NULL)
-plot_grid(
-  pfar,
-  pCumStrmDetRateNearSc5 [[1]],
-  pCumStrmDetRateNearSc10 [[1]],
-  pCumStrmDetRateNearSc20 [[1]],
-  pCumOutDetRateNearSc30[[1]],
-  ncol = 2
-  #labels = "AUTO"  # Optionnel : ajoute des lettres A, B, C...
-)
-
