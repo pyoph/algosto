@@ -52,7 +52,6 @@ res1runFarScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 
 res1runNearScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 
-
 res1rund100FarScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 
 save(res1rund100,file = "res1rund100.RData")
