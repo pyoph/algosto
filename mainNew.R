@@ -1,5 +1,5 @@
 
-calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns,cluster = FALSE){
+calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns,cluster = FALSE,reduction_dim = FALSE){
   
   
   methodes = c("sampleCovOnline","online","streaming")
@@ -19,7 +19,6 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
   taux_OutliersDetectesVraisRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
   taux_OutliersDetectesRec = array(0, dim = c(nbrows, length(taux_contamination), length(methodes),nb_runs))
   aucRec = array(0, dim = c(length(taux_contamination),length(methodes), nb_runs))
-  
   
   
   
@@ -365,8 +364,8 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
       #compt_meth = compt_meth + 1
     }
     
-    
-    #compt = compt + 1
+
+      
     
   }
   
