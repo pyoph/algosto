@@ -278,7 +278,7 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
     y = "False negatives",
     color = "Method"
   ) +
-  scale_x_continuous(breaks = taux_valeurs) +
+  scale_x_continuous(breaks = taux_valeurs) 
   # theme_minimal() +
   # theme(legend.position = "bottom")
 

@@ -1,5 +1,5 @@
 
-calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns,cluster = FALSE,reduction_dim = FALSE){
+calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows  = n,nb_runs = nbruns,cluster = FALSE,k = 0,l = 1,rho = 0.3,reduction_dim = FALSE){
   
   
   methodes = c("sampleCovOnline","online","streaming")
@@ -28,9 +28,9 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
     r = taux_contamination[k]
     print(paste("r = ",r))
     sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
-    SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.8^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+    SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
     
-    data <- genererEchantillon(n,d,mu1,mu2 = 30*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 2*SigmaContamin,contamin,cluster)
+    data <- genererEchantillon(n,d,mu1,mu2 = k*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = l*SigmaContamin,contamin,cluster)
     
     Z = data$Z
     
@@ -330,7 +330,14 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         outliersLabelsRec[,k,l,j] = outliers_labels
         #taux_OutliersDetectesVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
       }
-      
+      if ((m %in% c("streaming","online")) & (reduction_dim == TRUE))
+      {
+        outliers_labels = reduce_dimension(Sigma)
+        outliersLabelsRec[,k,l,j] = outliers_labels
+        faux_positifsRec[,k,l,j] = cumsum(outliers_labels == 1 & data$labelsVrais == 0)
+        faux_negatifsRec[,k,l,j] = cumsum(outliers_labels == 0 & data$labelsVrais == 1)
+        
+      }
       #print(fp[compt])
       #correction = qchisq(.5,df = d)/(median(sqrt(distances)))^2
       

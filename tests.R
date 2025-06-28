@@ -24,7 +24,8 @@ evalues1_matrix[t,] <- eigen(Sigma1)$values
 
 }
 
-
+#Exclusion des valeurs propres trop grandes
+reduce_dimension = function(Sigma){
 
 #Exclusion des valeurs aberrantes pour l'estimation des valeurs propres 
 
@@ -50,9 +51,13 @@ for (i in (1:nrow(Z))){
  
     cutoffCorr[i]  = qchisq(.95,df = d)*median(resultats$distances[1:i])/qchisq(.5,df = d)
     if (distances[i] > cutoffCorr[i]) {outliers_labels[i] = 1}
-  }
-  
+}
+return(outliers_labels)
+}
 
+outlier_label = reduce_dimension(resultats$Sigma[nrow(Z),,])
+
+table(resultats$outlier_labels,data$labelsVrais)
 
 # Configuration de la zone de graphique
 par(mfrow = c(2, 5))
