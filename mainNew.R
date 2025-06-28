@@ -330,7 +330,7 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         outliersLabelsRec[,k,l,j] = outliers_labels
         #taux_OutliersDetectesVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
       }
-      if ((m %in% c("streaming","online")) & (reduction_dim == TRUE))
+      if ((m %in% c("streaming")) & (reduction_dim == TRUE))
       {
         outliers_labels = reduce_dimension(Sigma)
         outliersLabelsRec[,k,l,j] = outliers_labels

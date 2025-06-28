@@ -1,16 +1,16 @@
-r = 30
+r = 40
 
 contamin = "moyenne_variance"
 cluster = FALSE
 
 sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
-SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.995^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.8^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
 
 data <- genererEchantillon(n,d,mu1,mu2 = 30*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 0.01*SigmaContamin,contamin,cluster)
 
 Z = data$Z
 
-resultats = StreamingOutlierDetection(Z,batch = ncol(Z))
+resultats = StreamingOutlierDetection(Z,batch = 1)
 
 Sigma = resultats$Sigma
 n_obs = d
@@ -57,7 +57,7 @@ return(outliers_labels)
 
 outlier_label = reduce_dimension(resultats$Sigma[nrow(Z),,])
 
-table(resultats$outlier_labels,data$labelsVrais)
+table(outlier_label,data$labelsVrais)
 
 # Configuration de la zone de graphique
 par(mfrow = c(2, 5))
