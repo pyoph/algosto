@@ -48,9 +48,10 @@ source("~/algosto/mainNew.R")
 #sourceCpp("~/algosto/update_mean_cov.cpp")
 sourceCpp("~/algosto/CodesRCpp.cpp")
 
-res1runFarScenario = calcule_tout(nb_runs = 1,k = 30,l = 2,rho = 0.6,contamin = "moyenne_variance",reduction_dim =  TRUE )
-
+ 
 res1runNearScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
+
+res1runFarScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance", k = 30, l = 0.1,rho= 0.8,reduction_dim =  TRUE)
 
 res1rund100FarScenario = calcule_tout(nb_runs = 1,contamin = "moyenne_variance" )
 

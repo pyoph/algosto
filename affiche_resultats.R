@@ -108,7 +108,7 @@ dim(rmseSigma)
 rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 
 #rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
-
+affiche_erreur_frob_norm = function(rmseSigma_moy){
 
 #rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
 # On prépare les données en long format pour ggplot2
@@ -173,8 +173,11 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   theme(legend.position = "bottom") +
   annotation_logticks(sides = "l")
 
-print(gg)
+return(gg)
 
+}
+
+affiche_erreur_frob_norm(rmseSigma_moy)
 
 # #########################################
 #             AUC
@@ -282,7 +285,7 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
   # theme_minimal() +
   # theme(legend.position = "bottom")
 
-
+ dim(faux_neg_10000)
 #########################################
 #Faux positifs moyenne
 ########################################

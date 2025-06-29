@@ -1,4 +1,4 @@
-r = 40
+r = 35
 
 contamin = "moyenne_variance"
 cluster = FALSE
@@ -6,7 +6,7 @@ cluster = FALSE
 sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
 SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.8^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
 
-data <- genererEchantillon(n,d,mu1,mu2 = 30*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 0.01*SigmaContamin,contamin,cluster)
+data <- genererEchantillon(n,d,mu1,mu2 = 30*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 0.1*SigmaContamin,contamin,cluster)
 
 Z = data$Z
 
@@ -34,9 +34,9 @@ outliers_labels = rep(0,nrow(Z))
 cutoffCorr = rep(0,nrow(Z))
 
 for (i in (1:nrow(Z))){
-  Sigma = resultats$Sigma[i,,]
   
-  lambda = eigen(Sigma)$values
+  
+  lambda = eigen(Sigma[i,,])$values
   Q <- quantile(lambda, probs = c(0.1, 0.9))
   IQR <- Q[2] - Q[1]
   limites <- c(Q[1] - 1.5 * IQR, Q[2] + 1.5 * IQR)
@@ -44,10 +44,10 @@ for (i in (1:nrow(Z))){
   lambda_filtre <- lambda[lambda >= max(limites[1],0) & lambda <= limites[2]]
   #print(paste0("indices non aberrants ", indices_non_aberrants))
   #print(paste0("lambda_filtre ",lambda_filtre))
-  distances[i] = mahalanobis_generalizedRcpp(Z[i,indices_non_aberrants],resultats$miter[i,indices_non_aberrants],eigen(Sigma)$vectors[indices_non_aberrants,indices_non_aberrants], eigen(Sigma)$values[indices_non_aberrants])
+  distances[i] = mahalanobis_generalizedRcpp(Z[i,indices_non_aberrants],resultats$miter[i,indices_non_aberrants],eigen(Sigma[i,,])$vectors[indices_non_aberrants,indices_non_aberrants], eigen(Sigma[i,,])$values[indices_non_aberrants])
   S = distances[i]
   
-  
+         
  
     cutoffCorr[i]  = qchisq(.95,df = d)*median(resultats$distances[1:i])/qchisq(.5,df = d)
     if (distances[i] > cutoffCorr[i]) {outliers_labels[i] = 1}
@@ -55,9 +55,12 @@ for (i in (1:nrow(Z))){
 return(outliers_labels)
 }
 
-outlier_label = reduce_dimension(resultats$Sigma[nrow(Z),,])
+outlier_label = reduce_dimension(resultats$Sigma)
 
-table(outlier_label,data$labelsVrais)
+table(data$labelsVrais,outlier_label)
+
+
+table(data$labelsVrais,resultats$outlier_labels)
 
 # Configuration de la zone de graphique
 par(mfrow = c(2, 5))

@@ -258,6 +258,9 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
           distances = resultats$distances
           outliers_labels = resultats$outlier_labels
           
+          print(paste0("méthode ",m))
+          outliers_labels = reduce_dimension(SigmaIter)
+          
           
         }
         
@@ -279,6 +282,8 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
           SigmaIter = resultats$Sigma
           outliers_labels = resultats$outlier_labels
           distances = resultats$distances
+          outliers_labels = reduce_dimension(SigmaIter)
+              
         }    
         # }
         # tc <- table(data$labelsVrais[1:nrow(Z)], as.numeric(outliers_labels))
@@ -307,6 +312,9 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         
         faux_positifsRec[,k,l,j] = cumsum(outliers_labels == 1 & data$labelsVrais == 0)
         faux_negatifsRec[,k,l,j] = cumsum(outliers_labels == 0 & data$labelsVrais == 1)
+        print(paste0("méthode ",m))
+        print(paste0("faux négatifs ", faux_negatifsRec[nrow(Z),k,l,j]))
+        print(paste0("faux positifs ", faux_positifsRec[nrow(Z),k,l,j]))
         temps_calcul[k,l,j] = temps["elapsed"] 
         cat("k =", k, "l =", l, "j =", j, 
             "-- temps_calcul =", temps_calcul[k, l, j], "secondes\n")  
@@ -330,14 +338,7 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
         outliersLabelsRec[,k,l,j] = outliers_labels
         #taux_OutliersDetectesVraisRec[,k,l,j] = cumulativeOutlierDetection(resultats,data,pourcentage = r,"Shifted Gaussian Contamination scenario")$taux_outliers_detectes_vrais 
       }
-      if ((m %in% c("streaming")) & (reduction_dim == TRUE))
-      {
-        outliers_labels = reduce_dimension(Sigma)
-        outliersLabelsRec[,k,l,j] = outliers_labels
-        faux_positifsRec[,k,l,j] = cumsum(outliers_labels == 1 & data$labelsVrais == 0)
-        faux_negatifsRec[,k,l,j] = cumsum(outliers_labels == 0 & data$labelsVrais == 1)
-        
-      }
+      
       #print(fp[compt])
       #correction = qchisq(.5,df = d)/(median(sqrt(distances)))^2
       
