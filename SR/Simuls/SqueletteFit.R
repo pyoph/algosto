@@ -1,6 +1,9 @@
 simDir <- 'DataSim/'
 resDir <- 'FitSim/'
 
+
+
+
 d <- 10
 rList <- 5*(0:10)
 load(paste0('SimParmsGrid-d', d, '.Rdata'))

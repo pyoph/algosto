@@ -6,7 +6,7 @@ cluster = FALSE
 sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
 SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.8^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
 
-data <- genererEchantillon(n,d,mu1,mu2 = 30*rep(1/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 0.1*SigmaContamin,contamin,cluster)
+data <- genererEchantillon(n,d,mu1,mu2 = 20*rep((-1)^(1:d)/sqrt(d), d),p1 = 1- r/100,r/100,Sigma1,Sigma2 = 0.1*SigmaContamin,contamin,cluster)
 
 Z = data$Z
 

@@ -23,7 +23,7 @@
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 #Génération d'un échantillon de n vecteurs de taille d selon différents modes de contamination
 
-genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne",deltacarre = 1.2, k = 5,rhomult = 0.9, kmu = 2.5,cluster = FALSE,nclust = d,rho = 0.6,cutoff = qchisq(0.95, df = d)) {
+genererEchantillon <- function(n, d, mu1, mu2, p1, p2, Sigma1, Sigma2, contamin = "moyenne_variance",deltacarre = 1.2, k = 5,rhomult = 0.9, kmu = 2.5,cluster = FALSE,nclust = d,rho = 0.6,cutoff = qchisq(0.95, df = d)) {
   # InitialSisation
   n1 <- floor(p1 * n)  # Taille du groupe non contaminé
   n2 <- n - n1         # Taille du groupe contaminé
