@@ -33,7 +33,7 @@ parms0 <- list(mu=mu0, Sigma=Sigma0)
 
 # Contamination
 m1 <- (-1)^(1:d)/sqrt(d)
-KL(parms1=parms0, parms2=ParmsF1(m1, 1, 1, 0.5))
+#KL(parms1=parms0, parms2=ParmsF1(m1, 1, 1, 0.5))
 
 # Setting simulation parms
 k1grid <- c(0, 2^seq(-4, 5, by=.001)); # k1val <- c(0, 2, 5, 10)
@@ -53,7 +53,7 @@ rho1grid <- seq(0.005, 0.995, by=0.005); #= rho1val <- c(0, .3, .6, 0.8, .95)
 KLrho1 <- sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))})
 rho1val <- rho1grid[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
 rho1val
-
+setwd("C:/Users/Paul/Documents/Simus/ParamsSim")
 # Export
 save(d, KLval, 
      mu0, sigmaSq0, Sigma0, rho0, 

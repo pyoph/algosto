@@ -320,12 +320,17 @@ calcule_tout = function(cutoff = qchisq(.95,df = d),contamin = "moyenne",nbrows 
             "-- temps_calcul =", temps_calcul[k, l, j], "secondes\n")  
         print(paste0("k = ",k))
         print(paste0("l = ",l))
-        tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers_labels)[1:(nrow(Z))])
-        if ("0" %in% rownames(tc)){
-          if((tc["0","0"] + tc["0","1"]) != 0)
-          {fp  <-(tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100
-          print(paste0("FP ",fp))}
-        }
+        # tc <- table(data$labelsVrais[1:(nrow(Z))], as.numeric(outliers_labels)[1:(nrow(Z))])
+        # if ("0" %in% rownames(tc)){
+        #   if((tc["0","0"] + tc["0","1"]) != 0)
+        #   {fp  <-(tc["0", "1"]/(tc["0", "1"] + tc["0", "0"]))*100
+        #   print(paste0("FP ",fp))}
+        # }
+        # if ("1" %in% rownames(tc)){
+        #   if((tc["1","0"] + tc["1","1"]) != 0)
+        #   {fn  <-(tc["1", "0"]/(tc["1", "1"] + tc["1", "0"]))*100
+        #   print(paste0("FN ",fn))}
+        # }
         
       #  print(paste0("FP ",faux_positifsRec[1e4,k,l,j]))    
         if (length(unique(data$labelsVrais)) == 2) {

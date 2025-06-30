@@ -1218,16 +1218,57 @@ SampleCovOnline = function(Z)
     meanOld = mean
     meanIter[i,] = mean
     SigmaIter[i,,] = Sigma
+      
+    }
     
     
-    
-  }
+  
   SigmaIter[nrow(Z),,] = Sigma
   meanIter[nrow(Z),] = mean
-  return(list(mean = mean, Sigma = Sigma, meanIter = meanIter, SigmaIter = SigmaIter))
+  
+  distances = rep(0, nrow(Z))
+  outliers_labels = rep(0,nrow(Z))
+  cutoff = qchisq(.95,df = ncol(Z))
+  for (i in (1:nrow(Z))){
+    distances[i] = mahalanobis_generalizedRcpp(Z[i,],meanIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
+    S = distances[i]
+    
+    if (S > cutoff) {outliers_labels[i] = 1}
+  }
+  
+  return(list(mean = mean, Sigma = Sigma, meanIter = meanIter, SigmaIter = SigmaIter,distances = distances, outliers_labels = outliers_labels))
 }
 
-
+#Exclusion des valeurs propres trop grandes
+reduce_dimension = function(Sigma){
+  
+  #Exclusion des valeurs aberrantes pour l'estimation des valeurs propres 
+  
+  distances = rep(0, nrow(Z))
+  outliers_labels = rep(0,nrow(Z))
+  cutoffCorr = rep(0,nrow(Z))
+  
+  for (i in (1:nrow(Z))){
+    
+    
+    lambda = eigen(Sigma[i,,])$values
+    Q <- quantile(lambda, probs = c(0.1, 0.9))
+    IQR <- Q[2] - Q[1]
+    limites <- c(Q[1] - 1.5 * IQR, Q[2] + 1.5 * IQR)
+    indices_non_aberrants <- which(lambda >= max(limites[1],0) & lambda <= limites[2])
+    lambda_filtre <- lambda[lambda >= max(limites[1],0) & lambda <= limites[2]]
+    #print(paste0("indices non aberrants ", indices_non_aberrants))
+    #print(paste0("lambda_filtre ",lambda_filtre))
+    distances[i] = mahalanobis_generalizedRcpp(Z[i,indices_non_aberrants],resultats$miter[i,indices_non_aberrants],eigen(Sigma[i,,])$vectors[indices_non_aberrants,indices_non_aberrants], eigen(Sigma[i,,])$values[indices_non_aberrants])
+    S = distances[i]
+    
+    
+    
+    cutoffCorr[i]  = qchisq(.95,df = d)*median(resultats$distances[1:i])/qchisq(.5,df = d)
+    if (distances[i] > cutoffCorr[i]) {outliers_labels[i] = 1}
+  }
+  return(outliers_labels)
+}
 #Shrinkage pour la médiane géométrique 
 
 shrinkage_med <- function(Y,muVrai = mu1)

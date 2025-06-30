@@ -7,22 +7,23 @@ resDir <- 'FitSim/'
 d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
-rList <- 5*(0:10)
-simNb <- 1
+simNb <- 2
 n <- 1e4
 
 # Fit (k for mu1) Other parameters are fixed
 for(r in rList){for(k in kList){
   for(sim in 1:simNb){
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0, '-sim', sim)
-    setwd("C:/Users/Paul GUILLOT/Documents/Simus/DataSim")
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0, '-sim', sim,".RData")
+    setwd("C:/Users/Paul/Documents/Simus/DataSim")
     load(file = dataFile)
+    fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-sim', sim,".RData")
     if(!file.exists(fitFile)){
-      fitNaif <- SampleCovOnline(data$Z)
-      fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)
-      fitUSStreaming = StreamingOutlierDetection(data$Z,batch = ncol(Z))
-      setwd("C:/Users/Paul GUILLOT/Documents/Simus/Fitsim")
-      save(fitNaif, fitUsOnline, fitUSStreaming,file=fitFile)
+      temps_naif = system.time(
+      {fitNaif <- SampleCovOnline(data$Z)})
+      temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
+      temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
+      setwd("C:/Users/Paul/Documents/Simus/Fitsim")
+      save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
 }}
@@ -31,16 +32,17 @@ for(r in rList){for(k in kList){
 # Fit (l for Sigma1) Other parameters are fixed
 for(r in rList){for(l in lList){
   for(sim in 1:simNb){
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0, '-sim', sim)
-    fitFile <- paste0('FitParms-d', d, '-n', n,  '-k', k, '-l', 1, '-rho', rho0, '-sim', sim)
-    setwd("C:/Users/Paul GUILLOT/Documents/Simus/DataSim")
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0, '-sim', sim,".RData")
+    setwd("C:/Users/Paul/Documents/Simus/DataSim")
     load(file = dataFile)
+    fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-sim', sim,".RData")
     if(!file.exists(fitFile)){
-      fitNaif <- SampleCovOnline(dataFile$Z)
-      fitUsOnline <- StreamingOutlierDetection(dataFile$Z,batch = 1)
-      fitUSStreaming = StreamingOutlierDetection(dataFile$Z,batch = ncol(Z))
-      setwd("C:/Users/Paul GUILLOT/Documents/Simus/Fitsim")
-      save(fitNaif, fitUsOnline, fitUSStreaming,file=fitFile)
+      temps_naif = system.time(
+        {fitNaif <- SampleCovOnline(data$Z)})
+      temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
+      temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
+      setwd("C:/Users/Paul/Documents/Simus/Fitsim")
+      save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
 }}
@@ -49,19 +51,21 @@ for(r in rList){for(l in lList){
 # Fit (rho for Sigma1) Other parameters are fixed
 for(r in rList){for(rho in rho1List){
   for(sim in 1:simNb){
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho, '-sim', sim,".RData")
-    fitFile <- paste0('FitParms-d', d, '-n', n,  '-k', k, '-l', 1, '-rho', rho, '-sim', sim)
-    setwd("C:/Users/Paul GUILLOT/Documents/Simus/DataSim")
-    load(dataFile)
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0, '-sim', sim,".RData")
+    setwd("C:/Users/Paul/Documents/Simus/DataSim")
+    load(file = dataFile)
+    fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-sim', sim,".RData")
     if(!file.exists(fitFile)){
-      fitNaif <- SampleCovOnline(data$Z)
-      fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)
-      fitUSStreaming = StreamingOutlierDetection(data$Z,batch = ncol(Z))
-      setwd("C:/Users/Paul GUILLOT/Documents/Simus/Fitsim")
-      save(fitNaif, fitUsOnline, fitUSStreaming,file=fitFile)
+      temps_naif = system.time(
+        {fitNaif <- SampleCovOnline(data$Z)})
+      temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
+      temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
+      setwd("C:/Users/Paul/Documents/Simus/Fitsim")
+      save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
-}}
+  }
+}
 
 
 
