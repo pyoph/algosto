@@ -75,7 +75,7 @@ parms0 <- list(mu=mu0, Sigma=Sigma0)
 m1 <- rep(1/sqrt(d), d)
 KL(parms1=parms0, parms2=ParmsF1(m1, 30, 0.01, 0.8))
 
-par(mfrow=c(3, 2)); KLval <- c(1, 10, 100)
+par(mfrow=c(3, 2)); KLval <- c(0, 1, 10, 100)
 k1grid <- 2^seq(-4, 5, by=.1); k1val <- c(0, 2, 5, 10)
 plot(k1grid, sapply(k1grid, function(k1){KL(parms0, ParmsF1(m1, k1, 1, rho0))}), log='xy')
 abline(h=KLval); abline(v=k1val)
