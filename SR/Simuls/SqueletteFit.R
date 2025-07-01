@@ -1,4 +1,4 @@
-simDir <- 'DataSim/'
+simDir <- "C:/Users/Paul/Documents/Simus/DataSim"
 resDir <- 'FitSim/'
 
 

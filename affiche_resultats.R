@@ -53,14 +53,10 @@ p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20)
 
 p1 = afficherContaminationScenarios(2,1,0.6,"Near scenario",20)
 
-p2 = afficherContaminationScenarios(30,0.01,0.8,"Far scenario",20)
-
+p2 = afficherContaminationScenarios(0,1,0.995,"moyenne_variance",20)
 
 # Créer une disposition 2x2 avec les 3 plots et un espace vide
 
-library(cowplot)
-library(cowplot)
-library(ggplot2)
 library(cowplot)
 library(ggplot2)
 
