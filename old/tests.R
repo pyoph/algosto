@@ -7,7 +7,7 @@ load("C:/Users/Paul GUILLOT/Documents/Simus/DataSim/")
 sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
 SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(0.3^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
 
-data <- genererEchantillon(n,d,mu1 = mu0,mu2 = mu0 ,p1 = 1- r/100,r/100,Sigma1,Sigma2 = 32*SigmaContamin,contamin,cluster)
+data <- genererEchantillon(n,d,mu1 = mu0,mu2 = mu0 ,p1 = 1- r/100,Sigma1,Sigma2 = 32*SigmaContamin,contamin,cluster)
 
 Z = data$Z
 
