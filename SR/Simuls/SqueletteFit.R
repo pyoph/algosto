@@ -1,5 +1,5 @@
 simDir <- "C:/Users/Paul/Documents/Simus/DataSim"
-resDir <- 'FitSim/'
+resDir <- 'C:/Users/Paul/Documents/Simus/FitSim/'
 
 
 
@@ -17,7 +17,7 @@ for(r in rList){for(k in kList){
     rho0 = 0.3
     rho1 = 0.3
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
-    setwd("C:/Users/Paul/Documents/Simus/DataSim")
+    setwd(simDir)
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
@@ -25,7 +25,7 @@ for(r in rList){for(k in kList){
       {fitNaif <- SampleCovOnline(data$Z)})
       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
-      setwd("C:/Users/Paul/Documents/Simus/Fitsim")
+      setwd(resDir)
       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
@@ -38,7 +38,7 @@ rho1 = 0.3
 for(r in rList){for(l in lList){
   for(sim in 1:simNb){
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
-    setwd("C:/Users/Paul/Documents/Simus/DataSim")
+    setwd(simDir)
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
@@ -46,7 +46,7 @@ for(r in rList){for(l in lList){
         {fitNaif <- SampleCovOnline(data$Z)})
       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
-      setwd("C:/Users/Paul/Documents/Simus/Fitsim")
+      setwd(resDir)
       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
@@ -60,7 +60,7 @@ for(r in rList){for(rho in rho1List){
   for(sim in 1:simNb){
     
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho,'-r',r , '-sim', sim,".RData")
-    setwd("C:/Users/Paul/Documents/Simus/DataSim")
+    setwd(simDir)
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
@@ -68,7 +68,7 @@ for(r in rList){for(rho in rho1List){
         {fitNaif <- SampleCovOnline(data$Z)})
       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
-      setwd("C:/Users/Paul/Documents/Simus/Fitsim")
+      setwd(resDir)
       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
@@ -82,7 +82,7 @@ for(r in rList){{
   for(sim in 1:simNb){
     
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho,'-r',r , '-sim', sim,".RData")
-    setwd("C:/Users/Paul/Documents/Simus/DataSim")
+    setwd(simDir)
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
@@ -90,15 +90,18 @@ for(r in rList){{
         {fitNaif <- SampleCovOnline(data$Z)})
       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
-      setwd("C:/Users/Paul/Documents/Simus/Fitsim")
+      setwd(resDir)
       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
 }
 }
 
+
+#Fit k and l varying rho fixed 
+rho1 = 0.3
 # Fit (all parms)
-for(r in rList){for(k in kList){for(l in lList){for(rho1 in rho1List){
+for(r in rList){for(k in kList){for(l in lList){
   for(sim in 1:simNb){
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
     setwd("C:/Users/Paul/Documents/Simus/DataSim")
@@ -113,5 +116,5 @@ for(r in rList){for(k in kList){for(l in lList){for(rho1 in rho1List){
       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
   }
-}}}}
-
+}
+}}S

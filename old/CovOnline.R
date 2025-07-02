@@ -3,7 +3,7 @@ SampleCovOnline = function(Z)
   nblignes = nrow(Z)
   
   mean = 1.5*rnorm(ncol(Z))
-  Sigma = matrix(0,ncol(Z),ncol(Z))
+  Sigma = diag(ncol(Z))
   
   meanIter =   matrix(0,nrow(Z),ncol(Z))
   SigmaIter = array(0, dim = c(nrow(Z),ncol(Z),ncol(Z)))
