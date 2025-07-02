@@ -3,13 +3,6 @@ resDir <- 'C:/Users/Paul/Documents/Simus/FitSim/'
 
 
 
-
-d <- 10
-rList <- 5*(0:10)
-#load(paste0('SimParmsGrid-d', d, '.Rdata'))
-simNb <- 1
-n <- 1e4
-
 # Fit (k for mu1) Other parameters are fixed
 for(r in rList){for(k in kList){
   for(sim in 1:simNb){
