@@ -45,21 +45,31 @@ for(r in rList){for(k in kList){
   }
 }}
 # Fit (l for Sigma1) Other parameters are fixed
-
+simNb = 1
 k = 0
 rho0 = 0.3
 rho1 = 0.3
-for(r in rList){for(l in lList){
-  for(sim in 1:simNb){
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
+for(r in rList){
+  print(paste0("r =",r))
+  r = 40
+  for(l in lList[5:length(lList)]){
+  print(paste0("l = ",l))
+    for(sim in 1:simNb){
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho1,'-r',r , '-sim', sim,".RData")
     setwd(simDir)
     load(file = dataFile)
+    print(paste0("nb outliers = ",sum(data$labelsVrais == 1)))
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
       temps_naif = system.time(
         {fitNaif <- SampleCovOnline(data$Z)})
+      print(paste0("erreur CovNaif ", norm(fitNaif$Sigma - Sigma0,"F")))
       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
+      print(paste0("erreur Online Us ", norm(fitUsOnline$Sigma[n,,] - Sigma0,"F")))
+      
       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
+      print(paste0("erreur Streaming Us ", norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F")))
+      
       setwd(resDir)
       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}

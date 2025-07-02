@@ -10,7 +10,8 @@ paramDir = "C:/Users/Paul GUILLOT/Documents/Simus/ParamsSim"
 rm(list=ls())
 
 ###########################################################################
-##########Output A file for paramaters in d = 10 and in d = 100############
+##########Output A file for paramaters in d = 10 and in d = 100 such 
+################
 ###########################################################################
 
 
