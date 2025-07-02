@@ -203,12 +203,12 @@ for (i in seq_along(rList) ){
 plot(rList, erreursSigma[,1,1], type = "l", col = "blue", lwd = 2,
      xlab = "r", ylab = "Sigma estimation error",
      ylim = range(erreursSigma[,,1], na.rm = TRUE),
-     main = "Sigma estimation error for different KL (rho varying streaming)")
+     main = "Sigma estimation error for different KL (l varying streaming)")
 
 # Ajouter les autres courbes
-lines(rList, erreursSigma[,2,3], col = "red", lwd = 2)
-lines(rList, erreursSigma[,3,3], col = "green", lwd = 2)
-lines(rList, erreursSigma[,4,3], col = "purple", lwd = 2)
+lines(rList, erreursSigma[,2,2], col = "red", lwd = 2)
+lines(rList, erreursSigma[,3,2], col = "green", lwd = 2)
+lines(rList, erreursSigma[,4,2], col = "purple", lwd = 2)
 
 # Ajouter une légende
 legend("topright", legend = c("KL = 0", "KL = 1", "KL = 10", "KL = 100"),

@@ -8,8 +8,8 @@
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir <- "C:/Users/Paul GUILLOT/Documents/Simus/DataSim"
-resDir <- 'C:/Users/Paul GUILLOT/Documents/Simus/FitSim/'
+simDir <- "C:/Users/Paul/Documents/Simus/DataSim"
+resDir <- 'C:/Users/Paul/Documents/Simus/FitSim/'
 
 ###################################################################
 #################Packages nécessaires##############################
@@ -17,7 +17,9 @@ resDir <- 'C:/Users/Paul GUILLOT/Documents/Simus/FitSim/'
 library(Rcpp)
 library(RMM)
 library(Gmedian)
-
+############################
+#############FIchiers nécessaires
+#################################
 source("~/algosto/algorithmes.R")
 
 sourceCpp("~/algosto/src/CodesRCpp.cpp")
@@ -28,7 +30,8 @@ l = 1
 rho1 = 0.3
 
 # Fit (k for mu1) Other parameters are fixed
-for(r in rList){for(k in kList){
+for(r in rList){
+for(k in kList){
   for(sim in 1:simNb){
       dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
     setwd(simDir)
@@ -37,8 +40,12 @@ for(r in rList){for(k in kList){
     if(!file.exists(fitFile)){
       temps_naif = system.time(
         {fitNaif <- SampleCovOnline(data$Z)})
+      print(paste0("erreur CovNaif ", norm(fitNaif$Sigma - Sigma0,"F")))
+      
       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
+      print(paste0("erreur Streaming Us ", norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F")))
+      
       setwd(resDir)
       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
     }else{load(fitFile)}
@@ -55,10 +62,9 @@ for(r in rList){
   for(l in lList[5:length(lList)]){
   print(paste0("l = ",l))
     for(sim in 1:simNb){
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho1,'-r',r , '-sim', sim,".RData")
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
     setwd(simDir)
     load(file = dataFile)
-    print(paste0("nb outliers = ",sum(data$labelsVrais == 1)))
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
       temps_naif = system.time(

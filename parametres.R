@@ -4,7 +4,7 @@
 
 
 ###Saving of simulation parameters
-paramDir = "C:/Users/Paul GUILLOT/Documents/Simus/ParamsSim"
+paramDir = "C:/Users/Paul/Documents/Simus/ParamsSim"
 
 
 rm(list=ls())
@@ -22,7 +22,7 @@ rm(list=ls())
 #d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
-simNb <- 100
+simNb <- 1
 n <- 1e4
 #############################################################
 
@@ -110,7 +110,7 @@ save(d, KLval,
 
 
 # Saving of parameter files
-for(r in rList){for(k in kList){for(l in lList){for(rho1 in rho1List){
+for(r in rList){for(k in k1val){for(l in l1val){for(rho1 in rho1val){
   for(sim in 1:simNb){
     set.seed(sim)
     setwd(paramDir)

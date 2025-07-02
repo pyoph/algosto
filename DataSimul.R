@@ -8,8 +8,8 @@ library(MASS)
 #######################################################
 #Directories paths à adapter selon votre configuration
 #########################################################
-paramDir = "C:/Users/Paul GUILLOT/Documents/Simus/ParamsSim"
-dataDir =  "C:/Users/Paul GUILLOT/Documents/Simus/DataSim"
+paramDir = "C:/Users/Paul/Documents/Simus/ParamsSim"
+dataDir =  "C:/Users/Paul/Documents/Simus/DataSim"
 
 
 ########################################################
@@ -73,7 +73,10 @@ simNb = 1
 
 
 # Simulation of datas
-for(r in rList){for(k in kList){for(l in lList){for(rho1 in rho1List){
+for(r in rList){
+  #print(paste0("r =",r))
+  
+  for(k in kList){for(l in lList){for(rho1 in rho1List){
   for(sim in 1:simNb){
     set.seed(sim)
     
@@ -85,7 +88,7 @@ for(r in rList){for(k in kList){for(l in lList){for(rho1 in rho1List){
     sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
     SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
     dataFile <- paste0('SimData-d', d, '-n', n,  '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-    
+    #print(paste0("nb outliers ",sum(data$labelsVrais == 1)))
     if(!file.exists(dataFile)){data = genererEchantillon(n,d,mu1 = mu0, mu2 = k*m1,Sigma1 = Sigma0,Sigma2 = l*SigmaContamin,r)
     }
     else {load(dataFile)}  
