@@ -44,11 +44,11 @@ for(r in rList){for(k in kList){
     }else{load(fitFile)}
   }
 }}
+# Fit (l for Sigma1) Other parameters are fixed
 
 k = 0
 rho0 = 0.3
 rho1 = 0.3
-# Fit (l for Sigma1) Other parameters are fixed
 for(r in rList){for(l in lList){
   for(sim in 1:simNb){
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
