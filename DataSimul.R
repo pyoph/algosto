@@ -8,14 +8,14 @@ library(MASS)
 #######################################################
 #Directories paths à adapter selon votre configuration
 #########################################################
-paramDir = "C:/Users/Paul/Documents/Simus/ParamsSim"
-dataDir =  "C:/Users/Paul/Documents/Simus/DataSim"
+paramDir = "D:/Simus/ParamsSim"
+dataDir =  "D:/Simus/DataSim"
 
 
 ########################################################
 #Loading of the parameters
 #######################################################
-load(paste0('SimParmsGrid-d', d, '.Rdata'))
+load(paste0('SimParmsGrid-n',n,-d', d, '.Rdata'))
 
 
 

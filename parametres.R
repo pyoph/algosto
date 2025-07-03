@@ -4,7 +4,7 @@
 
 
 ###Saving of simulation parameters
-paramDir = "C:/Users/Paul/Documents/Simus/ParamsSim"
+paramDir = "D:/Simus/ParamsSim"
 
 
 rm(list=ls())
