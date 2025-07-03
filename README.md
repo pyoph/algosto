@@ -13,7 +13,7 @@ Le projet s'articule autour de quatre scripts principaux :
 - **Rôle** : Génère les fichiers de paramètres pour les différents scénarios de simulation.
 - **Entrée** : Aucune.
 - **Sortie** :
-  - `SimParmsGrid-n10000-d10.Rdata` : Grille de paramètres pour \( d = 10 \).
+  - `SimParmsGrid-n10000-d10.Rdata` : Grille de paramètres pour $d = 10$.
   - Plusieurs fichiers nommés selon le format :
     ```
     Parms-d<d>-n<n>-k<k>-l<l>-rho1<rho1>-r<r>-sim<sim>.Rdata
@@ -32,7 +32,7 @@ Le projet s'articule autour de quatre scripts principaux :
 
 - **Rôle** : Lance les méthodes d'estimation et de détection d'outlier concurrentes : cov online naïf, shrinkage selon les idées de Wolf et de Cabana.
 - **Entrée** :
-  - Dataset $Z \in \mathcal{M}_{n,d}(\mathbb{R}$.
+  - Dataset $Z \in \mathcal{M}_{n,d}(\mathbb{R})$.
 - **Sortie** :
   - Estimateur de $\Sigma$ : $\widehat{\Sigma}$ final et à chaque itération pour méthodes online, outliers_labels (vecteurs où l'entrée $i$ si la donnée $i$ traitée est un outlier, $0$ sinon.
 
