@@ -6,7 +6,7 @@ Ce projet contient un pipeline de simulation en R destiné à estimer onlinede m
 
 ## Structure du projet
 
-Le projet s'articule autour de quatre scripts principaux :
+Le projet s'articule autour de cinq fichiers principaux :
 
 ### 1. `parametres.R`
 
