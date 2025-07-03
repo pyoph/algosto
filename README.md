@@ -28,6 +28,14 @@ Le projet s'articule autour de quatre scripts principaux :
 - **Sortie** :
   - Fichiers de données simulées (`dataFile`, au format `.Rdata`).
 
+### 3. `algorithmes.R`
+
+- **Rôle** : Lance les méthodes d'estimation et de détection d'outlier concurrentes : cov online naïf, shrinkage selon les idées de Wolf et de Cabana.
+- **Entrée** :
+  - Dataset $Z \in \mathcal{M}_{n,d}(\mathbb{R}$.
+- **Sortie** :
+  - Estimateur de $\Sigma$ : $\widehat{\Sigma}$ final et à chaque itération pour méthodes online, outliers_labels (vecteurs où l'entrée $i$ si la donnée $i$ traitée est un outlier, $0$ sinon.
+
 ### 3. `fitParameters.R`
 
 - **Rôle** : Ajuste les modèles aux données simulées.
