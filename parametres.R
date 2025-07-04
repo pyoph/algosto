@@ -88,7 +88,36 @@ KLrho1 <- sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))})
 rho1val <- rho1grid[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
 rho1val
 
+###############Choice of the couples such that the target is reached###########"
+KL_targets <- c(0, 1, 10, 100)
 
+# 1. Pour (k1, l1)
+kl_k_l <- expand.grid(k1 = k1grid, l1 = l1grid)
+kl_k_l$KL <- apply(kl_k_l, 1, function(row) KL(parms0, ParmsF1(m1, row["k1"], row["l1"], rho0)))
+closest_k_l <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+  row <- kl_k_l[which.min(abs(kl_k_l$KL - kl_target)), ]
+  data.frame(KL_target = kl_target, k1 = row$k1, l1 = row$l1, KL = row$KL)
+}))
+
+#Extraction du couple rho1 fixé
+
+k1l1val = c(closest_k_l[1,2],closest_k_l[1,3],rho0)
+
+# 2. Pour (k1, rho1)
+kl_k_rho <- expand.grid(k1 = k1grid, rho1 = rho1grid)
+kl_k_rho$KL <- apply(kl_k_rho, 1, function(row) KL(parms0, ParmsF1(m1, row["k1"], 1, row["rho1"])))
+closest_k_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+  row <- kl_k_rho[which.min(abs(kl_k_rho$KL - kl_target)), ]
+  data.frame(KL_target = kl_target, k1 = row$k1, rho1 = row$rho1, KL = row$KL)
+}))
+
+# 3. Pour (l1, rho1)
+kl_l_rho <- expand.grid(l1 = l1grid, rho1 = rho1grid)
+kl_l_rho$KL <- apply(kl_l_rho, 1, function(row) KL(parms0, ParmsF1(m1, 0, row["l1"], row["rho1"])))
+closest_l_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+  row <- kl_l_rho[which.min(abs(kl_l_rho$KL - kl_target)), ]
+  data.frame(KL_target = kl_target, l1 = row$l1, rho1 = row$rho1, KL = row$KL)
+}))
 
 
 #####################################################################################################################

@@ -15,7 +15,7 @@ dataDir =  "D:/Simus/DataSim"
 ########################################################
 #Loading of the parameters
 #######################################################
-load(paste0('SimParmsGrid-n',n,-d', d, '.Rdata'))
+load(paste0('SimParmsGrid-n',n,'-d', d, '.Rdata'))
 
 
 
