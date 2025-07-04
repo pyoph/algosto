@@ -99,9 +99,14 @@ closest_k_l <- do.call(rbind, lapply(KL_targets, function(kl_target) {
   data.frame(KL_target = kl_target, k1 = row$k1, l1 = row$l1, KL = row$KL)
 }))
 
-#Extraction du couple rho1 fixé
+#Extraction des couples (k,l) rho1 fixé
 
-k1l1val = c(closest_k_l[1,2],closest_k_l[1,3],rho0)
+k1l1val = matrix(0,4,3)
+
+for (i in (1:4))
+{
+k1l1val[i,] = c(closest_k_l[i,2],closest_k_l[i,3],rho0)
+}
 
 # 2. Pour (k1, rho1)
 kl_k_rho <- expand.grid(k1 = k1grid, rho1 = rho1grid)
@@ -110,6 +115,15 @@ closest_k_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
   row <- kl_k_rho[which.min(abs(kl_k_rho$KL - kl_target)), ]
   data.frame(KL_target = kl_target, k1 = row$k1, rho1 = row$rho1, KL = row$KL)
 }))
+
+#Extraction des couples k rho l fixé
+
+k1rho1val = matrix(0,4,3)
+
+for (i in (1:4))
+{
+k1rho1val[i,] = c(closest_k_rho[i,2],1,closest_k_rho[i,3])
+}
 
 # 3. Pour (l1, rho1)
 kl_l_rho <- expand.grid(l1 = l1grid, rho1 = rho1grid)
@@ -120,15 +134,57 @@ closest_l_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
 }))
 
 
+#Extraction des couples (l,rho) k fixé
+
+
+l1rho1val = matrix(0,4,3)
+
+
+for (i in (1:4))
+{
+  l1rho1val[i,] = c(0,closest_l_rho[i,2],closest_l_rho[i,3])
+}
+
+
+KL_targets <- c(0, 1, 10, 100)
+
+# Générer la grille complète de combinaisons (attention : peut être longue)
+kl_k_l_rho <- expand.grid(k1 = k1grid, l1 = l1grid, rho1 = rho1grid)
+
+# Calculer KL pour chaque triplet
+kl_k_l_rho$KL <- apply(kl_k_l_rho, 1, function(row) {
+  KL(parms0, ParmsF1(m1, row["k1"], row["l1"], row["rho1"]))
+})
+
+# Pour chaque valeur cible de KL, trouver le triplet (k1, l1, rho1) le plus proche
+closest_k_l_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+  row <- kl_k_l_rho[which.min(abs(kl_k_l_rho$KL - kl_target)), ]
+  data.frame(KL_target = kl_target,
+             k1 = row$k1,
+             l1 = row$l1,
+             rho1 = row$rho1,
+             KL = row$KL)
+}))
+
+# Afficher les triplets qui conviennent
+print(closest_k_l_rho)
+
+k_l_rhoval = matrix(0,4,3)
+
+for (i in (1:4))
+{
+  k_l_rhoval[i,] = c(closest_k_l_rho[i,2],closest_k_l_rho[i,3],closest_k_l_rho[i,4] )
+}
+
+
 #####################################################################################################################
 ################################# Export of the parameter file one for d = 10 and one for d=100######################
 #####################################################################################################################
 save(d, KLval, 
      mu0, sigmaSq0, Sigma0, rho0, 
      m1, 
-     k1val, l1val, rho1val, n,d,rList,
+     k1val, l1val, rho1val,n,d,rList,
      file=paste0('SimParmsGrid-n', n,'-d',d, '.Rdata'))
-
 
 
 
