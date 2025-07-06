@@ -3,13 +3,13 @@
 ################
 
 library(MASS)
-
+library(ggplot2)
 
 #######################################################
 #Directories paths à adapter selon votre configuration
 #########################################################
-paramDir = "D:/Simus/ParamsSim"
-dataDir =  "D:/Simus/DataSim"
+paramDir = "C:/Users/Paul/Documents/Simus/ParamsSim"
+dataDir =  "C:/Users/Paul/Documents/Simus/DataSim"
 
 
 ########################################################
@@ -69,7 +69,7 @@ genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
 }
 
 
-simNb = 1
+simNb = 10
 
 
 # Simulation of datas
@@ -88,13 +88,67 @@ for(r in rList){
     sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
     SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
     dataFile <- paste0('SimData-d', d, '-n', n,  '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-    #print(paste0("nb outliers ",sum(data$labelsVrais == 1)))
-    if(!file.exists(dataFile)){data = genererEchantillon(n,d,mu1 = mu0, mu2 = k*m1,Sigma1 = Sigma0,Sigma2 = l*SigmaContamin,r)
-    }
-    else {load(dataFile)}  
+    print(paste0("nb outliers ",sum(data$labelsVrais == 1)))
+    if(!file.exists(dataFile)){
+      data = genererEchantillon(n,d,mu1 = mu0, mu2 = k*m1,Sigma1 = Sigma0,Sigma2 = l*SigmaContamin,r)
+      save(data, file=dataFile)
+      print(paste0("n-",n,"d-",d,"k-",k,"l-",l,"r-",r," save ok"))
+      #print("save OK")
+      }
+    else {print(paste0("n-",n,"d-",d,"k-",k,"l-",l,"r-",r," file exists"))
+      load(dataFile)}  
     # data <- Simul(d=d, r=r, k=k, rho1=rho1)
-    save(data, file=dataFile)
+    
   }
+    
+    
 }}}}
 
 
+# 
+# ##################################################
+# #Plots
+# #################################################
+# 
+# 
+# 
+# 
+# afficherContaminationScenarios = function(k,l,rho,contamination,rate){
+#   
+#   m1 <- (-1)^(1:d)/sqrt(d)
+#   sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
+#   SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+#   
+#   data = genererEchantillon(n,d,mu1 = mu0, mu2 = k*m1,Sigma1 = Sigma0,Sigma2 = l*SigmaContamin,r)
+#   
+#   Z = data$Z
+#   # Création d'un dataframe pour ggplot
+#   df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+#                    Label = factor(data$labelsVrais, levels = c(0, 1)))
+#   #Création du plot
+#   # Create the plot (English version)
+#   p <- ggplot(df, aes(x = X1, y = X2, color = Label, alpha = Label)) +
+#     geom_point(size = 3) +
+#     scale_color_manual(
+#       values = c("0" = "blue", "1" = "red"),
+#       labels = c("Inlier", "Outlier"),
+#       name = "Status"
+#     ) +
+#     scale_alpha_manual(
+#       values = c("0" = 0.1, "1" = 1),  # 0.2 transparency for blue, 1 for red
+#       guide = "none"  # Hide alpha from legend
+#     ) +
+#     labs(
+#       title = "Contamination Scenario: Mean and Variance",
+#       subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho =", rho),
+#       x = "X1",
+#       y = "X2"
+#     ) +
+#     theme_minimal() +
+#     theme(
+#       legend.position = "bottom",
+#       plot.title = element_text(face = "bold")
+#     )
+#   return(p)
+# }
+# 
