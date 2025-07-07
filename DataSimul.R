@@ -78,10 +78,12 @@ for(r in rList){
     parmsFile <- paste0('Parms-d', d, '-n', n,  '-k', k, '-l', l, '-rho1', rho1, '-r', r,'-sim', sim,".RData")
     setwd(paramDir)
     load(parmsFile)
-    setwd(dataDir)               
-    m1 <- (-1)^(1:d)/sqrt(d)
-    sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
-    SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+    setwd(dataDir)  
+    # Utiliser parmsFile
+    # m1 <- (-1)^(1:d)/sqrt(d)
+    # sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
+    # Utiliser ParmsF1
+    # SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
     dataFile <- paste0('SimData-d', d, '-n', n,  '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     print(paste0("nb outliers ",sum(data$labelsVrais == 1)))
     if(!file.exists(dataFile)){
