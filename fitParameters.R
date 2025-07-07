@@ -2,14 +2,15 @@
 ############Fit parameters file
 ##################################################
 
-
+##########Load necessary packages##############################
+source("~/work/algosto/loadnecessary.R")
 
 ####################################################################
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir <- "C:/Users/Paul GUILLOT/Documents/Simus/DataSim"
-resDir <- "C:/Users/Paul GUILLOT/Documents/Simus/FitSim"
+simDir <- "~/work/Simus/DataSim"
+resDir <- "~/work/Simus/FitSim"
 
 ###################################################################
 #####load sim parameters
@@ -28,17 +29,19 @@ lList = l1val
 rho1List = rho1val
 
 #simNb = 5
-simNb = 10
+simNb = 100
 
 
 # Fit (k for mu1) Other parameters are fixed
 l = 1
-rho1 = 0.3
+rho1 = rho0
 for(r in rList){
 for(k in kList){
   for(sim in 1:simNb){
+    print(paste0("-n",n,"-d",d,"-k",k,"-l",l,))
       dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
-    setwd(simDir)
+   
+      setwd(simDir)
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
