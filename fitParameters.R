@@ -8,8 +8,8 @@
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir <- "C:/Users/Paul/Documents/Simus/DataSim"
-resDir <- "C:/Users/Paul/Documents/Simus/FitSim"
+simDir <- "C:/Users/Paul GUILLOT/Documents/Simus/DataSim"
+resDir <- "C:/Users/Paul GUILLOT/Documents/Simus/FitSim"
 
 ###################################################################
 #####load sim parameters
@@ -26,18 +26,8 @@ kList = k1val
 lList = l1val
 
 rho1List = rho1val
-###################################################################
-#################Packages nécessaires##############################
-##################################################################
-library(Rcpp)
-library(RMM)
-library(Gmedian)
-############################
-#############FIchiers nécessaires
-#################################
-source("~/algosto/algorithmes.R")
 
-sourceCpp("C:/Users/Paul/Documents/algosto/src/CodesRCpp.cpp")
+
 
 #simNb = 5
 simNb = 10
@@ -196,7 +186,7 @@ for(r in rList){for(k in KLval){
 #Fit k1 and l1 rho1 is fixed
 
 rho1 = 0.3
-simNb = 10
+simNb = 1
 # Fit (rho for Sigma1) Other parameters are fixed
 for(r in rList){for(i in (1:4)){ 
   

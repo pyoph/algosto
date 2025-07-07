@@ -1,15 +1,10 @@
-##############
-#Library needed
-################
 
-library(MASS)
-library(ggplot2)
 
 #######################################################
 #Directories paths à adapter selon votre configuration
 #########################################################
-paramDir = "C:/Users/Paul/Documents/Simus/ParamsSim"
-dataDir =  "C:/Users/Paul/Documents/Simus/DataSim"
+paramDir = "C:/Users/Paul GUILLOT/Documents/Simus/ParamsSim"
+dataDir =  "C:/Users/Paul GUILLOT/Documents/Simus/DataSim"
 
 
 ########################################################
@@ -69,7 +64,7 @@ genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
 }
 
 
-simNb = 10
+simNb = 1
 
 
 # Simulation of datas
