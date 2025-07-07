@@ -4,7 +4,7 @@
 #Directories paths à adapter selon votre configuration
 #########################################################
 paramDir = "~/work/Simus/ParamsSim"
-dataDir =  "~/work/Simus/DataSim"
+simDir =  "~/work/Simus/DataSim"
 
 
 ########################################################
@@ -25,46 +25,6 @@ lList = l1val
 rho1List = rho1val
 
 simNb = 100
-
-#######################################################################
-#Simulation of a dataset with different parameters####################
-######################################################################
-
-genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
-  # InitialSisation
-  n1 <- floor((1 -r/100) * n)  # Taille du groupe non contaminé
-  n2 <- n - n1         # Taille du groupe contaminé
-  
-  labels_mu1 <- rep(0, n1)  # Labels pour les vecteurs avec moyenne mu1
-  labels_mu2 <- rep(1, n2)  # Labels pour les vecteurs avec moyenne mu2
-  
-  if (r > 0) {
-    # Générer les vecteurs selon le type de contamination
-      vecteurs_mu1 <- mvrnorm(n1, mu1, Sigma1)
-      vecteurs_mu2 <- mvrnorm(n2, mu2, Sigma2)
-    
-      # Combinaison des vecteurs
-      Z <- rbind(vecteurs_mu1, vecteurs_mu2)
-      labelsVrais <- c(labels_mu1, labels_mu2)  
-    }
-    
-    
-    
-  else {
-    # Pas de contamination
-    Z <- mvrnorm(n, mu1, Sigma1)
-    labelsVrais <- rep(0, n)
-  } # Mélanger aléatoirement les données
-    set.seed(123)  # Pour garantir la reproductibilité
-    indices <- sample(nrow(Z))
-    Z <- Z[indices, ]
-    labelsVrais <- labelsVrais[indices]
-  
-  
-  return(list(Z = Z,labelsVrais = labelsVrais))
-}
-
-
 
 
 # Simulation of datas

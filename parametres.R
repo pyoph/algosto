@@ -19,7 +19,7 @@ rm(list=ls())
 #############################################################
 #####################sample size and number of runs###############
 ############################################################
-#d <- 10
+d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
 simNb <- 100
@@ -32,23 +32,23 @@ n <- 1e4
 # Dims and KL distance reached. The parameters are chosen such that the KL distance is in {0,1,10,100}
 #d <- 100; KLval <- c(0, 1, 10, 100)
 d <- 10; KLval <- c(0, 1, 10, 100)
-
-# Functions
-KL <- function(parms1, parms2){
-  invSigma2 <- solve(parms2$Sigma)
-  0.5*(log(det(parms2$Sigma)/det(parms1$Sigma)) - d + sum(diag(invSigma2%*%parms1$Sigma)) +
-         t(parms2$mu-parms1$mu)%*%invSigma2%*%(parms2$mu-parms1$mu))[1, 1]
-}
-
 # 
-# # Contamination parms: F1
-ParmsF1 <- function(m1, k1, l1, rho1){
-  d <- length(m1)
-  mu1 <- k1*m1
-  sigmaSq1 <- l1*sigmaSq0
-  Sigma1 <- diag(sqrt(sigmaSq1)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq1))
-  return(list(mu1=mu1, Sigma1=Sigma1))
-}
+# # Functions
+# KL <- function(parms1, parms2){
+#   invSigma2 <- solve(parms2$Sigma)
+#   0.5*(log(det(parms2$Sigma)/det(parms1$Sigma)) - d + sum(diag(invSigma2%*%parms1$Sigma)) +
+#          t(parms2$mu-parms1$mu)%*%invSigma2%*%(parms2$mu-parms1$mu))[1, 1]
+# }
+# 
+# # 
+# # # Contamination parms: F1
+# ParmsF1 <- function(m1, k1, l1, rho1){
+#   d <- length(m1)
+#   mu1 <- k1*m1
+#   sigmaSq1 <- l1*sigmaSq0
+#   Sigma1 <- diag(sqrt(sigmaSq1)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq1))
+#   return(list(mu1=mu1, Sigma1=Sigma1))
+# }
 
 #########################################################################################
 ######################### Null parms for non contamination : F0##########################
