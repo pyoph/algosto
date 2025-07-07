@@ -3,8 +3,8 @@
 #######################################################
 #Directories paths à adapter selon votre configuration
 #########################################################
-paramDir = "C:/Users/Paul GUILLOT/Documents/Simus/ParamsSim"
-dataDir =  "C:/Users/Paul GUILLOT/Documents/Simus/DataSim"
+paramDir = "~/work/Simus/ParamsSim"
+dataDir =  "~/work/Simus/DataSim"
 
 
 ########################################################
@@ -24,6 +24,7 @@ kList = k1val
 lList = l1val
 rho1List = rho1val
 
+simNb = 100
 
 #######################################################################
 #Simulation of a dataset with different parameters####################
@@ -64,42 +65,33 @@ genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
 }
 
 
-simNb = 1
 
 
 # Simulation of datas
+
 for(r in rList){
-  #print(paste0("r =",r))
-  
-  for(k in kList){for(l in lList){for(rho1 in rho1List){
-  for(sim in 1:simNb){
-    set.seed(sim)
-    
-    parmsFile <- paste0('Parms-d', d, '-n', n,  '-k', k, '-l', l, '-rho1', rho1, '-r', r,'-sim', sim,".RData")
-    setwd(paramDir)
-    load(parmsFile)
-    setwd(dataDir)  
-    # Utiliser parmsFile
-    # m1 <- (-1)^(1:d)/sqrt(d)
-    # sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
-    # Utiliser ParmsF1
-    # SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
-    dataFile <- paste0('SimData-d', d, '-n', n,  '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-    print(paste0("nb outliers ",sum(data$labelsVrais == 1)))
-    if(!file.exists(dataFile)){
-      data = genererEchantillon(n,d,mu1 = mu0, mu2 = k*m1,Sigma1 = Sigma0,Sigma2 = l*SigmaContamin,r)
-      save(data, file=dataFile)
-      print(paste0("n-",n,"d-",d,"k-",k,"l-",l,"r-",r," save ok"))
-      #print("save OK")
-      }
-    else {print(paste0("n-",n,"d-",d,"k-",k,"l-",l,"r-",r," file exists"))
-      load(dataFile)}  
-    # data <- Simul(d=d, r=r, k=k, rho1=rho1)
-    
-  }
-    
-    
-}}}}
+  for(k in kList){
+    for(l in lList){
+      for (rho1 in rho1List){  
+        for(sim in 1:simNb){
+          
+          setwd(simDir)
+          contParam = ParmsF1(m1, k, l, rho1)
+          dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
+          
+          
+          if(!file.exists(dataFile)){   
+            data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
+            save(data,file = dataFile)
+            print(paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData"," save OK"))
+          }
+          else(print(paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData"," File exists")))
+          print(paste0("r ",r,"number of outliers ",sum(data$labelsVrais == 1)))
+          
+          
+          
+        }}}
+  }}
 
 
 # 

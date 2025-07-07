@@ -4,7 +4,7 @@
 
 
 ###Saving of simulation parameters
-paramDir = "C:/Users/Paul GUILLOT/Documents/Simus/ParamsSim"
+paramDir = "~/work/Simus/ParamsSim"
 
 
 rm(list=ls())
@@ -22,7 +22,7 @@ rm(list=ls())
 #d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
-simNb <- 1
+simNb <- 100
 n <- 1e4
 #############################################################
 
@@ -40,8 +40,8 @@ KL <- function(parms1, parms2){
          t(parms2$mu-parms1$mu)%*%invSigma2%*%(parms2$mu-parms1$mu))[1, 1]
 }
 
-
-# Contamination parms: F1
+# 
+# # Contamination parms: F1
 ParmsF1 <- function(m1, k1, l1, rho1){
   d <- length(m1)
   mu1 <- k1*m1

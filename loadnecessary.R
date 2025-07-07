@@ -7,5 +7,5 @@ library(ggplot2)
 ############################
 #############FIchiers nécessaires
 #################################
-source("~/algosto/algorithmes.R")
-sourceCpp("~/algosto/src/CodesRCpp.cpp")
+source("~/work/algosto/algorithmes.R")
+sourceCpp("~/work/algosto/src/CodesRCpp.cpp")
