@@ -9,8 +9,8 @@ source("~/work/algosto/loadnecessary.R")
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir =  "C:/Users/Paul/Documents/Simus/DataSim"
-resDir <- "C:/Users/Paul/Documents/Simus/FitSim"
+simDir =  "C:/Users/Paul Guillot/Documents/Simus/DataSim"
+resDir <- "C:/Users/Paul Guillot/Documents/Simus/FitSim"
 
 ###################################################################
 #####load sim parameters
@@ -67,15 +67,22 @@ rho1 = rho0
 for(r in rList){
   print(paste0("r =",r))
   #r = 40
-  for(l in lList[5:length(lList)]){
+  for(l in lList[2:length(lList)]){
   print(paste0("l = ",l))
     for(sim in 1:simNb){
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
     print(paste0("sim ",sim))
     setwd(simDir)
+    if(!file.exists(dataFile)){
+      contParam = ParmsF1(m1, k, l, rho1)
+      data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
+      save(data,file = dataFile)
+      print(paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData"," save OK"))
+      }
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
+      print(paste0('-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData"))
       temps_naif = system.time(
         {fitNaif <- SampleCovOnline(data$Z)})
       print(paste0("erreur CovNaif ", norm(fitNaif$Sigma - Sigma0,"F")))

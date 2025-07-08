@@ -76,6 +76,9 @@ SampleCovOnline = function(Z)
   
   meanIter =   matrix(0,nrow(Z),ncol(Z))
   SigmaIter = array(0, dim = c(nrow(Z),ncol(Z),ncol(Z)))
+  distances = rep(0, nrow(Z))
+  outliers_labels = rep(0,nrow(Z))
+  cutoff = qchisq(.95,df = ncol(Z))
   
   for (i in (1:(nblignes-1)))
   {
@@ -84,7 +87,10 @@ SampleCovOnline = function(Z)
     meanOld = mean
     meanIter[i,] = mean
     SigmaIter[i,,] = Sigma
-      
+    distances[i] = mahalanobis_generalizedRcpp(Z[i,],meanIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
+    S = distances[i]
+    
+    if (S > cutoff) {outliers_labels[i] = 1}      
     }
     
     
@@ -92,15 +98,7 @@ SampleCovOnline = function(Z)
   SigmaIter[nrow(Z),,] = Sigma
   meanIter[nrow(Z),] = mean
   
-  distances = rep(0, nrow(Z))
-  outliers_labels = rep(0,nrow(Z))
-  cutoff = qchisq(.95,df = ncol(Z))
-  for (i in (1:nrow(Z))){
-    distances[i] = mahalanobis_generalizedRcpp(Z[i,],meanIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
-    S = distances[i]
-    
-    if (S > cutoff) {outliers_labels[i] = 1}
-  }
+
   
   return(list(mean = mean, Sigma = Sigma, meanIter = meanIter, SigmaIter = SigmaIter,distances = distances, outliers_labels = outliers_labels))
 }
