@@ -3,8 +3,8 @@
 #######################################################
 #Directories paths à adapter selon votre configuration
 #########################################################
-paramDir = "~/work/Simus/ParamsSim"
-simDir =  "~/work/Simus/DataSim"
+paramDir = "C:/Users/Paul/Documents/Simus/ParamsSim/ParamsSim"
+simDir =  "C:/Users/Paul/Documents/Simus/DataSim"
 
 
 ########################################################
