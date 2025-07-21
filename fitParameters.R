@@ -9,14 +9,14 @@ source("~/work/algosto/loadnecessary.R")
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir =  "C:/Users/Paul Guillot/Documents/Simus/DataSim"
-resDir <- "C:/Users/Paul Guillot/Documents/Simus/FitSim"
-
+simDir =  "C:/Users/Paul/Documents/Simus/DataSim"
+#resDir <- "C:/Users/Paul/Documents/Simus/FitSim"
+resDir = "D:/Simus/FitSim/klvaryingrhofixed"
 ###################################################################
 #####load sim parameters
 ###################################################################
 
-load("SimParmsGrid-n10000-d10.Rdata")
+load("SimParmsGrid-n10000-d100.Rdata")
 
 ##########################################
 ###Extraction of the parameters
@@ -36,10 +36,10 @@ simNb = 100
 l = 1
 rho1 = rho0
 for(r in rList){
-for(k in kList){
+for(k in kList[2:length(kList)]){
   for(sim in 1:simNb){
     # print(paste0("-n",n,"-d",d,"-k",k,"-l",l,))
-      dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
+      dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho0,'-r',r , '-sim', sim,".RData")
    
       setwd(simDir)
     load(file = dataFile)
@@ -71,7 +71,7 @@ for(r in rList){
   print(paste0("l = ",l))
     for(sim in 1:simNb){
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
-    print(paste0("sim ",sim))
+    paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim)
     setwd(simDir)
     if(!file.exists(dataFile)){
       contParam = ParmsF1(m1, k, l, rho1)
@@ -132,14 +132,24 @@ for(r in rList){
 # Fit (rho for Sigma1) Other parameters are fixed
 k = 0
 l = 1
-for(r in rList){for(rho in rho1List){
+for(r in rList){for(rho1 in rho1List[2:length(rho1List)]){
   for(sim in 1:simNb){
     
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho,'-r',r , '-sim', sim,".RData")
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
     setwd(simDir)
-    print(paste0("k-",k,"-l",l,"-rho",rho,"-r",r,"-sim",sim))
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
+    paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim)
+    
+    if(!file.exists(dataFile)){
+      contParam = ParmsF1(m1, k, l, rho1)
+      data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
+      save(data,file = dataFile)
+      print(paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho1,'-r',r , '-sim', sim,".RData"," save OK"))
+    }
     load(file = dataFile)
-    fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho, '-r',r,'-sim', sim,".RData")
+    print(paste0("k-",k,"-l",l,"-rho",rho1,"-r",r,"-sim",sim))
+    load(file = dataFile)
+    fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
       temps_naif = system.time(
         {fitNaif <- SampleCovOnline(data$Z)})
@@ -159,17 +169,25 @@ for(r in rList){for(rho in rho1List){
 
 #Fit k and l rho is fixed 
 
-rho = 0.3
+rho1 = rho0
 
 
 # Fit (rho for Sigma1) Other parameters are fixed
-for(r in rList){for(k in KLval){ 
-  for(l in l1val){
-   print(paste0("k = ",k,"l = ",l,"rho ",rho))
+for(r in rList){for(k in kList[2:length(kList)]){ 
+  for(l in l1val[2:length(l1val)]){
+   print(paste0("k = ",k,"l = ",l,"rho1 ",rho1))
     for(sim in 1:simNb){
         
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho,'-r',r , '-sim', sim,".RData")
+    
     setwd(simDir)
+    if(!file.exists(dataFile)){
+      contParam = ParmsF1(m1, k, l, rho1)
+      data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
+      save(data,file = dataFile)
+      print(paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData"," save OK"))
+    }
+    load(file = dataFile)
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
@@ -283,3 +301,37 @@ for(r in rList){for(k in kList){for(l in lList){
   }
 }
 }}
+
+#####Fit k, l and rho fixed 
+
+k = 0
+l=1
+#Fit k and l varying rho fixed 
+rho1 = rho0
+# Fit (all parms)
+for(r in rList){
+  for(sim in 1:simNb){
+    print(paste0("r = ",r,"k = ",k,"l = ",l,"rho = ",rho1))
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
+    setwd(simDir)
+    load(file = dataFile)
+    fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+    if(!file.exists(fitFile)){
+      temps_naif = system.time(
+        {fitNaif <- SampleCovOnline(data$Z)})
+      print(paste0("Erreur Naif = ",norm(fitNaif$Sigma - Sigma0,"F")))
+      temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
+      print(norm(fitUsOnline$Sigma[n,,] - Sigma0,"F"))
+      print(paste0("Erreur online = ",norm(fitUsOnline$Sigma[n,,] - Sigma0,"F")))
+      
+      temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
+      print(norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F"))
+      print(paste0("Erreur streaming = ",norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F")))
+      
+      setwd(resDir)
+      save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
+    }else{load(fitFile)}
+  }
+}
+
+
