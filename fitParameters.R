@@ -9,9 +9,9 @@ source("~/work/algosto/loadnecessary.R")
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir =  "C:/Users/Paul/Documents/Simus/DataSim"
+simDir =  "~/work/Simus/DataSim"
 #resDir <- "C:/Users/Paul/Documents/Simus/FitSim"
-resDir = "D:/Simus/FitSim/klvaryingrhofixed"
+resDir = "~/work/Simus/FitSim/"
 ###################################################################
 #####load sim parameters
 ###################################################################
@@ -29,7 +29,7 @@ lList = l1val
 rho1List = rho1val
 
 #simNb = 5
-simNb = 100
+simNb = 1
 
 
 # Fit (k for mu1) Other parameters are fixed
@@ -39,9 +39,18 @@ for(r in rList){
 for(k in kList[2:length(kList)]){
   for(sim in 1:simNb){
     # print(paste0("-n",n,"-d",d,"-k",k,"-l",l,))
-      dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho0,'-r',r , '-sim', sim,".RData")
+      dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
    
       setwd(simDir)
+      if(!file.exists(dataFile))
+      {
+        
+        contParam = ParmsF1(m1, k, l, rho1)
+        data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
+        save(data,file = dataFile)
+        print(paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData"," save OK"))
+        
+      }
     load(file = dataFile)
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     if(!file.exists(fitFile)){
