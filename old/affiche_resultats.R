@@ -11,13 +11,11 @@ library(patchwork)  # pour agencer les 4 graphiques
 
 
 
-afficherContaminationScenarios = function(k,l,rho,contamination,rate){
+afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
+  contParam = ParmsF1(m1, k, l, rho1)
   
-  sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
-  SigmaContamin = diag(sqrt(sigmaSq0)) %*% toeplitz(rho^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
-
-  data <- genererEchantillon(n,d,mu1,mu2 = k*rep(1/sqrt(d), d),p1 = 1- rate/100,rate/100,Sigma1,Sigma2 = l*SigmaContamin,contamin = contamination,cluster = FALSE)
-  
+    data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
+    
  Z = data$Z
  # Création d'un dataframe pour ggplot
  df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
@@ -26,6 +24,7 @@ afficherContaminationScenarios = function(k,l,rho,contamination,rate){
  # Create the plot (English version)
  p <- ggplot(df, aes(x = X1, y = X2, color = Label, alpha = Label)) +
    geom_point(size = 3) +
+   ylim(a,b) +
    scale_color_manual(
      values = c("0" = "blue", "1" = "red"),
      labels = c("Inlier", "Outlier"),
@@ -36,8 +35,8 @@ afficherContaminationScenarios = function(k,l,rho,contamination,rate){
      guide = "none"  # Hide alpha from legend
    ) +
    labs(
-     title = "Contamination Scenario: Mean and Variance",
-     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho =", rho),
+     title = "",
+     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho =", rho1),
      x = "X1",
      y = "X2"
    ) +
@@ -49,11 +48,11 @@ afficherContaminationScenarios = function(k,l,rho,contamination,rate){
   return(p)
 }
 
-p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20)
+p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-2.5,2.5)
 
-p1 = afficherContaminationScenarios(2,1,0.6,"Near scenario",20)
+p1 = afficherContaminationScenarios(0.86,0.56,0.3,"(k,l,rho1) = (0.86,0.56,0.3)",20,-2.5,2.5)
 
-p2 = afficherContaminationScenarios(0,1,0.995,"moyenne_variance",20)
+p2 = afficherContaminationScenarios(8.59,32,0.3,"(k,l,rho1) = (8.59,32,0.3)",20,-10,15)
 
 # Créer une disposition 2x2 avec les 3 plots et un espace vide
 
