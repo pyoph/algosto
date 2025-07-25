@@ -36,7 +36,7 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
    ) +
    labs(
      title = "",
-     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho =", rho1),
+     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
      x = "X1",
      y = "X2"
    ) +
@@ -48,11 +48,11 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
   return(p)
 }
 
-p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-2.5,2.5)
+p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-5,5)
 
-p1 = afficherContaminationScenarios(0.86,0.56,0.3,"(k,l,rho1) = (0.86,0.56,0.3)",20,-2.5,2.5)
+p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",20,-5,5)
 
-p2 = afficherContaminationScenarios(8.59,32,0.3,"(k,l,rho1) = (8.59,32,0.3)",20,-10,15)
+p2 = afficherContaminationScenarios(8.59,32,0.975,"(k,l,rho1) = (8.59,32,0.3)",20,-30,30)
 
 # Créer une disposition 2x2 avec les 3 plots et un espace vide
 
