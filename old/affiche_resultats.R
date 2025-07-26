@@ -90,38 +90,41 @@ print(final_plot)
 ######################################################################
 #######RMSE Sigma Iter
 ######################################################################
+# 
+# rmseSigma = res100runNearesScenario$rmseSigmaRec
+# 
+# rmseSigma_moy = res1runFarScenario$rmseSigmaRec[,,,1]
+# 
+# rmseSigma_moy = res1runNearScenario$rmseSigmaRec[,,,1]
+# rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
+# dim(rmseSigma)
+# #rmseSigma_moy = rmseSigma[,,,1]
+# 
+# rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
+# load(file = "res1runFarNear.Rdata")
+rmseSigma_moy = erreursSigmaFar
 
-rmseSigma = res100runNearesScenario$rmseSigmaRec
-
-rmseSigma_moy = res1runFarScenario$rmseSigmaRec[,,,1]
-
-rmseSigma_moy = res1runNearScenario$rmseSigmaRec[,,,1]
-rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
-dim(rmseSigma)
-#rmseSigma_moy = rmseSigma[,,,1]
-
-rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
-
+dim(rmseSigma_moy)
 #rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
-affiche_erreur_frob_norm = function(rmseSigma_moy){
+affiche_erreur_frob_norm = function(rmseSigma_moy,titre){
 
 #rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
 # On prépare les données en long format pour ggplot2
 # Extraire les méthodes et taux souhaités
-methodes <- c(1, 9, 10)
-taux_indices <- c(3, 4, 5, 8)
+methodes <- c(1, 2, 3)
+taux_indices <- c(2, 3, 5, 7)
 
 method_labels <- c(
   "1" = "Sample covariance (online)",
-  "9" = "Online",
-  "10" = "Streaming"
+  "2" = "Online",
+  "3" = "Streaming"
 )
 
 rate_labels <- c(
-  "3" = "5%",
-  "4" = "10%",
+  "2" = "5%",
+  "3" = "10%",
   "5" = "20%",
-  "8" = "30%"
+  "7" = "30%"
 )
 
 # Mappage des identifiants méthode à leur position dans le tableau (axe 3)
@@ -154,8 +157,8 @@ gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
   geom_line(size = 0.8) +
   facet_wrap(~ Rate, ncol = 2) +
   labs(
-    title = "Frobenius Norm Error Across Different Contamination Rates",
-    subtitle = "Comparison of Online Covariance Estimation Methods ((k,l,rho) = (30,0.01,0.8))",
+    title = "Covariance matrix estimation error",
+    subtitle = titre,
     x = "Observation Index",
     y = "Frobenius Norm Error"
   ) +
@@ -172,7 +175,8 @@ return(gg)
 
 }
 
-affiche_erreur_frob_norm(rmseSigma_moy)
+affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,l,rho1) = (8.59,32,0.975)")
+
 
 # #########################################
 #             AUC
@@ -238,19 +242,18 @@ dim(res10run$faux_positifsRec)
 ########################################
 
 
-res1run$faux_negatifsRec[1e4,9,3,1]
-
-
-faux_neg_moy = apply(res1runFarScenario$faux_negatifsRec, c(1, 2, 3), mean)
-
-faux_neg_10000 <- faux_neg_moy[10000, , ]
-
-
-methodes <- c(1, 9, 10)
-method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
+# res1run$faux_negatifsRec[1e4,9,3,1]
+# 
+# 
+# faux_neg_moy = apply(res1runFarScenario$faux_negatifsRec, c(1, 2, 3), mean)
+# 
+# faux_neg_10000 <- faux_neg_moy[10000, , ]
+faux_neg_10000 = faux_negatifsFar
+methodes <- c(1, 2, 3)
+method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
 method_pos_map <- setNames(1:3, methodes)
 
-taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
+taux_valeurs <- rList
 data_list <- list()
 for (i in seq_along(taux_valeurs)) {
   total_outliers = taux_valeurs[i]/100*n
@@ -269,39 +272,43 @@ df_long$Method <- factor(df_long$Method, levels = method_labels)
 
 pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) +
   geom_line(size = 1) +
+  #xlim(5,50)+
   geom_point(size = 2) +
   labs(
-    title = "False negatives (k,l,rho) = (30,2,0.8), d = 10",
+    title = "(k,l,rho1) = (8.59,32,0.975)",
     x = "Contamination rate (%)",
     y = "False negatives",
     color = "Method"
   ) +
-  scale_x_continuous(breaks = taux_valeurs) 
+  scale_x_continuous(breaks=seq(0,50,5))+
+  scale_y_continuous(breaks=seq(0,90,5))
+  #scale_x_continuous(breaks = taux_valeurs) 
+  #scale_y_continuous(breaks = 5*(1:20)) 
   # theme_minimal() +
   # theme(legend.position = "bottom")
 
- dim(faux_neg_10000)
+
 #########################################
 #Faux positifs moyenne
 ########################################
 
-
-fprec = res100runNearesScenario$faux_positifsRec
-fprec = res1run$faux_positifsRec
-fprec = res1runNearScenario$faux_positifsRec
-fprec = res1rund100$faux_positifsRec
-
-fprec_moy <- apply(fprec, c(1, 2, 3), mean)
-
-fprec100run = fprec_moy[1e4,,]
+# 
+# fprec = res100runNearesScenario$faux_positifsRec
+# fprec = res1run$faux_positifsRec
+# fprec = res1runNearScenario$faux_positifsRec
+# fprec = res1rund100$faux_positifsRec
+# 
+# fprec_moy <- apply(fprec, c(1, 2, 3), mean)
+# 
+# fprec100run = fprec_moy[1e4,,]
 
 #dim(fprec1run)
-
-methodes <- c(1, 9, 10)
-method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
+fprec100run = faux_positifsNear 
+methodes <- c(1, 2, 3)
+method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
 method_pos_map <- setNames(1:3, methodes)
 
-taux_valeurs <- c(0,2, 5, 10, 15, 20, 25, 30,  40)
+taux_valeurs <- rList
 data_list <- list()
 for (i in seq_along(taux_valeurs)) {
   total_inliers = (1 - taux_valeurs[i]/100)*n
@@ -320,19 +327,22 @@ df_long$Method <- factor(df_long$Method, levels = method_labels)
 
 pnearDist = ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, color = Method)) +
   geom_line(size = 1) +
+  ylim(0,90)+
   geom_point(size = 2) +
   labs(
-    title = "False Positives (k,l,rho) = (2,1,0.6)",
-    x = "Contamination rates (%)",
+    title = "(k,l,rho1) = (0.86,0.56,0.6)",
+    x = "",
     y = "False positives",
     color = "Methods"
   ) +
   scale_x_continuous(breaks = taux_valeurs) +
+  scale_y_continuous(breaks = 5*(0:20)) +
+  
   theme_minimal() +
   theme(legend.position = "none")
 
 method_colors <- c(
-  "Sample covariance (online)" = "blue",
+  "Sample covariance" = "blue",
   "Online" = "red",
   "Streaming" = "green"
 )
@@ -353,9 +363,9 @@ legend_plot <- ggplot() +
   labs(title = "Method") +
   theme(plot.title = element_text(hjust = 0.5, size = 11),
         plot.margin = margin(0, 0, 0, 0))
-
+library(cowplot)
 # 3. Assembler les graphiques côte à côte
-main_grid <- plot_grid(pnearDist, pfar, ncol = 2, align = "hv")
+main_grid <- plot_grid(pnearDist, pfar, ncol = 1, align = "hv")
 
 # 4. Combiner avec la légende manuelle
 final_plot <- plot_grid(main_grid, legend_plot,
