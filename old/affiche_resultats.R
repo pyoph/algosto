@@ -280,13 +280,12 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
     y = "False negatives",
     color = "Method"
   ) +
-  scale_x_continuous(breaks=seq(0,50,5))+
+  scale_x_continuous(breaks=seq(0,50,5),limits = c(5,50))+
   scale_y_continuous(breaks=seq(0,90,5))
   #scale_x_continuous(breaks = taux_valeurs) 
   #scale_y_continuous(breaks = 5*(1:20)) 
   # theme_minimal() +
   # theme(legend.position = "bottom")
-
 
 #########################################
 #Faux positifs moyenne
