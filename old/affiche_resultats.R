@@ -448,48 +448,55 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
   nb_outliers_detectes_vrais <- 0
   nb_outliers_vrais <- 0
   
-  taux_outliers_detectes <- numeric(total_points)
-  taux_outliers_vrais <- numeric(total_points)
-  taux_outliers_detectes_vrais = numeric(total_points)
+  taux_outliers_detectes <- rep(100,total_points)
+  taux_outliers_vrais <- rep(100,total_points)
+  taux_outliers_detectes_vrais = rep(100,total_points)
   
   for (i in 1:total_points) {
-    if(labelsVrais[i] == 1) nb_outliers_vrais =  nb_outliers_vrais + 1
     
-    if (labelsVrais[i] == 1 & outlier_labels[i] == 1) {
+    if (labelsVrais[i] == 1 & as.numeric(outlier_labels[i]) == 1) {
       nb_outliers_detectes <- nb_outliers_detectes + 1
-      #nb_outliers_vrais <- nb_outliers_vrais + 1
+      nb_outliers_vrais <- nb_outliers_vrais + 1
       nb_outliers_detectes_vrais = nb_outliers_detectes_vrais + 1
+      taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
+      taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100
+      }
       #taux_outliers_vrais[i] <- nb_outliers_detectes_vrais
-    } else if (labelsVrais[i] == 0 && outlier_labels[i] == 1) {
-      nb_outliers_detectes <- nb_outliers_detectes + 1}
-    if(nb_outliers_vrais != 0){
-      taux_outliers_detectes[i] <- nb_outliers_detectes / nb_outliers_vrais * 100
-      #taux_outliers_detectes[i] <- nb_outliers_detectes
+     else if (labelsVrais[i] == 0 && as.numeric(outlier_labels[i]) == 1) {
+      nb_outliers_detectes <- nb_outliers_detectes + 1
+      if(nb_outliers_vrais != 0){
+      taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
+      taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100}
+      
+     }
+    else if (labelsVrais[i] == 1 && as.numeric(outlier_labels[i]) == 0) {
+      #nb_outliers_detectes <- nb_outliers_detectes + 1
+      nb_outliers_vrais = nb_outliers_vrais + 1
+      
+        taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
+        taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100
+      
     }
-    else {taux_outliers_detectes[i] <-  100
+    else if (labelsVrais[i] == 0 && as.numeric(outlier_labels[i]) == 0) {
+      #nb_outliers_detectes <- nb_outliers_detectes + 1
+      if(nb_outliers_vrais != 0){
+        taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
+        taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100}
+      
+    }
+    #else {taux_outliers_detectes[i] <-  100
     #taux_outliers_detectes[i] <- nb_outliers_detectes
-    }
-    if(nb_outliers_vrais != 0){
-      taux_outliers_detectes_vrais[i] <- nb_outliers_detectes_vrais / nb_outliers_vrais * 100
-      #taux_outliers_detectes[i] <- nb_outliers_detectes
-    }
-    else {taux_outliers_detectes_vrais[i] <-  100
-    #taux_outliers_detectes[i] <- nb_outliers_detectes
-    }
+  }
     
     
     
-    taux_outliers_vrais[i] <- 100
+    
+    #taux_outliers_vrais[i] <- 100
     
     # print(paste("nb_outliers_detectes_vrais ",nb_outliers_detectes_vrais ))
     # print(paste("nb_outliers_vrais ",nb_outliers_vrais ))
     # print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
     # print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
-  }
-  
-  
-  
-  
   df <- data.frame(
     index = 1:total_points,
     Detected_rate = taux_outliers_detectes,
@@ -498,26 +505,31 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
   )
   
   p <- ggplot(df, aes(x = index)) +
-    geom_line(aes(y = Detected_rate, color = "True and false positive rate"), size = 0.5) +
+    geom_line(aes(y = Detected_rate, color = "True and false outliers rate"), size = 0.5) +
     geom_line(aes(y = True_positive_rate, color = "True positives rate"), size = 0.5) +
     geom_line(aes(y = True_outliers, color = "True outliers rate"), size = 0.5) +
     scale_color_manual(values = c(
-      "True outliers rate" = "red",
-      "True and false positive rate" = "orange",
-      "True positives rate" = "purple"
-    )) +
+       "True outliers rate" = "red",
+       "True and false outliers rate" = "orange",
+       "True positives rate" = "purple"
+     )) +
+    ylim(c(0,200))+
     #scale_x_log10() +
     labs(
       title = paste(pourcentage, "% of outliers"),
-      x = "Data index",
-      y = "Cumulative rate (%)",
+      x = "",
+      y = "",
       color = "Legend"
     ) +
     theme_minimal() +
     theme(legend.position = "bottom")
   # print(taux_outliers_vrais[1:10])
   return(list(p = p,taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes,taux_outliers_detectes_vrais = taux_outliers_detectes_vrais))
-}
+  } 
+  
+  
+  
+  
 
 #outliers_majority = outliers_labelsTout[,,1]
 # res1run$faux_negatifsRec[9900:1e4]
@@ -529,21 +541,22 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
 library(ggplot2)
 library(cowplot)
 
-pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,3],res1runNearScenario$outliersLabelsRec[,3,2,1],5,"")
+pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(labelsVraisNear[,2],outliersLabelsNear[,2,2],5,"")
 
-pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,4],res1runNearScenario$outliersLabelsRec[,4,2,1],10,"")
+pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(labelsVraisNear[,3],outliersLabelsNear[,3,2],10,"")
 
-pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,6],res1runNearScenario$outliersLabelsRec[,6,2,1],20,"")
+pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(labelsVraisNear[,5],outliersLabelsNear[,5,2],20,"")
 
-pCumOutDetRateNearScOnl35 = cumulativeOutlierDetection(res1runNearScenario$labelsVraisRec[,8],res1runNearScenario$outliersLabelsRec[,8,2,1],35,"")
+pCumOutDetRateNearScOnl35 = cumulativeOutlierDetection(labelsVraisNear[,7],outliersLabelsNear[,7,2],35,"")
 
 library(ggplot2)
 library(cowplot)
 
 # Couleurs des lignes
 rate_colors <- c(
+  "True and false outliers rate" = "orange",
   "True outliers rate" = "red",
-  "True + false positive rate" = "orange",
+  
   "True positive rates" = "purple"
 )
 
@@ -557,7 +570,7 @@ clean_plot <- function(p) {
 }
 
 # Appliquer à chaque graphe
-p1 <- clean_plot(pCumOutDetRateNearScOnl5[[1]])
+p1 <- clean_plot(pCumOutDetRateFarcOnl5[[1]])
 p2 <- clean_plot(pCumOutDetRateNearScOnl10[[1]])
 p3 <- clean_plot(pCumOutDetRateNearScOnl20[[1]])
 p4 <- clean_plot(pCumOutDetRateNearScOnl35[[1]])
@@ -591,7 +604,7 @@ body_with_legend <- plot_grid(
 
 # Titre principal
 final_plot <- plot_grid(
-  ggdraw() + draw_label("Near contamination scenario", fontface = "bold", size = 14, hjust = 0.5),
+  ggdraw() + draw_label("(k,l,rho1) = (0.86,0.56,0.6) online outlier detection", fontface = "bold", size = 14, hjust = 0.5),
   body_with_legend,
   ncol = 1,
   rel_heights = c(0.08, 0.92)
