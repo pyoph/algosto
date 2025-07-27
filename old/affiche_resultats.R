@@ -513,7 +513,7 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
        "True and false outliers rate" = "orange",
        "True positives rate" = "purple"
      )) +
-    ylim(c(0,200))+
+    ylim(c(0,140))+
     #scale_x_log10() +
     labs(
       title = paste(pourcentage, "% of outliers"),
@@ -541,13 +541,13 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
 library(ggplot2)
 library(cowplot)
 
-pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(labelsVraisNear[,2],outliersLabelsNear[,2,2],5,"")
+pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsNear[,2,2],5,"")
 
-pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(labelsVraisNear[,3],outliersLabelsNear[,3,2],10,"")
+pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(labelsVraisFar[,3],outliersLabelsFar[,3,2],10,"")
 
-pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(labelsVraisNear[,5],outliersLabelsNear[,5,2],20,"")
+pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,2],20,"")
 
-pCumOutDetRateNearScOnl35 = cumulativeOutlierDetection(labelsVraisNear[,7],outliersLabelsNear[,7,2],35,"")
+pCumOutDetRateNearScOnl35 = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,2],35,"")
 
 library(ggplot2)
 library(cowplot)
@@ -604,7 +604,7 @@ body_with_legend <- plot_grid(
 
 # Titre principal
 final_plot <- plot_grid(
-  ggdraw() + draw_label("(k,l,rho1) = (0.86,0.56,0.6) online outlier detection", fontface = "bold", size = 14, hjust = 0.5),
+  ggdraw() + draw_label("(k,l,rho1) = (8.59,32,0.975) online outlier detection", fontface = "bold", size = 14, hjust = 0.5),
   body_with_legend,
   ncol = 1,
   rel_heights = c(0.08, 0.92)
