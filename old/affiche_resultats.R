@@ -334,9 +334,8 @@ pnearDist = ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, color
     y = "False positives",
     color = "Methods"
   ) +
-  scale_x_continuous(breaks = taux_valeurs) +
-  scale_y_continuous(breaks = 5*(0:20)) +
-  
+  scale_x_continuous(breaks=seq(0,50,5))+
+  scale_y_continuous(breaks=seq(0,90,5))
   theme_minimal() +
   theme(legend.position = "none")
 
