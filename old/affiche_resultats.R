@@ -440,16 +440,22 @@ outliers_majority <- apply(outliers_labelsTout, c(1, 2, 3), majority_vote)
 
 #outliers_majority = res$outliersLabelsRec[,,,1]
 
-cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,titre) {
+cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage) {
   total_points <- length(labelsVrais)
+  
+  
   total_outliers_theoriques <- pourcentage / 100 * total_points
   
   nb_outliers_detectes <- 0
+  
   nb_outliers_detectes_vrais <- 0
-  nb_outliers_vrais <- 0
+  
+    nb_outliers_vrais <- 0
   
   taux_outliers_detectes <- rep(100,total_points)
+  
   taux_outliers_vrais <- rep(100,total_points)
+  
   taux_outliers_detectes_vrais = rep(100,total_points)
   
   for (i in 1:total_points) {
@@ -460,30 +466,61 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
       nb_outliers_detectes_vrais = nb_outliers_detectes_vrais + 1
       taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
       taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100
-      }
-      #taux_outliers_vrais[i] <- nb_outliers_detectes_vrais
-     else if (labelsVrais[i] == 0 && as.numeric(outlier_labels[i]) == 1) {
+      
+          }
+    if (labelsVrais[i] == 0 & as.numeric(outlier_labels[i]) == 1) {
       nb_outliers_detectes <- nb_outliers_detectes + 1
       if(nb_outliers_vrais != 0){
-      taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
-      taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100}
-      
-     }
-    else if (labelsVrais[i] == 1 && as.numeric(outlier_labels[i]) == 0) {
-      #nb_outliers_detectes <- nb_outliers_detectes + 1
-      nb_outliers_vrais = nb_outliers_vrais + 1
-      
         taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
-        taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100
+        taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100}
       
     }
-    else if (labelsVrais[i] == 0 && as.numeric(outlier_labels[i]) == 0) {
+    
+    
+    if (labelsVrais[i] == 0 & as.numeric(outlier_labels[i]) == 0) {
       #nb_outliers_detectes <- nb_outliers_detectes + 1
       if(nb_outliers_vrais != 0){
         taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
         taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100}
       
     }
+    
+    
+    if (labelsVrais[i] == 1 & as.numeric(outlier_labels[i]) == 0) {
+      #nb_outliers_detectesCov <- nb_outliers_detectesCov + 1
+      nb_outliers_vrais <- nb_outliers_vrais + 1
+      #nb_outliers_detectes_vraisCov = nb_outliers_detectes_vraisCov + 1
+      taux_outliers_detectes[i] = nb_outliers_detectes/nb_outliers_vrais*100
+      taux_outliers_detectes_vrais[i] = nb_outliers_detectes_vrais/nb_outliers_vrais*100
+    }
+    
+    # 
+    # if (labelsVrais[i] == 1 & as.numeric(outlier_labelsOnline[i]) == 1) {
+    #   nb_outliers_detectesOnl <- nb_outliers_detectesOnl + 1
+    #   nb_outliers_vrais <- nb_outliers_vrais + 1
+    #   nb_outliers_detectes_vraisOnl = nb_outliers_detectes_vraisOnl + 1
+    #   taux_outliers_detectesOnl[i] = nb_outliers_detectesOnl/nb_outliers_vrais*100
+    #   taux_outliers_detectes_vraisOnl[i] = nb_outliers_detectes_vraisOnl/nb_outliers_vrais*100
+    # }
+    # 
+    # if (labelsVrais[i] == 1 & as.numeric(outliers_labelsStrm[i]) == 1) {
+    #   nb_outliers_detectesStrm <- nb_outliers_detectesStrm + 1
+    #   nb_outliers_vrais <- nb_outliers_vrais + 1
+    #   nb_outliers_detectes_vraisStrm = nb_outliers_detectes_vraisStrm + 1
+    #   taux_outliers_detectesStrm[i] = nb_outliers_detectesStrm/nb_outliers_vrais*100
+    #   taux_outliers_detectes_vraisStrm[i] = nb_outliers_detectes_vraisStrm/nb_outliers_vrais*100
+    # }
+    #   #taux_outliers_vrais[i] <- nb_outliers_detectes_vrais
+    #     if (labelsVrais[i] == 1 && as.numeric(outlier_labelsCovOnline[i]) == 0) {
+    #   #nb_outliers_detectes <- nb_outliers_detectes + 1
+    #   nb_outliers_vrais = nb_outliers_vrais + 1
+    #   
+    #     taux_outliers_detectesCov[i] = nb_outliers_detectesCov/nb_outliers_vrais*100
+    #     taux_outliers_detectes_vraisCov[i] = nb_outliers_detectes_vraisCov/nb_outliers_vrais*100
+    #   
+    # }
+    # 
+    #print(paste0("taux outliers vrais detectes Cov ",taux_outliers_detectes_vraisCov))
     #else {taux_outliers_detectes[i] <-  100
     #taux_outliers_detectes[i] <- nb_outliers_detectes
   }
@@ -497,34 +534,8 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
     # print(paste("nb_outliers_vrais ",nb_outliers_vrais ))
     # print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
     # print(paste("taux_outliers_vrais[i] ",taux_outliers_vrais[i] ))
-  df <- data.frame(
-    index = 1:total_points,
-    Detected_rate = taux_outliers_detectes,
-    True_outliers = taux_outliers_vrais,
-    True_positive_rate = taux_outliers_detectes_vrais
-  )
-  
-  p <- ggplot(df, aes(x = index)) +
-    geom_line(aes(y = Detected_rate, color = "True and false outliers rate"), size = 0.5) +
-    geom_line(aes(y = True_positive_rate, color = "True positives rate"), size = 0.5) +
-    geom_line(aes(y = True_outliers, color = "True outliers rate"), size = 0.5) +
-    scale_color_manual(values = c(
-       "True outliers rate" = "red",
-       "True and false outliers rate" = "orange",
-       "True positives rate" = "purple"
-     )) +
-    ylim(c(0,140))+
-    #scale_x_log10() +
-    labs(
-      title = paste(pourcentage, "% of outliers"),
-      x = "",
-      y = "",
-      color = "Legend"
-    ) +
-    theme_minimal() +
-    theme(legend.position = "bottom")
-  # print(taux_outliers_vrais[1:10])
-  return(list(p = p,taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes,taux_outliers_detectes_vrais = taux_outliers_detectes_vrais))
+    # print(taux_outliers_vrais[1:10])
+  return(list(taux_outliers_vrais = taux_outliers_vrais,taux_outliers_detectes = taux_outliers_detectes,taux_outliers_detectes_vrais = taux_outliers_detectes_vrais,nb_outliers_detectes_vrais = nb_outliers_detectes_vrais,nb_outliers_vrais = nb_outliers_vrais))
   } 
   
   
@@ -541,74 +552,218 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage,
 library(ggplot2)
 library(cowplot)
 
-pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsNear[,2,2],5,"")
+# pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,3],5)
+# 
+# taux_outliers_detectesCov5 = pCumOutDetRateFarcOnl5$taux_outliers_detectes
+# 
+# taux_outliers_detectesVraisCov5 = pCumOutDetRateFarcOnl5$taux_outliers_detectes_vrais
+# 
+# taux_outliers_detectesOnl5 = pCumOutDetRateFarcOnl5$taux_outliers_detectes
+# 
+# taux_outliers_detectesVraisOnl5 = pCumOutDetRateFarcOnl5$taux_outliers_detectes_vrais
+# 
+# taux_outliers_detectesStrm5 = pCumOutDetRateFarcOnl5$taux_outliers_detectes
+# 
+# taux_outliers_detectesVraisStrm5 = pCumOutDetRateFarcOnl5$taux_outliers_detectes_vrais
+# 
+# 
+# taux_outliers_detectesVraisCov5 = pCumOutDetRateFarcOnl5$taux_outliers_detectes_vrais
+# 
+# 
+# pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(labelsVraisFar[,3],outliersLabelsFar[,3,],10,"")
+# 
+# pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,],20,"")
+# 
+# pCumOutDetRateNearScOnl35 = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,],35,"")
 
-pCumOutDetRateNearScOnl10 = cumulativeOutlierDetection(labelsVraisFar[,3],outliersLabelsFar[,3,2],10,"")
+plot_cumulative_outlier = function(labelsVrais,outliers_labels,rate){
 
-pCumOutDetRateNearScOnl20 = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,2],20,"")
-
-pCumOutDetRateNearScOnl35 = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,2],35,"")
-
-library(ggplot2)
-library(cowplot)
-
-# Couleurs des lignes
-rate_colors <- c(
-  "True and false outliers rate" = "orange",
-  "True outliers rate" = "red",
+  cumoutDetCov = cumulativeOutlierDetection(labelsVrais,outliers_labels[,1],rate)
   
-  "True positive rates" = "purple"
+  taux_outliers_detectesCov = cumoutDetCov$taux_outliers_detectes
+  taux_outliers_detectesVraisCov = cumoutDetCov$taux_outliers_detectes_vrais
+  
+  
+  cumoutDetOnl = cumulativeOutlierDetection(labelsVrais,outliers_labels[,2],rate)
+  
+  taux_outliers_detectesOnl = cumoutDetOnl$taux_outliers_detectes
+  taux_outliers_detectesVraisOnl = cumoutDetOnl$taux_outliers_detectes_vrais
+  
+  
+  cumoutDetStrm = cumulativeOutlierDetection(labelsVrais,outliers_labels[,3],rate)
+  
+  taux_outliers_detectesStrm = cumoutDetStrm$taux_outliers_detectes
+  taux_outliers_detectesVraisStrm = cumoutDetStrm$taux_outliers_detectes_vrais
+# Préparer les données
+df <- data.frame(
+  index = 1:total_points,
+  True_outliers = taux_outliers_vrais,
+  Detected_Cov = taux_outliers_detectesCov,
+  TP_Cov = taux_outliers_detectesVraisCov,
+  Detected_Onl = taux_outliers_detectesOnl,
+  TP_Onl = taux_outliers_detectesVraisOnl,
+  Detected_Strm = taux_outliers_detectesStrm,
+  TP_Strm = taux_outliers_detectesVraisStrm
 )
 
-# Fonction de nettoyage : enlever la légende et le titre de l'axe Y
-clean_plot <- function(p) {
-  p +
-    theme(
-      legend.position = "none",
-      axis.title.y = element_blank()  # Enlever uniquement le titre
-    )
-}
-
-# Appliquer à chaque graphe
-p1 <- clean_plot(pCumOutDetRateFarcOnl5[[1]])
-p2 <- clean_plot(pCumOutDetRateNearScOnl10[[1]])
-p3 <- clean_plot(pCumOutDetRateNearScOnl20[[1]])
-p4 <- clean_plot(pCumOutDetRateNearScOnl35[[1]])
-
-# Grille 2x2 de graphes
-main_grid <- plot_grid(
-  p1, p2,
-  p3, p4,
-  ncol = 2,
-  align = "hv"
-)
-
-# Légende personnalisée
-legend_plot <- ggplot() +
-  annotate("point", x = 1, y = 1, color = rate_colors[1], size = 3) +
-  annotate("point", x = 2, y = 1, color = rate_colors[2], size = 3) +
-  annotate("point", x = 3, y = 1, color = rate_colors[3], size = 3) +
-  annotate("text", x = 1.2, y = 1, label = names(rate_colors)[1], hjust = 0, size = 4) +
-  annotate("text", x = 2.2, y = 1, label = names(rate_colors)[2], hjust = 0, size = 4) +
-  annotate("text", x = 3.2, y = 1, label = names(rate_colors)[3], hjust = 0, size = 4) +
-  theme_void() +
-  xlim(0.5, 4)
-
-# Combiner graphiques + légende
-body_with_legend <- plot_grid(
-  main_grid,
-  legend_plot,
-  ncol = 1,
-  rel_heights = c(10, 1)
-)
-
-# Titre principal
-final_plot <- plot_grid(
-  ggdraw() + draw_label("(k,l,rho1) = (8.59,32,0.975) online outlier detection", fontface = "bold", size = 14, hjust = 0.5),
-  body_with_legend,
-  ncol = 1,
-  rel_heights = c(0.08, 0.92)
-)
+# Construction du graphique
+p <- ggplot(df, aes(x = index)) +
+  # Courbes Cov (lignes pleines)
+  geom_line(aes(y = Detected_Cov, color = "Detected rate", linetype = "Cov"), size = 0.5) +
+  geom_line(aes(y = TP_Cov, color = "True positives rate", linetype = "Cov"), size = 0.5) +
+  # Courbes Onl (lignes pointillées)
+  geom_line(aes(y = Detected_Onl, color = "Detected rate", linetype = "Onl"), size = 0.5) +
+  geom_line(aes(y = TP_Onl, color = "True positives rate", linetype = "Onl"), size = 0.5) +
+  # Courbes Strm (lignes en pointillés courts)
+  geom_line(aes(y = Detected_Strm, color = "Detected rate", linetype = "Strm"), size = 0.5) +
+  geom_line(aes(y = TP_Strm, color = "True positives rate", linetype = "Strm"), size = 0.5) +
+  # True outliers (une seule courbe, donc pas besoin de linetype)
+  geom_line(aes(y = True_outliers, color = "True outliers rate"), size = 0.5) +
+  # Couleurs partagées
+  scale_color_manual(values = c(
+    "True outliers rate" = "red",
+    "Detected rate" = "orange",
+    "True positives rate" = "purple"
+  )) +
+  # Légende des types de ligne
+  scale_linetype_manual(values = c(
+    "Cov" = "dotted",
+    "Onl" = "dashed",
+    "Strm" = "solid"
+  )) +
+  ylim(c(0, 250)) +
+  labs(
+    title = paste(rate, "% of outliers"),
+    x = "",
+    y = "",
+    color = "Metric",
+    linetype = "Method"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 
 # Affichage
+return(p)
+}
+
+pfar5 = plot_cumulative_outlier(labelsVraisFar[,2],outliersLabelsFar[,2,],5 )
+
+pfar20 = plot_cumulative_outlier(labelsVraisFar[,5],outliersLabelsFar[,5,],20 )
+
+pfar30 = plot_cumulative_outlier(labelsVraisFar[,7],outliersLabelsFar[,7,],30 )
+
+
+pfar40 = plot_cumulative_outlier(labelsVraisFar[,9],outliersLabelsFar[,9,],40 )
+library(patchwork)
+
+combined_plot <- (
+  (pfar5 | pfar20) /
+    (pfar30 | pfar40)
+) + 
+  plot_layout(guides = "collect") & 
+  theme(legend.position = "bottom")
+
+# Ajouter un titre global
+final_plot <- combined_plot + 
+  plot_annotation(
+    title = "Cumulative Outlier Detection F_1 : (k,l,rho1) = (8.59,32,0.975)",
+    theme = theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+    )
+  )
+
+# Afficher
 print(final_plot)
+
+pNear5 = plot_cumulative_outlier(labelsVraisNear[,2],outliersLabelsNear[,2,],5 )
+
+pNear20 = plot_cumulative_outlier(labelsVraisNear[,5],outliersLabelsNear[,5,],20 )
+
+pNear30 = plot_cumulative_outlier(labelsVraisNear[,7],outliersLabelsNear[,7,],30 )
+
+
+pNear40 = plot_cumulative_outlier(labelsVraisNear[,9],outliersLabelsNear[,9,],40 )
+
+combined_plot <- (
+  (pNear5 | pNear20) /
+    (pNear30 | pNear40)
+) + 
+  plot_layout(guides = "collect") & 
+  theme(legend.position = "bottom")
+
+# Ajouter un titre global
+final_plot <- combined_plot + 
+  plot_annotation(
+    title = "Cumulative Outlier Detection F_1 : (k,l,rho1) = (0.86,0.56,0.6)",
+    theme = theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+    )
+  )
+
+# Afficher
+print(final_plot)
+
+
+# library(ggplot2)
+# library(cowplot)
+# 
+# # Couleurs des lignes
+# rate_colors <- c(
+#   "True and false outliers rate" = "orange",
+#   "True outliers rate" = "red",
+#   
+#   "True positive rates" = "purple"
+# )
+# 
+# # Fonction de nettoyage : enlever la légende et le titre de l'axe Y
+# clean_plot <- function(p) {
+#   p +
+#     theme(
+#       legend.position = "none",
+#       axis.title.y = element_blank()  # Enlever uniquement le titre
+#     )
+# }
+# 
+# # Appliquer à chaque graphe
+# p1 <- clean_plot(pCumOutDetRateFarcOnl5[[1]])
+# p2 <- clean_plot(pCumOutDetRateNearScOnl10[[1]])
+# p3 <- clean_plot(pCumOutDetRateNearScOnl20[[1]])
+# p4 <- clean_plot(pCumOutDetRateNearScOnl35[[1]])
+# 
+# # Grille 2x2 de graphes
+# main_grid <- plot_grid(
+#   p1, p2,
+#   p3, p4,
+#   ncol = 2,
+#   align = "hv"
+# )
+# 
+# # Légende personnalisée
+# legend_plot <- ggplot() +
+#   annotate("point", x = 1, y = 1, color = rate_colors[1], size = 3) +
+#   annotate("point", x = 2, y = 1, color = rate_colors[2], size = 3) +
+#   annotate("point", x = 3, y = 1, color = rate_colors[3], size = 3) +
+#   annotate("text", x = 1.2, y = 1, label = names(rate_colors)[1], hjust = 0, size = 4) +
+#   annotate("text", x = 2.2, y = 1, label = names(rate_colors)[2], hjust = 0, size = 4) +
+#   annotate("text", x = 3.2, y = 1, label = names(rate_colors)[3], hjust = 0, size = 4) +
+#   theme_void() +
+#   xlim(0.5, 4)
+# 
+# # Combiner graphiques + légende
+# body_with_legend <- plot_grid(
+#   main_grid,
+#   legend_plot,
+#   ncol = 1,
+#   rel_heights = c(10, 1)
+# )
+# 
+# # Titre principal
+# final_plot <- plot_grid(
+#   ggdraw() + draw_label("(k,l,rho1) = (8.59,32,0.975) online outlier detection", fontface = "bold", size = 14, hjust = 0.5),
+#   body_with_legend,
+#   ncol = 1,
+#   rel_heights = c(0.08, 0.92)
+# )
+# 
+# # Affichage
+# print(final_plot)
