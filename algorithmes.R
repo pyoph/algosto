@@ -89,11 +89,15 @@ SampleCovOnline = function(Z)
     SigmaIter[i,,] = Sigma
     distances[i] = mahalanobis_generalizedRcpp(Z[i,],meanIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
     S = distances[i]
+<<<<<<< HEAD
     if(is.nan(S)) {S = 1e10}
+=======
+    if(!is.nan(S)){
+>>>>>>> c7a6dc5afc96e6f1332c0781a2f10d145d435c08
     
-    if (S > cutoff) {outliers_labels[i] = 1}      
+    if (S > cutoff) {outliers_labels[i] = 1}}      
     }
-    
+  
     
   
   SigmaIter[nrow(Z),,] = Sigma
