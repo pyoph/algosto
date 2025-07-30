@@ -135,7 +135,7 @@ setwd(simDir)
 
 if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
 data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
-
+save(dataFile,file = dataFile)
 }
 else{load(dataFile)}
 labelsVraisFar[,m] = data$labelsVrais
@@ -225,3 +225,4 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
 }
 
 save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard100.Rdata")
+

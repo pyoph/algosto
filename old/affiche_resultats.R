@@ -175,7 +175,7 @@ return(gg)
 
 }
 
-affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,l,rho1) = (8.59,32,0.975)")
+affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,l,rho1) = (6.57,19.02,0.415)")
 
 
 # #########################################
