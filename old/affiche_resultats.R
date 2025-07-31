@@ -767,3 +767,44 @@ print(final_plot)
 # 
 # # Affichage
 # print(final_plot)
+
+###################
+#Plot distances and outliers
+######################
+
+plot_outliers_distances = function(distances,labels_vrais,rate,method,scenario,dim = 10){
+# Préparer les données
+df <- data.frame(
+  index = 1:n,
+  distance =distances,
+  label = as.factor(labels_vrais)  # 0 = inlier, 1 = true outlier
+)
+
+# Tracer
+p <- ggplot(df, aes(x = index, y = distance, color = label)) +
+  geom_point(size = 1.5) +
+  geom_hline(
+    yintercept = qchisq(0.95, df = dim),
+    linetype = "dashed",
+    color = "black"
+  ) +
+  scale_color_manual(
+    values = c("0" = "blue", "1" = "red"),
+    labels = c("Inliers", "True outliers"),
+    name = "Point type"
+  ) +
+  labs(
+    title = scenario,
+    subtitle= paste0("Method: ",method," ",rate," % outliers"),
+    x = "Index",
+    y = "Distance"
+  ) +
+  ylim(0, 90) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+return(p)
+}
+
+plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsOnline$distances,scenario = paste0("k =",k,"l =","rho =",rho),method = "online",rate = r)
+
