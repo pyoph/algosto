@@ -827,14 +827,84 @@ combined_plot <- (
   plot_layout(guides = "collect") & 
   theme(legend.position = "bottom")
 
-# Ajouter un titre global
-final_plot <- combined_plot + 
+
+#################################################################################
+#######Affichage erreurs estimation val propres Sigma0 et SigmaEst###############
+#################################################################################
+library(ggplot2)
+library(patchwork)
+
+# Paramètres
+p <- nrow(Sigma0)                # dimension de la matrice
+n_iter <- dim(resUsStreaming$Sigma)[1]  # nombre d'itérations
+
+# 1. Calcul des vraies valeurs propres triées (lambda_0)
+true_eigenvalues <- sort(eigen(Sigma0, symmetric = TRUE)$values, decreasing = TRUE)
+
+# 2. Initialiser la matrice d'erreurs (p × n_iter)
+df_errors <- matrix(NA, nrow = p, ncol = n_iter)
+
+# 3. Calculer l'erreur signée pour chaque itération et chaque composante
+for (iter in 1:n_iter) {
+  # Eigenvalues estimées triées à l'itération iter
+  est_eigvals <- sort(eigen(resUsStreaming$Sigma[iter, , ], symmetric = TRUE)$values, decreasing = TRUE)
+  # Différence signée (hat(lambda) - lambda0)
+  df_errors[, iter] <- est_eigvals - true_eigenvalues
+}
+
+# 4. Création des graphiques
+plot_list <- lapply(1:p, function(i) {
+  df_i <- data.frame(
+    Iteration = 1:n_iter,
+    Error = df_errors[i, ]
+  )
+  
+  ggplot(df_i, aes(x = Iteration, y = Error)) +
+    geom_line(color = "steelblue", size = 0.7) +  # Estimated eigenvalue error
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black", size = 0.6) +  # True eigenvalue reference
+    ylim(c(-0.9,0))+
+    labs(
+      title = paste("Eigenvalue", i),
+      x = ifelse(i > 5, "Iteration", ""),
+      y = ifelse(i %% 5 == 1, expression(hat(lambda) - lambda[0]), "")
+    ) +
+    theme_minimal(base_size = 10) +
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      axis.title.x = element_text(size = 9),
+      axis.title.y = element_text(size = 9)
+    )
+})
+
+# 5. Légende manuelle
+legend_df <- data.frame(
+  x = c(1, 2),
+  y = c(1, 1),
+  type = c("Estimated eigenvalue", "True eigenvalue")
+)
+
+legend_plot <- ggplot(legend_df, aes(x = x, y = y, linetype = type, color = type)) +
+  geom_line(size = 1) +
+  scale_color_manual(values = c("Estimated eigenvalue" = "steelblue", "True eigenvalue" = "black")) +
+  scale_linetype_manual(values = c("Estimated eigenvalue" = "solid", "True eigenvalue" = "dashed")) +
+  guides(color = guide_legend(title = NULL), linetype = guide_legend(title = NULL)) +
+  theme_void() +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 11)
+  )
+
+# 6. Assemblage final
+combined <- wrap_plots(plot_list, ncol = 5, nrow = 2)
+
+final_plot <- combined / legend_plot +
+  plot_layout(heights = c(10, 1)) +
   plot_annotation(
-    title = paste0("k = ",k," l = ",l," rho1 = ",rho1),
+    title = "(k,l,rho1) = (0.86,0.56;0.6) 40 % of outliers",
     theme = theme(
-      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5)
     )
   )
 
-# Afficher
 print(final_plot)
+
