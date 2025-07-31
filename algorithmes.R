@@ -72,14 +72,14 @@ SampleCovOnline = function(Z)
   
   mean = rep(1,ncol(Z))
   meanOld = mean
-  Sigma = diag(ncol(Z))
+  Sigma = 1.5*diag(ncol(Z))
   
   meanIter =   matrix(0,nrow(Z),ncol(Z))
   SigmaIter = array(0, dim = c(nrow(Z),ncol(Z),ncol(Z)))
   distances = rep(0, nrow(Z))
   outliers_labels = rep(0,nrow(Z))
   cutoff = qchisq(.95,df = ncol(Z))
-  
+  #nb_out= 0
   for (i in (1:(nblignes-1)))
   {
     mean   = mean   + (1.0 / (i + 1)) * (Z[i+1,] - mean);
@@ -88,18 +88,19 @@ SampleCovOnline = function(Z)
     meanIter[i,] = mean
     SigmaIter[i,,] = Sigma
     distances[i] = mahalanobis_generalizedRcpp(Z[i,],meanIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
+    #distances[i] = mahalanobis(Z[i,],meanIter[i,],SigmaIter[i,,],inverted = FALSE)
+    
+    
     S = distances[i]
-<<<<<<< HEAD
-    if(is.nan(S)) {S = 1e10}
-=======
-    if(!is.nan(S)){
->>>>>>> c7a6dc5afc96e6f1332c0781a2f10d145d435c08
-    
-    if (S > cutoff) {outliers_labels[i] = 1}}      
-    }
-  
-    
-  
+
+    # if(!is.nan(S)){
+    # 
+    # if (S > cutoff) {outliers_labels[i] = 1}}else{print("S = Nan ")}      
+    # }
+    # 
+    #print(paste0("cutoff =",cutoff))
+    if (S > cutoff) {outliers_labels[i] = 1
+      }}
   SigmaIter[nrow(Z),,] = Sigma
   meanIter[nrow(Z),] = mean
   

@@ -6,7 +6,6 @@ explDir = "~/Simus/exploitResults"
 
 setwd(resDir)
 
-
 sim = 1
 
 erreursSigmaNear = array(0,dim = c(n,length(rList),3))
@@ -19,9 +18,9 @@ faux_negatifsNear = array(0,dim = c(length(rList),3))
 
 
 #Near scenario d = 10
-k = 0.86;l=0.56;rho1 = 0.6
-#Far scenario d = 100
-k = 0.66;l=0.82;rho1 = 0.415
+if(d == 10) {k = 0.86;l=0.56;rho1 = 0.6}
+#Near scenario d = 100
+if(d == 100) {k = 0.66;l=0.82;rho1 = 0.415}
 
 for (m in seq_along(rList)){
 r = rList[m]
@@ -32,7 +31,7 @@ print(dataFile)
 setwd(simDir)
 if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
 data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
-
+#save(dataFile)
 }
 else{load(dataFile)}
 labelsVraisNear[,m] = data$labelsVrais
@@ -119,9 +118,9 @@ labelsVraisFar = array(0,dim = c(n,length(rList)))
 
 
 #Far scenario d = 10
-k = 8.59;l=32;rho1 = 0.975
+if(d == 10){k = 8.59;l=32;rho1 = 0.975}
 #Far scenario d = 100
-k = 6.57;l = 19.02;rho1 = 0.845
+if(d == 100){k = 6.57;l = 19.02;rho1 = 0.845}
 
 for (m in seq_along(rList)) {
 contParam = ParmsF1(m1, k, l, rho1)
@@ -225,4 +224,43 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
 }
 
 save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard100.Rdata")
+
+vraiesDistances = rep(0,n)
+for (i in (1:n)){
+vraiesDistances[i] = mahalanobis_generalizedRcpp(data$Z[i,],rep(0,d),eigen(Sigma0)$vectors, eigen(Sigma0)$values)
+}
+
+library(reshape2)  # pour melt()
+library(ggplot2)
+
+# Préparer les données
+df <- data.frame(
+  index = 1:n,
+  distance = resUsOnline$distances,
+  label = as.factor(data$labelsVrais)  # 0 = inlier, 1 = true outlier
+)
+
+# Tracer
+p <- ggplot(df, aes(x = index, y = distance, color = label)) +
+  geom_point(size = 1.5) +
+  geom_hline(
+    yintercept = qchisq(0.95, df = 10),
+    linetype = "dashed",
+    color = "black"
+  ) +
+  scale_color_manual(
+    values = c("0" = "blue", "1" = "red"),
+    labels = c("Inliers", "True outliers"),
+    name = "Point type"
+  ) +
+  labs(
+    title = "Outlier Detection Using Distance Threshold",
+    x = "Index",
+    y = "Distance"
+  ) +
+  ylim(0, 90) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+print(p)
 
