@@ -772,7 +772,7 @@ print(final_plot)
 #Plot distances and outliers
 ######################
 
-plot_outliers_distances = function(distances,labels_vrais,rate,method,scenario,dim = 10){
+plot_outliers_distances = function(distances,labels_vrais,rate,method,ylab = "",dim = 10){
 # Préparer les données
 df <- data.frame(
   index = 1:n,
@@ -794,10 +794,10 @@ p <- ggplot(df, aes(x = index, y = distance, color = label)) +
     name = "Point type"
   ) +
   labs(
-    title = scenario,
-    subtitle= paste0("Method: ",method," ",rate," % outliers"),
-    x = "Index",
-    y = "Distance"
+    title = "",
+    subtitle= paste0("Method: ",method," ",rate," % of outliers"),
+    x = "",
+    y = ylab
   ) +
   ylim(0, 90) +
   theme_minimal() +
@@ -806,5 +806,35 @@ p <- ggplot(df, aes(x = index, y = distance, color = label)) +
 return(p)
 }
 
-plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsOnline$distances,scenario = paste0("k =",k,"l =","rho =",rho),method = "online",rate = r)
+k = 0.86;l=0.56;rho1 = 0.6
 
+method = "streaming"
+
+
+
+p1 = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsStreaming$distances,ylab = "Distance",method = method,rate = 10)
+
+p2 = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsStreaming$distances,method = method,rate = 20)
+
+p3 = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsStreaming$distances,ylab = "Distance",method = method,rate = 30)
+
+p4 = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsStreaming$distances,method = method,rate = 30)
+
+combined_plot <- (
+  (p1 | p2) /
+    (p3 | p4)
+) + 
+  plot_layout(guides = "collect") & 
+  theme(legend.position = "bottom")
+
+# Ajouter un titre global
+final_plot <- combined_plot + 
+  plot_annotation(
+    title = paste0("k = ",k," l = ",l," rho1 = ",rho1),
+    theme = theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+    )
+  )
+
+# Afficher
+print(final_plot)

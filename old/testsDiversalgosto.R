@@ -6,12 +6,9 @@ explDir = "~/Simus/exploitResults"
 
 #setwd(resDir)
 
-<<<<<<< HEAD
 sim = 1
-=======
 
 erreursSigmaNear = array(0,dim = c(n,length(rList),3,simNb))
->>>>>>> edc1eb19b16a2a1ee4a896d325c0cc7f02d459f2
 
 outliersLabelsNear = array(0,dim = c(n,length(rList),3,simNb))
 labelsVraisNear = array(0,dim = c(n,length(rList)))
@@ -21,15 +18,12 @@ faux_negatifsNear = array(0,dim = c(length(rList),3,simNb))
 
 
 #Near scenario d = 10
-<<<<<<< HEAD
 if(d == 10) {k = 0.86;l=0.56;rho1 = 0.6}
 #Near scenario d = 100
 if(d == 100) {k = 0.66;l=0.82;rho1 = 0.415}
-=======
 k = 0.86;l=0.56;rho1 = 0.6
 #Far scenario d = 100
 #k = 0.66;l=0.82;rho1 = 0.415
->>>>>>> edc1eb19b16a2a1ee4a896d325c0cc7f02d459f2
 
 for (m in seq_along(rList)){
   for(sim in(1:100)){
@@ -130,11 +124,9 @@ faux_negatifsFar = array(0,dim = c(length(rList),3,simNb))
 #Far scenario d = 10
 if(d == 10){k = 8.59;l=32;rho1 = 0.975}
 #Far scenario d = 100
-<<<<<<< HEAD
+
 if(d == 100){k = 6.57;l = 19.02;rho1 = 0.845}
-=======
 #k = 6.57;l = 19.02;rho1 = 0.845
->>>>>>> edc1eb19b16a2a1ee4a896d325c0cc7f02d459f2
 
 for (m in seq_along(rList)) {
   for (sim in (1:100)){
