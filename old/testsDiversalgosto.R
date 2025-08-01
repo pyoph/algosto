@@ -1,12 +1,25 @@
 simDir = "~/Simus/DataSim"
 
-resDir = "~/Simus/FitSim"
+resDir = "D:/Simus/FitSim"
 
 explDir = "~/Simus/exploitResults"
 
 #setwd(resDir)
 
+test_outliers = function(distances,dim = 100,cutoff)
+{
+  outlab = rep(0,length(distances))
+  
+  
+  for (i in (1:length(distances)))
+  {
+    if(distances[i] > cutoff){outlab[i] = 1}
+  }
+  return(outlab)
+}
+
 sim = 1
+simNb = 1
 
 erreursSigmaNear = array(0,dim = c(n,length(rList),3,simNb))
 
@@ -22,11 +35,11 @@ if(d == 10) {k = 0.86;l=0.56;rho1 = 0.6}
 #Near scenario d = 100
 if(d == 100) {k = 0.66;l=0.82;rho1 = 0.415}
 k = 0.86;l=0.56;rho1 = 0.6
-#Far scenario d = 100
+#Near scenario d = 100
 #k = 0.66;l=0.82;rho1 = 0.415
 
 for (m in seq_along(rList)){
-  for(sim in(1:100)){
+  for(sim in(1:simNb)){
 r = rList[m]
 dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
 
@@ -47,8 +60,9 @@ temps_naif = system.time(
 fitNaif = resNaif
 for(s in (1:n)){
 erreursSigmaNear[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
-outliersLabelsNear[,m,1,sim] = resNaif$outliers_labels[s]
 }
+outliersLabelsNear[,m,1,sim] = resNaif$outliers_labels[s]
+
 print(paste0("Erreur naive near ",erreursSigmaNear[n,m,1,sim]))
 
 t = table(data$labelsVrais,resNaif$outliers_labels)
@@ -70,11 +84,14 @@ temps_online = (
 fitUsOnline = resUsOnline
 for(s in (1:n)){
 erreursSigmaNear[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
+#outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
 }
+outliersLabelsNear[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))
+
 print(paste0("Erreur us online near ",erreursSigmaNear[n,m,2,sim]))
 
-t = table(data$labelsVrais,resUsOnline$outlier_labels)
+#t = table(data$labelsVrais,resUsOnline$outlier_labels)
+t = table(data$labelsVrais,outliersLabelsNear[,m,2,sim])
 if (r != 0) {faux_positifsNear[m,2,sim] =  t[1,2]
 faux_negatifsNear[m,2,sim] = t[2,1]}
 if(r == 0){faux_positifsNear[m,2,sim] =  t[1,2]}
@@ -94,11 +111,14 @@ resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)),cuto
 fitUSStreaming = resUsStreaming
 for(s in (1:n)){
 erreursSigmaNear[s,m,3,sim] =norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
-outliersLabelsNear[s,m,2,sim] = resUsStreaming$outlier_labels[s]
+#outliersLabelsNear[s,m,3,sim] = resUsStreaming$outlier_labels[s]
 }
+outliersLabelsNear[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
+
 print(paste0("Erreur us streaming near ",erreursSigmaNear[n,m,3,sim]))
 
-t = table(data$labelsVrais,resUsStreaming$outlier_labels)
+#t = table(data$labelsVrais,resUsStreaming$outlier_labels)
+t = table(data$labelsVrais,outliersLabelsNear[,m,3,sim])
 if(r == 0){faux_positifsNear[m,3,sim] =  t[1,2]}
 if (r != 0) {faux_positifsNear[m,3,sim] =  t[1,2]
 faux_negatifsNear[m,3,sim] = t[2,1]}
@@ -129,7 +149,7 @@ if(d == 100){k = 6.57;l = 19.02;rho1 = 0.845}
 #k = 6.57;l = 19.02;rho1 = 0.845
 
 for (m in seq_along(rList)) {
-  for (sim in (1:100)){
+  for (sim in (1:simNb)){
 contParam = ParmsF1(m1, k, l, rho1)
 r = rList[m]
 dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
@@ -153,8 +173,8 @@ resNaif = SampleCovOnline(data$Z)})
 fitNaif = resNaif
 for (s in (1:n)){
 erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
-outliersLabelsFar[s,m,1,sim] = resNaif$outliers_labels[s]
 }
+outliersLabelsFar[,m,1,sim] = resNaif$outliers_labels
 
 print(paste0("Erreur naive far ",erreursSigmaFar[n,m,1,sim]))
 
@@ -180,16 +200,19 @@ temps_online = system.time(
       resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
 })
 fitUsOnline = resUsOnline
-t = table(data$labelsVrais,resUsOnline$outlier_labels)
+
+for (s in (1:n)){
+  erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+  #outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
+
+}
+outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.27 * qchisq(0.95, df = d))
+#t = table(data$labelsVrais,resUsOnline$outlier_labels)
+t = table(data$labelsVrais,outliersLabelsFar[,m,2,sim])
 if(r == 0){faux_positifsFar[m,2,sim] =  t[1,2]}
 
 if (r != 0) {faux_positifsFar[m,2,sim] =  t[1,2]
 faux_negatifsFar[m,2,sim] = t[2,1]}
-
-for (s in (1:n)){
-  erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-  outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
-}
 
 print(paste0("Erreur online us far ",erreursSigmaFar[n,m,2,sim]))
 
@@ -209,8 +232,13 @@ fitUSStreaming = resUsStreaming
 for(s in (1:n)){
 erreursSigmaFar[s,m,3,sim] = norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
 
-outliersLabelsFar[s,m,3,sim] = resUsStreaming$outlier_labels[s]}
-t =table(data$labelsVrais,resUsStreaming$outlier_labels)
+#outliersLabelsFar[s,m,3,sim] = resUsStreaming$outlier_labels[s]
+}
+outliersLabelsFar[,m,3,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.38 * qchisq(0.95, df = d))
+
+#t =table(data$labelsVrais,resUsStreaming$outlier_labels)
+
+t =table(data$labelsVrais,outliersLabelsFar[,m,3,sim])
 
 if (r != 0) {
 faux_positifsFar[m,3,sim] =  t[1,2]
@@ -233,43 +261,4 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
 }
 
 save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard100.Rdata")
-
-vraiesDistances = rep(0,n)
-for (i in (1:n)){
-vraiesDistances[i] = mahalanobis_generalizedRcpp(data$Z[i,],rep(0,d),eigen(Sigma0)$vectors, eigen(Sigma0)$values)
-}
-
-library(reshape2)  # pour melt()
-library(ggplot2)
-
-# Préparer les données
-df <- data.frame(
-  index = 1:n,
-  distance = resUsOnline$distances,
-  label = as.factor(data$labelsVrais)  # 0 = inlier, 1 = true outlier
-)
-
-# Tracer
-p <- ggplot(df, aes(x = index, y = distance, color = label)) +
-  geom_point(size = 1.5) +
-  geom_hline(
-    yintercept = qchisq(0.95, df = 10),
-    linetype = "dashed",
-    color = "black"
-  ) +
-  scale_color_manual(
-    values = c("0" = "blue", "1" = "red"),
-    labels = c("Inliers", "True outliers"),
-    name = "Point type"
-  ) +
-  labs(
-    title = "Outlier Detection Using Distance Threshold",
-    x = "Index",
-    y = "Distance"
-  ) +
-  ylim(0, 90) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-print(p)
 

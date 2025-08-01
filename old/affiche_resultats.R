@@ -799,7 +799,7 @@ p <- ggplot(df, aes(x = index, y = distance, color = label)) +
     x = "",
     y = ylab
   ) +
-  ylim(0, 90) +
+  ylim(0, 1000) +
   theme_minimal() +
   theme(legend.position = "bottom")
 
@@ -810,6 +810,12 @@ k = 0.86;l=0.56;rho1 = 0.6
 
 method = "streaming"
 
+
+pvraies = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = vraiesDistances,ylab = "Distance",method = "vraies distances",dim = 100,rate = 40)
+
+pnaif = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resNaif$distances,ylab = "Distance",method = "naive",dim = 100,rate = 40)
+
+pStream = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsStreaming$distances,ylab = "Distance",method = "streaming",dim = 100,rate = 40)
 
 
 p1 = plot_outliers_distances(labels_vrais = data$labelsVrais,distances = resUsStreaming$distances,ylab = "Distance",method = method,rate = 10)

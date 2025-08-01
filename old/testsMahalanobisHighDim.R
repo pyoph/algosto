@@ -17,11 +17,11 @@ outllab = rep(0,n)
 
 
 for(i in (1:n)){
-  distancesHD[i] = mahalanobis_high_dim(Z[i,],resNaif$meanIter[i,],resNaif$SigmaIter[i,,])
+  distancesHD[i] = mahalanobis_high_dim(Z[i,],rep(0,d),Sigma0)
   
-  v = diag(resNaif$SigmaIter[i,,])
+  v = diag(Sigma0)
   
-  RIter[i,,] = solve(diag(v,d))%*%resNaif$SigmaIter[i,,]%*%solve(diag(v,d))
+  RIter[i,,] = solve(diag(v,d))%*%Sigma0%*%solve(diag(v,d))
   
   c[i]= median(distancesHD[1:i])/d
   
