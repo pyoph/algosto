@@ -32,7 +32,7 @@ for(i in (1:n)){
   
   cutoff_corr[i] = d + quantNorm*(2*adj_quant*(sum(diag(RIter[i,,]%*%RIter[i,,])) -  d^2/n))^(1/2)
   
-  if(distancesHD[i] > cutoff_corr[i]){outllab[i] = 1}/c[i]
+  if(distancesHD[i] > cutoff_corr[i]/c[i]){outllab[i] = 1}
   
   }
 

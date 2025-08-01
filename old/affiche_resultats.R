@@ -900,7 +900,7 @@ combined <- wrap_plots(plot_list, ncol = 5, nrow = 2)
 final_plot <- combined / legend_plot +
   plot_layout(heights = c(10, 1)) +
   plot_annotation(
-    title = "(k,l,rho1) = (0.86,0.56;0.6) 40 % of outliers",
+    title = "(k,l,rho1) = (0.86,0.56;0.6) 40 % of outliers streaming method",
     theme = theme(
       plot.title = element_text(size = 14, face = "bold", hjust = 0.5)
     )
