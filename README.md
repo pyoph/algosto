@@ -8,6 +8,10 @@ Ce projet contient un pipeline de simulation en R destiné à estimer onlinede m
 
 Le projet s'articule autour de cinq fichiers principaux :
 
+### 0. `loadnecessary.R`
+
+- **Rôle** : charge les packages et fonctions nécessaires et les packages nécessaires : Rcpp, RMM, Gmedian, MASS, ggplot2, cowplot, patchwork
+
 ### 1. `parametres.R`
 
 - **Rôle** : Génère les fichiers de paramètres pour les différents scénarios de simulation.
@@ -51,4 +55,13 @@ Le projet s'articule autour de cinq fichiers principaux :
   - Fichier `fitFile` produit par `fitParameters.R`.
 - **Sortie** :
   - Fichiers d’erreurs (ex. : erreurs de classification ou estimation).
-  - Graphiques de performance.
+
+  
+### 5. `affiche_resultats.R`
+
+- **Rôle** : Graphiques (scénarios de contamination, erreurs norme de Frobenius matrice de covariance, faux positifs, faux négatifs)
+- **Entrée** :
+  - Résultats des runs 
+- **Sortie** :
+  - Graphiques.
+  
