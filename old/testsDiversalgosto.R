@@ -6,7 +6,7 @@ explDir = "~/Simus/exploitResults"
 
 #setwd(resDir)
 
-test_outliers = function(distances,dim = 100,cutoff)
+test_outliers = function(distances,dim = 10,cutoff)
 {
   outlab = rep(0,length(distances))
   
@@ -86,7 +86,9 @@ for(s in (1:n)){
 erreursSigmaNear[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
 #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
 }
-outliersLabelsNear[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))
+
+if(d == 10){outliersLabelsNear[,m,2,sim] = resUsOnline$outlier_labels}
+if(d == 100){outliersLabelsNear[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
 
 print(paste0("Erreur us online near ",erreursSigmaNear[n,m,2,sim]))
 
@@ -94,7 +96,7 @@ print(paste0("Erreur us online near ",erreursSigmaNear[n,m,2,sim]))
 t = table(data$labelsVrais,outliersLabelsNear[,m,2,sim])
 if (r != 0) {faux_positifsNear[m,2,sim] =  t[1,2]
 faux_negatifsNear[m,2,sim] = t[2,1]}
-if(r == 0){faux_positifsNear[m,2,sim] =  t[1,2]}
+if(r == 0){faux_positifsNear[m,2,sim] = t[1,2]}
 
 
 print(paste0("faux positifs near us online ",faux_positifsNear[m,2,sim]))
@@ -113,8 +115,10 @@ for(s in (1:n)){
 erreursSigmaNear[s,m,3,sim] =norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
 #outliersLabelsNear[s,m,3,sim] = resUsStreaming$outlier_labels[s]
 }
+if(d == 10){outliersLabelsNear[,m,3,sim]= resUsStreaming$outlier_labels}
+if(d == 100){
 outliersLabelsNear[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
-
+}
 print(paste0("Erreur us streaming near ",erreursSigmaNear[n,m,3,sim]))
 
 #t = table(data$labelsVrais,resUsStreaming$outlier_labels)
@@ -206,7 +210,13 @@ for (s in (1:n)){
   #outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
 
 }
-outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.27 * qchisq(0.95, df = d))
+
+
+if(d == 10){outliersLabelsFar[,m,2,sim]= resUsOnline$outlier_labels}
+if(d == 100){
+  outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.38*qchisq(.95,df = 100))
+}
+#outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.27 * qchisq(0.95, df = d))
 #t = table(data$labelsVrais,resUsOnline$outlier_labels)
 t = table(data$labelsVrais,outliersLabelsFar[,m,2,sim])
 if(r == 0){faux_positifsFar[m,2,sim] =  t[1,2]}
@@ -223,7 +233,7 @@ print(paste0("faux négatifs far us online ",faux_negatifsFar[m,2,sim]))
 temps_streaming = system.time(
   {
   if(d == 10){
-  resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z))}
+  resUsStreaming = StreamingOutlierDetection(data$Z,batch = ncol(data$Z))}
     if(d == 100){resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)),cutoff = 1.38 * qchisq(0.95, df = d))}
     }
   
@@ -234,8 +244,11 @@ erreursSigmaFar[s,m,3,sim] = norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
 
 #outliersLabelsFar[s,m,3,sim] = resUsStreaming$outlier_labels[s]
 }
-outliersLabelsFar[,m,3,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.38 * qchisq(0.95, df = d))
 
+if(d == 10){outliersLabelsFar[,m,3,sim]= resUsStreaming$outlier_labels}
+if(d == 100){
+  outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
+}
 #t =table(data$labelsVrais,resUsStreaming$outlier_labels)
 
 t =table(data$labelsVrais,outliersLabelsFar[,m,3,sim])

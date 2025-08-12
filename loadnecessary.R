@@ -3,7 +3,8 @@ library(RMM)
 library(Gmedian)
 library(MASS)
 library(ggplot2)
-
+library(cowplot)
+library(patchwork)
 ############################
 #############FIchiers nécessaires
 #################################
