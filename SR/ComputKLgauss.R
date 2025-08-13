@@ -4,45 +4,7 @@ rm(list=ls())
 library(nlme); library(flexmix); library(fields)
 
 # Functions
-KL <- function(parms1, parms2){
-  invSigma2 <- solve(parms2$Sigma)
-  0.5*(log(det(parms2$Sigma)/det(parms1$Sigma)) - d + sum(diag(invSigma2%*%parms1$Sigma)) +
-         t(parms2$mu-parms1$mu)%*%invSigma2%*%(parms2$mu-parms1$mu))[1, 1]
-}
-
-FrobeniusNormError = function(Sigmahat,Sigma1){
-  return (norm(Sigmahat - Sigma1,"F"))
-}
-
-
-taux_detection <- function(vrais_labels, labels_predits) {
-  # S'assurer que les entrées sont binaires
-  if (!all(vrais_labels %in% c(0, 1)) || !all(labels_predits %in% c(0, 1))) {
-    stop("Les vecteurs doivent contenir uniquement 0 (normal) ou 1 (outlier).")
-  }
-  
-  # Calcul des éléments de la matrice de confusion
-  VP <- sum(vrais_labels == 1 & labels_predits == 1)  # Vrai Positifs
-  FP <- sum(vrais_labels == 0 & labels_predits == 1)  # Faux Positifs
-  FN <- sum(vrais_labels == 1 & labels_predits == 0)  # Faux Négatifs
-  VN <- sum(vrais_labels == 0 & labels_predits == 0)  # Vrai Négatifs
-  
-  # Taux
-  TPR <- if ((VP + FN) > 0) VP / (VP + FN) else NA  # Sensibilité
-  FPR <- if ((FP + VN) > 0) FP / (FP + VN) else NA  # 1 - Spécificité
-  
-  return(list(
-    TPR = TPR,
-    FPR = FPR,
-    VP = VP,
-    FP = FP,
-    FN = FN,
-    VN = VN
-  ))
-}
-
-
-
+source('FunctionsKLgauss.R')
 
 # Contamination parms: F1
 ParmsF1 <- function(m1, k1, l1, rho1){
@@ -55,7 +17,7 @@ ParmsF1 <- function(m1, k1, l1, rho1){
 
 
 # Dims
-d <- 100
+d <- 10
 
 # Null parms: F0
 mu0 <- rep(0, d)
@@ -82,7 +44,7 @@ abline(h=KLval); abline(v=k1val)
 l1grid <- 2^seq(-5, 5, .1); l1val <- c(1/20, .2, .5, 1, 2, 20)
 plot(l1grid, sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))}), log='xy')
 abline(h=KLval); abline(v=l1val)
-rho1grid <- seq(0.005, 0.995, by=0.005); rho1val <- c(0, .3, .6, 0.8, .95)
+rho1grid <- seq(-0.995, 0.995, by=0.005); rho1val <- c(0, .3, .6, 0.8, .95)
 plot(rho1grid, sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))}), log='y')
 abline(h=KLval); abline(v=rho1val)
 
@@ -161,9 +123,9 @@ for (m in methodes)
 
 }
 
-save(erreurNormeFrobenius,file ="erreurNormeFrobeniusKGrid.Rdata") 
-save(faux_positifs,file ="faux_positifsKGrid.Rdata") 
-save(faux_negatifs,file ="faux_negatifsKGrid.Rdata") 
+# save(erreurNormeFrobenius,file ="erreurNormeFrobeniusKGrid.Rdata") 
+# save(faux_positifs,file ="faux_positifsKGrid.Rdata") 
+# save(faux_negatifs,file ="faux_negatifsKGrid.Rdata") 
 
 plot(k1grid,faux_negatifs[9,2,])
 
