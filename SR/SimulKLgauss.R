@@ -31,7 +31,7 @@ B <- 100; n <- 1e4
 parmList <- k1List; parmNb <- k1Nb; parmName = 'k1'
 # parmList <- l1List; parmNb <- l1Nb; parmName = 'lambda'
 # parmList <- rho1List; parmNb <- rho1Nb; parmName = 'rho1'
-resFile <- paste0(simDir, 'SimContamination-', parmName, '-B', B, '.Rdata')
+resFile <- paste0(simDir, 'SimContamination-', parmName, '-n', n, '-B', B, '.Rdata')
 if(!file.exists(resFile)){
   kl <- rmse <- array(NA, dim=c(B, rNb, parmNb), dimnames=list(1:B, rList, parmList))
   klTheo  <- rmseTheo <- rep(NA, parmNb)
@@ -64,9 +64,9 @@ if(!file.exists(resFile)){
        file=resFile)
 }else{load(resFile)}
 
-figFile <- paste0(figDir, 'SimContamination-', parmName, '-B', B, '.png')
+figFile <- paste0(figDir, 'SimContamination-', parmName, '-n', n, '-B', B, '.png')
 if(exportFig){png(figFile)}
-par(mfcol=c(2, parmNb))
+par(mfcol=c(2, parmNb), mex=.6)
 for(pp in 1:parmNb){
   boxplot(rmse[, , pp], main=paste(parmName, '=', parmList[pp]), 
           ylim=c(min(rmse), max(max(rmse), max(rmseTheo))), , log='y', ylab='RMSE')
