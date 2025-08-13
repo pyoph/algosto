@@ -44,7 +44,7 @@ abline(h=KLval); abline(v=k1val)
 l1grid <- 2^seq(-5, 5, .1); l1val <- c(1/20, .2, .5, 1, 2, 20)
 plot(l1grid, sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))}), log='xy')
 abline(h=KLval); abline(v=l1val)
-rho1grid <- seq(-0.995, 0.995, by=0.005); rho1val <- c(0, .3, .6, 0.8, .95)
+rho1grid <- seq(-0.995, 0.995, by=0.005); rho1val <- c(-.95, -.7, -.15, .3, .6, .85, .975)
 plot(rho1grid, sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))}), log='y')
 abline(h=KLval); abline(v=rho1val)
 
