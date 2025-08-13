@@ -9,9 +9,9 @@ source("~/work/algosto/loadnecessary.R")
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir =  "~/work/Simus/DataSim"
+simDir =  "D:/Simus/DataSim"
 #resDir <- "C:/Users/Paul/Documents/Simus/FitSim"
-resDir = "~/work/Simus/FitSim/"
+resDir = "D:/Simus/FitSim/"
 ###################################################################
 #####load sim parameters
 ###################################################################
@@ -28,8 +28,10 @@ lList = l1val
 
 rho1List = rho1val
 
+rho1ListNeg = rho1valNeg
+
 #simNb = 5
-simNb = 1
+simNb = 10
 
 
 # Fit (k for mu1) Other parameters are fixed
@@ -38,7 +40,7 @@ rho1 = rho0
 for(r in rList){
 for(k in kList[2:length(kList)]){
   for(sim in 1:simNb){
-    # print(paste0("-n",n,"-d",d,"-k",k,"-l",l,))
+     print(paste0("-n",n,"-d",d,"-k",k,"-l",l,"-rho1",rho1))
       dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
    
       setwd(simDir)

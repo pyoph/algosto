@@ -47,7 +47,7 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
    )
   return(p)
 }
-
+#######################Appels de la fonction######################################
 p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-5,5)
 
 p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",20,-5,5)
@@ -88,7 +88,7 @@ final_plot <- plot_grid(main_grid, legend_plot,
 print(final_plot)
 
 ######################################################################
-#######RMSE Sigma Iter
+#######Affichage des erreurs d'estimation de Sigma
 ######################################################################
 # 
 # rmseSigma = res100runNearesScenario$rmseSigmaRec
@@ -177,65 +177,65 @@ return(gg)
 
 affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,l,rho1) = (6.57,19.02,0.415)")
 
-
-# #########################################
-#             AUC
-# ########################################
-
-
-aucTout = res100runNearesScenario$aucRec
-
-
-#aucTout = res1run$aucRec
-
-auc_moy <- apply(aucTout, c(1, 2), mean)
-
-auc_moy = res10run$aucRec[,,1]
-#auc_moy = res$aucRec[,,1]
-#auc_moy = res$aucRec[,,1]
-
-
-methodes <- c(1, 9, 10)
-method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
-method_pos_map <- setNames(1:3, methodes)  # map méthode → colonne
-
-taux_indices <- 1:9
-taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
-
-data_list <- list()
-for (i in seq_along(taux_indices)) {
-  j <- taux_indices[i]
-  for (k in methodes) {
-    k_pos <- method_pos_map[as.character(k)]
-    df <- data.frame(
-      ContaminationRate = taux_valeurs[i],
-      AUC = auc_moy[j, k_pos],
-      Method = method_labels[as.character(k)]
-    )
-    data_list[[length(data_list) + 1]] <- df
-  }
-}
-df_long <- do.call(rbind, data_list)
-df_long$Method <- factor(df_long$Method, levels = method_labels)
-
-# Graphique
-ggplot(df_long, aes(x = ContaminationRate, y = AUC, color = Method)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
-  labs(
-    title = "AUC vs. Contamination Rate",
-    x = "Contamination Rate (%)",
-    y = "AUC",
-    color = "Method"
-  ) +
-  scale_x_continuous(
-    breaks = taux_valeurs
-  ) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-
-dim(res10run$faux_positifsRec)
+# 
+# # #########################################
+# #             AUC
+# # ########################################
+# 
+# 
+# aucTout = res100runNearesScenario$aucRec
+# 
+# 
+# #aucTout = res1run$aucRec
+# 
+# auc_moy <- apply(aucTout, c(1, 2), mean)
+# 
+# auc_moy = res10run$aucRec[,,1]
+# #auc_moy = res$aucRec[,,1]
+# #auc_moy = res$aucRec[,,1]
+# 
+# 
+# methodes <- c(1, 9, 10)
+# method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
+# method_pos_map <- setNames(1:3, methodes)  # map méthode → colonne
+# 
+# taux_indices <- 1:9
+# taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
+# 
+# data_list <- list()
+# for (i in seq_along(taux_indices)) {
+#   j <- taux_indices[i]
+#   for (k in methodes) {
+#     k_pos <- method_pos_map[as.character(k)]
+#     df <- data.frame(
+#       ContaminationRate = taux_valeurs[i],
+#       AUC = auc_moy[j, k_pos],
+#       Method = method_labels[as.character(k)]
+#     )
+#     data_list[[length(data_list) + 1]] <- df
+#   }
+# }
+# df_long <- do.call(rbind, data_list)
+# df_long$Method <- factor(df_long$Method, levels = method_labels)
+# 
+# # Graphique
+# ggplot(df_long, aes(x = ContaminationRate, y = AUC, color = Method)) +
+#   geom_line(size = 1) +
+#   geom_point(size = 2) +
+#   labs(
+#     title = "AUC vs. Contamination Rate",
+#     x = "Contamination Rate (%)",
+#     y = "AUC",
+#     color = "Method"
+#   ) +
+#   scale_x_continuous(
+#     breaks = taux_valeurs
+#   ) +
+#   theme_minimal() +
+#   theme(legend.position = "bottom")
+# 
+# 
+# dim(res10run$faux_positifsRec)
 
 #########################################
 #Faux négatifs moyenne

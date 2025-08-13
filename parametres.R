@@ -19,7 +19,7 @@ rm(list=ls())
 #############################################################
 #####################sample size and number of runs###############
 ############################################################
-d <- 100
+d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
 simNb <- 100
@@ -31,7 +31,7 @@ n <- 1e4
 
 # Dims and KL distance reached. The parameters are chosen such that the KL distance is in {0,1,10,100}
 #d <- 100; KLval <- c(0, 1, 10, 100)
-d <- 100; KLval <- c(0, 1, 10, 100)
+d <- 10; KLval <- c(0, 1, 10, 100)
 # 
 # # Functions
 # KL <- function(parms1, parms2){
@@ -84,99 +84,101 @@ l1val <- unique(l1val)
 l1val
 l1grid <- 2^seq(-5, 5, 0.01)
 rho1grid <- seq(0.005, 0.995, by=0.005); #= rho1val <- c(0, .3, .6, 0.8, .95)
+rho1gridneg <- seq(-0.995, 0.005, by=0.005); #= rho1val <- c(0, .3, .6, 0.8, .95)
 KLrho1 <- sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))})
 rho1val <- rho1grid[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
 rho1val
-
-###############Choice of the couples such that the target is reached###########"
-KL_targets <- c(0, 1, 10, 100)
-
-# 1. Pour (k1, l1)
-kl_k_l <- expand.grid(k1 = k1grid, l1 = l1grid)
-kl_k_l$KL <- apply(kl_k_l, 1, function(row) KL(parms0, ParmsF1(m1, row["k1"], row["l1"], rho0)))
-closest_k_l <- do.call(rbind, lapply(KL_targets, function(kl_target) {
-  row <- kl_k_l[which.min(abs(kl_k_l$KL - kl_target)), ]
-  data.frame(KL_target = kl_target, k1 = row$k1, l1 = row$l1, KL = row$KL)
-}))
-
-#Extraction des couples (k,l) rho1 fixé
-
-k1l1val = matrix(0,4,3)
-
-for (i in (1:4))
-{
-k1l1val[i,] = c(closest_k_l[i,2],closest_k_l[i,3],rho0)
-}
-
-# 2. Pour (k1, rho1)
-kl_k_rho <- expand.grid(k1 = k1grid, rho1 = rho1grid)
-kl_k_rho$KL <- apply(kl_k_rho, 1, function(row) KL(parms0, ParmsF1(m1, row["k1"], 1, row["rho1"])))
-closest_k_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
-  row <- kl_k_rho[which.min(abs(kl_k_rho$KL - kl_target)), ]
-  data.frame(KL_target = kl_target, k1 = row$k1, rho1 = row$rho1, KL = row$KL)
-}))
-
-#Extraction des couples k rho l fixé
-
-k1rho1val = matrix(0,4,3)
-
-for (i in (1:4))
-{
-k1rho1val[i,] = c(closest_k_rho[i,2],1,closest_k_rho[i,3])
-}
-
-# 3. Pour (l1, rho1)
-kl_l_rho <- expand.grid(l1 = l1grid, rho1 = rho1grid)
-kl_l_rho$KL <- apply(kl_l_rho, 1, function(row) KL(parms0, ParmsF1(m1, 0, row["l1"], row["rho1"])))
-closest_l_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
-  row <- kl_l_rho[which.min(abs(kl_l_rho$KL - kl_target)), ]
-  data.frame(KL_target = kl_target, l1 = row$l1, rho1 = row$rho1, KL = row$KL)
-}))
-
-
-#Extraction des couples (l,rho) k fixé
-
-
-l1rho1val = matrix(0,4,3)
-
-
-for (i in (1:4))
-{
-  l1rho1val[i,] = c(0,closest_l_rho[i,2],closest_l_rho[i,3])
-}
-
-
-KL_targets <- c(0, 1, 10, 100)
-
-# Générer la grille complète de combinaisons (attention : peut être longue)
-kl_k_l_rho <- expand.grid(k1 = k1grid, l1 = l1grid, rho1 = rho1grid)
-
-# Calculer KL pour chaque triplet
-kl_k_l_rho$KL <- apply(kl_k_l_rho, 1, function(row) {
-  KL(parms0, ParmsF1(m1, row["k1"], row["l1"], row["rho1"]))
-})
-
-# Pour chaque valeur cible de KL, trouver le triplet (k1, l1, rho1) le plus proche
-closest_k_l_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
-  row <- kl_k_l_rho[which.min(abs(kl_k_l_rho$KL - kl_target)), ]
-  data.frame(KL_target = kl_target,
-             k1 = row$k1,
-             l1 = row$l1,
-             rho1 = row$rho1,
-             KL = row$KL)
-}))
-
-# Afficher les triplets qui conviennent
-print(closest_k_l_rho)
-
-k_l_rhoval = matrix(0,4,3)
-
-for (i in (1:4))
-{
-  k_l_rhoval[i,] = c(closest_k_l_rho[i,2],closest_k_l_rho[i,3],closest_k_l_rho[i,4] )
-}
-
-
+rho1valNeg = rho1gridneg[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
+# 
+# ###############Choice of the couples such that the target is reached###########"
+# KL_targets <- c(0, 1, 10, 100)
+# 
+# # 1. Pour (k1, l1)
+# kl_k_l <- expand.grid(k1 = k1grid, l1 = l1grid)
+# kl_k_l$KL <- apply(kl_k_l, 1, function(row) KL(parms0, ParmsF1(m1, row["k1"], row["l1"], rho0)))
+# closest_k_l <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+#   row <- kl_k_l[which.min(abs(kl_k_l$KL - kl_target)), ]
+#   data.frame(KL_target = kl_target, k1 = row$k1, l1 = row$l1, KL = row$KL)
+# }))
+# 
+# #Extraction des couples (k,l) rho1 fixé
+# 
+# k1l1val = matrix(0,4,3)
+# 
+# for (i in (1:4))
+# {
+# k1l1val[i,] = c(closest_k_l[i,2],closest_k_l[i,3],rho0)
+# }
+# 
+# # 2. Pour (k1, rho1)
+# kl_k_rho <- expand.grid(k1 = k1grid, rho1 = rho1grid)
+# kl_k_rho$KL <- apply(kl_k_rho, 1, function(row) KL(parms0, ParmsF1(m1, row["k1"], 1, row["rho1"])))
+# closest_k_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+#   row <- kl_k_rho[which.min(abs(kl_k_rho$KL - kl_target)), ]
+#   data.frame(KL_target = kl_target, k1 = row$k1, rho1 = row$rho1, KL = row$KL)
+# }))
+# 
+# #Extraction des couples k rho l fixé
+# 
+# k1rho1val = matrix(0,4,3)
+# 
+# for (i in (1:4))
+# {
+# k1rho1val[i,] = c(closest_k_rho[i,2],1,closest_k_rho[i,3])
+# }
+# 
+# # 3. Pour (l1, rho1)
+# kl_l_rho <- expand.grid(l1 = l1grid, rho1 = rho1grid)
+# kl_l_rho$KL <- apply(kl_l_rho, 1, function(row) KL(parms0, ParmsF1(m1, 0, row["l1"], row["rho1"])))
+# closest_l_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+#   row <- kl_l_rho[which.min(abs(kl_l_rho$KL - kl_target)), ]
+#   data.frame(KL_target = kl_target, l1 = row$l1, rho1 = row$rho1, KL = row$KL)
+# }))
+# 
+# 
+# #Extraction des couples (l,rho) k fixé
+# 
+# 
+# l1rho1val = matrix(0,4,3)
+# 
+# 
+# for (i in (1:4))
+# {
+#   l1rho1val[i,] = c(0,closest_l_rho[i,2],closest_l_rho[i,3])
+# }
+# 
+# 
+# KL_targets <- c(0, 1, 10, 100)
+# 
+# # Générer la grille complète de combinaisons (attention : peut être longue)
+# kl_k_l_rho <- expand.grid(k1 = k1grid, l1 = l1grid, rho1 = rho1grid)
+# 
+# # Calculer KL pour chaque triplet
+# kl_k_l_rho$KL <- apply(kl_k_l_rho, 1, function(row) {
+#   KL(parms0, ParmsF1(m1, row["k1"], row["l1"], row["rho1"]))
+# })
+# 
+# # Pour chaque valeur cible de KL, trouver le triplet (k1, l1, rho1) le plus proche
+# closest_k_l_rho <- do.call(rbind, lapply(KL_targets, function(kl_target) {
+#   row <- kl_k_l_rho[which.min(abs(kl_k_l_rho$KL - kl_target)), ]
+#   data.frame(KL_target = kl_target,
+#              k1 = row$k1,
+#              l1 = row$l1,
+#              rho1 = row$rho1,
+#              KL = row$KL)
+# }))
+# 
+# # Afficher les triplets qui conviennent
+# print(closest_k_l_rho)
+# 
+# k_l_rhoval = matrix(0,4,3)
+# 
+# for (i in (1:4))
+# {
+#   k_l_rhoval[i,] = c(closest_k_l_rho[i,2],closest_k_l_rho[i,3],closest_k_l_rho[i,4] )
+# }
+# 
+# 
 #####################################################################################################################
 ################################# Export of the parameter file one for d = 10 and one for d=100######################
 #####################################################################################################################
@@ -205,14 +207,3 @@ for(r in rList){for(k in k1val){for(l in l1val){for(rho1 in rho1val){
   }
 }}}}
 
-
-########################################################### 
-##################################Plots#############################################################################
-################################################################
-par(mfrow=c(3, 1))
-plot(k1grid, sapply(k1grid, function(k1){KL(parms0, ParmsF1(m1, k1, 1, rho0))}), log='xy')
-abline(h=KLval); abline(v=k1val)
-plot(l1grid, sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))}), log='xy')
-abline(h=KLval); abline(v=l1val)
-plot(rho1grid, sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))}), log='y')
-abline(h=KLval); abline(v=rho1val)

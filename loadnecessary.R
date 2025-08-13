@@ -68,3 +68,23 @@ ParmsF1 <- function(m1, k1, l1, rho1){
   Sigma1 <- diag(sqrt(sigmaSq1)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq1))
   return(list(mu1=mu1, Sigma1=Sigma1))
 }
+
+
+# Functions
+KL <- function(parms1, parms2){
+  invSigma2 <- solve(parms2$Sigma)
+  0.5*(log(det(parms2$Sigma)/det(parms1$Sigma)) - d + sum(diag(invSigma2%*%parms1$Sigma)) +
+         t(parms2$mu-parms1$mu)%*%invSigma2%*%(parms2$mu-parms1$mu))[1, 1]
+}
+
+test_outliers = function(distances,dim = 10,cutoff)
+{
+  outlab = rep(0,length(distances))
+  
+  
+  for (i in (1:length(distances)))
+  {
+    if(distances[i] > cutoff){outlab[i] = 1}
+  }
+  return(outlab)
+}

@@ -5,6 +5,20 @@ library(dplyr)
 library(tidyr)
 library(patchwork)  # pour agencer les 4 graphiques
 
+
+##############################################################################
+#####################Plots for klval l1val and rho1val#########################
+########################################################### 
+##################################Plots#############################################################################
+################################################################
+par(mfrow=c(3, 1))
+plot(k1grid, sapply(k1grid, function(k1){KL(parms0, ParmsF1(m1, k1, 1, rho0))}), log='xy')
+abline(h=KLval); abline(v=k1val)
+plot(l1grid, sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))}), log='xy')
+abline(h=KLval); abline(v=l1val)
+plot(rho1grid, sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))}), log='y')
+abline(h=KLval); abline(v=rho1val)
+
 ###################################################
 #Affiche contamination scenarios
 ##################################################

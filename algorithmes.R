@@ -70,18 +70,36 @@ SampleCovOnline = function(Z)
 {
   nblignes = nrow(Z)
   
-  mean = rep(1,ncol(Z))
+  # Initialisation avec les 2 premières données
+  mean = colMeans(Z[1:2, , drop = FALSE])        # moyenne empirique
   meanOld = mean
-  Sigma = 1.5*diag(ncol(Z))
+  Sigma = cov(Z[1:2, , drop = FALSE])            # covariance empirique
   
-  meanIter =   matrix(0,nrow(Z),ncol(Z))
-  SigmaIter = array(0, dim = c(nrow(Z),ncol(Z),ncol(Z)))
+  meanIter = matrix(0, nrow(Z), ncol(Z))
+  SigmaIter = array(0, dim = c(nrow(Z), ncol(Z), ncol(Z)))
+  
+  
+  meanIter[1,] = mean
+  
+  
+  
+  
+
+  distances = rep(0, nrow(Z))
+  outliers_labels = rep(0, nrow(Z))
+  cutoff = qchisq(.95, df = ncol(Z))
+  
+  meanOld = mean
+  #Sigma = 1.5*diag(ncol(Z))
+  
+  #SigmaIter = array(0, dim = c(nrow(Z),ncol(Z),ncol(Z)))
   distances = rep(0, nrow(Z))
   outliers_labels = rep(0,nrow(Z))
   cutoff = qchisq(.95,df = ncol(Z))
   #nb_out= 0
-  for (i in (1:(nblignes-1)))
+  for (i in (2:(nblignes-1)))
   {
+
     mean   = mean   + (1.0 / (i + 1)) * (Z[i+1,] - mean);
     Sigma = (i - 1)/i*Sigma + 1/(i + 1)*((Z[i+1,] - meanOld)%*%t(Z[i+1,] - meanOld))
     meanOld = mean
