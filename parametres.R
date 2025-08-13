@@ -89,6 +89,22 @@ KLrho1 <- sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))})
 rho1val <- rho1grid[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
 rho1val
 rho1valNeg = rho1gridneg[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
+
+
+# Grille de rho1 négatifs
+rho1gridneg <- seq(-0.995, 0, by = 0.005)
+
+# Calcul des KL pour chaque rho1
+KLrho1neg <- sapply(rho1gridneg, function(rho1) {
+  KL(parms0, ParmsF1(m1, 0, 1, rho1))
+})
+
+# Trouver les rho1 qui minimisent |KL - valeur cible|
+rho1valNeg <- sapply(KLval, function(kl) {
+  rho1gridneg[which.min(abs(KLrho1neg - kl))]
+})
+
+rho1valNeg
 # 
 # ###############Choice of the couples such that the target is reached###########"
 # KL_targets <- c(0, 1, 10, 100)
