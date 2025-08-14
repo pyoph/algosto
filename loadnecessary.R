@@ -2,8 +2,8 @@
 ######################################
 ################Packages nécessaires#####
 #########################################
-setwd("~/algosto")
-packages = c("Rcpp","Gmedian","MASS","DescTools", "checkmate", "doFuture", "future")
+setwd("~/work/algosto")
+packages = c("Rcpp","Gmedian","MASS","DescTools", "checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2')
 
 for (p in packages) {
   if (!requireNamespace(p, quietly = TRUE)) {
@@ -28,8 +28,8 @@ library(MASS)
 ############################
 #############FIchiers nécessaires
 #################################
-source("~/algosto/algorithmes.R")
-sourceCpp("~/algosto/src/CodesRCpp.cpp")
+source("~/work/algosto/algorithmes.R")
+sourceCpp("~/work/algosto/src/CodesRCpp.cpp")
 
 
 #######################################################################

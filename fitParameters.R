@@ -3,20 +3,20 @@
 ##################################################
 
 ##########Load necessary packages##############################
-source("~/algosto/loadnecessary.R")
+source("~/work/algosto/loadnecessary.R")
 
 ####################################################################
 ###########Repositories à adapter en fonction de votre configuration
 ####################################################################
 
-simDir =  "~/Simus/DataSim"
+simDir =  "~/work/Simus/DataSim"
 
-resDir = "~/Simus/FitSim/"
+resDir = "~/work/Simus/FitSim/"
 ###################################################################
 #####load sim parameters
 ###################################################################
-setwd("~/algosto")
-load("SimParmsGrid-n10000-d100.Rdata")
+setwd("~/work/algosto")
+load("SimParmsGrid-n10000-d10.Rdata")
 
 
 ##########################################
@@ -32,7 +32,7 @@ rho1List = rho1val
 rho1ListNeg = rho1valNeg
 
 #simNb = 5
-simNb = 100
+simNb = 1
 
 
 # Fit (rho for Sigma1) Other parameters are fixed
