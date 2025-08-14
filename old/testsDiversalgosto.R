@@ -154,6 +154,7 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
 
 }
 erreursSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
+erreursInvSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
 outliersLabelsFar = array(0,dim = c(n,length(rList),3,simNb))
 labelsVraisFar = array(0,dim = c(n,length(rList)))
 faux_positifsFar= array(0,dim = c(length(rList),3,simNb))
@@ -192,10 +193,33 @@ resNaif = SampleCovOnline(data$Z)})
 fitNaif = resNaif
 for (s in (1:n)){
 erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
+
+VectPSigma = eigen(resNaif$SigmaIter[s,,])$vectors
+valPSigma = eigen(resNaif$SigmaIter[s,,])$values
+
+
+for(t in(1:d)){
+  
+  SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
+  
+}
+erreursInvSigmaFar[s,m,1,sim] = norm(SigmaInvSqrt - (Sigma0)^(-0.5),"F")
+
 }
 outliersLabelsFar[,m,1,sim] = resNaif$outliers_labels
 
 print(paste0("Erreur naive far ",erreursSigmaFar[n,m,1,sim]))
+
+
+if(erreursSigmaInvFar[n,m,1,sim] < 1e12){
+print(paste0("Erreur naive sqrt inv far ",erreursInvSigmaFar[n,m,1,sim]))
+}
+
+if(erreursSigmaInvFar[n,m,1,sim] >= 1e12){
+  print("NAN")
+}
+
+
 
 t = table(data$labelsVrais,resNaif$outliers_labels)
 if (r != 0) {faux_positifsFar[m,1,sim] =  t[1,2]
@@ -222,8 +246,27 @@ fitUsOnline = resUsOnline
 
 for (s in (1:n)){
   erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+  
+  VectPSigma = eigen(resUsOnline$Sigma[s,,])$vectors
+  valPSigma = eigen(resUsOnline$Sigma[s,,])$values
+  
+  
+  for(t in(1:d)){
+    
+    SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
+    
+  }
   #outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
+  
+  erreursInvSigmaFar[s,m,2,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
+}
 
+if(erreursSigmaInvFar[n,m,2,sim] < 1e12){
+  print(paste0("Erreur online us sqrt inv far ",erreursInvSigmaFar[n,m,2,sim]))
+}
+
+if(erreursSigmaInvFar[n,m,2,sim] >= 1e12){
+  print("NAN")
 }
 
 
@@ -257,6 +300,16 @@ fitUSStreaming = resUsStreaming
 for(s in (1:n)){
 erreursSigmaFar[s,m,3,sim] = norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
 
+VectPSigma = eigen(resUsStreaming$Sigma[s,,])$vectors
+valPSigma = eigen(resUsStreaming$Sigma[s,,])$values
+
+
+for(t in(1:d)){
+  
+  SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
+  
+}
+erreursInvSigmaFar[s,m,3,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
 #outliersLabelsFar[s,m,3,sim] = resUsStreaming$outlier_labels[s]
 }
 
@@ -265,7 +318,10 @@ if(d == 100){
   outliersLabelsFar[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
 }
 #t =table(data$labelsVrais,resUsStreaming$outlier_labels)
-
+if(erreursInvSigmaFar[n,m,3,sim] < 1e12)
+  {print("Erreur Sigma inv streaming ", erreursInvSigmaFar[n,m,3,sim])}
+if (erreursInvSigmaFar[n,m,3,sim] > 1e12)
+  {print("NAN")}
 t =table(data$labelsVrais,outliersLabelsFar[,m,3,sim])
 
 if (r != 0) {
