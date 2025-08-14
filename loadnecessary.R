@@ -3,7 +3,7 @@
 ################Packages nécessaires#####
 #########################################
 
-packages = c("Rcpp","Gmedian","MASS","ggplot2","cowplot","patchwork")
+packages = c("Rcpp","Gmedian","MASS","ggplot2")
 
 for (p in packages) {
   if (!requireNamespace(p, quietly = TRUE)) {
@@ -18,9 +18,9 @@ library(Rcpp)
 library(RMM)
 library(Gmedian)
 library(MASS)
-library(ggplot2)
-library(cowplot)
-library(patchwork)
+#library(ggplot2)
+# library(cowplot)
+# library(patchwork)
 
 ############################
 #############FIchiers nécessaires
