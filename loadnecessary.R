@@ -3,7 +3,7 @@
 ################Packages nécessaires#####
 #########################################
 setwd("~/algosto")
-packages = c("Rcpp","Gmedian","MASS")
+packages = c("Rcpp","Gmedian","MASS","DescTools", "checkmate", "doFuture", "future")
 
 for (p in packages) {
   if (!requireNamespace(p, quietly = TRUE)) {
@@ -11,6 +11,8 @@ for (p in packages) {
   }
   library(p, character.only = TRUE)
 }
+
+
 
 install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 
