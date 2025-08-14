@@ -12,7 +12,7 @@ for (p in packages) {
   library(p, character.only = TRUE)
 }
 
-install.packages("RMM_1.0.tar")
+install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 
 
 library(Rcpp)
