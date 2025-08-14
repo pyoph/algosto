@@ -1,10 +1,25 @@
 simDir = "~/Simus/DataSim"
 
-resDir = "D:/Simus/FitSim"
+resDir = "~/Simus/FitSim"
 
 explDir = "~/Simus/exploitResults"
 
 #setwd(resDir)
+
+
+##########################################
+###Extraction of the parameters
+##########################################
+
+kList = k1val
+
+lList = l1val
+
+rho1List = rho1val
+
+rho1ListNeg = rho1valNeg
+
+
 
 test_outliers = function(distances,dim = 10,cutoff)
 {
@@ -247,7 +262,7 @@ erreursSigmaFar[s,m,3,sim] = norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
 
 if(d == 10){outliersLabelsFar[,m,3,sim]= resUsStreaming$outlier_labels}
 if(d == 100){
-  outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
+  outliersLabelsFar[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
 }
 #t =table(data$labelsVrais,resUsStreaming$outlier_labels)
 

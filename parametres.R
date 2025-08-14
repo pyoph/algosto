@@ -201,7 +201,7 @@ rho1valNeg
 save(d, KLval, 
      mu0, sigmaSq0, Sigma0, rho0, 
      m1, 
-     k1val, l1val, rho1val,n,d,rList,
+     k1val, l1val, rho1val,rho1valNeg,n,d,rList,
      file=paste0('SimParmsGrid-n', n,'-d',d, '.Rdata'))
 
 

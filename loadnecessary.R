@@ -1,3 +1,19 @@
+
+######################################
+################Packages nécessaires#####
+#########################################
+
+packages = c("Rcpp","Gmedian","MASS","ggplot2","cowplot","patchwork")
+
+for (p in packages) {
+  if (!requireNamespace(p, quietly = TRUE)) {
+    install.packages(p)
+  }
+  library(p, character.only = TRUE)
+}
+
+
+
 library(Rcpp)
 library(RMM)
 library(Gmedian)
@@ -5,6 +21,7 @@ library(MASS)
 library(ggplot2)
 library(cowplot)
 library(patchwork)
+
 ############################
 #############FIchiers nécessaires
 #################################
