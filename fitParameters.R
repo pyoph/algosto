@@ -16,7 +16,7 @@ resDir = "~/Simus/FitSim/"
 #####load sim parameters
 ###################################################################
 setwd("~/algosto")
-load("SimParmsGrid-n10000-d10.Rdata")
+load("SimParmsGrid-n10000-d100.Rdata")
 
 
 ##########################################
