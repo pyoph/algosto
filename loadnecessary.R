@@ -2,8 +2,8 @@
 ######################################
 ################Packages nécessaires#####
 #########################################
-
-packages = c("Rcpp","Gmedian","MASS","ggplot2")
+setwd("~/algosto")
+packages = c("Rcpp","Gmedian","MASS")
 
 for (p in packages) {
   if (!requireNamespace(p, quietly = TRUE)) {
@@ -12,6 +12,7 @@ for (p in packages) {
   library(p, character.only = TRUE)
 }
 
+install.packages("RMM_1.0.tar")
 
 
 library(Rcpp)
