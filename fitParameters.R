@@ -3,7 +3,7 @@
 ##################################################
 
 ##########Load necessary packages##############################
-source("~/work/algosto/loadnecessary.R")
+source("~/algosto/loadnecessary.R")
 
 ####################################################################
 ###########Repositories à adapter en fonction de votre configuration
