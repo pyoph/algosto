@@ -14,7 +14,7 @@ for (p in packages) {
 
 
 
-install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
+#install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 
 
 library(Rcpp)
@@ -28,8 +28,8 @@ library(MASS)
 ############################
 #############FIchiers nécessaires
 #################################
-source("~/work/algosto/algorithmes.R")
-sourceCpp("~/work/algosto/src/CodesRCpp.cpp")
+source("~/algosto/algorithmes.R")
+sourceCpp("~/algosto/src/CodesRCpp.cpp")
 
 
 #######################################################################
