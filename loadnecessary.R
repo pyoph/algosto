@@ -2,7 +2,7 @@
 ######################################
 ################Packages nécessaires#####
 #########################################
-setwd("~/work/algosto")
+setwd("~/algosto")
 packages = c("Rcpp","Gmedian","MASS","DescTools", "checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2')
 
 for (p in packages) {
