@@ -22,7 +22,7 @@ rm(list=ls())
 d <- 100
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
-simNb <- 100
+simNb <- 1
 n <- 1e4
 #############################################################
 
