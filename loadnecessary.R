@@ -2,16 +2,16 @@
 ######################################
 ################Packages nécessaires#####
 #########################################
-setwd("~/algosto")
-packages = c("Rcpp","Gmedian","MASS","DescTools", "checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2')
-
-for (p in packages) {
-  if (!requireNamespace(p, quietly = TRUE)) {
-    install.packages(p)
-  }
-  library(p, character.only = TRUE)
-}
-
+# setwd("~/algosto")
+# packages = c("Rcpp","Gmedian","MASS","DescTools", "checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2')
+# 
+# for (p in packages) {
+#   if (!requireNamespace(p, quietly = TRUE)) {
+#     install.packages(p)
+#   }
+#   library(p, character.only = TRUE)
+# }
+# 
 
 
 #install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
