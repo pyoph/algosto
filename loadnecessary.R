@@ -13,7 +13,7 @@ setwd("~/algosto")
 #  }
 # # 
 
-#install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
+install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 
 
 library(Rcpp)
