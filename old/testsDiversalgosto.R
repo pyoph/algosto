@@ -1,8 +1,8 @@
-simDir = "~/Simus/DataSim"
+simDir = "~/work/Simus/DataSim"
 
-resDir = "~/Simus/FitSim"
+resDir = "~/work/Simus/FitSim"
 
-explDir = "~/Simus/exploitResults"
+explDir = "~/work/Simus/exploitResults"
 
 #setwd(resDir)
 
@@ -146,10 +146,12 @@ faux_negatifsNear[m,3,sim] = t[2,1]}
 print(paste0("faux positifs near us streaming ",faux_positifsNear[m,3,sim]))
 
 print(paste0("faux négatifs near us streaming ",faux_negatifsNear[m,3,sim]))
-
+Sigma_naive = fitNaif$SigmaIter
+Sigma_online = fitUsOnline$Sigma
+Sigma_str = fitUSStreaming$Sigma
 
 setwd(resDir)
-save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
+save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
   }
 
 }
@@ -191,33 +193,36 @@ fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r
 temps_naif = system.time({
 resNaif = SampleCovOnline(data$Z)})
 fitNaif = resNaif
+# for (s in (1:n)){
+# erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
+# 
+# VectPSigma = eigen(resNaif$SigmaIter[s,,])$vectors
+# valPSigma = eigen(resNaif$SigmaIter[s,,])$values
+# 
+# 
+# for(t in(1:d)){
+#   
+#   SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
+#   
+# }
+# erreursInvSigmaFar[s,m,1,sim] = norm(SigmaInvSqrt - (Sigma0)^(-0.5),"F")
+# 
+# }
 for (s in (1:n)){
-erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
+  erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")}
 
-VectPSigma = eigen(resNaif$SigmaIter[s,,])$vectors
-valPSigma = eigen(resNaif$SigmaIter[s,,])$values
-
-
-for(t in(1:d)){
-  
-  SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
-  
-}
-erreursInvSigmaFar[s,m,1,sim] = norm(SigmaInvSqrt - (Sigma0)^(-0.5),"F")
-
-}
 outliersLabelsFar[,m,1,sim] = resNaif$outliers_labels
 
 print(paste0("Erreur naive far ",erreursSigmaFar[n,m,1,sim]))
 
 
-if(erreursSigmaInvFar[n,m,1,sim] < 1e12){
-print(paste0("Erreur naive sqrt inv far ",erreursInvSigmaFar[n,m,1,sim]))
-}
-
-if(erreursSigmaInvFar[n,m,1,sim] >= 1e12){
-  print("NAN")
-}
+# if(erreursSigmaInvFar[n,m,1,sim] < 1e12){
+# print(paste0("Erreur naive sqrt inv far ",erreursInvSigmaFar[n,m,1,sim]))
+# }
+# 
+# if(erreursSigmaInvFar[n,m,1,sim] >= 1e12){
+#   print("NAN")
+# }
 
 
 
@@ -243,32 +248,33 @@ temps_online = system.time(
       resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
 })
 fitUsOnline = resUsOnline
-
-for (s in (1:n)){
-  erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-  
-  VectPSigma = eigen(resUsOnline$Sigma[s,,])$vectors
-  valPSigma = eigen(resUsOnline$Sigma[s,,])$values
-  
-  
-  for(t in(1:d)){
-    
-    SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
-    
-  }
-  #outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
-  
-  erreursInvSigmaFar[s,m,2,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
+# 
+# for (s in (1:n)){
+#   erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+#   
+#   VectPSigma = eigen(resUsOnline$Sigma[s,,])$vectors
+#   valPSigma = eigen(resUsOnline$Sigma[s,,])$values
+#   
+#   
+#   for(t in(1:d)){
+#     
+#     SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
+#     
+#   }
+#   #outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
+#   
+#   erreursInvSigmaFar[s,m,2,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
 }
+# 
+# if(erreursSigmaInvFar[n,m,2,sim] < 1e12){
+#   print(paste0("Erreur online us sqrt inv far ",erreursInvSigmaFar[n,m,2,sim]))
+# }
 
-if(erreursSigmaInvFar[n,m,2,sim] < 1e12){
-  print(paste0("Erreur online us sqrt inv far ",erreursInvSigmaFar[n,m,2,sim]))
-}
-
-if(erreursSigmaInvFar[n,m,2,sim] >= 1e12){
-  print("NAN")
-}
-
+# if(erreursSigmaInvFar[n,m,2,sim] >= 1e12){
+#   print("NAN")
+# }
+   for (s in (1:n)){
+     erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")}
 
 if(d == 10){outliersLabelsFar[,m,2,sim]= resUsOnline$outlier_labels}
 if(d == 100){
@@ -299,17 +305,17 @@ temps_streaming = system.time(
 fitUSStreaming = resUsStreaming
 for(s in (1:n)){
 erreursSigmaFar[s,m,3,sim] = norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
-
-VectPSigma = eigen(resUsStreaming$Sigma[s,,])$vectors
-valPSigma = eigen(resUsStreaming$Sigma[s,,])$values
-
-
-for(t in(1:d)){
-  
-  SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
-  
-}
-erreursInvSigmaFar[s,m,3,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
+# 
+# VectPSigma = eigen(resUsStreaming$Sigma[s,,])$vectors
+# valPSigma = eigen(resUsStreaming$Sigma[s,,])$values
+# 
+# 
+# for(t in(1:d)){
+#   
+#   SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
+#   
+# }
+# erreursInvSigmaFar[s,m,3,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
 #outliersLabelsFar[s,m,3,sim] = resUsStreaming$outlier_labels[s]
 }
 
@@ -317,11 +323,11 @@ if(d == 10){outliersLabelsFar[,m,3,sim]= resUsStreaming$outlier_labels}
 if(d == 100){
   outliersLabelsFar[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
 }
-#t =table(data$labelsVrais,resUsStreaming$outlier_labels)
-if(erreursInvSigmaFar[n,m,3,sim] < 1e12)
-  {print("Erreur Sigma inv streaming ", erreursInvSigmaFar[n,m,3,sim])}
-if (erreursInvSigmaFar[n,m,3,sim] > 1e12)
-  {print("NAN")}
+# #t =table(data$labelsVrais,resUsStreaming$outlier_labels)
+# if(erreursInvSigmaFar[n,m,3,sim] < 1e12)
+#   {print("Erreur Sigma inv streaming ", erreursInvSigmaFar[n,m,3,sim])}
+# if (erreursInvSigmaFar[n,m,3,sim] > 1e12)
+#   {print("NAN")}
 t =table(data$labelsVrais,outliersLabelsFar[,m,3,sim])
 
 if (r != 0) {
@@ -342,7 +348,7 @@ print(paste0("faux négatifs far us streaming ",faux_negatifsFar[m,3,sim]))
 setwd(resDir)
 save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
   }
-}
 
-save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard100.Rdata")
+
+save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
 
