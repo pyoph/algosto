@@ -16,7 +16,7 @@ resDir = "~/Simus/FitSim/"
 #####load sim parameters
 ###################################################################
 setwd("~/algosto")
-load("SimParmsGrid-n10000-d10.Rdata")
+load("SimParmsGrid-n10000-d100.Rdata")
 
 
 ##########################################
@@ -32,7 +32,7 @@ rho1List = rho1val
 rho1ListNeg = rho1valNeg
 
 #simNb = 5
-simNb = 1
+simNb = 100
 
 
 # Fit (rho for Sigma1) Other parameters are fixed
