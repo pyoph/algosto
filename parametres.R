@@ -88,7 +88,7 @@ rho1gridneg <- seq(-0.995, 0.005, by=0.005); #= rho1val <- c(0, .3, .6, 0.8, .95
 KLrho1 <- sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))})
 rho1val <- rho1grid[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
 rho1val
-rho1valNeg = rho1gridneg[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
+#rho1valNeg = rho1gridneg[sapply(KLval, function(kl){which.min(abs(KLrho1 - kl))})]
 
 
 # Grille de rho1 négatifs

@@ -20,15 +20,15 @@ library(Rcpp)
 library(RMM)
 library(Gmedian)
 library(MASS)
-#library(ggplot2)
-# library(cowplot)
-# library(patchwork)
+library(ggplot2)
+library(cowplot)
+library(patchwork)
 
 ############################
 #############FIchiers nécessaires
 #################################
-source("~/work/algosto/algorithmes.R")
-sourceCpp("~/work/algosto/src/CodesRCpp.cpp")
+source("~/algosto/algorithmes.R")
+sourceCpp("~/algosto/src/CodesRCpp.cpp")
 
 
 #######################################################################

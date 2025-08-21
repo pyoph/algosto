@@ -116,80 +116,81 @@ print(final_plot)
 # 
 # rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
 # load(file = "res1runFarNear.Rdata")
-rmseSigma_moy = erreursSigmaFar
+rmseSigma_moy = erreursSigmaFar[,,,1]
 
 dim(rmseSigma_moy)
 #rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
-affiche_erreur_frob_norm = function(rmseSigma_moy,titre){
-
-#rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
-# On prépare les données en long format pour ggplot2
-# Extraire les méthodes et taux souhaités
-methodes <- c(1, 2, 3)
-taux_indices <- c(2, 3, 5, 7)
-
-method_labels <- c(
-  "1" = "Sample covariance (online)",
-  "2" = "Online",
-  "3" = "Streaming"
-)
-
-rate_labels <- c(
-  "2" = "5%",
-  "3" = "10%",
-  "5" = "20%",
-  "7" = "30%"
-)
-
-# Mappage des identifiants méthode à leur position dans le tableau (axe 3)
-method_position_map <- setNames(1:length(methodes), methodes)
-
-data_list <- list()
-n <- dim(rmseSigma_moy)[1]
-
-for (j in taux_indices) {
-  for (k in methodes) {
-    k_pos <- method_position_map[as.character(k)]
-    df <- data.frame(
-      index = 1:n,
-      RMSE = rmseSigma_moy[, j, k_pos],
-      Method = method_labels[as.character(k)],
-      Rate = rate_labels[as.character(j)]
-    )
-    data_list[[length(data_list) + 1]] <- df
+affiche_erreur_frob_norm <- function(rmseSigma_moy, titre) {
+  # Méthodes et taux
+  methodes <- c(1, 2, 3)
+  taux_indices <- c(2, 3, 5, 7)
+  
+  method_labels <- c(
+    "1" = "Sample covariance (online)",
+    "2" = "Online",
+    "3" = "Streaming"
+  )
+  
+  rate_labels <- c(
+    "2" = "5%",
+    "3" = "10%",
+    "5" = "20%",
+    "7" = "30%"
+  )
+  
+  method_position_map <- setNames(1:length(methodes), methodes)
+  
+  # Construction dataframe
+  data_list <- list()
+  n <- dim(rmseSigma_moy)[1]
+  
+  for (j in taux_indices) {
+    for (k in methodes) {
+      k_pos <- method_position_map[as.character(k)]
+      df <- data.frame(
+        index = 1:n,
+        RMSE = rmseSigma_moy[, j, k_pos],
+        Method = method_labels[as.character(k)],
+        Rate = rate_labels[as.character(j)]
+      )
+      data_list[[length(data_list) + 1]] <- df
+    }
   }
+  
+  df_long <- do.call(rbind, data_list)
+  df_long$Rate <- factor(df_long$Rate, levels = c("5%", "10%", "20%", "30%"))
+  
+  # Mapping des styles de ligne
+  linetypes <- c(
+    "Streaming" = "solid",
+    "Online" = "dashed",
+    "Sample covariance (online)" = "dotted"
+  )
+  
+  # Plot
+  gg <- ggplot(df_long, aes(x = index, y = RMSE, linetype = Method)) +
+    geom_line(size = 0.8, color = "black") +   # couleur unique (noir)
+    facet_wrap(~ Rate, ncol = 2) +
+    labs(
+      title = "Covariance matrix estimation error",
+      subtitle = titre,
+      x = "Observation Index",
+      y = "Frobenius Norm Error"
+    ) +
+    theme_minimal(base_size = 12) +
+    scale_y_log10(
+      breaks = 10^seq(0, 5, by = 1),
+      labels = c("1", "10", "100", "1000", "10000", "100000")
+    ) +
+    scale_linetype_manual(values = linetypes) +
+    theme(legend.position = "bottom") +
+    annotation_logticks(sides = "l")
+  
+  return(gg)
 }
 
-########################################
-#Frobenius norm error iterations
-#######################################
 
-df_long <- do.call(rbind, data_list)
-df_long$Rate <- factor(df_long$Rate, levels = c( "5%", "10%", "20%","30%"))
-
-gg <- ggplot(df_long, aes(x = index, y = RMSE, color = Method)) +
-  geom_line(size = 0.8) +
-  facet_wrap(~ Rate, ncol = 2) +
-  labs(
-    title = "Covariance matrix estimation error",
-    subtitle = titre,
-    x = "Observation Index",
-    y = "Frobenius Norm Error"
-  ) +
-  theme_minimal(base_size = 12) +
-  scale_y_log10(
-     breaks = 10^seq(0, 5, by = 1),
-     labels = c("1", "10", "100", "1000", "10000", "100000")
-   ) +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  annotation_logticks(sides = "l")
-
-return(gg)
-
-}
-
-affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,l,rho1) = (6.57,19.02,0.415)")
+affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,l,rho1) = (8.58,32,0.975)")
 
 
 # #########################################

@@ -1,8 +1,8 @@
-simDir = "~/work/Simus/DataSim"
+simDir = "~/Simus/DataSim"
 
-resDir = "~/work/Simus/FitSim"
+resDir = "~/Simus/FitSim"
 
-explDir = "~/work/Simus/exploitResults"
+explDir = "~/Simus/exploitResults"
 
 #setwd(resDir)
 
@@ -37,7 +37,7 @@ sim = 1
 simNb = 1
 
 erreursSigmaNear = array(0,dim = c(n,length(rList),3,simNb))
-
+erreursKLNear = array(0,dim = c(n,length(rList),3,simNb))
 outliersLabelsNear = array(0,dim = c(n,length(rList),3,simNb))
 labelsVraisNear = array(0,dim = c(n,length(rList)))
 faux_positifsNear = array(0,dim = c(length(rList),3,simNb))
@@ -180,12 +180,15 @@ print(dataFile)
 
 
 setwd(simDir)
-
-if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
+# 
+# if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
+# data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
+# save(dataFile,file = dataFile)
+# }
+# else{load(dataFile)}
+contParam = ParmsF1(m1, k, l, rho1)
 data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
-save(dataFile,file = dataFile)
-}
-else{load(dataFile)}
+
 labelsVraisFar[,m] = data$labelsVrais
 fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
 
