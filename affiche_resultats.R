@@ -319,7 +319,8 @@ affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,lambda,rho1) =(8.59,32,0.975)
 # faux_neg_moy = apply(res1runFarScenario$faux_negatifsRec, c(1, 2, 3), mean)
 # 
 # faux_neg_10000 <- faux_neg_moy[10000, , ]
-faux_neg_10000 = faux_negatifsFar
+# Préparer les données
+faux_neg_10000 = faux_negatifsFar[,,1]
 methodes <- c(1, 2, 3)
 method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
 method_pos_map <- setNames(1:3, methodes)
@@ -328,8 +329,8 @@ taux_valeurs <- rList
 data_list <- list()
 for (i in seq_along(taux_valeurs)) {
   total_outliers = taux_valeurs[i]/100*n
-    
-    for (k in methodes) {
+  
+  for (k in methodes) {
     k_pos <- method_pos_map[as.character(k)]
     data_list[[length(data_list) + 1]] <- data.frame(
       ContaminationRate = taux_valeurs[i],
@@ -341,22 +342,73 @@ for (i in seq_along(taux_valeurs)) {
 df_long <- do.call(rbind, data_list)
 df_long$Method <- factor(df_long$Method, levels = method_labels)
 
-pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Method)) +
-  geom_line(size = 1) +
-  #xlim(5,50)+
-  geom_point(size = 2) +
+# Styles de ligne
+linetypes <- c(
+  "Streaming" = "solid",
+  "Online" = "dashed",
+  "Cov Online" = "dotted"
+)
+
+# Plot sans couleurs, uniquement types de ligne
+pfarFn <- ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives,
+                              linetype = Method, group = Method)) +
+  geom_line(size = 1, color = "black") +
+  geom_point(size = 2, color = "black") +
   labs(
     title = "(k,l,rho1) = (8.59,32,0.975)",
     x = "Contamination rate (%)",
-    y = "False negatives",
-    color = "Method"
+    y = "False negatives"
   ) +
-  scale_x_continuous(breaks=seq(0,50,5),limits = c(5,50))+
-  scale_y_continuous(breaks=seq(0,90,5))
-  #scale_x_continuous(breaks = taux_valeurs) 
-  #scale_y_continuous(breaks = 5*(1:20)) 
-  # theme_minimal() +
-  # theme(legend.position = "bottom")
+  scale_x_continuous(breaks = seq(0,50,5), limits = c(5,50)) +
+  scale_y_continuous(breaks = seq(0,90,5)) +
+  scale_linetype_manual(values = linetypes) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+faux_pos_10000 = faux_positifsFar[,,1]
+methodes <- c(1, 2, 3)
+method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
+method_pos_map <- setNames(1:3, methodes)
+
+taux_valeurs <- rList
+data_list <- list()
+for (i in seq_along(taux_valeurs)) {
+  total_outliers = taux_valeurs[i]/100*n
+  
+  for (k in methodes) {
+    k_pos <- method_pos_map[as.character(k)]
+    data_list[[length(data_list) + 1]] <- data.frame(
+      ContaminationRate = taux_valeurs[i],
+      Falsepositives = faux_pos_10000[i, k_pos]/(n - total_outliers)*100,
+      Method = method_labels[as.character(k)]
+    )
+  }
+}
+df_long <- do.call(rbind, data_list)
+df_long$Method <- factor(df_long$Method, levels = method_labels)
+
+# Styles de ligne
+linetypes <- c(
+  "Streaming" = "solid",
+  "Online" = "dashed",
+  "Cov Online" = "dotted"
+)
+
+# Plot sans couleurs, uniquement types de ligne
+pfarFp <- ggplot(df_long, aes(x = ContaminationRate, y = Falsepositives,
+                              linetype = Method, group = Method)) +
+  geom_line(size = 1, color = "black") +
+  geom_point(size = 2, color = "black") +
+  labs(
+    title = "(k,l,rho1) = (8.59,32,0.975)",
+    x = "Contamination rate (%)",
+    y = "False positives"
+  ) +
+  scale_x_continuous(breaks = seq(0,50,5), limits = c(0,50)) +
+  scale_y_continuous(breaks = seq(0,5,1)) +
+  scale_linetype_manual(values = linetypes) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 
 #########################################
 #Faux positifs moyenne
@@ -373,7 +425,10 @@ pfar = ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, color = Me
 # fprec100run = fprec_moy[1e4,,]
 
 #dim(fprec1run)
-fprec100run = faux_positifsNear 
+############################################
+# Faux positifs (Near)
+############################################
+fprec100run = faux_positifsNear[,,1] 
 methodes <- c(1, 2, 3)
 method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
 method_pos_map <- setNames(1:3, methodes)
@@ -395,55 +450,149 @@ for (i in seq_along(taux_valeurs)) {
 df_long <- do.call(rbind, data_list)
 df_long$Method <- factor(df_long$Method, levels = method_labels)
 
-pnearDist = ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, color = Method)) +
-  geom_line(size = 1) +
-  ylim(0,90)+
-  geom_point(size = 2) +
+# Types de ligne
+linetypes <- c(
+  "Streaming" = "solid",
+  "Online" = "dashed",
+  "Cov Online" = "dotted"
+)
+
+pnearDistFp <- ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives,
+                                 linetype = Method, group = Method)) +
+  geom_line(size = 1, color = "black") +
+  geom_point(size = 2, color = "black") +
   labs(
     title = "(k,l,rho1) = (0.86,0.56,0.6)",
     x = "",
     y = "False positives",
-    color = "Methods"
+    linetype = "Method"
   ) +
-  scale_x_continuous(breaks=seq(0,50,5))+
-  scale_y_continuous(breaks=seq(0,90,5))
+  scale_x_continuous(breaks=seq(0,50,5)) +
+  scale_y_continuous(breaks=seq(0,40,5), limits = c(0,40)) +
+  scale_linetype_manual(values = linetypes) +
   theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom")
 
-method_colors <- c(
-  "Sample covariance" = "blue",
-  "Online" = "red",
-  "Streaming" = "green"
+###############################################
+####Faux négatifs near#########################
+###############################################
+
+fnrec100run = faux_negatifsNear[,,1] 
+methodes <- c(1, 2, 3)
+method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
+method_pos_map <- setNames(1:3, methodes)
+
+taux_valeurs <- rList
+data_list <- list()
+for (i in seq_along(taux_valeurs)) {
+  total_outliers = (taux_valeurs[i]/100)*n
+  
+  for (k in methodes) {
+    k_pos <- method_pos_map[as.character(k)]
+    data_list[[length(data_list) + 1]] <- data.frame(
+      ContaminationRate = taux_valeurs[i],
+      FalseNegatives = fnrec100run[i, k_pos]/(total_outliers)*100,
+      Method = method_labels[as.character(k)]
+    )
+  }
+}
+df_long <- do.call(rbind, data_list)
+df_long$Method <- factor(df_long$Method, levels = method_labels)
+
+# Types de ligne
+linetypes <- c(
+  "Streaming" = "solid",
+  "Online" = "dashed",
+  "Cov Online" = "dotted"
 )
-# 1. Retirer la légende des deux graphes
-pnearDist <- pnearDist + theme(legend.position = "none")
-pfar <- pfar + theme(legend.position = "none")
 
-# 2. Créer une légende manuelle ("en dur")
-legend_plot <- ggplot() +
-  annotate("point", x = 1, y = 1, color = method_colors[1], size = 3) +
-  annotate("point", x = 2, y = 1, color = method_colors[2], size = 3) +
-  annotate("point", x = 3, y = 1, color = method_colors[3], size = 3) +
-  annotate("text", x = 1.2, y = 1, label = names(method_colors)[1], hjust = 0, size = 4) +
-  annotate("text", x = 2.2, y = 1, label = names(method_colors)[2], hjust = 0, size = 4) +
-  annotate("text", x = 3.2, y = 1, label = names(method_colors)[3], hjust = 0, size = 4) +
-  theme_void() +
-  xlim(0.5, 4.2) +
-  labs(title = "Method") +
-  theme(plot.title = element_text(hjust = 0.5, size = 11),
-        plot.margin = margin(0, 0, 0, 0))
-library(cowplot)
-# 3. Assembler les graphiques côte à côte
-main_grid <- plot_grid(pnearDist, pfar, ncol = 1, align = "hv")
+pnearDistFn <- ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives,
+                                   linetype = Method, group = Method)) +
+  geom_line(size = 1, color = "black") +
+  geom_point(size = 2, color = "black") +
+  labs(
+    title = "(k,l,rho1) = (0.86,0.56,0.6)",
+    x = "",
+    y = "False negatives",
+    linetype = "Method"
+  ) +
+  scale_x_continuous(breaks=seq(5,50,5)) +
+  scale_y_continuous(breaks=seq(0,100,5), limits = c(0,100)) +
+  scale_linetype_manual(values = linetypes) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 
-# 4. Combiner avec la légende manuelle
-final_plot <- plot_grid(main_grid, legend_plot,
-                        ncol = 1,
-                        rel_heights = c(10, 1))  # 90% graphes, 10% légende
+# On enlève les titres des graphes
+pfarFp_nl      <- pfarFp      + labs(title = NULL) + theme(legend.position = "none")
+pfarFn_nl      <- pfarFn      + labs(title = NULL) + theme(legend.position = "none")
+pnearDistFp_nl <- pnearDistFp + labs(title = NULL) + theme(legend.position = "none")
+pnearDistFn_nl <- pnearDistFn + labs(title = NULL) + theme(legend.position = "none")
 
-# Afficher
+# Récupérer la légende commune
+legend <- get_legend(pfarFp + theme(legend.position = "bottom"))
+
+# 1ère ligne FAR avec titre commun
+row1 <- plot_grid(
+  pfarFp_nl, pfarFn_nl,
+  ncol = 2, align = "hv"
+)
+row1 <- plot_grid(
+  ggdraw() + draw_label("(k,l,rho1) = (8.59,32,0.975)", fontface = "bold", size = 12),
+  row1,
+  ncol = 1,
+  rel_heights = c(0.1, 1)
+)
+
+# 2ème ligne NEAR avec titre commun
+row2 <- plot_grid(
+  pnearDistFp_nl, pnearDistFn_nl,
+  ncol = 2, align = "hv"
+)
+row2 <- plot_grid(
+  ggdraw() + draw_label("(k,l,rho1) = (0.86,0.56,0.6)", fontface = "bold", size = 12),
+  row2,
+  ncol = 1,
+  rel_heights = c(0.1, 1)
+)
+
+# Assembler lignes + légende
+final_plot <- plot_grid(
+  row1, row2, legend,
+  ncol = 1,
+  rel_heights = c(1, 1, 0.15)  # ajuster la taille des zones
+)
+
 print(final_plot)
-saveRDS(pnearDist, file = "pnearDistFP.rds")
+# 
+# # 1. Retirer la légende des deux graphes
+# pnearDist <- pnearDist + theme(legend.position = "none")
+# pfar <- pfar + theme(legend.position = "none")
+# 
+# # 2. Créer une légende manuelle ("en dur")
+# legend_plot <- ggplot() +
+#   annotate("point", x = 1, y = 1, color = method_colors[1], size = 3) +
+#   annotate("point", x = 2, y = 1, color = method_colors[2], size = 3) +
+#   annotate("point", x = 3, y = 1, color = method_colors[3], size = 3) +
+#   annotate("text", x = 1.2, y = 1, label = names(method_colors)[1], hjust = 0, size = 4) +
+#   annotate("text", x = 2.2, y = 1, label = names(method_colors)[2], hjust = 0, size = 4) +
+#   annotate("text", x = 3.2, y = 1, label = names(method_colors)[3], hjust = 0, size = 4) +
+#   theme_void() +
+#   xlim(0.5, 4.2) +
+#   labs(title = "Method") +
+#   theme(plot.title = element_text(hjust = 0.5, size = 11),
+#         plot.margin = margin(0, 0, 0, 0))
+# library(cowplot)
+# # 3. Assembler les graphiques côte à côte
+# main_grid <- plot_grid(pnearDist, pfar, ncol = 1, align = "hv")
+# 
+# # 4. Combiner avec la légende manuelle
+# final_plot <- plot_grid(main_grid, legend_plot,
+#                         ncol = 1,
+#                         rel_heights = c(10, 1))  # 90% graphes, 10% légende
+# 
+# # Afficher
+# print(final_plot)
+# saveRDS(pnearDist, file = "pnearDistFP.rds")
 
 # ##############################################
 # Temps calculs

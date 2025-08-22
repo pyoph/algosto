@@ -212,7 +212,7 @@ fitNaif = resNaif
 # 
 # }
 for (s in (1:n)){
-  erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")}
+erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")}
 
 outliersLabelsFar[,m,1,sim] = resNaif$outliers_labels
 
