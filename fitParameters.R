@@ -16,7 +16,7 @@ resDir = "~/Simus/FitSim/"
 #####load sim parameters
 ###################################################################
 setwd("~/algosto")
-load("SimParmsGrid-n10000-d100.Rdata")
+load(paste0("SimParmsGrid-n10000-d",d,".Rdata"))
 
 
 ##########################################
@@ -32,7 +32,7 @@ rho1List = rho1val
 rho1ListNeg = rho1valNeg
 
 #simNb = 5
-simNb = 100
+simNb = 1
 
 
 # Fit (rho for Sigma1) Other parameters are fixed
@@ -356,34 +356,56 @@ for(r in rList){for(k in kList[2:length(kList)]){
 # 
 # # #####Fit k, l and rho fixed 
 # # 
-# # k = 0
-# # l=1
+ k = 0
+ l=1
 # # #Fit k and l varying rho fixed 
-# # rho1 = rho0
+ rho1 = rho0
 # # # Fit (all parms)
-# # for(r in rList){
-# #   for(sim in 1:simNb){
-# #     print(paste0("r = ",r,"k = ",k,"l = ",l,"rho = ",rho1))
-# #     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
-# #     setwd(simDir)
-# #     load(file = dataFile)
-# #     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-# #     if(!file.exists(fitFile)){
-# #       temps_naif = system.time(
-# #         {fitNaif <- SampleCovOnline(data$Z)})
-# #       print(paste0("Erreur Naif = ",norm(fitNaif$Sigma - Sigma0,"F")))
-# #       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
-# #       print(norm(fitUsOnline$Sigma[n,,] - Sigma0,"F"))
-# #       print(paste0("Erreur online = ",norm(fitUsOnline$Sigma[n,,] - Sigma0,"F")))
-# #       
-# #       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
-# #       print(norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F"))
-# #       print(paste0("Erreur streaming = ",norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F")))
-# #       
-# #       setwd(resDir)
-# #       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
-# #     }else{load(fitFile)}
-# #   }
-# # }
+ for(r in rList){
+   for(sim in 1:simNb){
+     print(paste0("r = ",r,"k = ",k,"l = ",l,"rho = ",rho1))
+     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', 1, '-rho', rho0,'-r',r , '-sim', sim,".RData")
+     setwd(simDir)
+     if(!file.exists(dataFile)){
+       m1 <- (-1)^(1:d)/sqrt(d)
+       sigmaSq0 <- (1:d); sigmaSq0 <- sigmaSq0 / mean(sigmaSq0)
+       SigmaContamin <- diag(sqrt(sigmaSq0)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq0))
+                
+                data = genererEchantillon(n,d,mu1 = mu0, mu2 = k*m1,Sigma1 = Sigma0,Sigma2 = l*SigmaContamin,r)
+                save(data, file=dataFile)
+                print(paste0("n-",n,"d-",d,"k-",k,"l-",l,"r-",r," save ok"))
+       #         
+       }
+     load(file = dataFile)
+     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+     if(!file.exists(fitFile)){
+       temps_naif = system.time(
+         {fitNaif <- SampleCovOnline(data$Z)})
+       print(paste0("Erreur Naif = ",norm(fitNaif$Sigma - Sigma0,"F")))
+       nb_fp = sum(data$labelsVrais == 0 & fitNaif$outliers_labels == 1)
+       print(paste0("FP naive = ",nb_fp))
+       nb_fn = sum(data$labelsVrais == 1 & fitNaif$outliers_labels == 0)
+       print(paste0("FN naive = ",nb_fn))
+       temps_online  = system.time({fitUsOnline <- StreamingOutlierDetection(data$Z,batch = 1)})
+       print(norm(fitUsOnline$Sigma[n,,] - Sigma0,"F"))
+       print(paste0("Erreur online = ",norm(fitUsOnline$Sigma[n,,] - Sigma0,"F")))
+       nb_fp = sum(data$labelsVrais == 0 & fitUsOnline$outlier_labels == 1)
+       print(paste0("FP online = ",nb_fp))
+       nb_fn = sum(data$labelsVrais == 1 & fitUsOnline$outlier_labels == 0)
+       print(paste0("FN online = ",nb_fn))
+       temps_streaming = system.time({fitUSStreaming =StreamingOutlierDetection(data$Z,batch = ncol(data$Z))})
+       print(norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F"))
+       print(paste0("Erreur streaming = ",norm(fitUSStreaming$Sigma[n,,] - Sigma0,"F")))
+       nb_fp = sum(data$labelsVrais == 0 & fitUSStreaming$outlier_labels == 1)
+       print(paste0("FP streaming = ",nb_fp))
+       nb_fn = sum(data$labelsVrais == 1 & fitUSStreaming$outlier_labels == 0) 
+       print(paste0("FN streaming = ",nb_fn))
+       
+       setwd(resDir)
+       save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
+     }else{load(fitFile)}
+   }
+
+    }
 # # 
 # # 
