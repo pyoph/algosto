@@ -18,6 +18,8 @@ resDir = "~/Simus/FitSim/"
 setwd("~/algosto")
 load("SimParmsGrid-n10000-d100.Rdata")
 
+install.packages("binom")
+library(binom)
 
 ##########################################
 ###Extraction of the parameters
