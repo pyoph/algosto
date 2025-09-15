@@ -1,9 +1,4 @@
 
-library(ggplot2)
-library(reshape2)
-library(dplyr)
-library(tidyr)
-library(patchwork)  # pour agencer les 4 graphiques
 
 ###################################################
 #Affiche contamination scenarios
@@ -768,9 +763,6 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage)
 #dim(res10run$outliersLabelsRec)
 
 ########Graphs
-
-library(ggplot2)
-library(cowplot)
 
 # pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,3],5)
 # 
