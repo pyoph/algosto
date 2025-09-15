@@ -16,10 +16,7 @@ resDir = "~/Simus/FitSim/"
 #####load sim parameters
 ###################################################################
 setwd("~/algosto")
-load("SimParmsGrid-n10000-d100.Rdata")
-
-install.packages("binom")
-library(binom)
+load("SimParmsGrid-n10000-d10.Rdata")
 
 ##########################################
 ###Extraction of the parameters
@@ -34,7 +31,7 @@ rho1List = rho1val
 rho1ListNeg = rho1valNeg
 
 #simNb = 5
-simNb = 100
+simNb = 1
 
 
 # Fit (rho for Sigma1) Other parameters are fixed

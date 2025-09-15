@@ -14,7 +14,7 @@ setwd("~/algosto")
 # # 
 
 install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
-
+install.packages("binom")
 
 library(Rcpp)
 library(RMM)
@@ -23,7 +23,7 @@ library(MASS)
 library(ggplot2)
 library(cowplot)
 library(patchwork)
-
+library(binom)
 ############################
 #############FIchiers nécessaires
 #################################

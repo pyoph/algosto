@@ -19,7 +19,7 @@ rm(list=ls())
 #############################################################
 #####################sample size and number of runs###############
 ############################################################
-d <- 40
+d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
 simNb <- 1
@@ -31,7 +31,7 @@ n <- 1e4
 
 # Dims and KL distance reached. The parameters are chosen such that the KL distance is in {0,1,10,100}
 #d <- 100; KLval <- c(0, 1, 10, 100)
-d <- 40; KLval <- c(0, 1, 10, 100)
+d <- 10; KLval <- c(0, 1, 10, 100)
 # 
 # # Functions
 # KL <- function(parms1, parms2){
@@ -104,7 +104,7 @@ rho1valNeg <- sapply(KLval, function(kl) {
   rho1gridneg[which.min(abs(KLrho1neg - kl))]
 })
 
-rho1valNeg
+rho1valNeg[1] = 0.3
 # 
 # ###############Choice of the couples such that the target is reached###########"
 # KL_targets <- c(0, 1, 10, 100)
@@ -198,7 +198,10 @@ rho1valNeg
 #####################################################################################################################
 ################################# Export of the parameter file one for d = 10 and one for d=100######################
 #####################################################################################################################
-save(d, KLval, 
+
+
+setwd("~/algosto")
+  save(d, KLval, 
      mu0, sigmaSq0, Sigma0, rho0, 
      m1, 
      k1val, l1val, rho1val,rho1valNeg,n,d,rList,
