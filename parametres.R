@@ -104,7 +104,12 @@ rho1valNeg <- sapply(KLval, function(kl) {
   rho1gridneg[which.min(abs(KLrho1neg - kl))]
 })
 
+#Correction valeurs pour l1val et rho1valNeg
+
+l1val[length(l1val)] = 1.321931e+09
+
 rho1valNeg[1] = 0.3
+
 # 
 # ###############Choice of the couples such that the target is reached###########"
 # KL_targets <- c(0, 1, 10, 100)
