@@ -273,8 +273,8 @@ for (m in seq_along(rList)){
 }
 
 
-
-
+setwd("~/algosto/resultsSelectedScenarios")
+save(erreursSigmaMed,faux_negatifsMed,faux_positifsMed,file = "erreursMedScenarios.RData")
 
 
 erreursSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
@@ -682,27 +682,30 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
 save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
 
 ###############
-contParam = ParmsF1(m1, k, l, rho1)
 
 k = k1val[2]
 
 l = l1val[2]
 
 rho1 = rho1val[2]
+contParam = ParmsF1(m1, k, l, rho1)
 
-r = 0
+cutoff = qchisq(.95,df=d)  
 
+outl = matrix(0,nrow(Z),length(rList))
+labvrais = matrix(0,nrow(Z),length(rList))
+
+for (i in seq_along(rList)){
+  r = rList[i]
 data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
 
 Z = data$Z
 
+
+labvrais[,i] = data$labelsVrais
 mu2 = contParam$mu1
 
-Sigma2 = !contParam$Sigma1
-
-cutoff = qchisq(.95,df=d)  
-
-outl = rep(0,nrow(Z))
+Sigma2 = contParam$Sigma1
 
 for (i in 1:nrow(Z))
 {
@@ -710,5 +713,5 @@ for (i in 1:nrow(Z))
   
 if (dist > cutoff) {outl[i] = 1}
 }
+}
 
-table(data$labelsVrais,outl)
