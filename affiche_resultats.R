@@ -43,45 +43,58 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
   return(p)
 }
 #######################Appels de la fonction######################################
-p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-5,5)
+p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-20,20)
 
-p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",20,-5,5)
+p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",20,-20,20)
 
-p2 = afficherContaminationScenarios(8.59,32,0.975,"(k,l,rho1) = (8.59,32,0.3)",20,-30,30)
+p2 = afficherContaminationScenarios(2.71,19.02,0.85,"(k,l,rho1) = (0.86,0.56,0.3)",20,-20,20)
+
+p3 = afficherContaminationScenarios(8.59,l1val[length(l1val)],0.975,"(k,l,rho1) = (8.59,1.32 x 10^9,0.975)",20,-1e5,1e5)
 
 # Créer une disposition 2x2 avec les 3 plots et un espace vide
 
-library(cowplot)
-library(ggplot2)
 
 # 1. Créer les plots sans légendes
 p0 <- p0 + theme(axis.title = element_blank(), legend.position = "none")
 p1 <- p1 + theme(axis.title = element_blank(), legend.position = "none")
 p2 <- p2 + theme(axis.title = element_blank(), legend.position = "none")
-
-# 2. Créer la grille 2x2
-main_grid <- plot_grid(p0, p1, p2, NULL, 
+p3 <- p3 + theme(axis.title = element_blank(), legend.position = "none")
+# 2. Créer la grille 4x4
+main_grid <- plot_grid(p0, p1, p2,p3 , 
                        ncol = 2, align = "hv")
 
-# 3. Créer la légende manuellement (version "en dur")
+
+# Création de la légende
 legend_plot <- ggplot() +
-  annotate("point", x = 1, y = 1, color = "blue", size = 3) +
-  annotate("point", x = 2, y = 1, color = "red", size = 3) +
-  annotate("text", x = 1.2, y = 1, label = "Inlier", hjust = 0, size = 4) +
-  annotate("text", x = 2.2, y = 1, label = "Outlier", hjust = 0, size = 4) +
+  geom_point(aes(x = 1, y = 1, color = "Inlier"), size = 3) +
+  geom_point(aes(x = 2, y = 1, color = "Outlier"), size = 3) +
+  scale_color_manual(name = "Status",
+                     values = c("Inlier" = "blue", "Outlier" = "red"),
+                     labels = c("Inlier", "Outlier")) +
   theme_void() +
-  xlim(0.5, 3) +
-  labs(title = "Status") +
-  theme(plot.title = element_text(hjust = 0.5, size = 11),
-        plot.margin = margin(0,0,0,0))
+  theme(legend.position = "bottom",
+        legend.title = element_text(hjust = 0.5, size = 11),
+        legend.text = element_text(size = 10))
 
-# 4. Assembler le tout
-final_plot <- plot_grid(main_grid, legend_plot,
-                        ncol = 1,
-                        rel_heights = c(10, 1))  # 90% pour la grille, 10% pour la légende
+# Extraction de la légende
+legend <- get_legend(legend_plot)
 
+# Création de la grille 2x2
+main_grid <- plot_grid(p0, p1, p2, p3, ncol = 2, align = "hv")
+
+# Assemblage final avec légende
+final_plot <- plot_grid(main_grid, legend, 
+                        ncol = 1, 
+                        rel_heights = c(10, 1))
+
+# Affichage
 print(final_plot)
 
+final_plot2 <- (p0 + p1) / (p2 + p3) + 
+  plot_layout(guides = 'collect') &
+  theme(legend.position = 'bottom')
+
+print(final_plot2)
 ######################################################################
 #######Affichage des erreurs d'estimation de Sigma
 ######################################################################

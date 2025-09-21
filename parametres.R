@@ -19,7 +19,7 @@ rm(list=ls())
 #############################################################
 #####################sample size and number of runs###############
 ############################################################
-d <- 10
+d <- 2
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
 simNb <- 1
@@ -31,7 +31,7 @@ n <- 1e4
 
 # Dims and KL distance reached. The parameters are chosen such that the KL distance is in {0,1,10,100}
 #d <- 100; KLval <- c(0, 1, 10, 100)
-d <- 10; KLval <- c(0, 1, 10, 100)
+d <- 2; KLval <- c(0, 1, 10, 100)
 # 
 # # Functions
 # KL <- function(parms1, parms2){
