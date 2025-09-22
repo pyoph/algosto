@@ -477,10 +477,6 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
 
 save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
 
-
-
-
-
 erreursSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
 erreursInvSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
 outliersLabelsFar = array(0,dim = c(n,length(rList),3,simNb))
@@ -681,6 +677,11 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
 
 save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
 
+
+setwd("~/algosto/resultsSelectedScenarios")
+save(erreursSigmaFar,faux_negatifsFar,faux_positifsFar,file = "erreursFarScenarios.RData")
+
+
 ###############
 
 k = k1val[2]
@@ -758,12 +759,6 @@ ggplot(plot_data, aes(x = taux_contamination, y = faux_neg)) +
 
 ##############################Plot errors Med scenario################################################
 
-
-plot(x = 1:nrow(Z),erreursSigmaMed[,5,1,1])
-
-plot(x = 1:nrow(Z),erreursSigmaMed[,5,2,1])
-
-plot(x = 1:nrow(Z),erreursSigmaMed[,5,3,1])
 
 # Créer un dataframe avec les trois séries
 plot_data <- data.frame(
