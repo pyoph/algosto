@@ -694,6 +694,8 @@ cutoff = qchisq(.95,df=d)
 
 outl = matrix(0,nrow(Z),length(rList))
 labvrais = matrix(0,nrow(Z),length(rList))
+faux_neg_final = rep(0,length(rList))
+faux_pos_final = rep(0,length(rList))
 
 for (i in seq_along(rList)){
   r = rList[i]
@@ -707,11 +709,88 @@ mu2 = contParam$mu1
 
 Sigma2 = contParam$Sigma1
 
-for (i in 1:nrow(Z))
+for (j in 1:nrow(Z))
 {
-  dist= t(Z[i,] - mu2)%*%Sigma2%*%(Z[i,] - mu2)
+  if(data$labelsVrais[j] == 1){
+  dist= t(Z[j,] - mu2)%*%solve(Sigma2)%*%(Z[j,] - mu2)}
+  else {dist= t(Z[j,])%*%solve(Sigma0)%*%(Z[j,])}
   
-if (dist > cutoff) {outl[i] = 1}
+if (dist > cutoff) {outl[j,i] = 1}
 }
-}
+faux_neg_final[i] = sum(data$labelsVrais == 1 & outl[,i] == 0)
 
+faux_pos_final[i] = sum(data$labelsVrais == 0 & outl[,i] == 1)
+
+}
+# Créer le dataframe pour ggplot
+plot_data <- data.frame(
+  taux_contamination = rList,
+  faux_neg = faux_neg_final
+)
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(faux_neg_final, na.rm = TRUE) + 500, by = 500)
+
+# Créer le plot avec graduations
+ggplot(plot_data, aes(x = taux_contamination, y = faux_neg)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_point(color = "red", size = 2, alpha = 0.7) +
+  labs(
+    title = "False negatives with true paramaters",
+    x = "Contamination rate (r)",
+    y = "False negatives"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    panel.grid.major = element_line(color = "gray80", linewidth = 0.2),
+    panel.grid.minor = element_line(color = "gray90", linewidth = 0.1)
+  ) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  scale_y_continuous(
+    breaks = y_breaks,
+    minor_breaks = NULL  # Enlève les graduations mineures pour plus de clarté
+  )
+
+
+
+##############################Plot errors Med scenario################################################
+
+
+plot(x = 1:nrow(Z),erreursSigmaMed[,5,1,1])
+
+plot(x = 1:nrow(Z),erreursSigmaMed[,5,2,1])
+
+plot(x = 1:nrow(Z),erreursSigmaMed[,5,3,1])
+
+# Créer un dataframe avec les trois séries
+plot_data <- data.frame(
+  index = 1:nrow(Z),
+  streaming = erreursSigmaMed[,5,3,1],
+  online_us = erreursSigmaMed[,5,2,1],
+  online_naive = erreursSigmaMed[,5,1,1]
+)
+
+# Créer le graphique
+ggplot(plot_data, aes(x = index)) +
+  geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+  geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+  geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+  scale_linetype_manual(
+    name = "Method",
+    values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+  ) +
+  labs(
+    title = "",
+    x = "Observation Index",
+    y = "Frobenius norm error"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
