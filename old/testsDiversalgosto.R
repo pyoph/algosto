@@ -693,10 +693,13 @@ contParam = ParmsF1(m1, k, l, rho1)
 
 cutoff = qchisq(.95,df=d)  
 
-outl = matrix(0,nrow(Z),length(rList))
-labvrais = matrix(0,nrow(Z),length(rList))
+outl = matrix(0,n,length(rList))
+labvrais = matrix(0,n,length(rList))
 faux_neg_final = rep(0,length(rList))
 faux_pos_final = rep(0,length(rList))
+true_neg_final = rep(0,length(rList))
+true_pos_final = rep(0,length(rList))
+
 
 for (i in seq_along(rList)){
   r = rList[i]
@@ -718,28 +721,79 @@ for (j in 1:nrow(Z))
   
 if (dist > cutoff) {outl[j,i] = 1}
 }
-faux_neg_final[i] = sum(data$labelsVrais == 1 & outl[,i] == 0)
+faux_neg_final[i] = sum(data$labelsVrais == 1 & outl[,i] == 0)/((r/100)*n)
 
-faux_pos_final[i] = sum(data$labelsVrais == 0 & outl[,i] == 1)
+faux_pos_final[i] = sum(data$labelsVrais == 0 & outl[,i] == 1)/((1 - r/100)*n)
+
+true_pos_final[i] = sum(data$labelsVrais == 1 & outl[,i] == 1)/((1 - r/100)*n)
+
+true_neg_final[i] = sum(data$labelsVrais == 0 & outl[,i] == 0)/((1 - r/100)*n)
 
 }
+# Créer le dataframe pour ggplot
+plot_data <- data.frame(
+  taux_contamination = rList,
+  true_pos = true_pos_final
+)
+
+
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(true_pos_final, na.rm = TRUE) + 500, by = 500)
+
+# Créer le plot avec graduations
+ggplot(plot_data, aes(x = taux_contamination, y = true_pos)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_point(color = "red", size = 2, alpha = 0.7) +
+  labs(
+    title = "True positives with true paramaters",
+    x = "Contamination rate (r)",
+    y = "true positives"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    panel.grid.major = element_line(color = "gray80", linewidth = 0.2),
+    panel.grid.minor = element_line(color = "gray90", linewidth = 0.1)
+  ) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  scale_y_continuous(
+    breaks = y_breaks,
+    minor_breaks = NULL  # Enlève les graduations mineures pour plus de clarté
+  )
+
 # Créer le dataframe pour ggplot
 plot_data <- data.frame(
   taux_contamination = rList,
   faux_neg = faux_neg_final
 )
 
+
+
 # Déterminer les breaks pour l'axe Y (tous les 500)
 y_breaks <- seq(0, max(faux_neg_final, na.rm = TRUE) + 500, by = 500)
 
+
+# Créer le dataframe pour ggplot
+plot_data <- data.frame(
+  taux_contamination = rList,
+  faux_pos = faux_pos_final
+)
+
+
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 500, by = 500)
+
 # Créer le plot avec graduations
-ggplot(plot_data, aes(x = taux_contamination, y = faux_neg)) +
+ggplot(plot_data, aes(x = taux_contamination, y = faux_pos)) +
   geom_line(color = "blue", linewidth = 1) +
   geom_point(color = "red", size = 2, alpha = 0.7) +
   labs(
-    title = "False negatives with true paramaters",
     x = "Contamination rate (r)",
-    y = "False negatives"
+    y = "False positives"
   ) +
   theme_minimal() +
   theme(
@@ -757,19 +811,109 @@ ggplot(plot_data, aes(x = taux_contamination, y = faux_neg)) +
 
 
 
-##############################Plot errors Med scenario################################################
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
+
+# Créer le dataframe pour ggplot
+plot_data <- data.frame(
+  taux_contamination = rList,
+  faux_pos = faux_pos_final
+)
 
 
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 500, by = 500)
+
+# Créer le plot avec graduations
+ggplot(plot_data, aes(x = taux_contamination, y = faux_pos)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_point(color = "red", size = 2, alpha = 0.7) +
+  labs(
+    x = "Contamination rate (r)",
+    y = "False positives"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    panel.grid.major = element_line(color = "gray80", linewidth = 0.2),
+    panel.grid.minor = element_line(color = "gray90", linewidth = 0.1)
+  ) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  scale_y_continuous(
+    breaks = y_breaks,
+    minor_breaks = NULL  # Enlève les graduations mineures pour plus de clarté
+  )
+
+
+
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
+
+# Créer le dataframe pour ggplot
+plot_data <- data.frame(
+  taux_contamination = rList,
+  true_pos = true_pos_final
+)
+
+
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(true_pos_final, na.rm = TRUE) + 500, by = 500)
+
+# Créer le plot avec graduations
+ggplot(plot_data, aes(x = taux_contamination, y = true_pos)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_point(color = "red", size = 2, alpha = 0.7) +
+  labs(
+    x = "Contamination rate (r)",
+    y = "True positives"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    panel.grid.major = element_line(color = "gray80", linewidth = 0.2),
+    panel.grid.minor = element_line(color = "gray90", linewidth = 0.1)
+  ) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  scale_y_continuous(
+    breaks = y_breaks,
+    minor_breaks = NULL  # Enlève les graduations mineures pour plus de clarté
+  )
+
+
+
+
+# Déterminer les breaks pour l'axe Y (tous les 500)
+y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
+
+
+
+##############################Plot errors Near scenario################################################
+
+setwd("~/algosto/resultsSelectedScenarios/figures/covarianceEstimation/")
+
+k = k1val[4] 
+l = l1val[7]
+rho1 = rho1val[4]
+
+for (m in seq_along(rList)){
 # Créer un dataframe avec les trois séries
 plot_data <- data.frame(
   index = 1:nrow(Z),
-  streaming = erreursSigmaMed[,5,3,1],
-  online_us = erreursSigmaMed[,5,2,1],
-  online_naive = erreursSigmaMed[,5,1,1]
+  streaming = erreursSigmaNear[,m,3,1],
+  online_us = erreursSigmaNear[,m,2,1],
+  online_naive = erreursSigmaNear[,m,1,1]
 )
 
 # Créer le graphique
-ggplot(plot_data, aes(x = index)) +
+p = ggplot(plot_data, aes(x = index)) +
   geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
   geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
   geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
@@ -789,3 +933,9 @@ ggplot(plot_data, aes(x = index)) +
     legend.title = element_text(size = 12),
     legend.text = element_text(size = 10)
   )
+r = rList[m]
+# Sauvegarder le plot en PNG
+filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
+ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+
+}
