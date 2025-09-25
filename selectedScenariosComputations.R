@@ -34,7 +34,7 @@ rho1ListNeg = rho1valNeg
 # }
 
 sim = 1
-simNb = 1
+simNb = 10
 
 erreursSigmaNear = array(0,dim = c(n,length(rList),3,simNb))
 erreursKLNear = array(0,dim = c(n,length(rList),3,simNb))
@@ -689,13 +689,14 @@ save(erreursSigmaFar,faux_negatifsFar,faux_positifsFar,outliersLabelsFar,labelsV
 # save(erreursSigmaFar,faux_negatifsFar,faux_positifsFar,file = "erreursFarScenarios.RData")
 
 
-###############
+###############Computations of the near scenario with true parameters#################################
 
 k = k1val[2]
 
 l = l1val[2]
 
 rho1 = rho1val[2]
+
 contParam = ParmsF1(m1, k, l, rho1)
 
 cutoff = qchisq(.95,df=d)  
@@ -904,50 +905,65 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 
 ##############################Affichages################################################
 
-setwd("~/algosto/resultsSelectedScenarios/figures/covarianceEstimation/")
-
-k = k1val[4] 
-l = l1val[7]
-rho1 = rho1val[4]
+k = k1val[2] 
+l = l1val[2]
+rho1 = rho1val[2]
 
 for (m in seq_along(rList)){
-# Créer un dataframe avec les trois séries
-plot_data <- data.frame(
-  index = 1:n,
-  streaming = erreursSigmaNear[,m,3,1],
-  online_us = erreursSigmaNear[,m,2,1],
-  online_naive = erreursSigmaNear[,m,1,1]
-)
-
-# Créer le graphique
-p = ggplot(plot_data, aes(x = index)) +
-  geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
-  geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
-  geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
-  scale_linetype_manual(
-    name = "Method",
-    values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
-  ) +
-  labs(
-    title = "",
-    x = "Observation Index",
-    y = "Frobenius norm error"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    legend.position = "bottom",
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 10)
-  )
-r = rList[m]
-# Sauvegarder le plot en PNG
-filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
-ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
-
+  # Créer un dataframe vide pour accumuler toutes les simulations
+  plot_data_all <- data.frame()
+  
+  for (sim in (1:simNb)){
+    # Créer un dataframe pour cette simulation
+    plot_data <- data.frame(
+      index = 1:n,
+      streaming = erreursSigmaNear[,m,3,sim],
+      online_us = erreursSigmaNear[,m,2,sim],
+      online_naive = erreursSigmaNear[,m,1,sim],
+      simulation = paste("Sim", sim)
+    )
+    
+    # Transformer en format long
+    plot_data_long <- plot_data %>%
+      pivot_longer(cols = c(streaming, online_us, online_naive),
+                   names_to = "method", values_to = "error")
+    
+    # Ajouter au dataframe principal
+    plot_data_all <- bind_rows(plot_data_all, plot_data_long)
+  }
+  
+  # Créer le graphique avec échelle log
+  p <- ggplot(plot_data_all, aes(x = index, y = error, group = interaction(method, simulation))) +
+    geom_line(aes(linetype = method, alpha = simulation), linewidth = 0.7) +
+    scale_linetype_manual(
+      name = "Method",
+      values = c("streaming" = "solid", "online_us" = "dashed", "online_naive" = "dotted"),
+      labels = c("Streaming", "Online US", "Online Naive")
+    ) +
+    scale_alpha_manual(
+      name = "Simulation",
+      values = rep(0.6, simNb)
+    ) +
+    scale_y_log10() +  # Échelle logarithmique base 10
+    labs(
+      title = paste("r =", rList[m], "(échelle log)"),
+      x = "Observation Index",
+      y = "Frobenius norm error (log scale)"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+      legend.position = "bottom",
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+  
+  r = rList[m]
+  filename <- paste0("k = ", k, " l = ", l, " rho1 = ", rho1, " r = ", r, "_log.png")
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  print(p)
 }
-
-
+######Changer échelles et début à 0 uniformiser 
 
 setwd("~/algosto/resultsSelectedScenarios/figures/false_negatives")
 
@@ -1399,7 +1415,8 @@ for (m in seq_along(rList)){
   # Sauvegarder le plot en PNG
   filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
   setwd("~/algosto/resultsSelectedScenarios/figures/false_positives/")
-  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  print(p)
+  #ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
   
 }
 
