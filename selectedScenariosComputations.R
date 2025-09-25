@@ -80,7 +80,7 @@ fitNaif = resNaif
 for(s in (1:n)){
 erreursSigmaNear[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
 }
-outliersLabelsNear[,m,1,sim] = resNaif$outliers_labels[s]
+outliersLabelsNear[,m,1,sim] = resNaif$outliers_labels
 
 print(paste0("Erreur naive near ",erreursSigmaNear[n,m,1,sim]))
 
@@ -1156,3 +1156,5 @@ for (i in (1:n))
   #ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
   
 }
+
+
