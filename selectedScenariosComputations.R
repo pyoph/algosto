@@ -20,18 +20,18 @@ rho1List = rho1val
 rho1ListNeg = rho1valNeg
 
 
-
-test_outliers = function(distances,dim = 10,cutoff)
-{
-  outlab = rep(0,length(distances))
-  
-  
-  for (i in (1:length(distances)))
-  {
-    if(distances[i] > cutoff){outlab[i] = 1}
-  }
-  return(outlab)
-}
+# 
+# test_outliers = function(distances,dim = 10,cutoff)
+# {
+#   outlab = rep(0,length(distances))
+#   
+#   
+#   for (i in (1:length(distances)))
+#   {
+#     if(distances[i] > cutoff){outlab[i] = 1}
+#   }
+#   return(outlab)
+# }
 
 sim = 1
 simNb = 1
