@@ -159,7 +159,8 @@ save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streamin
   }
 
 }
-
+setwd("~/algosto/resultsSelectedScenarios/")
+save(erreursSigmaNear,faux_negatifsNear,faux_positifsNear,outliersLabelsNear,labelsVraisNear,file ="results_near_scenario.RData")
 #######################Erreur Med scenario###########################
 
 k = k1val[3];l = l1val[6];rho1 = rho1val[3]
@@ -278,7 +279,7 @@ for (m in seq_along(rList)){
 
 
 setwd("~/algosto/resultsSelectedScenarios")
-save(erreursSigmaMed,faux_negatifsMed,faux_positifsMed,file = "erreursMedScenarios.RData")
+save(erreursSigmaMed,faux_negatifsMed,faux_positifsMed,outliersLabelsMed,labelsVraisMed,file = "results_med_scenario.RData")
 
 
 erreursSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
@@ -479,7 +480,7 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
   }
 
 
-save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
+# save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
 
 erreursSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
 erreursInvSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
@@ -679,11 +680,13 @@ save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streamin
   }
 
 
-save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
+#save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
+setwd("~/algosto/resultsSelectedScenarios/")
+save(erreursSigmaFar,faux_negatifsFar,faux_positifsFar,outliersLabelsFar,labelsVraisFar,file = "results_far_scenario.Rdata")
 
-
-setwd("~/algosto/resultsSelectedScenarios")
-save(erreursSigmaFar,faux_negatifsFar,faux_positifsFar,file = "erreursFarScenarios.RData")
+# 
+# setwd("~/algosto/resultsSelectedScenarios")
+# save(erreursSigmaFar,faux_negatifsFar,faux_positifsFar,file = "erreursFarScenarios.RData")
 
 
 ###############
@@ -899,7 +902,7 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 
 
 
-##############################Plot errors Near scenario################################################
+##############################Affichages################################################
 
 setwd("~/algosto/resultsSelectedScenarios/figures/covarianceEstimation/")
 
@@ -950,9 +953,9 @@ setwd("~/algosto/resultsSelectedScenarios/figures/false_negatives")
 
 plot_data <- data.frame(
   index = rList,
-  streaming = 100*faux_negatifsNear[,3,1]/((rList/100)*n),
-  online_us = 100*faux_negatifsNear[,2,1]/((rList/100)*n),
-  online_naive = 100*faux_negatifsNear[,1,1]/((rList/100)*n)
+  streaming = 100*faux_negatifsMed[,3,1]/((rList/100)*n),
+  online_us = 100*faux_negatifsMed[,2,1]/((rList/100)*n),
+  online_naive = 100*faux_negatifsMed[,1,1]/((rList/100)*n)
 )
 
 # Créer le graphique
@@ -977,6 +980,69 @@ p = ggplot(plot_data, aes(x = index)) +
     legend.text = element_text(size = 10)
   )
 
+setwd("~/algosto/resultsSelectedScenarios/figures/false_positives")
+
+plot_data <- data.frame(
+  index = rList,
+  streaming = 100*faux_positifsMed[,3,1]/((1 - rList/100)*n),
+  online_us = 100*faux_positifsMed[,2,1]/((1 - rList/100)*n),
+  online_naive = 100*faux_positifsMed[,1,1]/((1 - rList/100)*n)
+)
+
+# Créer le graphique
+p = ggplot(plot_data, aes(x = index)) +
+  geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+  geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+  geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+  scale_linetype_manual(
+    name = "Method",
+    values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+  ) +
+  labs(
+    title = "",
+    x = "Contamination rate",
+    y = "False positives"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+
+
+plot_data <- data.frame(
+  index = rList,
+  streaming = 100*faux_positifsNear[,3,1]/((1 - rList/100)*n),
+  online_us = 100*faux_positifsNear[,2,1]/((1 - rList/100)*n),
+  online_naive = 100*faux_positifsNear[,1,1]/((1 - rList/100)*n)
+)
+
+# Créer le graphique
+p = ggplot(plot_data, aes(x = index)) +
+  geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+  geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+  geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+  scale_linetype_manual(
+    name = "Method",
+    values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+  ) +
+  labs(
+    title = "",
+    x = "Contamination rate",
+    y = "False positives"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+
+
+
 ####################Trajectoires faux positifs faux negatifs###################################
 
 
@@ -998,6 +1064,8 @@ for (i in (1:n))
   if (outliersLabelsNear[i,m,1,1] == 1 & labelsVraisNear[i,m] == 0) {
     fp_cum_naive <- fp_cum_naive + 1
   }
+  
+  #print(paste0("FP cum naive = ",fp_cum_naive))
   
   if (outliersLabelsNear[i,m,2,1] == 1 & labelsVraisNear[i,m] == 0) {
     fp_cum_online <- fp_cum_online + 1
