@@ -1045,6 +1045,11 @@ p = ggplot(plot_data, aes(x = index)) +
 
 ####################Trajectoires faux positifs faux negatifs###################################
 
+#####Near scenario###############
+
+k = k1val[2];l = l1val[2];rho1 = rho1val[2]
+
+
 
 faux_negatifsNearTraj = array(0,dim = c(n,length(rList),3,simNb))
 
@@ -1120,7 +1125,8 @@ for (i in (1:n))
   r = rList[m]
   # Sauvegarder le plot en PNG
   filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
-  #ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  setwd("~/algosto/resultsSelectedScenarios/figures/false_negatives/")
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
   
   plot_data <- data.frame(
     index = 1:n,
@@ -1153,7 +1159,247 @@ for (i in (1:n))
   r = rList[m]
   # Sauvegarder le plot en PNG
   filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
-  #ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  setwd("~/algosto/resultsSelectedScenarios/figures/false_positives/")
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  
+}
+
+
+#####Med scenario###############
+
+k = k1val[3];l = l1val[6];rho1 = rho1val[3]
+
+
+
+faux_negatifsNearMed = array(0,dim = c(n,length(rList),3,simNb))
+
+faux_positifsNearMed = array(0,dim = c(n,length(rList),3,simNb))
+
+
+for (m in seq_along(rList)){
+  fn_cum_naive <- 0
+  fp_cum_naive <- 0
+  fn_cum_online <- 0
+  fp_cum_online <- 0
+  fn_cum_strm <- 0
+  fp_cum_strm <- 0
+  for (i in (1:n))
+  {
+    
+    if (outliersLabelsMed[i,m,1,1] == 1 & labelsVraisMed[i,m] == 0) {
+      fp_cum_naive <- fp_cum_naive + 1
+    }
+    
+    #print(paste0("FP cum naive = ",fp_cum_naive))
+    
+    if (outliersLabelsMed[i,m,2,1] == 1 & labelsVraisMed[i,m] == 0) {
+      fp_cum_online <- fp_cum_online + 1
+    }
+    
+    if (outliersLabelsMed[i,m,3,1] == 1 & labelsVraisMed[i,m] == 0) {
+      fp_cum_strm <- fp_cum_strm + 1
+    }
+    if (outliersLabelsMed[i,m,1,1] == 0 & labelsVraisMed[i,m] == 1) {fn_cum_naive = fn_cum_naive + 1}
+    if (outliersLabelsMed[i,m,2,1] == 0 & labelsVraisMed[i,m] == 1) {fn_cum_online = fn_cum_online + 1}
+    if (outliersLabelsMed[i,m,3,1] == 0 & labelsVraisMed[i,m] == 1) {fn_cum_strm = fn_cum_strm + 1}
+    
+    faux_negatifsNearMed[i,m,1,1] <- fn_cum_naive
+    faux_positifsNearMed[i,m,1,1] <- fp_cum_naive
+    
+    faux_negatifsNearMed[i,m,2,1] <- fn_cum_online
+    faux_positifsNearMed[i,m,2,1] <- fp_cum_online
+    
+    faux_negatifsNearMed[i,m,3,1] <- fn_cum_strm
+    faux_positifsNearMed[i,m,3,1] <- fp_cum_strm
+    
+    
+  }
+  plot_data <- data.frame(
+    index = 1:n,
+    streaming = faux_negatifsNearMed[,m,3,1],
+    online_us = faux_negatifsNearMed[,m,2,1],
+    online_naive = faux_negatifsNearMed[,m,1,1]
+  )
+  
+  # Créer le graphique
+  p = ggplot(plot_data, aes(x = index)) +
+    geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+    geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+    geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+    scale_linetype_manual(
+      name = "Method",
+      values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+    ) +
+    labs(
+      title = "",
+      x = "Observation Index",
+      y = "False negatives"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+      legend.position = "bottom",
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+  r = rList[m]
+  # Sauvegarder le plot en PNG
+  filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
+  setwd("~/algosto/resultsSelectedScenarios/figures/false_negatives/")
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  
+  plot_data <- data.frame(
+    index = 1:n,
+    streaming = faux_positifsNearMed[,m,3,1],
+    online_us = faux_positifsNearMed[,m,2,1],
+    online_naive = faux_positifsNearMed[,m,1,1]
+  )
+  
+  # Créer le graphique
+  p = ggplot(plot_data, aes(x = index)) +
+    geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+    geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+    geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+    scale_linetype_manual(
+      name = "Method",
+      values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+    ) +
+    labs(
+      title = "",
+      x = "Observation Index",
+      y = "False positives"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+      legend.position = "bottom",
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+  r = rList[m]
+  # Sauvegarder le plot en PNG
+  filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
+  setwd("~/algosto/resultsSelectedScenarios/figures/false_positives/")
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  
+}
+
+#####Far scenario###############
+
+k = k1val[4];l = l1val[4];rho1 = rho1val[4]
+
+
+
+faux_negatifsTrajFar = array(0,dim = c(n,length(rList),3,simNb))
+
+faux_positifsTrajFar = array(0,dim = c(n,length(rList),3,simNb))
+
+
+for (m in seq_along(rList)){
+  fn_cum_naive <- 0
+  fp_cum_naive <- 0
+  fn_cum_online <- 0
+  fp_cum_online <- 0
+  fn_cum_strm <- 0
+  fp_cum_strm <- 0
+  for (i in (1:n))
+  {
+    
+    if (outliersLabelsMed[i,m,1,1] == 1 & labelsVraisMed[i,m] == 0) {
+      fp_cum_naive <- fp_cum_naive + 1
+    }
+    
+    #print(paste0("FP cum naive = ",fp_cum_naive))
+    
+    if (outliersLabelsMed[i,m,2,1] == 1 & labelsVraisMed[i,m] == 0) {
+      fp_cum_online <- fp_cum_online + 1
+    }
+    
+    if (outliersLabelsMed[i,m,3,1] == 1 & labelsVraisMed[i,m] == 0) {
+      fp_cum_strm <- fp_cum_strm + 1
+    }
+    if (outliersLabelsMed[i,m,1,1] == 0 & labelsVraisMed[i,m] == 1) {fn_cum_naive = fn_cum_naive + 1}
+    if (outliersLabelsMed[i,m,2,1] == 0 & labelsVraisMed[i,m] == 1) {fn_cum_online = fn_cum_online + 1}
+    if (outliersLabelsMed[i,m,3,1] == 0 & labelsVraisMed[i,m] == 1) {fn_cum_strm = fn_cum_strm + 1}
+    
+    faux_negatifsTrajFar[i,m,1,1] <- fn_cum_naive
+    faux_positifsTrajFar[i,m,1,1] <- fp_cum_naive
+    
+    faux_negatifsTrajFar[i,m,2,1] <- fn_cum_online
+    faux_positifsTrajFar[i,m,2,1] <- fp_cum_online
+    
+    faux_negatifsTrajFar[i,m,3,1] <- fn_cum_strm
+    faux_positifsTrajFar[i,m,3,1] <- fp_cum_strm
+    
+    
+  }
+  plot_data <- data.frame(
+    index = 1:n,
+    streaming = faux_negatifsTrajFar[,m,3,1],
+    online_us = faux_negatifsTrajFar[,m,2,1],
+    online_naive = faux_negatifsTrajFar[,m,1,1]
+  )
+  
+  # Créer le graphique
+  p = ggplot(plot_data, aes(x = index)) +
+    geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+    geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+    geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+    scale_linetype_manual(
+      name = "Method",
+      values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+    ) +
+    labs(
+      title = "",
+      x = "Observation Index",
+      y = "False negatives"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+      legend.position = "bottom",
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+  r = rList[m]
+  # Sauvegarder le plot en PNG
+  filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
+  setwd("~/algosto/resultsSelectedScenarios/figures/false_negatives/")
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
+  
+  plot_data <- data.frame(
+    index = 1:n,
+    streaming = faux_positifsNearMed[,m,3,1],
+    online_us = faux_positifsNearMed[,m,2,1],
+    online_naive = faux_positifsNearMed[,m,1,1]
+  )
+  
+  # Créer le graphique
+  p = ggplot(plot_data, aes(x = index)) +
+    geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+    geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+    geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+    scale_linetype_manual(
+      name = "Method",
+      values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+    ) +
+    labs(
+      title = "",
+      x = "Observation Index",
+      y = "False positives"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+      legend.position = "bottom",
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10)
+    )
+  r = rList[m]
+  # Sauvegarder le plot en PNG
+  filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
+  setwd("~/algosto/resultsSelectedScenarios/figures/false_positives/")
+  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
   
 }
 
