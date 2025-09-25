@@ -939,3 +939,44 @@ filename <- paste0("k = ", k, " l = ",l," rho1 = ",rho1, "r = ", r, ".png")
 ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
 
 }
+
+
+
+setwd("~/algosto/resultsSelectedScenarios/figures/false_negatives")
+
+plot_data <- data.frame(
+  index = rList,
+  streaming = 100*faux_negatifsNear[,3,1]/((rList/100)*n),
+  online_us = 100*faux_negatifsNear[,2,1]/((rList/100)*n),
+  online_naive = 100*faux_negatifsNear[,1,1]/((rList/100)*n)
+)
+
+# Créer le graphique
+p = ggplot(plot_data, aes(x = index)) +
+  geom_line(aes(y = streaming, linetype = "Streaming"), linewidth = 1) +
+  geom_line(aes(y = online_us, linetype = "Online US"), linewidth = 1) +
+  geom_line(aes(y = online_naive, linetype = "Online Naive"), linewidth = 1) +
+  scale_linetype_manual(
+    name = "Method",
+    values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
+  ) +
+  labs(
+    title = "",
+    x = "Contamination rate",
+    y = "False negatives"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+
+####################Trajectoires faux positifs faux negatifs###################################
+
+
+faux_negatifsNearTraj = array(0,dim = c(n,length(rList),3,simNb))
+
+faux_positifsNearTraj = array(0,dim = c(n,length(rList),3,simNb))
+
