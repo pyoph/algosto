@@ -28,8 +28,6 @@ library(ggplot2)
 library(reshape2)
 library(dplyr)
 library(tidyr)
-library(patchwork)  # pour agencer les 4 graphiques
-library(cowplot)
 
 ############################
 #############FIchiers nécessaires
