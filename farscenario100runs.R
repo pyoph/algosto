@@ -6,7 +6,7 @@ explDir = "~/Simus/exploitResults"
 
 source("~/algosto/loadnecessary.R")
 
-load("~/algosto/load("~/algosto/SimParmsGrid-n10000-d10.Rdata")
+load("~/algosto/SimParmsGrid-n10000-d10.Rdata")
 .RData")
 
 simNb = 100
