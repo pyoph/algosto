@@ -18,10 +18,13 @@ simNb = 100
 kList = k1val
 
 lList = l1val
-
+print("lList = ",lList)
 rho1List = rho1val
+print("rho1List = ",rho1List)
 
 rho1ListNeg = rho1valNeg
+print("rho1ListNeg = ",rho1ListNeg)
+
 
 erreursSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
 erreursInvSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
