@@ -34,7 +34,7 @@ rho1ListNeg = rho1valNeg
 # }
 
 sim = 1
-simNb = 10
+simNb = 1
 
 erreursSigmaNear = array(0,dim = c(n,length(rList),3,simNb))
 erreursKLNear = array(0,dim = c(n,length(rList),3,simNb))
@@ -165,7 +165,6 @@ save(erreursSigmaNear,faux_negatifsNear,faux_positifsNear,outliersLabelsNear,lab
 
 k = k1val[3];l = l1val[6];rho1 = rho1val[3]
 
-
 erreursSigmaMed = array(0,dim = c(n,length(rList),3,simNb))
 erreursInvSigmaMed = array(0,dim = c(n,length(rList),3,simNb))
 outliersLabelsMed = array(0,dim = c(n,length(rList),3,simNb))
@@ -278,7 +277,7 @@ for (m in seq_along(rList)){
 }
 
 
-setwd("~/algosto/resultsSelectedScenarios")
+setwd("~/Simus/FitSim/")
 save(erreursSigmaMed,faux_negatifsMed,faux_positifsMed,outliersLabelsMed,labelsVraisMed,file = "results_med_scenario.RData")
 
 
@@ -1422,4 +1421,131 @@ for (m in seq_along(rList)){
   
 }
 
+# 
+ plot(1:n, erreursSigmaMed[,2,3,1],
+     type = "l", lwd = 2, 
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      log = "y",              # Échelle logarithmique Y
+      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+ )
+# 
+# # Autres courbes
+ lines(1:n, erreursSigmaMed[,2,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaMed[,2,1,1], lty = "dotted")
+# 
+# # Axe Y logarithmique
+ log_ticks <- 10^seq(-2, 2, by = 1)
+ axis(2, at = log_ticks,
+      labels = parse(text = paste0("10^", -2:2)),
+      las = 1)
+ x_ticks <- seq(0, n, by = 1000)
+ axis(1, at = x_ticks,las = 1)
+ 
+ 
+ plot(1:n, erreursSigmaMed[,5,3,1],
+      type = "l", lwd = 2, 
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      log = "y",              # Échelle logarithmique Y
+      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(1:n, erreursSigmaMed[,5,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaMed[,5,1,1], lty = "dotted")
+ # 
+ # # Axe Y logarithmique
+ log_ticks <- 10^seq(-2, 2, by = 1)
+ axis(2, at = log_ticks,
+      labels = parse(text = paste0("10^", -2:2)),
+      las = 1)
+ x_ticks <- seq(0, n, by = 1000)
+ axis(1, at = x_ticks,las = 1)
+ 
+ 
+ 
+ plot(1:n, erreursSigmaMed[,7,3,1],
+      type = "l", lwd = 2, 
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      log = "y",              # Échelle logarithmique Y
+      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(1:n, erreursSigmaMed[,7,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaMed[,7,1,1], lty = "dotted")
+ # 
+ # # Axe Y logarithmique
+ log_ticks <- 10^seq(-2, 2, by = 1)
+ axis(2, at = log_ticks,
+      labels = parse(text = paste0("10^", -2:2)),
+      las = 1)
+ x_ticks <- seq(0, n, by = 1000)
+ axis(1, at = x_ticks,las = 1) 
 
+ 
+ 
+ plot(1:n, erreursSigmaMed[,11,3,1],
+      type = "l", lwd = 2, 
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      log = "y",              # Échelle logarithmique Y
+      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(1:n, erreursSigmaMed[,11,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaMed[,11,1,1], lty = "dotted")
+ # 
+ # # Axe Y logarithmique
+ log_ticks <- 10^seq(-2, 2, by = 1)
+ axis(2, at = log_ticks,
+      labels = parse(text = paste0("10^", -2:2)),
+      las = 1)
+ x_ticks <- seq(0, n, by = 1000)
+ axis(1, at = x_ticks,las = 1) 
+ 
+ # 
+# 
+# # Initialiser le plot vide
+# p <- ggplot()
+# 
+# # Boucle sur les simulations
+# for(sim in 1:simNb){
+#   
+#   plot_data <- data.frame(
+#     index = 1:n,
+#     streaming    = erreursSigmaMed[,5,3,sim],
+#     online_us    = erreursSigmaMed[,5,2,sim],
+#     online_naive = erreursSigmaMed[,5,1,sim]
+#   )
+#   
+#   # Ajouter les 3 courbes pour cette simulation
+#   p <- p +
+#     geom_line(data = plot_data, aes(x = index, y = streaming),
+#               linetype = "solid", linewidth = 0.7, alpha = 0.6) +
+#     geom_line(data = plot_data, aes(x = index, y = online_us),
+#               linetype = "dashed", linewidth = 0.7, alpha = 0.6) +
+#     geom_line(data = plot_data, aes(x = index, y = online_naive),
+#               linetype = "dotted", linewidth = 0.7, alpha = 0.6)
+# }
+# 
+# # Mise en forme finale
+# p <- p +
+#   scale_y_log10(
+#     breaks = 10^seq(-3, 3, by = 1),
+#     labels = trans_format("log10", math_format(10^.x))
+#   ) +
+#   theme_minimal() +
+#   theme(
+#     axis.title = element_blank(),
+#     plot.title = element_blank(),
+#     legend.position = "none",
+#     axis.text = element_text(size = 10),
+#     panel.grid.minor = element_blank()
+#   )
+# 
+# print(p)
+# 

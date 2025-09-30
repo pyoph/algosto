@@ -28,7 +28,7 @@ library(ggplot2)
 library(reshape2)
 library(dplyr)
 library(tidyr)
-
+library(scales)
 ############################
 #############FIchiers nécessaires
 #################################
