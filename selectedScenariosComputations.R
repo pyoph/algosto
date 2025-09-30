@@ -908,64 +908,66 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 k = k1val[2] 
 l = l1val[2]
 rho1 = rho1val[2]
+library(ggplot2)
+library(scales)
+
 
 for (m in seq_along(rList)){
-  # Créer un dataframe vide pour accumuler toutes les simulations
-  plot_data_all <- data.frame()
+  p <- ggplot()
+  # Boucle sur les simulations
+for(sim in 1:simNb){
+ 
+  plot_data <- data.frame(
+    index = 1:n,
+    streaming    = erreursSigmaNear[,m,3,sim],
+    online_us    = erreursSigmaNear[,m,2,sim],
+    online_naive = erreursSigmaNear[,m,1,sim]
+  )
   
-  for (sim in (1:simNb)){
-    # Créer un dataframe pour cette simulation
-    plot_data <- data.frame(
-      index = 1:n,
-      streaming = erreursSigmaNear[,m,3,sim],
-      online_us = erreursSigmaNear[,m,2,sim],
-      online_naive = erreursSigmaNear[,m,1,sim],
-      simulation = paste("Sim", sim)
-    )
-    
-    # Transformer en format long
-    plot_data_long <- plot_data %>%
-      pivot_longer(cols = c(streaming, online_us, online_naive),
-                   names_to = "method", values_to = "error")
-    
-    # Ajouter au dataframe principal
-    plot_data_all <- bind_rows(plot_data_all, plot_data_long)
-  }
+  # Ajouter les 3 courbes pour cette simulation
+  p <- p +
+    geom_line(data = plot_data, aes(x = index, y = streaming),
+              linetype = "solid", linewidth = 0.7, alpha = 0.6) +
+    geom_line(data = plot_data, aes(x = index, y = online_us),
+              linetype = "dashed", linewidth = 0.7, alpha = 0.6) +
+    geom_line(data = plot_data, aes(x = index, y = online_naive),
+              linetype = "dotted", linewidth = 0.7, alpha = 0.6)
   
-  # Créer le graphique avec échelle log
-  p <- ggplot(plot_data_all, aes(x = index, y = error, group = interaction(method, simulation))) +
-    geom_line(aes(linetype = method, alpha = simulation), linewidth = 0.7) +
-    scale_linetype_manual(
-      name = "Method",
-      values = c("streaming" = "solid", "online_us" = "dashed", "online_naive" = "dotted"),
-      labels = c("Streaming", "Online US", "Online Naive")
-    ) +
-    scale_alpha_manual(
-      name = "Simulation",
-      values = rep(0.6, simNb)
-    ) +
-    scale_y_log10() +  # Échelle logarithmique base 10
-    labs(
-      title = paste("r =", rList[m], "(échelle log)"),
-      x = "Observation Index",
-      y = "Frobenius norm error (log scale)"
-    ) +
-    theme_minimal() +
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-      legend.position = "bottom",
-      legend.title = element_text(size = 12),
-      legend.text = element_text(size = 10)
-    )
   
-  r = rList[m]
-  filename <- paste0("k = ", k, " l = ", l, " rho1 = ", rho1, " r = ", r, "_log.png")
-  ggsave(filename, plot = p, width = 10, height = 6, dpi = 300)
-  print(p)
+
+# Mise en forme finale
+p <- p +
+  scale_y_log10(
+    breaks = 10^seq(-3, 3, by = 1),
+    labels = trans_format("log10", math_format(10^.x))
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    plot.title = element_blank(),
+    legend.position = "none",
+    axis.text = element_text(size = 10),
+    panel.grid.minor = element_blank()
+  )
+print(p)
+
 }
+ 
+  
+  setwd("~/algosto/resultsSelectedScenarios/figures/covarianceEstimation/")
+  r = rList[m]
+  filename = paste0("k = ",k," l = ",l, " rho1 = ",rho1,"r = " ,r,".png")
+  ggsave(filename, p, bg = "white", dpi = 300, width = 8, height = 6)  
+  
+}
+
+
 ######Changer échelles et début à 0 uniformiser 
 
 setwd("~/algosto/resultsSelectedScenarios/figures/false_negatives")
+
+
+
 
 plot_data <- data.frame(
   index = rList,
@@ -982,7 +984,7 @@ p = ggplot(plot_data, aes(x = index)) +
   scale_linetype_manual(
     name = "Method",
     values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
-  ) +
+  ) +q
   labs(
     title = "",
     x = "Contamination rate",
