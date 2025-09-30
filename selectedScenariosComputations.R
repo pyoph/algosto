@@ -1422,87 +1422,87 @@ for (m in seq_along(rList)){
 }
 
 # 
- plot(1:n, erreursSigmaMed[,2,3,1],
+ plot(1:n, erreursSigmaFar[,2,3,1],
      type = "l", lwd = 2, 
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e9)     # Plage Y adaptée à tes ticks log
  )
 # 
 # # Autres courbes
- lines(1:n, erreursSigmaMed[,2,2,1], lty = "dashed")
- lines(1:n, erreursSigmaMed[,2,1,1], lty = "dotted")
+ lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
 # 
 # # Axe Y logarithmique
- log_ticks <- 10^seq(-2, 2, by = 1)
+ log_ticks <- 10^seq(-1, 9, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -2:2)),
+      labels = parse(text = paste0("10^", -1:9)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1)
  
  
- plot(1:n, erreursSigmaMed[,5,3,1],
+ plot(1:n, erreursSigmaFar[,5,3,1],
       type = "l", lwd = 2, 
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e9)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
- lines(1:n, erreursSigmaMed[,5,2,1], lty = "dashed")
- lines(1:n, erreursSigmaMed[,5,1,1], lty = "dotted")
+ lines(1:n, erreursSigmaFar[,5,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(-2, 2, by = 1)
+ log_ticks <- 10^seq(-1, 9, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -2:2)),
+      labels = parse(text = paste0("10^", -1:9)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1)
  
  
  
- plot(1:n, erreursSigmaMed[,7,3,1],
+ plot(1:n, erreursSigmaFar[,7,3,1],
       type = "l", lwd = 2, 
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e9)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
- lines(1:n, erreursSigmaMed[,7,2,1], lty = "dashed")
- lines(1:n, erreursSigmaMed[,7,1,1], lty = "dotted")
+ lines(1:n, erreursSigmaFar[,7,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaFar[,7,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(-2, 2, by = 1)
+ log_ticks <- 10^seq(-1, 9, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -2:2)),
+      labels = parse(text = paste0("10^", -1:9)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1) 
 
  
  
- plot(1:n, erreursSigmaMed[,11,3,1],
+ plot(1:n, erreursSigmaFar[,11,3,1],
       type = "l", lwd = 2, 
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-2, 1e2)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e1, 1e5)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
- lines(1:n, erreursSigmaMed[,11,2,1], lty = "dashed")
- lines(1:n, erreursSigmaMed[,11,1,1], lty = "dotted")
+ lines(1:n, erreursSigmaFar[,11,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaFar[,11,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(-2, 2, by = 1)
+ log_ticks <- 10^seq(1,5, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -2:2)),
+      labels = parse(text = paste0("10^", 1:5)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1) 
