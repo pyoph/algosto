@@ -767,9 +767,6 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage)
   } 
   
   
-  
-  
-
 #outliers_majority = outliers_labelsTout[,,1]
 # res1run$faux_negatifsRec[9900:1e4]
 # table(res1run$labelsVraisRec[,5],res1run$outliersLabelsRec[,5,9,1])

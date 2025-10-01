@@ -1700,3 +1700,93 @@ axis(1, at = x_ticks,las = 1)
 # 
 # print(p)
 # 
+########################Cumulative outlier detection###################
+ 
+ 
+ resFar5Naive = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,1,1],5)
+ resFar5Online = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,2,1],5)
+ resFar5Streaming = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,3,1],5)
+ 
+ plot(1:n, resFar5Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 2,lty = "dotted",
+      xlab = "", ylab = "",
+      yaxt = "n", xaxt = "n",
+      ylim = c(0, 100)
+ )
+ lines(1:n, resFar5Online$taux_outliers_detectes_vrais,
+       lwd = 2, lty = "dashed")
+ lines(1:n, resFar5Streaming$taux_outliers_detectes_vrais,
+       lwd = 2, lty = "solid")
+ 
+ lines(1:n, resFar5Naive$taux_outliers_vrais,
+       lwd = 2, col = "red", type = "l")
+ 
+ # Axes manuels
+ axis(1, at = seq(0, n, by = 1000))
+ axis(2, at = seq(0, 100, by = 10))
+ 
+ 
+ resFar20Naive = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,1,1],20)
+ resFar20Online = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,2,1],20)
+ resFar20Streaming = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,3,1],20)
+ 
+ plot(1:n, resFar20Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 2,lty = "dotted",
+      xlab = "", ylab = "",
+      yaxt = "n", xaxt = "n",
+      ylim = c(0, 100)
+  )
+ lines(1:n, resFar20Online$taux_outliers_detectes_vrais,
+        lwd = 2, lty = "dashed")
+  lines(1:n, resFar5Streaming$taux_outliers_detectes_vrais,
+        lwd = 2, lty="solid")
+  
+ lines(1:n, resFar20Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
+ 
+ # Axes manuels
+ axis(1, at = seq(0, n, by = 1000))
+ axis(2, at = seq(0, 100, by = 10))
+ 
+ resFar30Naive = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,1,1],30)
+ resFar30Online = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,2,1],30)
+ resFar30Streaming = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,3,1],30)
+ 
+ plot(1:n, resFar30Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 2,lty = "dotted",
+      xlab = "", ylab = "",
+      yaxt = "n", xaxt = "n",
+      ylim = c(0, 100)
+ )
+ lines(1:n, resFar30Online$taux_outliers_detectes_vrais,
+       lwd = 2, lty = "dashed")
+ lines(1:n, resFar30Streaming$taux_outliers_detectes_vrais,
+       lwd = 2, lty="solid")
+ 
+ lines(1:n, resFar30Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
+ 
+ # Axes manuels
+ axis(1, at = seq(0, n, by = 1000))
+ axis(2, at = seq(0, 100, by = 10))
+ 
+ 
+ resFar50Naive = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,1,1],50)
+ resFar50Online = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,2,1],50)
+ resFar50Streaming = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,3,1],50)
+ 
+ plot(1:n, resFar50Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 2,lty = "dotted",
+      xlab = "", ylab = "",
+      yaxt = "n", xaxt = "n",
+      ylim = c(0, 100)
+ )
+ lines(1:n, resFar50Online$taux_outliers_detectes_vrais,
+       lwd = 2, lty = "dashed")
+ lines(1:n, resFar50Streaming$taux_outliers_detectes_vrais,
+       lwd = 2, lty="solid")
+ 
+ lines(1:n, resFar50Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
+ 
+ # Axes manuels
+ axis(1, at = seq(0, n, by = 1000))
+ axis(2, at = seq(0, 100, by = 10))
+ 
