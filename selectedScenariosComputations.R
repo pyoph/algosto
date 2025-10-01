@@ -1427,7 +1427,7 @@ for (m in seq_along(rList)){
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-1, 1e9)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
  )
 # 
 # # Autres courbes
@@ -1435,9 +1435,9 @@ for (m in seq_along(rList)){
  lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
 # 
 # # Axe Y logarithmique
- log_ticks <- 10^seq(-1, 9, by = 1)
+ log_ticks <- 10^seq(-1, 10, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -1:9)),
+      labels = parse(text = paste0("10^", -1:10)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1)
@@ -1448,7 +1448,7 @@ for (m in seq_along(rList)){
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-1, 1e9)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
@@ -1456,9 +1456,9 @@ for (m in seq_along(rList)){
  lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(-1, 9, by = 1)
+ log_ticks <- 10^seq(-1, 10, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -1:9)),
+      labels = parse(text = paste0("10^", -1:10)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1)
@@ -1470,7 +1470,7 @@ for (m in seq_along(rList)){
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-1, 1e9)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
@@ -1478,9 +1478,9 @@ for (m in seq_along(rList)){
  lines(1:n, erreursSigmaFar[,7,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(-1, 9, by = 1)
+ log_ticks <- 10^seq(-1, 10, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -1:9)),
+      labels = parse(text = paste0("10^", -1:10)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1) 
@@ -1492,7 +1492,7 @@ for (m in seq_along(rList)){
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e1, 1e5)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
@@ -1500,9 +1500,9 @@ for (m in seq_along(rList)){
  lines(1:n, erreursSigmaFar[,11,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(1,5, by = 1)
+ log_ticks <- 10^seq(-1,10, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", 1:5)),
+      labels = parse(text = paste0("10^", -1:10)),
       las = 1)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks,las = 1) 
