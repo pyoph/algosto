@@ -173,10 +173,9 @@ faux_negatifsNear = array(0,dim = c(length(rList),3,simNb))
 
 
 #Near scenario d = 10
-if(d == 10) {k = 0.86;l=0.56;rho1 = 0.6}
+if(d == 10) {k = k1val[2];l=l1val[5];rho1 = rho1val[2]}
 #Near scenario d = 100
 if(d == 100) {k = 0.66;l=0.82;rho1 = 0.415}
-k = 0.86;l=0.56;rho1 = 0.6
 #Near scenario d = 100
 #k = 0.66;l=0.82;rho1 = 0.415
 
@@ -1526,7 +1525,7 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 #     scale_linetype_manual(
 #       name = "Method",
 #       values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
-#     ) +
+#     ) +s
 #     labs(
 #       title = "",
 #       x = "Observation Index",
@@ -1566,9 +1565,9 @@ lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),1,1]/((rList[2:len
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
 x_ticks <- rList[2:length(rList)]
-axis(2, at = seq(0, 100, by = 5), las = 1)
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 1.25)
 
-axis(1, at = x_ticks,las = 1)
+axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
 
 # 
  plot(1:n, erreursSigmaFar[,2,3,1],
@@ -1576,9 +1575,13 @@ axis(1, at = x_ticks,las = 1)
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e10)
+    ,   # taille du texte sur les axes
+     # Plage Y adaptée à tes ticks log
  )
 # 
+ 
+ 
 # # Autres courbes
  lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
  lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
@@ -1587,33 +1590,189 @@ axis(1, at = x_ticks,las = 1)
  log_ticks <- 10^seq(-1, 10, by = 1)
  axis(2, at = log_ticks,
       labels = parse(text = paste0("10^", -1:10)),
-      las = 1)
+           cex.axis = 1.25,las = 1)
  x_ticks <- seq(0, n, by = 1000)
- axis(1, at = x_ticks,las = 1)
+ axis(1, at = x_ticks, cex.axis = 1.25,las = 1)
+ 
+ setwd("~/Documents")
+ dev.copy(png, "erreursSigmaFar_d10.png", width = 1800, height = 1200, res = 200)
+ dev.off() 
+ mtab = c(2,5,7,11)
  
  
+ setwd("~")
+ for (m in mtab){
+ r = rList[m]
+ 
+ file = paste0("errorfrobnormnear_scenr",r,".png")
+ 
+ png(file, width = 1800, height = 1200, res = 200)
  
  
- plot(1:n, erreursSigmaFar[,5,3,1],
+ plot(1:n, erreursSigmaNear[,m,3,1],
       type = "l", lwd = 2, 
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
- lines(1:n, erreursSigmaFar[,5,2,1], lty = "dashed")
- lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
+ lines(1:n, erreursSigmaNear[,m,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaNear[,m,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(-1, 10, by = 1)
+ log_ticks <- 10^seq(-1, 2, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -1:10)),
-      las = 1)
- x_ticks <- seq(0, n, by = 1000)
- axis(1, at = x_ticks,las = 1)
+      labels = parse(text = paste0("10^", -1:2)),
+      las = 1,cex.axis = 1.9)
+ x_ticks <- seq(0, n, by = 2000)
+ axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
  
+ dev.off()
+ }
+ 
+ mtab = c(2,5,7,11)
+ 
+ 
+ setwd("~")
+ for (m in mtab){
+   r = rList[m]
+   
+   file = paste0("errorfrobnormmed_scenr",r,".png")
+   
+   png(file, width = 1800, height = 1200, res = 200)
+   
+   
+   plot(1:n, erreursSigmaMed[,m,3,1],
+        type = "l", lwd = 2, 
+        xlab = "", ylab = "",   # Pas de label
+        yaxt = "n", xaxt = "n", # On masque les axes par défaut
+        log = "y",              # Échelle logarithmique Y
+        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
+   )
+   # 
+   # # Autres courbes
+   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
+   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
+   # 
+   # # Axe Y logarithmique
+   log_ticks <- 10^seq(-1, 2, by = 1)
+   axis(2, at = log_ticks,
+        labels = parse(text = paste0("10^", -1:2)),
+        las = 1,cex.axis = 1.9)
+   x_ticks <- seq(0, n, by = 2000)
+   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
+   
+   dev.off()
+ }
+ 
+ mtab = c(2,5,7,11)
+ 
+ 
+ setwd("~")
+ for (m in mtab){
+   r = rList[m]
+   
+   file = paste0("errorfrobnormmed_scenr",r,".png")
+   
+   png(file, width = 1800, height = 1200, res = 200)
+   
+   
+   plot(1:n, erreursSigmaMed[,m,3,1],
+        type = "l", lwd = 2, 
+        xlab = "", ylab = "",   # Pas de label
+        yaxt = "n", xaxt = "n", # On masque les axes par défaut
+        log = "y",              # Échelle logarithmique Y
+        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
+   )
+   # 
+   # # Autres courbes
+   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
+   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
+   # 
+   # # Axe Y logarithmique
+   log_ticks <- 10^seq(-1, 2, by = 1)
+   axis(2, at = log_ticks,
+        labels = parse(text = paste0("10^", -1:2)),
+        las = 1,cex.axis = 1.9)
+   x_ticks <- seq(0, n, by = 2000)
+   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
+   
+   dev.off()
+ }
+ 
+ mtab = c(2,5,7,11)
+ 
+ 
+ setwd("~")
+ for (m in mtab){
+   r = rList[m]
+   
+   file = paste0("errorfrobnormmed_scenr",r,".png")
+   
+   png(file, width = 1800, height = 1200, res = 200)
+   
+   
+   plot(1:n, erreursSigmaMed[,m,3,1],
+        type = "l", lwd = 2, 
+        xlab = "", ylab = "",   # Pas de label
+        yaxt = "n", xaxt = "n", # On masque les axes par défaut
+        log = "y",              # Échelle logarithmique Y
+        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
+   )
+   # 
+   # # Autres courbes
+   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
+   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
+   # 
+   # # Axe Y logarithmique
+   log_ticks <- 10^seq(-1, 2, by = 1)
+   axis(2, at = log_ticks,
+        labels = parse(text = paste0("10^", -1:2)),
+        las = 1,cex.axis = 1.9)
+   x_ticks <- seq(0, n, by = 2000)
+   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
+   
+   dev.off()
+ }
+ 
+ 
+ 
+ mtab = c(2,5,7,11)
+ 
+ 
+ setwd("~")
+ for (m in mtab){
+   r = rList[m]
+   
+   file = paste0("errorfrobnormmed_scenr",r,".png")
+   
+   png(file, width = 1800, height = 1200, res = 200)
+   
+   
+   plot(1:n, erreursSigmaMed[,m,3,1],
+        type = "l", lwd = 2, 
+        xlab = "", ylab = "",   # Pas de label
+        yaxt = "n", xaxt = "n", # On masque les axes par défaut
+        log = "y",              # Échelle logarithmique Y
+        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
+   )
+   # 
+   # # Autres courbes
+   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
+   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
+   # 
+   # # Axe Y logarithmique
+   log_ticks <- 10^seq(-1, 2, by = 1)
+   axis(2, at = log_ticks,
+        labels = parse(text = paste0("10^", -1:2)),
+        las = 1,cex.axis = 1.9)
+   x_ticks <- seq(0, n, by = 2000)
+   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
+   
+   dev.off()
+ }
  
  
  plot(1:n, erreursSigmaFar[,7,3,1],
