@@ -1547,7 +1547,11 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 #   
 # }
 
-plot(rList[2:length(rList)], faux_negatifsId[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+setwd("~")
+
+file= paste0("false_negatives_far.png")
+
+plot(rList[2:length(rList)], faux_negatifsFar[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
      type = "l", lwd = 2, 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -1556,8 +1560,8 @@ plot(rList[2:length(rList)], faux_negatifsId[2:length(rList),3,1]/((rList[2:leng
 )
 # 
 # # Autres courbes
-lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dashed")
-lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dotted")
+lines(rList[2:length(rList)], faux_negatifsFar[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dashed")
+lines(rList[2:length(rList)], faux_negatifsFar[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dotted")
 #  
 # # Axe Y logarithmique
 # log_ticks <- 10^seq(-1, 10, by = 1)
@@ -1565,9 +1569,12 @@ lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),1,1]/((rList[2:len
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
 x_ticks <- rList[2:length(rList)]
-axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 1.25)
+axis(2, at = seq(0, 100, by = 10), las = 1,cex.axis = 2.5)
 
-axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
+axis(1, at = x_ticks,las = 1,cex.axis = 2.5)
+
+png(file, width = 1800, height = 1200, res = 200)
+
 
 # 
  plot(1:n, erreursSigmaFar[,2,3,1],
@@ -1594,9 +1601,6 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
  x_ticks <- seq(0, n, by = 1000)
  axis(1, at = x_ticks, cex.axis = 1.25,las = 1)
  
- setwd("~/Documents")
- dev.copy(png, "erreursSigmaFar_d10.png", width = 1800, height = 1200, res = 200)
- dev.off() 
  mtab = c(2,5,7,11)
  
  
@@ -1746,12 +1750,12 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
  for (m in mtab){
    r = rList[m]
    
-   file = paste0("errorfrobnormmed_scenr",r,".png")
+   file = paste0("errorfrobnormfar_scenr",r,".png")
    
    png(file, width = 1800, height = 1200, res = 200)
    
    
-   plot(1:n, erreursSigmaMed[,m,3,1],
+   plot(1:n, erreursSigmaFar[,m,3,1],
         type = "l", lwd = 2, 
         xlab = "", ylab = "",   # Pas de label
         yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -1760,8 +1764,8 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
    )
    # 
    # # Autres courbes
-   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
-   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
+   lines(1:n, erreursSigmaFar[,m,2,1], lty = "dashed")
+   lines(1:n, erreursSigmaFar[,m,1,1], lty = "dotted")
    # 
    # # Axe Y logarithmique
    log_ticks <- 10^seq(-1, 2, by = 1)
@@ -1866,6 +1870,12 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
  resFar5Online = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,2,1],5)
  resFar5Streaming = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,3,1],5)
  
+ setwd("~")
+ r = rList[2]
+ file = paste0("cumulativeOutlierDetFarr",r,".png")
+ 
+ png(file, width = 1800, height = 1200, res = 200)
+ 
  plot(1:n, resFar5Naive$taux_outliers_detectes_vrais,
       type = "l", lwd = 2,lty = "dotted",
       xlab = "", ylab = "",
@@ -1878,16 +1888,27 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
        lwd = 2, lty = "solid")
  
  lines(1:n, resFar5Naive$taux_outliers_vrais,
-       lwd = 2, col = "red", type = "l")
+       lwd = 2, col = "red", type = "l",lty = "dotted")
  
  # Axes manuels
- axis(1, at = seq(0, n, by = 1000))
- axis(2, at = seq(0, 100, by = 10))
+ axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
+ axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
+ 
+ dev.off()
+ 
  
  
  resFar20Naive = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,1,1],20)
  resFar20Online = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,2,1],20)
  resFar20Streaming = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,3,1],20)
+ 
+ 
+ setwd("~")
+ r = rList[5]
+ file = paste0("cumulativeOutlierDetFarr",r,".png")
+ 
+ png(file, width = 1800, height = 1200, res = 200)
+ 
  
  plot(1:n, resFar20Naive$taux_outliers_detectes_vrais,
       type = "l", lwd = 2,lty = "dotted",
@@ -1903,12 +1924,21 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
  lines(1:n, resFar20Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
  
  # Axes manuels
- axis(1, at = seq(0, n, by = 1000))
- axis(2, at = seq(0, 100, by = 10))
+ axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
+ axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
+ 
+ dev.off()
  
  resFar30Naive = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,1,1],30)
  resFar30Online = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,2,1],30)
  resFar30Streaming = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,3,1],30)
+ 
+ 
+ setwd("~")
+ r = rList[7]
+ file = paste0("cumulativeOutlierDetFarr",r,".png")
+ 
+ png(file, width = 1800, height = 1200, res = 200)
  
  plot(1:n, resFar30Naive$taux_outliers_detectes_vrais,
       type = "l", lwd = 2,lty = "dotted",
@@ -1924,14 +1954,22 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
  lines(1:n, resFar30Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
  
  # Axes manuels
- axis(1, at = seq(0, n, by = 1000))
- axis(2, at = seq(0, 100, by = 10))
+ axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
+ axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
  
+ dev.off()
  
  resFar50Naive = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,1,1],50)
  resFar50Online = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,2,1],50)
  resFar50Streaming = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,3,1],50)
  
+ 
+ setwd("~")
+ r = rList[11]
+ file = paste0("cumulativeOutlierDetFarr",r,".png")
+ 
+ png(file, width = 1800, height = 1200, res = 200)
+
  plot(1:n, resFar50Naive$taux_outliers_detectes_vrais,
       type = "l", lwd = 2,lty = "dotted",
       xlab = "", ylab = "",
@@ -1946,6 +1984,6 @@ axis(1, at = x_ticks,las = 1,cex.axis = 1.25)
  lines(1:n, resFar50Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
  
  # Axes manuels
- axis(1, at = seq(0, n, by = 1000))
- axis(2, at = seq(0, 100, by = 10))
- 
+ axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
+ axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
+ dev.off()
