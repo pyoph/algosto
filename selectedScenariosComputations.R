@@ -519,7 +519,7 @@ fitUsOnline = resUsOnline
 #   #outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
 #   
 #   erreursInvSigmaFar[s,m,2,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
-}
+
 # 
 # if(erreursSigmaInvFar[n,m,2,sim] < 1e12){
 #   print(paste0("Erreur online us sqrt inv far ",erreursInvSigmaFar[n,m,2,sim]))
@@ -602,7 +602,7 @@ print(paste0("faux négatifs far us streaming ",faux_negatifsFar[m,3,sim]))
 
 setwd(resDir)
 save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
-  }
+}  }
 
 
 # save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
