@@ -1743,11 +1743,11 @@ png(file, width = 1800, height = 1200, res = 200)
  
  
  
- mtab = c(2,5,7,11)
+mtab = c(2,5,7,9)
  
- 
- setwd("~")
- for (m in mtab){
+setwd("~")
+
+for (m in mtab){
    r = rList[m]
    
    file = paste0("errorfrobnormfar_scenr",r,".png")
@@ -1756,7 +1756,7 @@ png(file, width = 1800, height = 1200, res = 200)
    
    
    plot(1:n, erreursSigmaFar[,m,3,1],
-        type = "l", lwd = 2, 
+        type = "l", lwd = 3, col= "red",  
         xlab = "", ylab = "",   # Pas de label
         yaxt = "n", xaxt = "n", # On masque les axes par défaut
         log = "y",              # Échelle logarithmique Y
@@ -1764,8 +1764,8 @@ png(file, width = 1800, height = 1200, res = 200)
    )
    # 
    # # Autres courbes
-   lines(1:n, erreursSigmaFar[,m,2,1], lty = "dashed")
-   lines(1:n, erreursSigmaFar[,m,1,1], lty = "dotted")
+   lines(1:n, erreursSigmaFar[,m,2,1], lwd = 3,col = "blue",lty = "dashed")
+   lines(1:n, erreursSigmaFar[,m,1,1], lwd = 3,col = "green", lty = "dotted")
    # 
    # # Axe Y logarithmique
    log_ticks <- 10^seq(-1, 2, by = 1)
@@ -1862,7 +1862,12 @@ png(file, width = 1800, height = 1200, res = 200)
 #   )
 # 
 # print(p)
-# 
+#
+ 
+ ####################Moyenne sur les 100 runs################################"
+ moyenne_erreurs_Far <- apply(erreursSigmaFar, c(1, 2, 3), mean)
+ moyenne_erreurs_Med <- apply(erreursSigmaMed, c(1, 2, 3), mean)
+ moyenne_erreurs_Near <- apply(erreursSigmaNear, c(1, 2, 3), mean)
 ########################Cumulative outlier detection###################
  
  
@@ -1987,3 +1992,4 @@ png(file, width = 1800, height = 1200, res = 200)
  axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
  axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
  dev.off()
+ 
