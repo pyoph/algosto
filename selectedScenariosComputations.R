@@ -1549,11 +1549,9 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 
 setwd("~")
 
+file= paste0("false_negatives_no_outlier.png")
 
-
-file= paste0("false_negatives_far.png")
-
-plot(rList[2:9], moyennes_faux_negatifs_Far[(2:9),3]/((rList[2:(length(rList) - 2)]/100)*n)*100,
+plot(rList[2:9], moyennes_faux_negatifs_Id[(2:9),3]/((rList[2:(length(rList) - 2)]/100)*n)*100,
      type = "l", lwd = 3, col = "red",
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -1562,8 +1560,8 @@ plot(rList[2:9], moyennes_faux_negatifs_Far[(2:9),3]/((rList[2:(length(rList) - 
 )
 # 
 # # Autres courbes
-lines(rList[2:9], moyennes_faux_negatifs_Far[2:9,2]/((rList[2:(length(rList)-2)]/100)*n)*100,lwd = 3,col = "blue" ,lty = "dashed")
-lines(rList[2:9], moyennes_faux_negatifs_Far[2:9,1]/((rList[2:(length(rList)-2)]/100)*n)*100,lwd = 3,col = "green", lty = "dotted")
+lines(rList[2:9], moyennes_faux_negatifs_Id[2:9,2]/((rList[2:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "blue" ,lty = "dashed")
+lines(rList[2:9], moyennes_faux_negatifs_Id[2:9,1]/((rList[2:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "darkgreen", lty = "dotted")
 #  
 # # Axe Y logarithmique
 # log_ticks <- 10^seq(-1, 10, by = 1)
@@ -1574,9 +1572,37 @@ x_ticks <- rList[2:9]
 axis(2, at = seq(0, 100, by = 10), las = 1,cex.axis = 2.5)
 
 axis(1, at = x_ticks,las = 1,cex.axis = 2.5)
+dev.off()
+
+setwd("~")
+
+file= paste0("false_positives_far.png")
+
+plot(rList[1:9], moyennes_faux_positifs_Far[(1:9),3]/((1 - rList[1:(length(rList) - 2)]/100)*n)*100,
+     type = "l", lwd = 3, col = "red",
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], moyennes_faux_positifs_Far[1:9,2]/((1 - rList[1:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "blue" ,lty = "dashed")
+lines(rList[1:9], moyennes_faux_positifs_Far[1:9,1]/((1 - rList[1:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "darkgreen", lty = "dotted")
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[1:9]
+axis(2, at = seq(0, 100, by = 10), las = 1,cex.axis = 2.5)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.5)
+dev.off()
+
 
 png(file, width = 1800, height = 1200, res = 200)
-
 
 # 
  plot(1:n, erreursSigmaFar[,2,3,1],
@@ -1757,12 +1783,12 @@ setwd("~")
 for (m in mtab){
    r = rList[m]
    
-   file = paste0("errorfrobnormfar_scenr",r,".png")
+   file = paste0("errorfrobnormmed_scenr",r,".png")
    
    png(file, width = 1800, height = 1200, res = 200)
 
    
-   plot(log10(1:n), moyenne_erreurs_Far[,m,3],
+   plot(log10(1:n), moyenne_erreurs_Med[,m,3],
         type = "l", lwd = 6, col= "red",  
         xlab = "", ylab = "",   # Pas de label
         yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -1772,8 +1798,8 @@ for (m in mtab){
    )
    # 
    # # Autres courbes
-   lines(log10(1:n), moyenne_erreurs_Far[,m,2], lwd = 6,col = "blue",lty = "dashed")
-   lines(log10(1:n), moyenne_erreurs_Far[,m,1], lwd = 6,col = "darkgreen", lty = "dotted")
+   lines(log10(1:n), moyenne_erreurs_Med[,m,2], lwd = 6,col = "blue",lty = "dashed")
+   lines(log10(1:n), moyenne_erreurs_Med[,m,1], lwd = 6,col = "darkgreen", lty = "dotted")
    # 
    # # Axe Y logarithmique
    log_ticks <- 10^seq(-1, 2, by = 1)
@@ -1887,6 +1913,14 @@ for (m in mtab){
  moyennes_faux_negatifs_Far = apply(faux_negatifsFar, c(1, 2), mean)
  moyennes_faux_negatifs_Med = apply(faux_negatifsMed, c(1, 2), mean)
  moyennes_faux_negatifs_Near = apply(faux_negatifsNear, c(1, 2), mean)
+ 
+ moyennes_faux_positifs_Far = apply(faux_negatifsFar, c(1, 2), mean)
+ moyennes_faux_positifs_Med = apply(faux_negatifsMed, c(1, 2), mean)
+ moyennes_faux_positifs_Near = apply(faux_negatifsNear, c(1, 2), mean)
+ 
+ moyennes_faux_negatifs_Id = apply(faux_negatifsId, c(1,2), mean)
+ moyennes_faux_positifs_Id = apply(faux_positifsId, c(1,2), mean)
+ 
  
  ########################Cumulative outlier detection###################
  
