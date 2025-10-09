@@ -1747,6 +1747,11 @@ png(file, width = 1800, height = 1200, res = 200)
  
 mtab = c(2,5,7,9)
  
+
+# Définition des ticks logarithmiques
+log_ticks_x <- 10^seq(0, 4, by = 1)   # 1, 10, 100, 1000, 10000
+log_ticks_y <- 10^seq(-1, 2, by = 1)  # 0.1, 1, 10, 100
+
 setwd("~")
 
 for (m in mtab){
@@ -1755,28 +1760,36 @@ for (m in mtab){
    file = paste0("errorfrobnormfar_scenr",r,".png")
    
    png(file, width = 1800, height = 1200, res = 200)
+
    
-   
-   plot(1:n, erreursSigmaFar[,m,3,1],
-        type = "l", lwd = 3, col= "red",  
+   plot(log10(1:n), moyenne_erreurs_Far[,m,3],
+        type = "l", lwd = 6, col= "red",  
         xlab = "", ylab = "",   # Pas de label
         yaxt = "n", xaxt = "n", # On masque les axes par défaut
-        log = "y",              # Échelle logarithmique Y
+        #log = "x", 
+         log = "y",              # Échelle logarithmique Y
         ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
    )
    # 
    # # Autres courbes
-   lines(1:n, erreursSigmaFar[,m,2,1], lwd = 3,col = "blue",lty = "dashed")
-   lines(1:n, erreursSigmaFar[,m,1,1], lwd = 3,col = "green", lty = "dotted")
+   lines(log10(1:n), moyenne_erreurs_Far[,m,2], lwd = 6,col = "blue",lty = "dashed")
+   lines(log10(1:n), moyenne_erreurs_Far[,m,1], lwd = 6,col = "darkgreen", lty = "dotted")
    # 
    # # Axe Y logarithmique
    log_ticks <- 10^seq(-1, 2, by = 1)
-   axis(2, at = log_ticks,
+   axis(2, at = log_ticks_y,
         labels = parse(text = paste0("10^", -1:2)),
         las = 1,cex.axis = 1.9)
-   x_ticks <- seq(0, n, by = 2000)
-   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
-   
+   # x_ticks <- c(0,1, 10, 100, 1000, 10000)
+   # axis(1, at = x_ticks,
+   #      labels = parse(text = c("0", "10^0", "10^1", "10^2", "10^3", "10^4")),
+   #      las = 1,
+   #      cex.axis = 1.6,
+   #      tck = -0.02)  
+   # Axe X logarithmique mais espacement égal (via log10)
+   axis(1, at = log10(log_ticks_x),
+        labels = parse(text = paste0("10^", 0:4)),
+        las = 1, cex.axis = 1.8)
    dev.off()
  }
  

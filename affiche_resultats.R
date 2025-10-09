@@ -20,20 +20,21 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
  p <- ggplot(df, aes(x = X1, y = X2, color = Label, alpha = Label)) +
    geom_point(size = 3) +
    ylim(a,b) +
+   xlim(a,b) +
    scale_color_manual(
      values = c("0" = "blue", "1" = "red"),
      labels = c("Inlier", "Outlier"),
      name = "Status"
    ) +
    scale_alpha_manual(
-     values = c("0" = 0.1, "1" = 1),  # 0.2 transparency for blue, 1 for red
+     values = c("0" = 0.1, "1" = 0.1),  # 0.2 transparency for blue, 1 for red
      guide = "none"  # Hide alpha from legend
    ) +
    labs(
      title = "",
      subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
-     x = "X1",
-     y = "X2"
+     x = "",
+     y = ""
    ) +
    theme_minimal() +
    theme(
@@ -43,13 +44,13 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
   return(p)
 }
 #######################Appels de la fonction######################################
-p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-20,20)
+p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",2,-10,10)
 
-p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",20,-20,20)
+p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",2,-10,10)
 
-p2 = afficherContaminationScenarios(2.71,19.02,0.85,"(k,l,rho1) = (0.86,0.56,0.3)",20,-20,20)
+p2 = afficherContaminationScenarios(2.71,19.02,0.85,"(k,l,rho1) = (0.86,0.56,0.3)",2,-10,10)
 
-p3 = afficherContaminationScenarios(8.59,l1val[length(l1val)],0.975,"(k,l,rho1) = (8.59,1.32 x 10^9,0.975)",20,-1e5,1e5)
+p3 = afficherContaminationScenarios(8.59,l1val[length(l1val)],0.975,"(k,l,rho1) = (8.59,1.32 x 10^9,0.975)",2,-10,10)
 
 # Créer une disposition 2x2 avec les 3 plots et un espace vide
 
