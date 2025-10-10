@@ -1,8 +1,8 @@
-simDir = "~/Simus/DataSim"
+simDir = "~/work/Simus/DataSim"
 
-resDir = "~/Simus/FitSim"
+resDir = "~/work/Simus/FitSim"
 
-explDir = "~/Simus/exploitResults"
+explDir = "~/work/Simus/exploitResults"
 
 #setwd(resDir)
 
@@ -34,7 +34,7 @@ rho1ListNeg = rho1valNeg
 # }
 
 sim = 1
-simNb = 1
+simNb = 100
 
 erreursSigmaId = array(0,dim = c(n,length(rList),3,simNb))
 erreursKLId = array(0,dim = c(n,length(rList),3,simNb))
@@ -155,7 +155,7 @@ for (m in seq_along(rList)){
     Sigma_str = fitUSStreaming$Sigma
     
     setwd(resDir)
-    save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
+    #save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
   }
   
 }
@@ -173,7 +173,7 @@ faux_negatifsNear = array(0,dim = c(length(rList),3,simNb))
 
 
 #Near scenario d = 10
-if(d == 10) {k = k1val[2];l=l1val[5];rho1 = rho1val[2]}
+if(d == 10) {k = 0.86;l=l1val[5];rho1 = 0.6}
 #Near scenario d = 100
 if(d == 100) {k = 0.66;l=0.82;rho1 = 0.415}
 #Near scenario d = 100
@@ -281,11 +281,11 @@ Sigma_online = fitUsOnline$Sigma
 Sigma_str = fitUSStreaming$Sigma
 
 setwd(resDir)
-save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
+#save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
   }
 
 }
-setwd("~/algosto/resultsSelectedScenarios/")
+setwd("~/work/Simus/FitSim")
 save(erreursSigmaNear,faux_negatifsNear,faux_positifsNear,outliersLabelsNear,labelsVraisNear,file ="results_near_scenario.RData")
 #######################Erreur Med scenario###########################
 
@@ -397,13 +397,13 @@ for (m in seq_along(rList)){
     Sigma_str = fitUSStreaming$Sigma
     
     setwd(resDir)
-    save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
+    #save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
   }
   
 }
 
 
-setwd("~/Simus/FitSim/")
+setwd("~/work/Simus/FitSim/")
 save(erreursSigmaMed,faux_negatifsMed,faux_positifsMed,outliersLabelsMed,labelsVraisMed,file = "results_med_scenario.RData")
 
 
@@ -601,212 +601,14 @@ print(paste0("faux négatifs far us streaming ",faux_negatifsFar[m,3,sim]))
 
 
 setwd(resDir)
-save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
-}  }
-
-
-# save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
-
-erreursSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
-erreursInvSigmaFar = array(0,dim = c(n,length(rList),3,simNb))
-outliersLabelsFar = array(0,dim = c(n,length(rList),3,simNb))
-labelsVraisFar = array(0,dim = c(n,length(rList)))
-faux_positifsFar= array(0,dim = c(length(rList),3,simNb))
-faux_negatifsFar = array(0,dim = c(length(rList),3,simNb))
-
-
-#Far scenario d = 10
-if(d == 10){k = 8.59;l=l1val[length(l1val)];rho1 = 0.975}
-#Far scenario d = 100
-
-if(d == 100){k = 6.57;l = 19.02;rho1 = 0.845}
-#k = 6.57;l = 19.02;rho1 = 0.845
-
-for (m in seq_along(rList)) {
-  for (sim in (1:simNb)){
-contParam = ParmsF1(m1, k, l, rho1)
-r = rList[m]
-dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
-
-print(dataFile)
-
-
-setwd(simDir)
-# 
-# if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
-# data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
-# save(dataFile,file = dataFile)
-# }
-# else{load(dataFile)}
-#contParam = ParmsF1(m1, k, l, rho1)
-data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
-
-labelsVraisFar[,m] = data$labelsVrais
-fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-
-
-temps_naif = system.time({
-resNaif = SampleCovOnline(data$Z)})
-fitNaif = resNaif
-# for (s in (1:n)){
-# erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
-# 
-# VectPSigma = eigen(resNaif$SigmaIter[s,,])$vectors
-# valPSigma = eigen(resNaif$SigmaIter[s,,])$values
-# 
-# 
-# for(t in(1:d)){
-#   
-#   SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
-#   
-# }
-# erreursInvSigmaFar[s,m,1,sim] = norm(SigmaInvSqrt - (Sigma0)^(-0.5),"F")
-# 
-# }
-for (s in (1:n)){
-erreursSigmaFar[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")}
-
-outliersLabelsFar[,m,1,sim] = resNaif$outliers_labels
-
-print(paste0("Erreur naive far ",erreursSigmaFar[n,m,1,sim]))
-
-
-# if(erreursSigmaInvFar[n,m,1,sim] < 1e12){
-# print(paste0("Erreur naive sqrt inv far ",erreursInvSigmaFar[n,m,1,sim]))
-# }
-# 
-# if(erreursSigmaInvFar[n,m,1,sim] >= 1e12){
-#   print("NAN")
-# }
-
-
-
-t = table(data$labelsVrais,resNaif$outliers_labels)
-if (r != 0) {faux_positifsFar[m,1,sim] =  t[1,2]
-faux_negatifsFar[m,1,sim] = t[2,1]}
-if(r == 0){faux_positifsFar[m,1,sim] =  t[1,2]}
-
-
-print(paste0("faux positifs far us naive ",faux_positifsFar[m,1,sim]))
-
-print(paste0("faux négatifs far us naive ",faux_negatifsFar[m,1,sim]))
-
-
-
-temps_online = system.time(
-  
-  {
-    if(d == 10){
-  resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
-    
-    if(d == 100){
-      resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
-})
-fitUsOnline = resUsOnline
-# 
-# for (s in (1:n)){
-#   erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-#   
-#   VectPSigma = eigen(resUsOnline$Sigma[s,,])$vectors
-#   valPSigma = eigen(resUsOnline$Sigma[s,,])$values
-#   
-#   
-#   for(t in(1:d)){
-#     
-#     SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
-#     
-#   }
-#   #outliersLabelsFar[s,m,2,sim] = resUsOnline$outlier_labels[s] 
-#   
-#   erreursInvSigmaFar[s,m,2,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
-}
-# 
-# if(erreursSigmaInvFar[n,m,2,sim] < 1e12){
-#   print(paste0("Erreur online us sqrt inv far ",erreursInvSigmaFar[n,m,2,sim]))
-# }
-
-# if(erreursSigmaInvFar[n,m,2,sim] >= 1e12){
-#   print("NAN")
-# }
-   for (s in (1:n)){
-     erreursSigmaFar[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")}
-
-if(d == 10){outliersLabelsFar[,m,2,sim]= resUsOnline$outlier_labels}
-if(d == 100){
-  outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.38*qchisq(.95,df = 100))
-}
-#outliersLabelsFar[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.27 * qchisq(0.95, df = d))
-#t = table(data$labelsVrais,resUsOnline$outlier_labels)
-t = table(data$labelsVrais,outliersLabelsFar[,m,2,sim])
-if(r == 0){faux_positifsFar[m,2,sim] =  t[1,2]}
-
-if (r != 0) {faux_positifsFar[m,2,sim] =  t[1,2]
-faux_negatifsFar[m,2,sim] = t[2,1]}
-
-print(paste0("Erreur online us far ",erreursSigmaFar[n,m,2,sim]))
-
-print(paste0("faux positifs far us online ",faux_positifsFar[m,2,sim]))
-
-print(paste0("faux négatifs far us online ",faux_negatifsFar[m,2,sim]))
-
-temps_streaming = system.time(
-  {
-  if(d == 10){
-  resUsStreaming = StreamingOutlierDetection(data$Z,batch = ncol(data$Z))}
-    if(d == 100){resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)),cutoff = 1.38 * qchisq(0.95, df = d))}
-    }
-  
-  )
-fitUSStreaming = resUsStreaming
-for(s in (1:n)){
-erreursSigmaFar[s,m,3,sim] = norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
-# 
-# VectPSigma = eigen(resUsStreaming$Sigma[s,,])$vectors
-# valPSigma = eigen(resUsStreaming$Sigma[s,,])$values
-# 
-# 
-# for(t in(1:d)){
-#   
-#   SigmaInvSqrt = 1/sqrt(valPSigma[t])*VectPSigma[,t]%*%t(VectPSigma[,t])
-#   
-# }
-# erreursInvSigmaFar[s,m,3,sim] = norm(SigmaInvSqrt - (Sigma0)^(-1/2),"F")
-#outliersLabelsFar[s,m,3,sim] = resUsStreaming$outlier_labels[s]
-}
-
-if(d == 10){outliersLabelsFar[,m,3,sim]= resUsStreaming$outlier_labels}
-if(d == 100){
-  outliersLabelsFar[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
-}
-# #t =table(data$labelsVrais,resUsStreaming$outlier_labels)
-# if(erreursInvSigmaFar[n,m,3,sim] < 1e12)
-#   {print("Erreur Sigma inv streaming ", erreursInvSigmaFar[n,m,3,sim])}
-# if (erreursInvSigmaFar[n,m,3,sim] > 1e12)
-#   {print("NAN")}
-t =table(data$labelsVrais,outliersLabelsFar[,m,3,sim])
-
-if (r != 0) {
-faux_positifsFar[m,3,sim] =  t[1,2]
-faux_negatifsFar[m,3,sim] = t[2,1]
-}
-if(r == 0){faux_positifsFar[m,3,sim] =  t[1,2]}
-
-
-print(paste0("Erreur streaming us far ",erreursSigmaFar[n,m,3,sim]))
-
-print(paste0("faux positifs far us streaming ",faux_positifsFar[m,3,sim]))
-
-print(paste0("faux négatifs far us streaming ",faux_negatifsFar[m,3,sim]))
-
-
-
-setwd(resDir)
-save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
-  }
+#save(fitNaif, fitUsOnline, fitUSStreaming,temps_naif,temps_online,temps_streaming,file=fitFile)
+  }}
 
 
 #save(erreursSigmaNear,erreursSigmaFar,outliersLabelsNear,outliersLabelsFar,file = "res1runFarNeard10.Rdata")
-setwd("~/algosto/resultsSelectedScenarios/")
+
+setwd("~/work/Simus/FitSim/")
+
 save(erreursSigmaFar,faux_negatifsFar,faux_positifsFar,outliersLabelsFar,labelsVraisFar,file = "results_far_scenario.Rdata")
 
 # 
@@ -1525,7 +1327,7 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 #     scale_linetype_manual(
 #       name = "Method",
 #       values = c("Streaming" = "solid", "Online US" = "dashed", "Online Naive" = "dotted")
-#     ) +s
+#     ) +
 #     labs(
 #       title = "",
 #       x = "Observation Index",
@@ -1547,12 +1349,8 @@ y_breaks <- seq(0, max(faux_pos_final, na.rm = TRUE) + 50, by = 50)
 #   
 # }
 
-setwd("~")
-
-file= paste0("false_negatives_no_outlier.png")
-
-plot(rList[2:9], moyennes_faux_negatifs_Id[(2:9),3]/((rList[2:(length(rList) - 2)]/100)*n)*100,
-     type = "l", lwd = 3, col = "red",
+plot(rList[2:length(rList)], faux_negatifsId[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+     type = "l", lwd = 2, 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
      #log = "y",              # Échelle logarithmique Y
@@ -1560,49 +1358,18 @@ plot(rList[2:9], moyennes_faux_negatifs_Id[(2:9),3]/((rList[2:(length(rList) - 2
 )
 # 
 # # Autres courbes
-lines(rList[2:9], moyennes_faux_negatifs_Id[2:9,2]/((rList[2:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "blue" ,lty = "dashed")
-lines(rList[2:9], moyennes_faux_negatifs_Id[2:9,1]/((rList[2:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "darkgreen", lty = "dotted")
+lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dashed")
+lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dotted")
 #  
 # # Axe Y logarithmique
 # log_ticks <- 10^seq(-1, 10, by = 1)
 # axis(2, at = log_ticks,
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
-x_ticks <- rList[2:9]
-axis(2, at = seq(0, 100, by = 10), las = 1,cex.axis = 2.5)
+x_ticks <- rList[2:length(rList)]
+axis(2, at = seq(0, 100, by = 5), las = 1)
 
-axis(1, at = x_ticks,las = 1,cex.axis = 2.5)
-dev.off()
-
-setwd("~")
-
-file= paste0("false_positives_far.png")
-
-plot(rList[1:9], moyennes_faux_positifs_Far[(1:9),3]/((1 - rList[1:(length(rList) - 2)]/100)*n)*100,
-     type = "l", lwd = 3, col = "red",
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     #log = "y",              # Échelle logarithmique Y
-     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
-)
-# 
-# # Autres courbes
-lines(rList[1:9], moyennes_faux_positifs_Far[1:9,2]/((1 - rList[1:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "blue" ,lty = "dashed")
-lines(rList[1:9], moyennes_faux_positifs_Far[1:9,1]/((1 - rList[1:(length(rList)-2)]/100)*n)*100,lwd = 4,col = "darkgreen", lty = "dotted")
-#  
-# # Axe Y logarithmique
-# log_ticks <- 10^seq(-1, 10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-x_ticks <- rList[1:9]
-axis(2, at = seq(0, 100, by = 10), las = 1,cex.axis = 2.5)
-
-axis(1, at = x_ticks,las = 1,cex.axis = 2.5)
-dev.off()
-
-
-png(file, width = 1800, height = 1200, res = 200)
+axis(1, at = x_ticks,las = 1)
 
 # 
  plot(1:n, erreursSigmaFar[,2,3,1],
@@ -1610,13 +1377,9 @@ png(file, width = 1800, height = 1200, res = 200)
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-1, 1e10)
-    ,   # taille du texte sur les axes
-     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
  )
 # 
- 
- 
 # # Autres courbes
  lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
  lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
@@ -1625,199 +1388,180 @@ png(file, width = 1800, height = 1200, res = 200)
  log_ticks <- 10^seq(-1, 10, by = 1)
  axis(2, at = log_ticks,
       labels = parse(text = paste0("10^", -1:10)),
-           cex.axis = 1.25,las = 1)
+      las = 1)
  x_ticks <- seq(0, n, by = 1000)
- axis(1, at = x_ticks, cex.axis = 1.25,las = 1)
- 
- mtab = c(2,5,7,11)
+ axis(1, at = x_ticks,las = 1)
  
  
  setwd("~")
- for (m in mtab){
- r = rList[m]
  
- file = paste0("errorfrobnormnear_scenr",r,".png")
- 
- png(file, width = 1800, height = 1200, res = 200)
+ png("falsepositives_id.png", width = 1800, height = 1200, res = 200)
  
  
- plot(1:n, erreursSigmaNear[,m,3,1],
+ plot(rList[1:9], moyenne_faux_positifsId[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+      type = "l", lwd = 4, 
+      col = "darkgreen",
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      #log = "y",              # Échelle logarithmique Y
+      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(rList[1:9], moyenne_faux_positifsId[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "red")
+ lines(rList[1:9], moyenne_faux_positifsId[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "blue")
+ #  
+ # # Axe Y logarithmique
+ # log_ticks <- 10^seq(-1, 10, by = 1)
+ # axis(2, at = log_ticks,
+ #      labels = parse(text = paste0("10^", -1:10)),
+ #      las = 1)
+ x_ticks <- rList[2:length(rList)]
+ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ 
+ axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+ 
+ dev.off()
+ 
+ 
+ 
+ setwd("~")
+ 
+ png("falsepositives_near.png", width = 1800, height = 1200, res = 200)
+ 
+ 
+ plot(rList[1:9], moyenne_faux_positifsNear[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+      type = "l", lwd = 4, 
+      col = "darkgreen",
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      #log = "y",              # Échelle logarithmique Y
+      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(rList[1:9], moyenne_faux_positifsNear[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "red")
+ lines(rList[1:9], moyenne_faux_positifsNear[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "blue")
+ #  
+ # # Axe Y logarithmique
+ # log_ticks <- 10^seq(-1, 10, by = 1)
+ # axis(2, at = log_ticks,
+ #      labels = parse(text = paste0("10^", -1:10)),
+ #      las = 1)
+ x_ticks <- rList[2:length(rList)]
+ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ 
+ axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+ 
+ dev.off()
+ 
+ 
+ 
+ setwd("~")
+ 
+ png("falsepositives_med.png", width = 1800, height = 1200, res = 200)
+ 
+ 
+ plot(rList[1:9], moyenne_faux_positifsMed[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+      type = "l", lwd = 4, 
+      col = "darkgreen",
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      #log = "y",              # Échelle logarithmique Y
+      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(rList[1:9], moyenne_faux_positifsMed[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "red")
+ lines(rList[1:9], moyenne_faux_positifsMed[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "blue")
+ #  
+ # # Axe Y logarithmique
+ # log_ticks <- 10^seq(-1, 10, by = 1)
+ # axis(2, at = log_ticks,
+ #      labels = parse(text = paste0("10^", -1:10)),
+ #      las = 1)
+ x_ticks <- rList[2:length(rList)]
+ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ 
+ axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+ 
+ dev.off()
+ 
+ 
+ setwd("~")
+ 
+ png("falsepositives_far.png", width = 1800, height = 1200, res = 200)
+ 
+ 
+ plot(rList[1:9], moyenne_faux_positifsFar[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+      type = "l", lwd = 4, 
+      col = "darkgreen",
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      #log = "y",              # Échelle logarithmique Y
+      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(rList[1:9], moyenne_faux_positifsFar[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "red")
+ lines(rList[1:9], moyenne_faux_positifsFar[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "blue")
+ #  
+ # # Axe Y logarithmique
+ # log_ticks <- 10^seq(-1, 10, by = 1)
+ # axis(2, at = log_ticks,
+ #      labels = parse(text = paste0("10^", -1:10)),
+ #      las = 1)
+ x_ticks <- rList[2:length(rList)]
+ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ 
+ axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+ 
+ dev.off()
+ 
+ # 
+ plot(1:n, erreursSigmaFar[,2,3,1],
       type = "l", lwd = 2, 
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       log = "y",              # Échelle logarithmique Y
-      ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
+      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
- lines(1:n, erreursSigmaNear[,m,2,1], lty = "dashed")
- lines(1:n, erreursSigmaNear[,m,1,1], lty = "dotted")
+ lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
  # 
  # # Axe Y logarithmique
- log_ticks <- 10^seq(-1, 2, by = 1)
+ log_ticks <- 10^seq(-1, 10, by = 1)
  axis(2, at = log_ticks,
-      labels = parse(text = paste0("10^", -1:2)),
-      las = 1,cex.axis = 1.9)
- x_ticks <- seq(0, n, by = 2000)
- axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
- 
- dev.off()
- }
- 
- mtab = c(2,5,7,11)
- 
- 
- setwd("~")
- for (m in mtab){
-   r = rList[m]
-   
-   file = paste0("errorfrobnormmed_scenr",r,".png")
-   
-   png(file, width = 1800, height = 1200, res = 200)
-   
-   
-   plot(1:n, erreursSigmaMed[,m,3,1],
-        type = "l", lwd = 2, 
-        xlab = "", ylab = "",   # Pas de label
-        yaxt = "n", xaxt = "n", # On masque les axes par défaut
-        log = "y",              # Échelle logarithmique Y
-        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
-   )
-   # 
-   # # Autres courbes
-   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
-   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
-   # 
-   # # Axe Y logarithmique
-   log_ticks <- 10^seq(-1, 2, by = 1)
-   axis(2, at = log_ticks,
-        labels = parse(text = paste0("10^", -1:2)),
-        las = 1,cex.axis = 1.9)
-   x_ticks <- seq(0, n, by = 2000)
-   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
-   
-   dev.off()
- }
- 
- mtab = c(2,5,7,11)
- 
- 
- setwd("~")
- for (m in mtab){
-   r = rList[m]
-   
-   file = paste0("errorfrobnormmed_scenr",r,".png")
-   
-   png(file, width = 1800, height = 1200, res = 200)
-   
-   
-   plot(1:n, erreursSigmaMed[,m,3,1],
-        type = "l", lwd = 2, 
-        xlab = "", ylab = "",   # Pas de label
-        yaxt = "n", xaxt = "n", # On masque les axes par défaut
-        log = "y",              # Échelle logarithmique Y
-        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
-   )
-   # 
-   # # Autres courbes
-   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
-   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
-   # 
-   # # Axe Y logarithmique
-   log_ticks <- 10^seq(-1, 2, by = 1)
-   axis(2, at = log_ticks,
-        labels = parse(text = paste0("10^", -1:2)),
-        las = 1,cex.axis = 1.9)
-   x_ticks <- seq(0, n, by = 2000)
-   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
-   
-   dev.off()
- }
- 
- mtab = c(2,5,7,11)
- 
- 
- setwd("~")
- for (m in mtab){
-   r = rList[m]
-   
-   file = paste0("errorfrobnormmed_scenr",r,".png")
-   
-   png(file, width = 1800, height = 1200, res = 200)
-   
-   
-   plot(1:n, erreursSigmaMed[,m,3,1],
-        type = "l", lwd = 2, 
-        xlab = "", ylab = "",   # Pas de label
-        yaxt = "n", xaxt = "n", # On masque les axes par défaut
-        log = "y",              # Échelle logarithmique Y
-        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
-   )
-   # 
-   # # Autres courbes
-   lines(1:n, erreursSigmaMed[,m,2,1], lty = "dashed")
-   lines(1:n, erreursSigmaMed[,m,1,1], lty = "dotted")
-   # 
-   # # Axe Y logarithmique
-   log_ticks <- 10^seq(-1, 2, by = 1)
-   axis(2, at = log_ticks,
-        labels = parse(text = paste0("10^", -1:2)),
-        las = 1,cex.axis = 1.9)
-   x_ticks <- seq(0, n, by = 2000)
-   axis(1, at = x_ticks,las = 1,cex.axis = 1.6)
-   
-   dev.off()
- }
+      labels = parse(text = paste0("10^", -1:10)),
+      las = 1)
+ x_ticks <- seq(0, n, by = 1000)
+ axis(1, at = x_ticks,las = 1)
  
  
  
-mtab = c(2,5,7,9)
  
-
-# Définition des ticks logarithmiques
-log_ticks_x <- 10^seq(0, 4, by = 1)   # 1, 10, 100, 1000, 10000
-log_ticks_y <- 10^seq(-1, 2, by = 1)  # 0.1, 1, 10, 100
-
-setwd("~")
-
-for (m in mtab){
-   r = rList[m]
-   
-   file = paste0("errorfrobnormmed_scenr",r,".png")
-   
-   png(file, width = 1800, height = 1200, res = 200)
-
-   
-   plot(log10(1:n), moyenne_erreurs_Med[,m,3],
-        type = "l", lwd = 6, col= "red",  
-        xlab = "", ylab = "",   # Pas de label
-        yaxt = "n", xaxt = "n", # On masque les axes par défaut
-        #log = "x", 
-         log = "y",              # Échelle logarithmique Y
-        ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
-   )
-   # 
-   # # Autres courbes
-   lines(log10(1:n), moyenne_erreurs_Med[,m,2], lwd = 6,col = "blue",lty = "dashed")
-   lines(log10(1:n), moyenne_erreurs_Med[,m,1], lwd = 6,col = "darkgreen", lty = "dotted")
-   # 
-   # # Axe Y logarithmique
-   log_ticks <- 10^seq(-1, 2, by = 1)
-   axis(2, at = log_ticks_y,
-        labels = parse(text = paste0("10^", -1:2)),
-        las = 1,cex.axis = 1.9)
-   # x_ticks <- c(0,1, 10, 100, 1000, 10000)
-   # axis(1, at = x_ticks,
-   #      labels = parse(text = c("0", "10^0", "10^1", "10^2", "10^3", "10^4")),
-   #      las = 1,
-   #      cex.axis = 1.6,
-   #      tck = -0.02)  
-   # Axe X logarithmique mais espacement égal (via log10)
-   axis(1, at = log10(log_ticks_x),
-        labels = parse(text = paste0("10^", 0:4)),
-        las = 1, cex.axis = 1.8)
-   dev.off()
- }
+ plot(1:n, erreursSigmaFar[,5,3,1],
+      type = "l", lwd = 2, 
+      xlab = "", ylab = "",   # Pas de label
+      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+      log = "y",              # Échelle logarithmique Y
+      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+ )
+ # 
+ # # Autres courbes
+ lines(1:n, erreursSigmaFar[,5,2,1], lty = "dashed")
+ lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
+ # 
+ # # Axe Y logarithmique
+ log_ticks <- 10^seq(-1, 10, by = 1)
+ axis(2, at = log_ticks,
+      labels = parse(text = paste0("10^", -1:10)),
+      las = 1)
+ x_ticks <- seq(0, n, by = 1000)
+ axis(1, at = x_ticks,las = 1)
+ 
  
  
  plot(1:n, erreursSigmaFar[,7,3,1],
@@ -1903,147 +1647,194 @@ for (m in mtab){
 #   )
 # 
 # print(p)
-#
- 
- ####################Moyenne sur les 100 runs################################"
- moyenne_erreurs_Far <- apply(erreursSigmaFar, c(1, 2, 3), mean)
- moyenne_erreurs_Med <- apply(erreursSigmaMed, c(1, 2, 3), mean)
- moyenne_erreurs_Near <- apply(erreursSigmaNear, c(1, 2, 3), mean)
- 
- moyennes_faux_negatifs_Far = apply(faux_negatifsFar, c(1, 2), mean)
- moyennes_faux_negatifs_Med = apply(faux_negatifsMed, c(1, 2), mean)
- moyennes_faux_negatifs_Near = apply(faux_negatifsNear, c(1, 2), mean)
- 
- moyennes_faux_positifs_Far = apply(faux_negatifsFar, c(1, 2), mean)
- moyennes_faux_positifs_Med = apply(faux_negatifsMed, c(1, 2), mean)
- moyennes_faux_positifs_Near = apply(faux_negatifsNear, c(1, 2), mean)
- 
- moyennes_faux_negatifs_Id = apply(faux_negatifsId, c(1,2), mean)
- moyennes_faux_positifs_Id = apply(faux_positifsId, c(1,2), mean)
+# 
+########################Cumulative outlier detection###################
  
  
- ########################Cumulative outlier detection###################
+ majority_vote_Far <- ifelse(apply(outliersLabelsFar, c(1,2,3), function(x) sum(x) >= 50), 1, 0)
  
+ resFar5Naive = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,1],5)
+ resFar5Online = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,2],5)
+ resFar5Streaming = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,3],5)
  
- resFar5Naive = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,1,1],5)
- resFar5Online = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,2,1],5)
- resFar5Streaming = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,3,1],5)
+ # Données supposées : n correspond à la taille de resFar5Naive$taux_outliers_detectes_vrais
+ x_vals <- 1:n
  
  setwd("~")
- r = rList[2]
- file = paste0("cumulativeOutlierDetFarr",r,".png")
  
+ file = paste0("cumulativeOutlierDetFarr5",".png")
  png(file, width = 1800, height = 1200, res = 200)
- 
- plot(1:n, resFar5Naive$taux_outliers_detectes_vrais,
-      type = "l", lwd = 2,lty = "dotted",
+ # --- Plot principal (échelle log sur X)
+ plot(x_vals, resFar5Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 4, lty = "dotted",
       xlab = "", ylab = "",
       yaxt = "n", xaxt = "n",
-      ylim = c(0, 100)
+      ylim = c(0, 100),
+      col = "darkgreen",
+      log = "x"        # <=== Échelle logarithmique sur l’axe X
  )
- lines(1:n, resFar5Online$taux_outliers_detectes_vrais,
-       lwd = 2, lty = "dashed")
- lines(1:n, resFar5Streaming$taux_outliers_detectes_vrais,
-       lwd = 2, lty = "solid")
- 
- lines(1:n, resFar5Naive$taux_outliers_vrais,
-       lwd = 2, col = "red", type = "l",lty = "dotted")
- 
- # Axes manuels
- axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
- axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
- 
- dev.off()
- 
- 
- 
- resFar20Naive = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,1,1],20)
- resFar20Online = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,2,1],20)
- resFar20Streaming = cumulativeOutlierDetection(labelsVraisFar[,5],outliersLabelsFar[,5,3,1],20)
- 
- 
- setwd("~")
- r = rList[5]
- file = paste0("cumulativeOutlierDetFarr",r,".png")
- 
- png(file, width = 1800, height = 1200, res = 200)
- 
- 
- plot(1:n, resFar20Naive$taux_outliers_detectes_vrais,
-      type = "l", lwd = 2,lty = "dotted",
-      xlab = "", ylab = "",
-      yaxt = "n", xaxt = "n",
-      ylim = c(0, 100)
-  )
- lines(1:n, resFar20Online$taux_outliers_detectes_vrais,
-        lwd = 2, lty = "dashed")
-  lines(1:n, resFar5Streaming$taux_outliers_detectes_vrais,
-        lwd = 2, lty="solid")
-  
- lines(1:n, resFar20Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
- 
- # Axes manuels
- axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
- axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
- 
- dev.off()
- 
- resFar30Naive = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,1,1],30)
- resFar30Online = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,2,1],30)
- resFar30Streaming = cumulativeOutlierDetection(labelsVraisFar[,7],outliersLabelsFar[,7,3,1],30)
- 
- 
- setwd("~")
- r = rList[7]
- file = paste0("cumulativeOutlierDetFarr",r,".png")
- 
- png(file, width = 1800, height = 1200, res = 200)
- 
- plot(1:n, resFar30Naive$taux_outliers_detectes_vrais,
-      type = "l", lwd = 2,lty = "dotted",
-      xlab = "", ylab = "",
-      yaxt = "n", xaxt = "n",
-      ylim = c(0, 100)
- )
- lines(1:n, resFar30Online$taux_outliers_detectes_vrais,
-       lwd = 2, lty = "dashed")
- lines(1:n, resFar30Streaming$taux_outliers_detectes_vrais,
-       lwd = 2, lty="solid")
- 
- lines(1:n, resFar30Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
- 
- # Axes manuels
- axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
- axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
- 
- dev.off()
- 
- resFar50Naive = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,1,1],50)
- resFar50Online = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,2,1],50)
- resFar50Streaming = cumulativeOutlierDetection(labelsVraisFar[,11],outliersLabelsFar[,11,3,1],50)
- 
- 
- setwd("~")
- r = rList[11]
- file = paste0("cumulativeOutlierDetFarr",r,".png")
- 
- png(file, width = 1800, height = 1200, res = 200)
 
- plot(1:n, resFar50Naive$taux_outliers_detectes_vrais,
-      type = "l", lwd = 2,lty = "dotted",
+ # --- Autres lignes
+ lines(x_vals, resFar5Online$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+ lines(x_vals, resFar5Streaming$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
+ 
+ # Ligne invisible (orange)
+ lines(x_vals, resFar5Naive$taux_outliers_vrais,
+       lwd = 4, col = adjustcolor("orange", alpha.f = 0), type = "l")
+ 
+ # --- Axes manuels
+ 
+ # Axe X (logarithmique)
+ log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+ axis(1, at = log_ticks_x,
+      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+      las = 1, cex.axis = 2)
+ 
+ # Axe Y (linéaire)
+ axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+dev.off() 
+
+setwd("~")
+
+file = paste0("cumulativeOutlierDetFarr20",".png")
+png(file, width = 1800, height = 1200, res = 200)
+ resFar20Naive = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,1],20)
+ resFar20Online = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,2],20)
+ resFar20Streaming = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,3],20)
+ x_vals <- 1:n
+ 
+ # --- Plot principal (échelle log sur X)
+ plot(x_vals, resFar20Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 4, lty = "dotted",
       xlab = "", ylab = "",
       yaxt = "n", xaxt = "n",
-      ylim = c(0, 100)
+      ylim = c(0, 100),
+      col = "darkgreen",
+      log = "x"        # <=== Échelle logarithmique sur l’axe X
  )
- lines(1:n, resFar50Online$taux_outliers_detectes_vrais,
-       lwd = 2, lty = "dashed")
- lines(1:n, resFar50Streaming$taux_outliers_detectes_vrais,
-       lwd = 2, lty="solid")
  
- lines(1:n, resFar50Naive$taux_outliers_vrais,lwd = 2, col = "red", type = "l")
+ # --- Autres lignes
+ lines(x_vals, resFar20Online$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+ lines(x_vals, resFar20Streaming$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
  
- # Axes manuels
- axis(1, at = seq(0, n, by = 1000),cex.axis = 1.5)
- axis(2, at = seq(0, 100, by = 10),cex.axis = 1.5)
+ # Ligne invisible (orange)
+ lines(x_vals, resFar20Naive$taux_outliers_vrais,
+       lwd = 4, col = adjustcolor("orange", alpha.f = 0), type = "l")
+ 
+ # --- Axes manuels
+ 
+ # Axe X (logarithmique)
+ log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+ axis(1, at = log_ticks_x,
+      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+      las = 1, cex.axis = 2)
+ 
+ # Axe Y (linéaire)
+ axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+ 
  dev.off()
+ 
+ setwd("~")
+ 
+ file = paste0("cumulativeOutlierDetFarr30",".png")
+ png(file, width = 1800, height = 1200, res = 200)
+ 
+ resFar30Naive = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,1],30)
+ resFar30Online = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,2],30)
+ resFar30Streaming = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,3],30)
+ 
+ # --- Plot principal (échelle log sur X)
+ plot(x_vals, resFar30Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 4, lty = "dotted",
+      xlab = "", ylab = "",
+      yaxt = "n", xaxt = "n",
+      ylim = c(0, 100),
+      col = "darkgreen",
+      log = "x"        # <=== Échelle logarithmique sur l’axe X
+ )
+ 
+ # --- Autres lignes
+ lines(x_vals, resFar30Online$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+ lines(x_vals, resFar30Streaming$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
+ 
+ # Ligne invisible (orange)
+ lines(x_vals, resFar30Naive$taux_outliers_vrais,
+       lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
+ 
+ # --- Axes manuels
+ 
+ # Axe X (logarithmique)
+ log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+ axis(1, at = log_ticks_x,
+      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+      las = 1, cex.axis = 2)
+ 
+ # Axe Y (linéaire)
+ axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+ 
+ dev.off()
+ 
+ resFar40Naive = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,1],50)
+ resFar40Online = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,2],50)
+ resFar40Streaming = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,3],50)
+ 
+ setwd("~")
+ 
+ file = paste0("cumulativeOutlierDetFarr40",".png")
+ png(file, width = 1800, height = 1200, res = 200)
+ 
+ 
+ # --- Plot principal (échelle log sur X)
+ 
+ 
+ 
+ plot(x_vals, resFar40Naive$taux_outliers_detectes_vrais,
+      type = "l", lwd = 4, lty = "dotted",
+      xlab = "", ylab = "",
+      yaxt = "n", xaxt = "n",
+      ylim = c(0, 100),
+      col = "darkgreen",
+      log = "x"        # <=== Échelle logarithmique sur l’axe X
+ )
+ 
+ # --- Autres lignes
+ lines(x_vals, resFar40Online$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+ lines(x_vals, resFar40Streaming$taux_outliers_detectes_vrais,
+       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
+ 
+ # Ligne invisible (orange)
+ lines(x_vals, resFar40Naive$taux_outliers_vrais,
+       lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
+ 
+ # --- Axes manuels
+ 
+ # Axe X (logarithmique)
+ log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+ axis(1, at = log_ticks_x,
+      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+      las = 1, cex.axis = 2)
+ 
+ # Axe Y (linéaire)
+ axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+ 
+ dev.off()
+ 
+ moyenne_faux_positifsFar = apply(faux_positifsFar,c(1,2),mean) 
+ moyenne_faux_positifsMed = apply(faux_positifsMed,c(1,2),mean) 
+ moyenne_faux_positifsNear = apply(faux_positifsNear,c(1,2),mean) 
+ moyenne_faux_positifsId = apply(faux_positifsId,c(1,2),mean) 
+ 
+ 
+ moyenne_faux_negatifsFar = apply(faux_negatifsFar,c(1,2),mean) 
+ moyenne_faux_negatifsMed = apply(faux_negatifsMed,c(1,2),mean) 
+ moyenne_faux_negatifsNear = apply(faux_negatifsNear,c(1,2),mean) 
+ moyenne_faux_negatifsId = apply(faux_negatifsId,c(1,2),mean) 
+ 
  
