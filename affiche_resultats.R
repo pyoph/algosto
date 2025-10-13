@@ -9,7 +9,7 @@
 afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
   contParam = ParmsF1(m1, k, l, rho1)
   
-    data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
+    data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
     
  Z = data$Z
  # Création d'un dataframe pour ggplot
@@ -27,7 +27,7 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
      name = "Status"
    ) +
    scale_alpha_manual(
-     values = c("0" = 0.1, "1" = 0.1),  # 0.2 transparency for blue, 1 for red
+     values = c("0" = 0.5, "1" = 0.5),  
      guide = "none"  # Hide alpha from legend
    ) +
    labs(
@@ -44,13 +44,39 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
   return(p)
 }
 #######################Appels de la fonction######################################
-p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",2,-10,10)
+p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",5,-5,5)
 
-p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",2,-10,10)
+setwd("~")
 
-p2 = afficherContaminationScenarios(2.71,19.02,0.85,"(k,l,rho1) = (0.86,0.56,0.3)",2,-10,10)
+file = paste0("contaminscenidr","5",".png")
+ggsave(file, p0, 
+       width = 10, height = 8, dpi = 600, 
+       bg = "white")
 
-p3 = afficherContaminationScenarios(8.59,l1val[length(l1val)],0.975,"(k,l,rho1) = (8.59,1.32 x 10^9,0.975)",2,-10,10)
+p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",5,-5,5)
+
+setwd("~")
+
+file = paste0("contaminscennearr","5",".png")
+ggsave(file, p1, 
+       width = 10, height = 8, dpi = 600, 
+       bg = "white")
+
+p2 = afficherContaminationScenarios(2.71,19.02,0.85,"(k,l,rho1) = (0.86,0.56,0.3)",5,-5,5)
+
+
+file = paste0("contaminscenmedr","5",".png")
+ggsave(file, p2, 
+       width = 10, height = 8, dpi = 600, 
+       bg = "white")
+
+p3 = afficherContaminationScenarios(8.59,l1val[length(l1val)],0.975,"(k,l,rho1) = (8.59,1.32 x 10^9,0.975)",5,-1e3,1e3)
+
+
+file = paste0("contaminscenfarr","5",".png")
+ggsave(file, p3, 
+       width = 10, height = 8, dpi = 600, 
+       bg = "white")
 
 # Créer une disposition 2x2 avec les 3 plots et un espace vide
 
@@ -88,14 +114,27 @@ final_plot <- plot_grid(main_grid, legend,
                         ncol = 1, 
                         rel_heights = c(10, 1))
 
+
+
 # Affichage
 print(final_plot)
+file = paste0("contaminscenfarr","5",".png")
+ggsave(file, p3, 
+       width = 10, height = 8, dpi = 600, 
+       bg = "white")
 
 final_plot2 <- (p0 + p1) / (p2 + p3) + 
   plot_layout(guides = 'collect') &
   theme(legend.position = 'bottom')
 
 print(final_plot2)
+
+# Affichage
+print(final_plot)
+file = paste0("contamin_scenarios",".png")
+ggsave(file, final_plot2, 
+       width = 10, height = 8, dpi = 600, 
+       bg = "white")
 ######################################################################
 #######Affichage des erreurs d'estimation de Sigma
 ######################################################################
