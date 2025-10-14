@@ -43,6 +43,44 @@ afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
    )
   return(p)
 }
+
+k =k1val[length(k1val)];l=l1val[length(l1val)];rho1 = rho1val[length(rho1val)];
+rate  = 40
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+a = -10
+b = 10
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+# Définir les transparences (alpha = 0.5)
+# converti avec adjustcolor()
+cols <- adjustcolor(cols, alpha.f = 0.5)
+
+# Créer le plot principal
+plot(df$X1, df$X2,
+     col = cols,
+     pch = 19,        # points pleins
+     cex = 1.2,       # taille des points
+     xlim = c(a, b),
+     ylim = c(a, b),
+     xlab = "",
+     ylab = "",
+     main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
+     xaxt = "n", yaxt = "n"  # masque les axes si tu veux un rendu épuré
+)
+
+axis(1,cex.axis = 1.8)
+
+axis(2,cex.axis = 1.8)
+
 #######################Appels de la fonction######################################
 p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",5,-5,5)
 
