@@ -1404,7 +1404,7 @@ axis(1, at = x_ticks,las = 1)
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       #log = "y",              # Échelle logarithmique Y
-      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+      ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
@@ -1417,7 +1417,7 @@ axis(1, at = x_ticks,las = 1)
  #      labels = parse(text = paste0("10^", -1:10)),
  #      las = 1)
  x_ticks <- rList[2:length(rList)]
- axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
  
  axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
  
@@ -1436,7 +1436,7 @@ axis(1, at = x_ticks,las = 1)
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       #log = "y",              # Échelle logarithmique Y
-      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+      ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
@@ -1449,7 +1449,7 @@ axis(1, at = x_ticks,las = 1)
  #      labels = parse(text = paste0("10^", -1:10)),
  #      las = 1)
  x_ticks <- rList[2:length(rList)]
- axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
  
  axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
  
@@ -1468,7 +1468,7 @@ axis(1, at = x_ticks,las = 1)
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       #log = "y",              # Échelle logarithmique Y
-      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+      ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
@@ -1481,7 +1481,7 @@ axis(1, at = x_ticks,las = 1)
  #      labels = parse(text = paste0("10^", -1:10)),
  #      las = 1)
  x_ticks <- rList[2:length(rList)]
- axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
  
  axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
  
@@ -1499,7 +1499,7 @@ axis(1, at = x_ticks,las = 1)
       xlab = "", ylab = "",   # Pas de label
       yaxt = "n", xaxt = "n", # On masque les axes par défaut
       #log = "y",              # Échelle logarithmique Y
-      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+      ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
  )
  # 
  # # Autres courbes
@@ -1512,7 +1512,7 @@ axis(1, at = x_ticks,las = 1)
  #      labels = parse(text = paste0("10^", -1:10)),
  #      las = 1)
  x_ticks <- rList[2:length(rList)]
- axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.4)
+ axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
  
  axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
  
