@@ -31,7 +31,7 @@ n <- 1e4
 
 # Dims and KL distance reached. The parameters are chosen such that the KL distance is in {0,1,10,100}
 #d <- 100; KLval <- c(0, 1, 10, 100)
-d <- 10; KLval <- c(0, 1, 10, 100)
+d <- 10; KLval <- c(0, 1, 5,10,50, 100)
 # 
 # # Functions
 # KL <- function(parms1, parms2){
@@ -74,15 +74,17 @@ k1grid <- c(0, 2^seq(-4, 5, by=.001)); # k1val <- c(0, 2, 5, 10)
 KLk1 <- sapply(k1grid, function(k1){KL(parms0, ParmsF1(m1, k1, 1, rho0))})
 k1val <- k1grid[sapply(KLval, function(kl){which.min(abs(KLk1 - kl))})]
 k1val
-l1grid <- 2^seq(-5, 0, .01); # l1val <- c(1/20, .2, .5, 1, 2, 20)
+l1grid <- 2^seq(-10, 0, .01); # l1val <- c(1/20, .2, .5, 1, 2, 20)
 KLl1 <- sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))})
 l1val <- l1grid[sapply(KLval, function(kl){which.min(abs(KLl1 - kl))})]
-l1grid <- 2^seq(0, 5, .01); # l1val <- c(1/20, .2, .5, 1, 2, 20)
-KLl1 <- sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))})
-l1val <- c(l1val, l1grid[sapply(KLval, function(kl){which.min(abs(KLl1 - kl))})])
-l1val <- unique(l1val)
-l1val
-l1grid <- 2^seq(-5, 5, 0.01)
+l1gridup1 <- 2^seq(0, 50, .01); # l1val <- c(1/20, .2, .5, 1, 2, 20)
+KLl1up1 <- sapply(l1gridup1 , function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))})
+#l1valup1 <- c(l1valup1, l1grid[sapply(KLval, function(kl){which.min(abs(KLl1 - kl))})])
+
+l1valup1 <- l1gridup1[sapply(KLval, function(kl){which.min(abs(KLl1up1 - kl))})]
+l1valup1 <- unique(l1valup1)
+l1valup1
+l1grid <- 2^seq(-10, 10, 0.01)
 rho1grid <- seq(0.005, 0.995, by=0.005); #= rho1val <- c(0, .3, .6, 0.8, .95)
 rho1gridneg <- seq(-0.995, 0.005, by=0.005); #= rho1val <- c(0, .3, .6, 0.8, .95)
 KLrho1 <- sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))})

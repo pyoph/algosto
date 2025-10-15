@@ -988,7 +988,6 @@ axis(2, at = seq(0, 100, by = 5),las = 1)
 a = -5
 b = 5
 
-k =k1val[1];l=l1val[1];rho1 = rho1val[1];
 rate  = 5
 contParam = ParmsF1(m1, k, l, rho1)
 
@@ -1029,7 +1028,23 @@ axis(1,cex.axis = 1.8)
 axis(2,cex.axis = 1.8)
 dev.off()
 
-k =k1val[2];l=l1val[5];rho1 = rho1val[2];
+#########KL 1#########################
+k =k1val[2];l=l1val[7];rho1 = rho1val[2];
+
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+###KL 5###########
+
+k =k1val[3];l=l1val[8];rho1 = rho1val[3];
 
 contParam = ParmsF1(m1, k, l, rho1)
 
@@ -1046,7 +1061,7 @@ cols <- ifelse(df$Label == 1, "red", "blue")
 # converti avec adjustcolor()
 cols <- adjustcolor(cols, alpha.f = 0.5)
 
-file = paste0("contaminScenNearr",rate,".pdf")
+file = paste0("contaminScen-k",k," l-",l,"rho1-",rho1,"r-",rate,".pdf")
 
 pdf(file, width = 8, height = 6)  # Ouvre un device PDF
 
@@ -1070,7 +1085,9 @@ axis(2,cex.axis = 1.8)
 dev.off()
 
 
-k =k1val[3];l=l1val[6];rho1 = rho1val[3];
+###KL 10###########
+
+k =k1val[4];l=l1val[9];rho1 = rho1val[4];
 
 contParam = ParmsF1(m1, k, l, rho1)
 
@@ -1087,7 +1104,7 @@ cols <- ifelse(df$Label == 1, "red", "blue")
 # converti avec adjustcolor()
 cols <- adjustcolor(cols, alpha.f = 0.5)
 
-file = paste0("contaminScenMedr",rate,".pdf")
+file = paste0("contaminScen-k",k," l-",l,"rho1-",rho1,"r-",rate,".pdf")
 
 pdf(file, width = 8, height = 6)  # Ouvre un device PDF
 
@@ -1110,6 +1127,49 @@ axis(1,cex.axis = 1.8)
 axis(2,cex.axis = 1.8)
 dev.off()
 
+###KL 50###########
+
+k =k1val[5];l=l1val[9];rho1 = rho1val[6];
+
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+# Définir les transparences (alpha = 0.5)
+# converti avec adjustcolor()
+cols <- adjustcolor(cols, alpha.f = 0.5)
+
+file = paste0("contaminScen-k",k," l-",l,"rho1-",rho1,"r-",rate,".pdf")
+
+pdf(file, width = 8, height = 6)  # Ouvre un device PDF
+
+# Créer le plot principal
+plot(df$X1, df$X2,
+     col = cols,
+     pch = 19,        # points pleins
+     cex = 1.2,       # taille des points
+     xlim = c(a, b),
+     ylim = c(a, b),
+     xlab = "",
+     ylab = "",
+     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
+     main = "",
+     xaxt = "n", yaxt = "n"  
+)
+
+axis(1,cex.axis = 1.8)
+
+axis(2,cex.axis = 1.8)
+dev.off()
+
+#KL 100
 
 k =k1val[length(k1val)];l=l1val[length(l1val)];rho1 = rho1val[length(rho1val)];
 
@@ -1128,9 +1188,11 @@ cols <- ifelse(df$Label == 1, "red", "blue")
 # converti avec adjustcolor()
 cols <- adjustcolor(cols, alpha.f = 0.5)
 
-file = paste0("contaminScenFarr",rate,".pdf")
+
+file = paste0("contaminScen-k",k," l-",l,"rho1-",rho1,"r-",rate,".pdf")
 
 pdf(file, width = 8, height = 6)  # Ouvre un device PDF
+
 
 # Créer le plot principal
 plot(df$X1, df$X2,

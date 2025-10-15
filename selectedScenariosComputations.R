@@ -627,7 +627,7 @@ moyenne_faux_positifsFar = apply(faux_positifsFar,c(1,2),mean)
 moyenne_faux_positifsMed = apply(faux_positifsMed,c(1,2),mean) 
 moyenne_faux_positifsNear = apply(faux_positifsNear,c(1,2),mean) 
 moyenne_faux_positifsId = apply(faux_positifsId,c(1,2),mean) 
-
+    
 
 moyenne_faux_negatifsFar = apply(faux_negatifsFar,c(1,2),mean) 
 moyenne_faux_negatifsMed = apply(faux_negatifsMed,c(1,2),mean) 
