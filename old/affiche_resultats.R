@@ -1,432 +1,1609 @@
+##########################################
+#Erreurs KL k,l rho1 false positives, false negatives
+#############################################
+setwd("~")
+pdf("frobnormerrorklkd10.pdf", width = 7, height = 5)
 
-library(ggplot2)
-library(reshape2)
-library(dplyr)
-library(tidyr)
-library(patchwork)  # pour agencer les 4 graphiques
+#######################Plot erreurs Sigma k#############################
+plot(rList, erreursSigmak[,4,3],
+     type = "l", lwd = 4, col = "red",
+     log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     ylim = c(1e-1, 1e2)) # on redessine les axes manuellement
+
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(erreursSigmak[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(erreursSigmaRho1[erreursSigmalsup1[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,erreursSigmak[,4,2],col = "red",lwd = 4,lty = "dashed")
+lines(rList,erreursSigmak[,4,1],col = "red",lwd = 4,lty = "dotted")
+#############KL 10############################
+lines(rList,erreursSigmak[,3,3],col = "orange",lwd = 4)
+lines(rList,erreursSigmak[,3,2],col = "orange",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmak[,3,1],col = "orange",lty = "dotted",lwd = 4)
+#############KL 1############################
+lines(rList,erreursSigmak[,2,3],col = "darkgreen",lwd = 4)
+lines(rList,erreursSigmak[,2,2],col = "darkgreen",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmak[,2,1],col = "darkgreen",lty = "dotted",lwd = 4)
+#############KL 0############################
+lines(rList,erreursSigmak[,1,3],col = "blue",lwd = 4)
+lines(rList,erreursSigmak[,1,2],col = "blue",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmak[,1,1],col = "blue",lty = "dotted",lwd = 4)
 
 
-##############################################################################
-#####################Plots for klval l1val and rho1val#########################
-########################################################### 
-##################################Plots#############################################################################
-################################################################
-par(mfrow=c(3, 1))
-plot(k1grid, sapply(k1grid, function(k1){KL(parms0, ParmsF1(m1, k1, 1, rho0))}), log='xy')
-abline(h=KLval); abline(v=k1val)
-plot(l1grid, sapply(l1grid, function(l1){KL(parms0, ParmsF1(m1, 0, l1, rho0))}), log='xy')
-abline(h=KLval); abline(v=l1val)
-plot(rho1grid, sapply(rho1grid, function(rho1){KL(parms0, ParmsF1(m1, 0, 1, rho1))}), log='y')
-abline(h=KLval); abline(v=rho1val)
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+log_ticks <- 10^seq(-1, 2, by = 1)  # ticks de 10^-2 à 10^5
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),cex.axis = 2.3)
+# Axe X tous les 50
+axis(1, at = seq(min(rList), max(rList), by = 5),cex.axis= 2.3)
+dev.off()
+
+
+setwd("~")
+pdf("frobnormerrorkllsup1d10.pdf", width = 7, height = 5)
+
+#######################Plot erreurs Sigma lsup 1#############################
+plot(rList, erreursSigmalsup1[,4,3],
+     type = "l", lwd = 4, col = "red",
+     log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     ylim = c(1e-1, 1e2)) # on redessine les axes manuellement
+
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(erreursSigmak[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(erreursSigmaRho1[erreursSigmalsup1[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,erreursSigmalsup1[,4,2],col = "red",lwd = 4,lty = "dashed")
+lines(rList,erreursSigmalsup1[,4,1],col = "red",lwd = 4,lty = "dotted")
+#############KL 10############################
+lines(rList,erreursSigmalsup1[,3,3],col = "orange",lwd = 4)
+lines(rList,erreursSigmalsup1[,3,2],col = "orange",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmalsup1[,3,1],col = "orange",lty = "dotted",lwd = 4)
+#############KL 1############################
+lines(rList,erreursSigmalsup1[,2,3],col = "darkgreen",lwd = 4)
+lines(rList,erreursSigmalsup1[,2,2],col = "darkgreen",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmalsup1[,2,1],col = "darkgreen",lty = "dotted",lwd = 4)
+#############KL 0############################
+lines(rList,erreursSigmalsup1[,1,3],col = "blue",lwd = 4)
+lines(rList,erreursSigmalsup1[,1,2],col = "blue",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmalsup1[,1,1],col = "blue",lty = "dotted",lwd = 4)
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+log_ticks <- 10^seq(-1, 2, by = 1)  # ticks de 10^-2 à 10^5
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),cex.axis = 2.3)
+# Axe X tous les 50
+axis(1, at = seq(min(rList), max(rList), by = 5),cex.axis= 2.3)
+
+dev.off()
+
+setwd("~")
+pdf("frobnormerrorklrho1d10.pdf", width = 7, height = 5)
+
+
+#######################Plot erreurs Sigma Rho1#############################
+plot(rList, erreursSigmaRho1[,4,3],
+     type = "l", lwd = 4, col = "red",
+     log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     ylim = c(1e-1, 1e2)) # on redessine les axes manuellement
+
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(erreursSigmak[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(erreursSigmaRho1[erreursSigmalsup1[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,erreursSigmaRho1[,4,2],col = "red",lwd = 4,lty = "dashed")
+lines(rList,erreursSigmaRho1[,4,1],col = "red",lwd = 4,lty = "dotted")
+#############KL 10############################
+lines(rList,erreursSigmaRho1[,3,3],col = "orange",lwd = 4)
+lines(rList,erreursSigmaRho1[,3,2],col = "orange",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmaRho1[,3,1],col = "orange",lty = "dotted",lwd = 4)
+#############KL 1############################
+lines(rList,erreursSigmaRho1[,2,3],col = "darkgreen",lwd = 4)
+lines(rList,erreursSigmaRho1[,2,2],col = "darkgreen",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmaRho1[,2,1],col = "darkgreen",lty = "dotted",lwd = 4)
+#############KL 0############################
+lines(rList,erreursSigmaRho1[,1,3],col = "blue",lwd = 4)
+lines(rList,erreursSigmaRho1[,1,2],col = "blue",lty = "dashed",lwd = 4)
+lines(rList,erreursSigmaRho1[,1,1],col = "blue",lty = "dotted",lwd = 4)
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+log_ticks <- 10^seq(-1, 2, by = 1)  # ticks de 10^-2 à 10^5
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),cex.axis = 2.3)
+# Axe X tous les 50
+axis(1, at = seq(min(rList), max(rList), by = 5),cex.axis= 2.3)
+
+dev.off()
+
+setwd("~")
+
+pdf("falsenegativesklkd10.pdf", width = 7, height = 5)
+
+#######################Plot faux négatifs k#############################
+plot(rList[2:length(rList)], faux_negatifsRatek[(2:length(rList)),4,3],
+     type = "l", lwd = 4, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),4,2],col = "red",lwd = 4,lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),4,1],col = "red",lwd = 4,lty = "dotted")
+#############KL 10############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,3],lwd = 4,col = "orange")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,2],lwd = 4,col = "orange",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,1],lwd = 4,col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,3],lwd = 4,col = "darkgreen")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,2],lwd = 4,col = "darkgreen",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,1],lwd = 4,col = "darkgreen",lty = "dotted")
+#############KL 0############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,3],lwd = 4,col = "blue")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,2],,lwd = 4,col = "blue",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,1],lwd = 4,col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(5, max(rList), by = 5),cex.axis = 2.3)
+
+
+
+# Axe X tous les 50
+
+axis(2, at = seq(0, 100, by = 5),las = 1,cex.axis = 1.8)
+
+
+dev.off()
+
+
+
+setwd("~")
+
+pdf("falsenegativeskllsup1d10.pdf", width = 7, height = 5)
+
+#######################Plot faux négatifs l >= 1#############################
+plot(rList[2:length(rList)], faux_negatifsRatelsup1[(2:length(rList)),4,3],
+     type = "l", lwd = 4, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),4,2],col = "red",lwd = 4,lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),4,1],col = "red",lwd = 4,lty = "dotted")
+#############KL 10############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),3,3],lwd = 4,col = "orange")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),3,2],lwd = 4,col = "orange",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),3,1],lwd = 4,col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),2,3],lwd = 4,col = "darkgreen")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),2,2],lwd = 4,col = "darkgreen",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),2,1],lwd = 4,col = "darkgreen",lty = "dotted")
+#############KL 0############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),1,3],lwd = 4,col = "blue")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),1,2],,lwd = 4,col = "blue",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),1,1],lwd = 4,col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(5, max(rList), by = 5),cex.axis = 2.3)
+
+
+
+# Axe X tous les 50
+
+axis(2, at = seq(0, 100, by = 5),las = 1,cex.axis = 1.8)
+
+
+dev.off()
+
+
+setwd("~")
+
+pdf("falsenegativesklrho1d10.pdf", width = 7, height = 5)
+
+#######################Plot faux négatifs l >= 1#############################
+plot(rList[2:length(rList)], faux_negatifsRateRho1[(2:length(rList)),4,3],
+     type = "l", lwd = 4, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),4,2],col = "red",lwd = 4,lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),4,1],col = "red",lwd = 4,lty = "dotted")
+#############KL 10############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,3],lwd = 4,col = "orange")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,2],lwd = 4,col = "orange",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,1],lwd = 4,col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,3],lwd = 4,col = "darkgreen")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,2],lwd = 4,col = "darkgreen",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,1],lwd = 4,col = "darkgreen",lty = "dotted")
+#############KL 0############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,3],lwd = 4,col = "blue")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,2],,lwd = 4,col = "blue",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,1],lwd = 4,col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(5, max(rList), by = 5),cex.axis = 2.3)
+
+
+
+# Axe X tous les 50
+
+axis(2, at = seq(0, 100, by = 5),las = 1,cex.axis = 1.8)
+
+
+dev.off()
+
+
+setwd("~")
+
+pdf("falsepositivesklkd10.pdf", width = 7, height = 5)
+
+
+#######################Plot faux positifs k#############################
+plot(rList, faux_positifsRatek[,4,3],
+     type = "l", lwd = 4, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 20)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,faux_positifsRatek[,4,2],lwd = 4,col = "red",lty = "dashed")
+lines(rList,faux_positifsRatek[,4,1],lwd = 4,col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,faux_positifsRatek[,3,3],lwd = 4,col = "orange")
+lines(rList,faux_positifsRatek[,3,2],lwd = 4,col = "orange",lty = "dashed")
+lines(rList,faux_positifsRatek[,3,1],lwd = 4,col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,faux_positifsRatek[,2,3],lwd = 4,col = "darkgreen")
+lines(rList,faux_positifsRatek[,2,2],lwd =4,col = "darkgreen",lty = "dashed")
+lines(rList,faux_positifsRatek[,2,1],lwd = 4,col = "darkgreen",lty = "dotted")
+#############KL 0############################
+lines(rList,faux_positifsRatek[,1,3],lwd = 4,col = "blue")
+lines(rList,faux_positifsRatek[,1,2],lwd = 4,col = "blue",lty = "dashed")
+lines(rList,faux_positifsRatek[,1,1],lwd = 4,col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(0, max(rList), by = 5),cex.axis = 2.3)
+
+
+
+# Axe X tous les 50
+
+axis(2, at = seq(0, 100, by = 5),las = 1,cex.axis = 2.3)
+
+
+dev.off()
+
+
+
+setwd("~")
+
+pdf("falsepositiveskllsup1d10.pdf", width = 7, height = 5)
+
+
+#######################Plot faux positifs k#############################
+plot(rList, faux_positifsRatelsup1[,4,3],
+     type = "l", lwd = 4, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 20)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,faux_positifsRatelsup1[,4,2],lwd = 4,col = "red",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,4,1],lwd = 4,col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,faux_positifsRatelsup1[,3,3],lwd = 4,col = "orange")
+lines(rList,faux_positifsRatelsup1[,3,2],lwd = 4,col = "orange",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,3,1],lwd = 4,col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,faux_positifsRatelsup1[,2,3],lwd = 4,col = "darkgreen")
+lines(rList,faux_positifsRatelsup1[,2,2],lwd =4,col = "darkgreen",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,2,1],lwd = 4,col = "darkgreen",lty = "dotted")
+#############KL 0############################
+lines(rList,faux_positifsRatelsup1[,1,3],lwd = 4,col = "blue")
+lines(rList,faux_positifsRatelsup1[,1,2],lwd = 4,col = "blue",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,1,1],lwd = 4,col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(0, max(rList), by = 5),cex.axis = 2.3)
+
+
+
+# Axe X tous les 50
+
+axis(2, at = seq(0, 100, by = 5),las = 1,cex.axis = 2.3)
+
+
+dev.off()
+
+
+
+setwd("~")
+
+pdf("falsepositivesklrho1d10.pdf", width = 7, height = 5)
+
+
+#######################Plot faux positifs k#############################
+plot(rList, faux_positifsRateRho1[,4,3],
+     type = "l", lwd = 4, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 20)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,faux_positifsRateRho1[,4,2],lwd = 4,col = "red",lty = "dashed")
+lines(rList,faux_positifsRateRho1[,4,1],lwd = 4,col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,faux_positifsRateRho1[,3,3],lwd = 4,col = "orange")
+lines(rList,faux_positifsRateRho1[,3,2],lwd = 4,col = "orange",lty = "dashed")
+lines(rList,faux_positifsRateRho1[,3,1],lwd = 4,col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,faux_positifsRateRho1[,2,3],lwd = 4,col = "darkgreen")
+lines(rList,faux_positifsRateRho1[,2,2],lwd =4,col = "darkgreen",lty = "dashed")
+lines(rList,faux_positifsRateRho1[,2,1],lwd = 4,col = "darkgreen",lty = "dotted")
+#############KL 0############################
+lines(rList,faux_positifsRateRho1[,1,3],lwd = 4,col = "blue")
+lines(rList,faux_positifsRateRho1[,1,2],lwd = 4,col = "blue",lty = "dashed")
+lines(rList,faux_positifsRateRho1[,1,1],lwd = 4,col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(0, max(rList), by = 5),cex.axis = 2.3)
+
+
+
+# Axe X tous les 50
+
+axis(2, at = seq(0, 100, by = 5),las = 1,cex.axis = 2.3)
+
+
+dev.off()
+
+
+#######################Plot erreurs Sigma l inf 1#############################
+plot(rList, erreursSigmalinf1[,4,3],
+     type = "l", lwd = 2, col = "red",
+     log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     ylim = c(1e-2, 1e9)) # on redessine les axes manuellement
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(erreursSigmak[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(erreursSigmak[erreursSigmak[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,erreursSigmalinf1[,4,2],col = "red",lty = "dashed")
+lines(rList,erreursSigmalinf1[,4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,erreursSigmalinf1[,3,3],col = "orange")
+lines(rList,erreursSigmalinf1[,3,2],col = "orange",lty = "dashed")
+lines(rList,erreursSigmalinf1[,3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,erreursSigmalinf1[,2,3],col = "green")
+lines(rList,erreursSigmalinf1[,2,2],col = "green",lty = "dashed")
+lines(rList,erreursSigmalinf1[,2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList,erreursSigmalinf1[,1,3],col = "blue")
+lines(rList,erreursSigmalinf1[,1,2],col = "blue",lty = "dashed")
+lines(rList,erreursSigmalinf1[,1,1],col = "blue",lty = "dotted")
+
+
+
+log_ticks <- 10^seq(-2, 9, by = 1)  # ticks de 10^-2 à 10^5
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -2:9)))
+# Axe X tous les 50
+axis(1, at = seq(min(rList), max(rList), by = 5))
+
+
+
+#######################Plot faux positifs l <= 1#############################
+plot(rList, faux_positifsRatelinf1[,4,3],
+     type = "l", lwd = 2, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n"
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     # ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,faux_positifsRatelinf1[,4,2],col = "red",lty = "dashed")
+lines(rList,faux_positifsRatelinf1[,4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,faux_positifsRatelinf1[,3,3],col = "orange")
+lines(rList,faux_positifsRatelinf1[,3,2],col = "orange",lty = "dashed")
+lines(rList,faux_positifsRatelinf1[,3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,faux_positifsRatelinf1[,2,3],col = "green")
+lines(rList,faux_positifsRatelinf1[,2,2],col = "green",lty = "dashed")
+lines(rList,faux_positifsRatelinf1[,2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList,faux_positifsRatelinf1[,1,3],col = "blue")
+lines(rList,faux_positifsRatelinf1[,1,2],col = "blue",lty = "dashed")
+lines(rList,faux_positifsRatelinf1[,1,1],col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(5, max(rList), by = 5))
+
+
+
+
+axis(2, at = seq(0, 100, by = 5),las = 1)
+
+
+
+
+
+#######################Plot faux négatifs l <= 1#############################
+plot(rList[2:length(rList)], faux_negatifsRatelinf1[(2:length(rList)),4,3],
+     type = "l", lwd = 2, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),4,2],col = "red",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),3,3],col = "orange")
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),3,2],col = "orange",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),2,3],col = "green")
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),2,2],col = "green",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),1,3],col = "blue")
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),1,2],col = "blue",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelinf1[(2:length(rList)),1,1],col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 5
+axis(1, at = seq(5, max(rList), by = 5))
+
+
+axis(2, at = seq(0, 100, by = 5),las = 1)
+
+
+
+
+
+#######################Plot erreurs Sigma l sup 1#############################
+plot(rList, erreursSigmalsup1[,4,3],
+     type = "l", lwd = 2, col = "red",
+     log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     ylim = c(1e-2, 1e9)) # on redessine les axes manuellement
+# # Axe Y en log10 avec labels 10^k
+# ylim <- range(erreursSigmalsup1[,4,1], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(erreursSigmak[erreursSigmalsup1[,4,1] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,erreursSigmalsup1[,4,2],col = "red",lty = "dashed")
+lines(rList,erreursSigmalsup1[,4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,erreursSigmalsup1[,3,3],col = "orange")
+lines(rList,erreursSigmalsup1[,3,2],col = "orange",lty = "dashed")
+lines(rList,erreursSigmalsup1[,3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,erreursSigmalsup1[,2,3],col = "green")
+lines(rList,erreursSigmalsup1[,2,2],col = "green",lty = "dashed")
+lines(rList,erreursSigmalsup1[,2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList,erreursSigmalsup1[,1,3],col = "blue")
+lines(rList,erreursSigmalsup1[,1,2],col = "blue",lty = "dashed")
+lines(rList,erreursSigmalsup1[,1,1],col = "blue",lty = "dotted")
+
+log_ticks <- 10^seq(-2, 9, by = 1)  # ticks de 10^-2 à 10^5
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -2:9)))
+# Axe X tous les 50
+axis(1, at = seq(min(rList), max(rList), by = 5))
+
+
+
+#######################Plot faux négatifs lsup 1#############################
+plot(rList[2:length(rList)], faux_negatifsRatelsup1[(2:length(rList)),4,3],
+     type = "l", lwd = 2, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),4,2],col = "red",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),3,3],col = "orange")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),3,2],col = "orange",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),2,3],col = "green")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),2,2],col = "green",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),1,3],col = "blue")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),1,2],col = "blue",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRatelsup1[(2:length(rList)),1,1],col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 5
+axis(1, at = seq(5, max(rList), by = 5))
+
+
+axis(2, at = seq(0, 100, by = 5),las = 1)
+
+
+#######################Plot faux positifs l >= 1#############################
+plot(rList, faux_positifsRatelsup1[,4,3],
+     type = "l", lwd = 2, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n"
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     # ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,faux_positifsRatelsup1[,4,2],col = "red",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,faux_positifsRatelsup1[,3,3],col = "orange")
+lines(rList,faux_positifsRatelsup1[,3,2],col = "orange",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,faux_positifsRatelsup1[,2,3],col = "green")
+lines(rList,faux_positifsRatelsup1[,2,2],col = "green",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList,faux_positifsRatelsup1[,1,3],col = "blue")
+lines(rList,faux_positifsRatelsup1[,1,2],col = "blue",lty = "dashed")
+lines(rList,faux_positifsRatelsup1[,1,1],col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(5, max(rList), by = 5))
+
+axis(2, at = seq(0, 8, by = 1),las = 1)
+
+
+#######################Plot erreurs rho1 >= 0.3#############################
+plot(rList, erreursSigmaRho1[,4,3],
+     type = "l", lwd = 4, col = "red",
+     log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n", # on redessine les axes manuellement
+     ylim = c(1e-2, 1e9)) 
+# # Axe Y en log10 avec labels 10^k
+# ylim <- range(erreursSigmalsup1[,4,1], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(erreursSigmak[erreursSigmalsup1[,4,1] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,erreursSigmaRho1[,4,2],lwd = 4,col = "red",lty = "dashed")
+lines(rList,erreursSigmaRho1[,4,1],lwd = 4,col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,erreursSigmaRho1[,3,3],lwd = 4,col = "orange")
+lines(rList,erreursSigmaRho1[,3,2],lwd = 4,col = "orange",lty ="dashed")
+lines(rList,erreursSigmaRho1[,3,1],lwd = 4,col = "orange",lty ="dotted")
+#############KL 1############################
+lines(rList,erreursSigmaRho1[,2,3],lwd = 4,col = "green")
+lines(rList,erreursSigmaRho1[,2,2],lwd = 4,col = "green",lty ="dashed")
+lines(rList,erreursSigmaRho1[,2,1],lwd = 4,col = "green",lty ="dotted")
+#############KL 1############################
+lines(rList,erreursSigmaRho1[,1,3],lwd = 4,col = "blue")
+lines(rList,erreursSigmaRho1[,1,2],lwd = 4,col = "blue",lty ="dashed")
+lines(rList,erreursSigmaRho1[,1,1],lwd = 4,col = "blue",lty ="dotted")
+
+
+log_ticks <- 10^seq(-2, 9, by = 1)  # ticks de 10^-2 à 10^5
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -2:9)),cex.axis = 1.8)
+# Axe X tous les 50
+axis(1, at = seq(min(rList), max(rList), by = 5),cex.axis = 1.8)
+
+#######################Plot faux positifs rho1 >= 0.3 #############################
+plot(rList, faux_positifsRateRho1[,4,3],
+     type = "l", lwd = 4, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n"
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     # ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,faux_positifsRateRho1[,4,2],col = "red",lwd = 4,lty = "dashed")
+lines(rList,faux_positifsRateRho1[,4,1],col = "red",lwd = 4,lty = "dotted")
+#############KL 10############################
+lines(rList,faux_positifsRateRho1[,3,3],lwd = 4,col = "orange")
+lines(rList,faux_positifsRateRho1[,3,2],lwd = 4,col = "orange",lty = "dashed")
+lines(rList,faux_positifsRateRho1[,3,1],lwd = 4,col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,faux_positifsRateRho1[,2,3],lwd = 4,col = "green")
+lines(rList,faux_positifsRateRho1[,2,2],lwd = 4,col = "green",lty = "dashed")
+lines(rList,faux_positifsRateRho1[,2,1],lwd = 4,col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList,faux_positifsRateRho1[,1,3],lwd = 4,col = "blue")
+lines(rList,faux_positifsRateRho1[,1,2],lwd = 4,col = "blue",lty = "dashed")
+lines(rList,faux_positifsRateRho1[,1,1],lwd = 4,col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(5, max(rList), by = 5),cex.axis = 1.8)
+
+axis(2, at = seq(0, 100, by = 5),las = 1,cex.axis = 1.8)
+
+
+
+
+
+
+#######################Plot faux négatifs rho1 <= 0.3#############################
+plot(rList[2:length(rList)], faux_negatifsRateRho1[(2:length(rList)),4,3],
+     type = "l", lwd = 2, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),4,2],col = "red",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,3],col = "orange")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,2],col = "orange",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,3],col = "green")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,2],col = "green",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,3],col = "blue")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,2],col = "blue",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1[(2:length(rList)),1,1],col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 5
+axis(1, at = seq(5, max(rList), by = 5))
+
+
+axis(2, at = seq(0, 100, by = 5),las = 1)
+
+
+
+
+#######################Plot erreurs rho1 <= 0.3#############################
+plot(rList, erreursSigmaRho1Neg[,4,3],
+     type = "l", lwd = 2, col = "red",
+     log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     ylim = c(1e-2, 1e9)) # on redessine les axes manuellement
+# # Axe Y en log10 avec labels 10^k
+# ylim <- range(erreursSigmalsup1[,4,1], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(erreursSigmak[erreursSigmalsup1[,4,1] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,erreursSigmaRho1Neg[,4,2],col = "red",lty = "dashed")
+lines(rList,erreursSigmaRho1Neg[,4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,erreursSigmaRho1Neg[,3,3],col = "orange")
+lines(rList,erreursSigmaRho1Neg[,3,2],col = "orange",lty ="dashed")
+lines(rList,erreursSigmaRho1Neg[,3,1],col = "orange",lty ="dotted")
+#############KL 1############################
+lines(rList,erreursSigmaRho1Neg[,2,3],col = "green")
+lines(rList,erreursSigmaRho1Neg[,2,2],col = "green",lty ="dashed")
+lines(rList,erreursSigmaRho1Neg[,2,1],col = "green",lty ="dotted")
+#############KL 1############################
+lines(rList,erreursSigmaRho1Neg[,1,3],col = "blue")
+lines(rList,erreursSigmaRho1Neg[,1,2],col = "blue",lty ="dashed")
+lines(rList,erreursSigmaRho1Neg[,1,1],col = "blue",lty ="dotted")
+
+
+log_ticks <- 10^seq(-2, 9, by = 1)  
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -2:9)))
+# Axe X tous les 50
+axis(1, at = seq(min(rList), max(rList), by = 5))
+
+
+
+#######################Plot faux négatifs rho1 <= 0.3#############################
+plot(rList[2:length(rList)], faux_negatifsRateRho1Neg[(2:length(rList)),4,3],
+     type = "l", lwd = 2, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n",
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),4,2],col = "red",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),3,3],col = "orange")
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),3,2],col = "orange",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),2,3],col = "green")
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),2,2],col = "green",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),1,3],col = "blue")
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),1,2],col = "blue",lty = "dashed")
+lines(rList[2:length(rList)],faux_negatifsRateRho1Neg[(2:length(rList)),1,1],col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 5
+axis(1, at = seq(5, max(rList), by = 5))
+
+
+axis(2, at = seq(0, 100, by = 5),las = 1)
+
+
+#######################Plot faux positifs rho1 <= 0.3 #############################
+plot(rList, faux_positifsRateRho1Neg[,4,3],
+     type = "l", lwd = 2, col = "red",
+     #log = "y",              # axe Y en log10
+     xlab = "", ylab = "",   # pas de noms d'axes
+     yaxt = "n", xaxt = "n"
+     #ylim = c(0, 1e2)) # on redessine les axes manuellement
+     # ylim = c(0, 1e2)
+)
+# Axe Y en log10 avec labels 10^k
+# ylim <- range(faux_negatifsRatek[,4,3], na.rm = TRUE)
+# ylim[1] <- max(ylim[1], min(faux_negatifsRatek[faux_negatifsRatek[,4,3] > 0,4,3], na.rm = TRUE)) # > 0
+#############KL 100############################
+lines(rList,faux_positifsRateRho1Neg[,4,2],col = "red",lty = "dashed")
+lines(rList,faux_positifsRateRho1Neg[,4,1],col = "red",lty = "dotted")
+#############KL 10############################
+lines(rList,faux_positifsRateRho1Neg[,3,3],col = "orange")
+lines(rList,faux_positifsRateRho1Neg[,3,2],col = "orange",lty = "dashed")
+lines(rList,faux_positifsRateRho1Neg[,3,1],col = "orange",lty = "dotted")
+#############KL 1############################
+lines(rList,faux_positifsRateRho1Neg[,2,3],col = "green")
+lines(rList,faux_positifsRateRho1Neg[,2,2],col = "green",lty = "dashed")
+lines(rList,faux_positifsRateRho1Neg[,2,1],col = "green",lty = "dotted")
+#############KL 0############################
+lines(rList,faux_positifsRateRho1Neg[,1,3],col = "blue")
+lines(rList,faux_positifsRateRho1Neg[,1,2],col = "blue",lty = "dashed")
+lines(rList,faux_positifsRateRho1Neg[,1,1],col = "blue",lty = "dotted")
+
+
+# log_ticks <- 10^seq(floor(log10(ylim[1])), ceiling(log10(ylim[2])), by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", seq(floor(log10(ylim[1])),
+#                                              ceiling(log10(ylim[2])), 1))))
+
+
+# log_ticks <- 10^seq(-2, 2, by = 1)  # ticks de 10^-2 à 10^5
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -2:2)))
+# # Axe X tous les 50
+axis(1, at = seq(5, max(rList), by = 5))
+
+axis(2, at = seq(0, 100, by = 5),las = 1)
+
 
 ###################################################
 #Affiche contamination scenarios
-##################################################
+#################################################
+a = -5
+b = 5
+
+k =k1val[1];l=l1val[1];rho1 = rho1val[1];
+rate  = 5
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+# Définir les transparences (alpha = 0.5)
+# converti avec adjustcolor()
+cols <- adjustcolor(cols, alpha.f = 0.5)
+
+file = paste0("contaminScen_no_outlierr",rate,".pdf")
+
+pdf(file, width = 8, height = 6)  # Ouvre un device PDF
+
+# Créer le plot principal
+plot(df$X1, df$X2,
+     col = cols,
+     pch = 19,        # points pleins
+     cex = 1.2,       # taille des points
+     xlim = c(a, b),
+     ylim = c(a, b),
+     xlab = "",
+     ylab = "",
+     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
+     main = "",
+     xaxt = "n", yaxt = "n"  
+)
+
+axis(1,cex.axis = 1.8)
+
+axis(2,cex.axis = 1.8)
+dev.off()
+
+k =k1val[2];l=l1val[5];rho1 = rho1val[2];
+
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+# Définir les transparences (alpha = 0.5)
+# converti avec adjustcolor()
+cols <- adjustcolor(cols, alpha.f = 0.5)
+
+file = paste0("contaminScenNearr",rate,".pdf")
+
+pdf(file, width = 8, height = 6)  # Ouvre un device PDF
+
+# Créer le plot principal
+plot(df$X1, df$X2,
+     col = cols,
+     pch = 19,        # points pleins
+     cex = 1.2,       # taille des points
+     xlim = c(a, b),
+     ylim = c(a, b),
+     xlab = "",
+     ylab = "",
+     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
+     main = "",
+     xaxt = "n", yaxt = "n"  
+)
+
+axis(1,cex.axis = 1.8)
+
+axis(2,cex.axis = 1.8)
+dev.off()
+
+
+k =k1val[3];l=l1val[6];rho1 = rho1val[3];
+
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+# Définir les transparences (alpha = 0.5)
+# converti avec adjustcolor()
+cols <- adjustcolor(cols, alpha.f = 0.5)
+
+file = paste0("contaminScenMedr",rate,".pdf")
+
+pdf(file, width = 8, height = 6)  # Ouvre un device PDF
+
+# Créer le plot principal
+plot(df$X1, df$X2,
+     col = cols,
+     pch = 19,        # points pleins
+     cex = 1.2,       # taille des points
+     xlim = c(a, b),
+     ylim = c(a, b),
+     xlab = "",
+     ylab = "",
+     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
+     main = "",
+     xaxt = "n", yaxt = "n"  
+)
+
+axis(1,cex.axis = 1.8)
+
+axis(2,cex.axis = 1.8)
+dev.off()
+
+
+k =k1val[length(k1val)];l=l1val[length(l1val)];rho1 = rho1val[length(rho1val)];
+
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+# Définir les transparences (alpha = 0.5)
+# converti avec adjustcolor()
+cols <- adjustcolor(cols, alpha.f = 0.5)
+
+file = paste0("contaminScenFarr",rate,".pdf")
+
+pdf(file, width = 8, height = 6)  # Ouvre un device PDF
+
+# Créer le plot principal
+plot(df$X1, df$X2,
+     col = cols,
+     pch = 19,        # points pleins
+     cex = 1.2,       # taille des points
+     xlim = c(a, b),
+     ylim = c(a, b),
+     xlab = "",
+     ylab = "",
+     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
+     main = "",
+     xaxt = "n", yaxt = "n"  
+)
+
+axis(1,cex.axis = 1.8)
+
+axis(2,cex.axis = 1.8)
+dev.off()
 
 
 
-afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
-  contParam = ParmsF1(m1, k, l, rho1)
-  
-    data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r )
-    
- Z = data$Z
- # Création d'un dataframe pour ggplot
- df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
-                  Label = factor(data$labelsVrais, levels = c(0, 1)))
- #Création du plot
- # Create the plot (English version)
- p <- ggplot(df, aes(x = X1, y = X2, color = Label, alpha = Label)) +
-   geom_point(size = 3) +
-   ylim(a,b) +
-   scale_color_manual(
-     values = c("0" = "blue", "1" = "red"),
-     labels = c("Inlier", "Outlier"),
-     name = "Status"
-   ) +
-   scale_alpha_manual(
-     values = c("0" = 0.1, "1" = 1),  # 0.2 transparency for blue, 1 for red
-     guide = "none"  # Hide alpha from legend
-   ) +
-   labs(
-     title = "",
-     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
-     x = "X1",
-     y = "X2"
-   ) +
-   theme_minimal() +
-   theme(
-     legend.position = "bottom",
-     plot.title = element_text(face = "bold")
-   )
-  return(p)
-}
 
-p0 = afficherContaminationScenarios(0,1,0.3,"F_0 = F_1",20,-5,5)
 
-p1 = afficherContaminationScenarios(0.86,0.56,0.6,"(k,l,rho1) = (0.86,0.56,0.3)",20,-5,5)
-
-p2 = afficherContaminationScenarios(8.59,32,0.975,"(k,l,rho1) = (8.59,32,0.3)",20,-30,30)
-
-# Créer une disposition 2x2 avec les 3 plots et un espace vide
-
-library(cowplot)
-library(ggplot2)
-
-# 1. Créer les plots sans légendes
-p0 <- p0 + theme(axis.title = element_blank(), legend.position = "none")
-p1 <- p1 + theme(axis.title = element_blank(), legend.position = "none")
-p2 <- p2 + theme(axis.title = element_blank(), legend.position = "none")
-
-# 2. Créer la grille 2x2
-main_grid <- plot_grid(p0, p1, p2, NULL, 
-                       ncol = 2, align = "hv")
-
-# 3. Créer la légende manuellement (version "en dur")
-legend_plot <- ggplot() +
-  annotate("point", x = 1, y = 1, color = "blue", size = 3) +
-  annotate("point", x = 2, y = 1, color = "red", size = 3) +
-  annotate("text", x = 1.2, y = 1, label = "Inlier", hjust = 0, size = 4) +
-  annotate("text", x = 2.2, y = 1, label = "Outlier", hjust = 0, size = 4) +
-  theme_void() +
-  xlim(0.5, 3) +
-  labs(title = "Status") +
-  theme(plot.title = element_text(hjust = 0.5, size = 11),
-        plot.margin = margin(0,0,0,0))
-
-# 4. Assembler le tout
-final_plot <- plot_grid(main_grid, legend_plot,
-                        ncol = 1,
-                        rel_heights = c(10, 1))  # 90% pour la grille, 10% pour la légende
-
-print(final_plot)
 
 ######################################################################
-#######RMSE Sigma Iter
+#######Affichage des erreurs d'estimation de Sigma
 ######################################################################
-# 
-# rmseSigma = res100runNearesScenario$rmseSigmaRec
-# 
-# rmseSigma_moy = res1runFarScenario$rmseSigmaRec[,,,1]
-# 
-# rmseSigma_moy = res1runNearScenario$rmseSigmaRec[,,,1]
-# rmseSigma_moy = res1rund100$rmseSigmaRec[,,,1]
-# dim(rmseSigma)
-# #rmseSigma_moy = rmseSigma[,,,1]
-# 
-# rmseSigma_moy <- apply(rmseSigma, c(1, 2, 3), mean)
-# load(file = "res1runFarNear.Rdata")
-rmseSigma_moy = erreursSigmaFar[,,,1]
 
-dim(rmseSigma_moy)
-#rmseSigma_moy = res1run$rmseSigmaRec[,,,1]
-affiche_erreur_frob_norm <- function(rmseSigma_moy, titre) {
-  # Méthodes et taux
-  methodes <- c(1, 2, 3)
-  taux_indices <- c(2, 3, 5, 7)
-  
-  method_labels <- c(
-    "1" = "Sample covariance (online)",
-    "2" = "Online",
-    "3" = "Streaming"
-  )
-  
-  rate_labels <- c(
-    "2" = "5%",
-    "3" = "10%",
-    "5" = "20%",
-    "7" = "30%"
-  )
-  
-  method_position_map <- setNames(1:length(methodes), methodes)
-  
-  # Construction dataframe
-  data_list <- list()
-  n <- dim(rmseSigma_moy)[1]
-  
-  for (j in taux_indices) {
-    for (k in methodes) {
-      k_pos <- method_position_map[as.character(k)]
-      df <- data.frame(
-        index = 1:n,
-        RMSE = rmseSigma_moy[, j, k_pos],
-        Method = method_labels[as.character(k)],
-        Rate = rate_labels[as.character(j)]
-      )
-      data_list[[length(data_list) + 1]] <- df
-    }
-  }
-  
-  df_long <- do.call(rbind, data_list)
-  df_long$Rate <- factor(df_long$Rate, levels = c("5%", "10%", "20%", "30%"))
-  
-  # Mapping des styles de ligne
-  linetypes <- c(
-    "Streaming" = "solid",
-    "Online" = "dashed",
-    "Sample covariance (online)" = "dotted"
-  )
-  
-  # Plot
-  gg <- ggplot(df_long, aes(x = index, y = RMSE, linetype = Method)) +
-    geom_line(size = 0.8, color = "black") +   # couleur unique (noir)
-    facet_wrap(~ Rate, ncol = 2) +
-    labs(
-      title = "Covariance matrix estimation error",
-      subtitle = titre,
-      x = "Observation Index",
-      y = "Frobenius Norm Error"
-    ) +
-    theme_minimal(base_size = 12) +
-    scale_y_log10(
-      breaks = 10^seq(0, 5, by = 1),
-      labels = c("1", "10", "100", "1000", "10000", "100000")
-    ) +
-    scale_linetype_manual(values = linetypes) +
-    theme(legend.position = "bottom") +
-    annotation_logticks(sides = "l")
-  
-  return(gg)
-}
+# 
+plot(1:n, erreursSigmaFar[,2,3,1],
+     type = "l", lwd = 2, 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     log = "y",              # Échelle logarithmique Y
+     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
+lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
+# 
+# # Axe Y logarithmique
+log_ticks <- 10^seq(-1, 10, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:10)),
+     las = 1)
+x_ticks <- seq(0, n, by = 1000)
+axis(1, at = x_ticks,las = 1)
 
 
-affiche_erreur_frob_norm(rmseSigma_moy,titre = "(k,l,rho1) = (8.58,32,0.975)")
 
 
-# #########################################
-#             AUC
-# ########################################
+plot(1:n, erreursSigmaFar[,5,3,1],
+     type = "l", lwd = 2, 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     log = "y",              # Échelle logarithmique Y
+     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+)
 # 
+# # Autres courbes
+lines(1:n, erreursSigmaFar[,5,2,1], lty = "dashed")
+lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
 # 
-# aucTout = res100runNearesScenario$aucRec
-# 
-# 
-# #aucTout = res1run$aucRec
-# 
-# auc_moy <- apply(aucTout, c(1, 2), mean)
-# 
-# auc_moy = res10run$aucRec[,,1]
-# #auc_moy = res$aucRec[,,1]
-# #auc_moy = res$aucRec[,,1]
-# 
-# 
-# methodes <- c(1, 9, 10)
-# method_labels <- c("1" = "Cov Online", "9" = "Online", "10" = "Streaming")
-# method_pos_map <- setNames(1:3, methodes)  # map méthode → colonne
-# 
-# taux_indices <- 1:9
-# taux_valeurs <- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
-# 
-# data_list <- list()
-# for (i in seq_along(taux_indices)) {
-#   j <- taux_indices[i]
-#   for (k in methodes) {
-#     k_pos <- method_pos_map[as.character(k)]
-#     df <- data.frame(
-#       ContaminationRate = taux_valeurs[i],
-#       AUC = auc_moy[j, k_pos],
-#       Method = method_labels[as.character(k)]
-#     )
-#     data_list[[length(data_list) + 1]] <- df
-#   }
-# }
-# df_long <- do.call(rbind, data_list)
-# df_long$Method <- factor(df_long$Method, levels = method_labels)
-# 
-# # Graphique
-# ggplot(df_long, aes(x = ContaminationRate, y = AUC, color = Method)) +
-#   geom_line(size = 1) +
-#   geom_point(size = 2) +
-#   labs(
-#     title = "AUC vs. Contamination Rate",
-#     x = "Contamination Rate (%)",
-#     y = "AUC",
-#     color = "Method"
-#   ) +
-#   scale_x_continuous(
-#     breaks = taux_valeurs
-#   ) +
-#   theme_minimal() +
-#   theme(legend.position = "bottom")
-# 
-# 
-# dim(res10run$faux_positifsRec)
-
-#########################################
-#Faux négatifs moyenne
-########################################
+# # Axe Y logarithmique
+log_ticks <- 10^seq(-1, 10, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:10)),
+     las = 1)
+x_ticks <- seq(0, n, by = 1000)
+axis(1, at = x_ticks,las = 1)
 
 
-# res1run$faux_negatifsRec[1e4,9,3,1]
+
+plot(1:n, erreursSigmaFar[,7,3,1],
+     type = "l", lwd = 2, 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     log = "y",              # Échelle logarithmique Y
+     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+)
 # 
+# # Autres courbes
+lines(1:n, erreursSigmaFar[,7,2,1], lty = "dashed")
+lines(1:n, erreursSigmaFar[,7,1,1], lty = "dotted")
 # 
-# faux_neg_moy = apply(res1runFarScenario$faux_negatifsRec, c(1, 2, 3), mean)
+# # Axe Y logarithmique
+log_ticks <- 10^seq(-1, 10, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:10)),
+     las = 1)
+x_ticks <- seq(0, n, by = 1000)
+axis(1, at = x_ticks,las = 1) 
+
+
+
+plot(1:n, erreursSigmaFar[,11,3,1],
+     type = "l", lwd = 2, 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     log = "y",              # Échelle logarithmique Y
+     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+)
 # 
-# faux_neg_10000 <- faux_neg_moy[10000, , ]
-faux_neg_10000 = faux_negatifsFar[,,1]
+# # Autres courbes
+lines(1:n, erreursSigmaFar[,11,2,1], lty = "dashed")
+lines(1:n, erreursSigmaFar[,11,1,1], lty = "dotted")
+# 
+# # Axe Y logarithmique
+log_ticks <- 10^seq(-1,10, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:10)),
+     las = 1)
+x_ticks <- seq(0, n, by = 1000)
+axis(1, at = x_ticks,las = 1) 
 
-methodes <- c(1, 2, 3)
-method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
-method_pos_map <- setNames(1:3, methodes)
+#######################################################False positives and false negatives########################################
 
-taux_valeurs <- rList
-data_list <- list()
 
-for (i in seq_along(taux_valeurs)) {
-  total_outliers = taux_valeurs[i]/100 * n
-  
-  for (k in methodes) {
-    k_pos <- method_pos_map[as.character(k)]
-    data_list[[length(data_list) + 1]] <- data.frame(
-      ContaminationRate = taux_valeurs[i],
-      FalseNegatives = faux_neg_10000[i, k_pos] / (total_outliers) * 100,
-      Method = method_labels[as.character(k)]
-    )
-  }
-}
 
-df_long <- do.call(rbind, data_list)
-df_long$Method <- factor(df_long$Method, levels = method_labels)
+plot(rList[2:length(rList)], faux_negatifsId[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+     type = "l", lwd = 2, 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dashed")
+lines(rList[2:length(rList)], faux_negatifsId[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100, lty = "dotted")
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:length(rList)]
+axis(2, at = seq(0, 100, by = 5), las = 1)
 
-# mapping des styles de ligne
-linetypes <- c(
-  "Streaming" = "solid",
-  "Online" = "dashed",
-  "Cov Online" = "dotted"
+axis(1, at = x_ticks,las = 1)
+
+# 
+plot(1:n, erreursSigmaFar[,2,3,1],
+     type = "l", lwd = 2, 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     log = "y",              # Échelle logarithmique Y
+     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
+lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
+# 
+# # Axe Y logarithmique
+log_ticks <- 10^seq(-1, 10, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:10)),
+     las = 1)
+x_ticks <- seq(0, n, by = 1000)
+axis(1, at = x_ticks,las = 1)
+
+
+setwd("~")
+
+png("falsepositives_id.png", width = 1800, height = 1200, res = 200)
+
+
+plot(rList[1:9], moyenne_faux_positifsId[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4, 
+     col = "red",
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], moyenne_faux_positifsId[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
+lines(rList[1:9], moyenne_faux_positifsId[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:length(rList)]
+axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+
+dev.off()
+
+
+
+setwd("~")
+
+png("falsepositives_near.png", width = 1800, height = 1200, res = 200)
+
+
+plot(rList[1:9], moyenne_faux_positifsNear[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4, 
+     col = "red",
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:length(rList)]
+axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+
+dev.off()
+
+
+
+setwd("~")
+
+png("falsepositives_med.png", width = 1800, height = 1200, res = 200)
+
+
+plot(rList[1:9], moyenne_faux_positifsMed[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4, 
+     col = "red",
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:length(rList)]
+axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+
+dev.off()
+
+
+setwd("~")
+
+png("falsepositives_far.png", width = 1800, height = 1200, res = 200)
+
+
+plot(rList[1:9], moyenne_faux_positifsFar[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4, 
+     col = "red",
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], moyenne_faux_positifsFar[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
+lines(rList[1:9], moyenne_faux_positifsFar[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:length(rList)]
+axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
+
+dev.off()
+
+
+
+
+
+
+##################################Cumulative outlier detection###################################
+
+########################Cumulative outlier detection###################
+
+
+resFar5Naive = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,1],5)
+resFar5Online = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,2],5)
+resFar5Streaming = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,3],5)
+
+# Données supposées : n correspond à la taille de resFar5Naive$taux_outliers_detectes_vrais
+x_vals <- 1:n
+
+setwd("~")
+
+file = paste0("cumulativeOutlierDetFarr5",".png")
+png(file, width = 1800, height = 1200, res = 200)
+# --- Plot principal (échelle log sur X)
+plot(x_vals, resFar5Naive$taux_outliers_detectes_vrais,
+     type = "l", lwd = 4, lty = "dotted",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     ylim = c(0, 100),
+     col = "darkgreen",
+     log = "x"        # <=== Échelle logarithmique sur l’axe X
 )
 
-pfar <- ggplot(df_long, aes(x = ContaminationRate, y = FalseNegatives, linetype = Method)) +
-  geom_line(size = 1, color = "black") +   # lignes noires
-  geom_point(size = 2, color = "black") +  # points noirs
-  labs(
-    title = "(k,l,rho1) = (8.59,32,0.975)",
-    x = "Contamination rate (%)",
-    y = "False negatives",
-    linetype = "Method"
-  ) +
-  scale_x_continuous(breaks = seq(0, 50, 5), limits = c(5, 50)) +
-  scale_y_continuous(breaks = seq(0, 90, 5)) +
-  scale_linetype_manual(values = linetypes) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
+# --- Autres lignes
+lines(x_vals, resFar5Online$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+lines(x_vals, resFar5Streaming$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
 
+# Ligne invisible (orange)
+lines(x_vals, resFar5Naive$taux_outliers_vrais,
+      lwd = 4, col = adjustcolor("orange", alpha.f = 0), type = "l")
 
-#########################################
-#Faux positifs moyenne
-########################################
+# --- Axes manuels
 
-# 
-# fprec = res100runNearesScenario$faux_positifsRec
-# fprec = res1run$faux_positifsRec
-# fprec = res1runNearScenario$faux_positifsRec
-# fprec = res1rund100$faux_positifsRec
-# 
-# fprec_moy <- apply(fprec, c(1, 2, 3), mean)
-# 
-# fprec100run = fprec_moy[1e4,,]
+# Axe X (logarithmique)
+log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+axis(1, at = log_ticks_x,
+     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+     las = 1, cex.axis = 2)
 
-#dim(fprec1run)
-fprec100run = faux_positifsNear[,,1] 
+# Axe Y (linéaire)
+axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+dev.off() 
 
-methodes <- c(1, 2, 3)
-method_labels <- c("1" = "Cov Online", "2" = "Online", "3" = "Streaming")
-method_pos_map <- setNames(1:3, methodes)
+setwd("~")
 
-taux_valeurs <- rList
-data_list <- list()
+file = paste0("cumulativeOutlierDetFarr20",".png")
+png(file, width = 1800, height = 1200, res = 200)
+resFar20Naive = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,1],20)
+resFar20Online = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,2],20)
+resFar20Streaming = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,3],20)
+x_vals <- 1:n
 
-for (i in seq_along(taux_valeurs)) {
-  total_inliers = (1 - taux_valeurs[i]/100) * n
-  
-  for (k in methodes) {
-    k_pos <- method_pos_map[as.character(k)]
-    data_list[[length(data_list) + 1]] <- data.frame(
-      ContaminationRate = taux_valeurs[i],
-      FalsePositives = fprec100run[i, k_pos] / (total_inliers) * 100,
-      Method = method_labels[as.character(k)]
-    )
-  }
-}
-
-df_long <- do.call(rbind, data_list)
-df_long$Method <- factor(df_long$Method, levels = method_labels)
-
-# mapping des styles de ligne
-linetypes <- c(
-  "Streaming" = "solid",
-  "Online" = "dashed",
-  "Cov Online" = "dotted"
+# --- Plot principal (échelle log sur X)
+plot(x_vals, resFar20Naive$taux_outliers_detectes_vrais,
+     type = "l", lwd = 4, lty = "dotted",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     ylim = c(0, 100),
+     col = "darkgreen",
+     log = "x"        # <=== Échelle logarithmique sur l’axe X
 )
 
-pnearDist <- ggplot(df_long, aes(x = ContaminationRate, y = FalsePositives, linetype = Method)) +
-  geom_line(size = 1, color = "black") +   # lignes noires
-  ylim(0, 90) +
-  geom_point(size = 2, color = "black") +  # points noirs
-  labs(
-    title = "(k,l,rho1) = (0.86,0.56,0.6)",
-    x = "",
-    y = "False positives",
-    linetype = "Methods"
-  ) +
-  scale_x_continuous(breaks = seq(0, 50, 5)) +
-  scale_y_continuous(breaks = seq(0, 90, 5)) +
-  scale_linetype_manual(values = linetypes) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
+# --- Autres lignes
+lines(x_vals, resFar20Online$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+lines(x_vals, resFar20Streaming$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
 
-# 1. Retirer la légende des deux graphes
-pnearDist <- pnearDist + theme(legend.position = "none")
-pfar <- pfar + theme(legend.position = "none")
+# Ligne invisible (orange)
+lines(x_vals, resFar20Naive$taux_outliers_vrais,
+      lwd = 4, col = adjustcolor("orange", alpha.f = 0), type = "l")
 
-# Styles de lignes utilisés
-linetypes <- c(
-  "Streaming" = "solid",
-  "Online" = "dashed",
-  "Cov Online" = "dotted"
+# --- Axes manuels
+
+# Axe X (logarithmique)
+log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+axis(1, at = log_ticks_x,
+     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+     las = 1, cex.axis = 2)
+
+# Axe Y (linéaire)
+axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+
+dev.off()
+
+setwd("~")
+
+file = paste0("cumulativeOutlierDetFarr30",".png")
+png(file, width = 1800, height = 1200, res = 200)
+
+resFar30Naive = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,1],30)
+resFar30Online = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,2],30)
+resFar30Streaming = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,3],30)
+
+# --- Plot principal (échelle log sur X)
+plot(x_vals, resFar30Naive$taux_outliers_detectes_vrais,
+     type = "l", lwd = 4, lty = "dotted",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     ylim = c(0, 100),
+     col = "darkgreen",
+     log = "x"        # <=== Échelle logarithmique sur l’axe X
 )
 
-# 1. Créer une légende manuelle avec les traits
-legend_plot <- ggplot() +
-  annotate("segment", x = 1, xend = 1.8, y = 1, yend = 1,
-           linetype = "solid", color = "black", size = 1) +
-  annotate("text", x = 2.0, y = 1, label = "Streaming", hjust = 0, size = 4) +
-  
-  annotate("segment", x = 1, xend = 1.8, y = 0.8, yend = 0.8,
-           linetype = "dashed", color = "black", size = 1) +
-  annotate("text", x = 2.0, y = 0.8, label = "Online", hjust = 0, size = 4) +
-  
-  annotate("segment", x = 1, xend = 1.8, y = 0.6, yend = 0.6,
-           linetype = "dotted", color = "black", size = 1) +
-  annotate("text", x = 2.0, y = 0.6, label = "Cov Online", hjust = 0, size = 4) +
-  
-  theme_void() +
-  xlim(0.8, 3.5) + ylim(0.5, 1.1) +
-  labs(title = "Methods") +
-  theme(plot.title = element_text(hjust = 0.5, size = 11),
-        plot.margin = margin(0, 0, 0, 0))
+# --- Autres lignes
+lines(x_vals, resFar30Online$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+lines(x_vals, resFar30Streaming$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
 
-# 2. Assembler les graphiques côte à côte avec la légende en dessous
-main_grid <- plot_grid(
-  pnearDist, pfar, ncol = 1, align = "hv"
+# Ligne invisible (orange)
+lines(x_vals, resFar30Naive$taux_outliers_vrais,
+      lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
+
+# --- Axes manuels
+
+# Axe X (logarithmique)
+log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+axis(1, at = log_ticks_x,
+     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+     las = 1, cex.axis = 2)
+
+# Axe Y (linéaire)
+axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+
+dev.off()
+
+resFar40Naive = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,1],50)
+resFar40Online = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,2],50)
+resFar40Streaming = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,3],50)
+
+setwd("~")
+
+file = paste0("cumulativeOutlierDetFarr40",".png")
+png(file, width = 1800, height = 1200, res = 200)
+
+
+# --- Plot principal (échelle log sur X)
+
+
+
+plot(x_vals, resFar40Naive$taux_outliers_detectes_vrais,
+     type = "l", lwd = 4, lty = "dotted",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     ylim = c(0, 100),
+     col = "darkgreen",
+     log = "x"        # <=== Échelle logarithmique sur l’axe X
 )
 
-final_plot <- plot_grid(
-  main_grid, legend_plot,
-  ncol = 1,
-  rel_heights = c(1, 0.2)  # espace pour la légende
-)
+# --- Autres lignes
+lines(x_vals, resFar40Online$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+lines(x_vals, resFar40Streaming$taux_outliers_detectes_vrais,
+      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
 
-# Afficher
-final_plot
+# Ligne invisible (orange)
+lines(x_vals, resFar40Naive$taux_outliers_vrais,
+      lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
 
-# 4. Combiner avec la légende manuelle
-final_plot <- plot_grid(main_grid, legend_plot,
-                        ncol = 1,
-                        rel_heights = c(10, 1))  # 90% graphes, 10% légende
+# --- Axes manuels
 
-# Afficher
-print(final_plot)
-saveRDS(pnearDist, file = "pnearDistFP.rds")
+# Axe X (logarithmique)
+log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+axis(1, at = log_ticks_x,
+     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+     las = 1, cex.axis = 2)
+
+# Axe Y (linéaire)
+axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+
+dev.off()
+
 
 # ##############################################
 # Temps calculs
@@ -593,18 +1770,12 @@ cumulativeOutlierDetection <- function(labelsVrais,outlier_labels , pourcentage)
   } 
   
   
-  
-  
-
 #outliers_majority = outliers_labelsTout[,,1]
 # res1run$faux_negatifsRec[9900:1e4]
 # table(res1run$labelsVraisRec[,5],res1run$outliersLabelsRec[,5,9,1])
 #dim(res10run$outliersLabelsRec)
 
 ########Graphs
-
-library(ggplot2)
-library(cowplot)
 
 # pCumOutDetRateFarcOnl5 = cumulativeOutlierDetection(labelsVraisFar[,2],outliersLabelsFar[,2,3],5)
 # 
@@ -1220,4 +2391,5 @@ final_plot <- combined / legend_plot +
   )
 
 print(final_plot)
+
 
