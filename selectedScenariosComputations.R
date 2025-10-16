@@ -1,8 +1,8 @@
-simDir = "~/work/Simus/DataSim"
+simDir = "~/Simus/DataSim"
 
-resDir = "~/work/Simus/FitSim"
+resDir = "~/Simus/FitSim"
 
-explDir = "~/work/Simus/exploitResults"
+explDir = "~/Simus/exploitResults"
 
 #setwd(resDir)
 
@@ -13,28 +13,14 @@ explDir = "~/work/Simus/exploitResults"
 
 kList = k1val
 
-lList = l1val
+lList = l1valup1
 
 rho1List = rho1val
 
 rho1ListNeg = rho1valNeg
 
-
-# 
-# test_outliers = function(distances,dim = 10,cutoff)
-# {
-#   outlab = rep(0,length(distances))
-#   
-#   
-#   for (i in (1:length(distances)))
-#   {
-#     if(distances[i] > cutoff){outlab[i] = 1}
-#   }
-#   return(outlab)
-# }
-
 sim = 1
-simNb = 100
+simNb = 1
 
 erreursSigmaId = array(0,dim = c(n,length(rList),3,simNb))
 erreursKLId = array(0,dim = c(n,length(rList),3,simNb))
@@ -164,16 +150,20 @@ for (m in seq_along(rList)){
 
 
 erreursSigmaNear = array(0,dim = c(n,length(rList),3,simNb))
+erreursSigmaOracle = array(0,dim = c(n,length(rList),3,simNb))
 erreursKLNear = array(0,dim = c(n,length(rList),3,simNb))
 outliersLabelsNear = array(0,dim = c(n,length(rList),3,simNb))
+outliersLabelsNearOracle = array(0,dim = c(n,length(rList),simNb))
 labelsVraisNear = array(0,dim = c(n,length(rList)))
 faux_positifsNear = array(0,dim = c(length(rList),3,simNb))
-
+faux_positifsOracle = array(0,dim = c(length(rList),simNb))
 faux_negatifsNear = array(0,dim = c(length(rList),3,simNb))
+faux_negatifsOracle = array(0,dim = c(length(rList),simNb))
+temps = array(0,dim = c(length(rList),3,simNb)) 
 
 
 #Near scenario d = 10
-if(d == 10) {k = 0.86;l=l1val[5];rho1 = 0.6}
+if(d == 10) {k = k1val[2];l=l1valup1[2];rho1 = rho1val[2]}
 #Near scenario d = 100
 if(d == 100) {k = 0.66;l=0.82;rho1 = 0.415}
 #Near scenario d = 100
@@ -205,27 +195,46 @@ temps_naif = system.time(
 fitNaif = resNaif
 for(s in (1:n)){
 erreursSigmaNear[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
+if(t(data$Z[s,])%*% solve(Sigma0)%*% data$Z[s,] > qchisq(.95,df = d)) {
+  outliersLabelsNearOracle[s,m,sim] = 1
+  }
+
 }
+
+temps[m,1,sim] = temps_naif[1]
 outliersLabelsNear[,m,1,sim] = resNaif$outliers_labels
 
 print(paste0("Erreur naive near ",erreursSigmaNear[n,m,1,sim]))
 
-t = table(data$labelsVrais,resNaif$outliers_labels)
-if (r != 0) {faux_positifsNear[m,1,sim] =  t[1,2]
-faux_negatifsNear[m,1,sim] = t[2,1]}
-if(r == 0){faux_positifsNear[m,1,sim] =  t[1,2]}
+t = table(data$labelsVrais,outliersLabelsNearOracle[,m,sim])
+if (r != 0) {faux_positifsOracle[m,sim] =  t[1,2]
+faux_negatifsOracle[m,sim] = t[2,1]}
+if(r == 0){faux_positifsOracle[m,sim] =  t[1,2]}
 
 print(paste0("faux positifs near naive ",faux_positifsNear[m,1,sim]))
 
 print(paste0("faux négatifs near naive ",faux_negatifsNear[m,1,sim]))
 
 
-temps_online = (
+print(paste0("faux positifs Oracle ",faux_positifsOracle[m,sim]))
+
+print(paste0("faux négatifs Oracle ",faux_negatifsOracle[m,sim]))
+
+t = table(data$labelsVrais,resNaif$outliers_labels)
+if (r != 0) {faux_positifsNear[m,1,sim] =  t[1,2]
+faux_negatifsNear[m,1,sim] = t[2,1]}
+if(r == 0){faux_positifsNear[m,1,sim] =  t[1,2]}
+
+
+
+temps_online = system.time(
   {
   if(d == 10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
     if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
     }
 )
+
+temps[m,2,sim] = temps_online[1]
 fitUsOnline = resUsOnline
 for(s in (1:n)){
 erreursSigmaNear[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
@@ -255,6 +264,9 @@ if(d == 10 ){resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$
   if(d == 100){
 resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)),cutoff = 1.38*qchisq(0.95,df = d))}
 })
+
+temps[m,3,sim] = temps_streaming[1]
+
 fitUSStreaming = resUsStreaming
 for(s in (1:n)){
 erreursSigmaNear[s,m,3,sim] =norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
@@ -285,8 +297,10 @@ setwd(resDir)
   }
 
 }
-setwd("~/work/Simus/FitSim")
-save(erreursSigmaNear,faux_negatifsNear,faux_positifsNear,outliersLabelsNear,labelsVraisNear,file ="results_near_scenario.RData")
+setwd("~/Simus/FitSim")
+
+file = paste0("results-k-",k,"l-",l,"rho1",rho1,".Rdata")
+save(erreursSigmaNear,faux_negatifsNear,faux_positifsNear,outliersLabelsNear,labelsVraisNear,temps,file = file)
 #######################Erreur Med scenario###########################
 
 k = k1val[3];l = l1val[6];rho1 = rho1val[3]

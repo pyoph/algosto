@@ -215,6 +215,53 @@ axis(1,cex.axis = 1.8)
 axis(2,cex.axis = 1.8)
 dev.off()
 
+
+#################KL 25####################
+
+k =k1val[5];l=l1valup1[5];rho1 = rho1val[5];
+
+contParam = ParmsF1(m1, k, l, rho1)
+
+data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
+
+Z = data$Z
+# Création d'un dataframe pour ggplot
+df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
+                 Label = factor(data$labelsVrais, levels = c(0, 1)))
+# Définir les couleurs selon le label
+cols <- ifelse(df$Label == 1, "red", "blue")
+
+# Définir les transparences (alpha = 0.5)
+# converti avec adjustcolor()
+cols <- adjustcolor(cols, alpha.f = 0.5)
+
+file = paste0("contaminScen","-k",k,"-l",l,"-rho1",rho1,"-r",rate,".pdf")
+
+setwd("~")
+
+pdf(file, width = 8, height = 6)  # Ouvre un device PDF
+
+# Créer le plot principal
+plot(df$X1, df$X2,
+     col = cols,
+     pch = 19,        # points pleins
+     cex = 1.2,       # taille des points
+     xlim = c(a, b),
+     ylim = c(a, b),
+     xlab = "",
+     ylab = "",
+     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
+     main = "",
+     xaxt = "n", yaxt = "n"  
+)
+
+axis(1,cex.axis = 1.8)
+
+axis(2,cex.axis = 1.8)
+dev.off()
+
+
+
 #################KL 50####################
 
 k =k1val[5];l=l1valup1[5];rho1 = rho1val[5];
@@ -331,14 +378,23 @@ mu_1 = contParam$mu1
 Sigma1 = contParam$Sigma1
 lambdaKL10 <- as.numeric(t(mu_1 - mu0) %*% solve(Sigma1) %*% (mu_1 - mu0))
 dens_noncentraleKL10 <- dchisq(x_vals, df = d, ncp = lambdaKL10)
-##########################KL 50###############################
+
+
+###########################KL 25###########################
 contParam = ParmsF1(m1, k1val[5], l1valup1[5], rho1val[5])
+mu_1 = contParam$mu1
+Sigma1 = contParam$Sigma1
+lambdaKL25 <- as.numeric(t(mu_1 - mu0) %*% solve(Sigma1) %*% (mu_1 - mu0))
+dens_noncentraleKL25 <- dchisq(x_vals, df = d, ncp = lambdaKL25)
+
+##########################KL 50###############################
+contParam = ParmsF1(m1, k1val[6], l1valup1[6], rho1val[6])
 mu_1 = contParam$mu1
 Sigma1 = contParam$Sigma1
 lambdaKL50 <- as.numeric(t(mu_1 - mu0) %*% solve(Sigma1) %*% (mu_1 - mu0))
 dens_noncentraleKL50 <- dchisq(x_vals, df = d, ncp = lambdaKL50)
 ##########################KL 100###############################
-contParam = ParmsF1(m1, k1val[6], l1valup1[6], rho1val[6])
+contParam = ParmsF1(m1, k1val[7], l1valup1[7], rho1val[7])
 mu_1 = contParam$mu1
 Sigma1 = contParam$Sigma1
 lambdaKL100 <- as.numeric(t(mu_1 - mu0) %*% solve(Sigma1) %*% (mu_1 - mu0))
@@ -350,11 +406,12 @@ pdf(file, width = 8, height = 6)  # Ouvre un device PDF
 
 # Tracé sans titre ni légende
 plot(x_vals, dens_centrale, type = "l", lwd = 4, col = "blue",
-     ylim = c(0, max(dens_centrale, dens_noncentrale)),
+     ylim = c(0, max(dens_centrale)),
      xlab = "", ylab = "", axes = FALSE)
 lines(x_vals, dens_noncentraleKL1,  col = "darkgreen", lwd = 4)
 lines(x_vals, dens_noncentraleKL5,  col = "orange",    lwd = 4)
 lines(x_vals, dens_noncentraleKL10, col = "red",       lwd = 4)
+lines(x_vals, dens_noncentraleKL25, col = "grey",   lwd = 4)
 lines(x_vals, dens_noncentraleKL50, col = "darkred",   lwd = 4)
 lines(x_vals, dens_noncentraleKL100, col = "black",   lwd = 4)
 

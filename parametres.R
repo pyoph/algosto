@@ -31,7 +31,7 @@ n <- 1e4
 
 # Dims and KL distance reached. The parameters are chosen such that the KL distance is in {0,1,10,100}
 #d <- 100; KLval <- c(0, 1, 10, 100)
-d <- 10; KLval <- c(0, 1, 5,10,50, 100)
+d <- 10; KLval <- c(0, 1, 5,10,25,50, 100)
 # 
 # # Functions
 # KL <- function(parms1, parms2){
