@@ -761,7 +761,7 @@ for (m in seq_along(rList)){
     }
     outliersLabelsMed4[,m,1,sim] = resNaif$outliers_labels[s]
     
-    print(paste0("Erreur naive med ",erreursSigmaMed2[n,m,1,sim]))
+    print(paste0("Erreur naive med ",erreursSigmaMed4[n,m,1,sim]))
     
     t = table(data$labelsVrais,resNaif$outliers_labels)
     if (r != 0) {faux_positifsMed4[m,1,sim] =  t[1,2]
@@ -904,12 +904,12 @@ for (m in seq_along(rList)){
     
     t = table(data$labelsVrais,resNaif$outliers_labels)
     if (r != 0) {faux_positifsMed5[m,1,sim] =  t[1,2]
-    faux_negatifsMed4[m,1,sim] = t[2,1]}
+    faux_negatifsMed5[m,1,sim] = t[2,1]}
     if(r == 0){faux_positifsMed5[m,1,sim] =  t[1,2]}
     
-    print(paste0("faux positifs med naive ",faux_positifsMed4[m,1,sim]))
+    print(paste0("faux positifs med naive ",faux_positifsMed5[m,1,sim]))
     
-    print(paste0("faux négatifs med naive ",faux_negatifsMed4[m,1,sim]))
+    print(paste0("faux négatifs med naive ",faux_negatifsMed5[m,1,sim]))
     
     t = table(data$labelsVrais,outliersLabelsOracleMed5[,m,sim])
     if (r != 0) {faux_positifsOracleMed5[m,sim] =  t[1,2]
@@ -917,9 +917,9 @@ for (m in seq_along(rList)){
     if(r == 0){faux_positifsOracleMed5[m,sim] =  t[1,2]}
     
     
-    print(paste0("faux positifs Oracle ",faux_positifsOracleMed4[m,sim]))
+    print(paste0("faux positifs Oracle ",faux_positifsOracleMed5[m,sim]))
     
-    print(paste0("faux négatifs Oracle ",faux_negatifsOracleMed4[m,sim]))
+    print(paste0("faux négatifs Oracle ",faux_negatifsOracleMed5[m,sim]))
     
     
     temps_online = (
