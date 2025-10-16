@@ -426,94 +426,94 @@ dev.off()
 ######################################################################
 
 # 
-plot(1:n, erreursSigmaFar[,2,3,1],
-     type = "l", lwd = 2, 
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     log = "y",              # Échelle logarithmique Y
-     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-)
+# plot(1:n, erreursSigmaFar[,2,3,1],
+#      type = "l", lwd = 2, 
+#      xlab = "", ylab = "",   # Pas de label
+#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+#      log = "y",              # Échelle logarithmique Y
+#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+# )
+# # 
+# # # Autres courbes
+# lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
+# lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
+# # 
+# # # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+# x_ticks <- seq(0, n, by = 1000)
+# axis(1, at = x_ticks,las = 1)
 # 
-# # Autres courbes
-lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
-lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
 # 
-# # Axe Y logarithmique
-log_ticks <- 10^seq(-1, 10, by = 1)
-axis(2, at = log_ticks,
-     labels = parse(text = paste0("10^", -1:10)),
-     las = 1)
-x_ticks <- seq(0, n, by = 1000)
-axis(1, at = x_ticks,las = 1)
-
-
-
-
-plot(1:n, erreursSigmaFar[,5,3,1],
-     type = "l", lwd = 2, 
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     log = "y",              # Échelle logarithmique Y
-     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-)
 # 
-# # Autres courbes
-lines(1:n, erreursSigmaFar[,5,2,1], lty = "dashed")
-lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
 # 
-# # Axe Y logarithmique
-log_ticks <- 10^seq(-1, 10, by = 1)
-axis(2, at = log_ticks,
-     labels = parse(text = paste0("10^", -1:10)),
-     las = 1)
-x_ticks <- seq(0, n, by = 1000)
-axis(1, at = x_ticks,las = 1)
-
-
-
-plot(1:n, erreursSigmaFar[,7,3,1],
-     type = "l", lwd = 2, 
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     log = "y",              # Échelle logarithmique Y
-     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-)
+# plot(1:n, erreursSigmaFar[,5,3,1],
+#      type = "l", lwd = 2, 
+#      xlab = "", ylab = "",   # Pas de label
+#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+#      log = "y",              # Échelle logarithmique Y
+#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+# )
+# # 
+# # # Autres courbes
+# lines(1:n, erreursSigmaFar[,5,2,1], lty = "dashed")
+# lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
+# # 
+# # # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+# x_ticks <- seq(0, n, by = 1000)
+# axis(1, at = x_ticks,las = 1)
 # 
-# # Autres courbes
-lines(1:n, erreursSigmaFar[,7,2,1], lty = "dashed")
-lines(1:n, erreursSigmaFar[,7,1,1], lty = "dotted")
 # 
-# # Axe Y logarithmique
-log_ticks <- 10^seq(-1, 10, by = 1)
-axis(2, at = log_ticks,
-     labels = parse(text = paste0("10^", -1:10)),
-     las = 1)
-x_ticks <- seq(0, n, by = 1000)
-axis(1, at = x_ticks,las = 1) 
-
-
-
-plot(1:n, erreursSigmaFar[,11,3,1],
-     type = "l", lwd = 2, 
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     log = "y",              # Échelle logarithmique Y
-     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-)
 # 
-# # Autres courbes
-lines(1:n, erreursSigmaFar[,11,2,1], lty = "dashed")
-lines(1:n, erreursSigmaFar[,11,1,1], lty = "dotted")
+# plot(1:n, erreursSigmaFar[,7,3,1],
+#      type = "l", lwd = 2, 
+#      xlab = "", ylab = "",   # Pas de label
+#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+#      log = "y",              # Échelle logarithmique Y
+#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+# )
+# # 
+# # # Autres courbes
+# lines(1:n, erreursSigmaFar[,7,2,1], lty = "dashed")
+# lines(1:n, erreursSigmaFar[,7,1,1], lty = "dotted")
+# # 
+# # # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+# x_ticks <- seq(0, n, by = 1000)
+# axis(1, at = x_ticks,las = 1) 
 # 
-# # Axe Y logarithmique
-log_ticks <- 10^seq(-1,10, by = 1)
-axis(2, at = log_ticks,
-     labels = parse(text = paste0("10^", -1:10)),
-     las = 1)
-x_ticks <- seq(0, n, by = 1000)
-axis(1, at = x_ticks,las = 1) 
+# 
+# 
+# plot(1:n, erreursSigmaFar[,11,3,1],
+#      type = "l", lwd = 2, 
+#      xlab = "", ylab = "",   # Pas de label
+#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
+#      log = "y",              # Échelle logarithmique Y
+#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+# )
+# # 
+# # # Autres courbes
+# lines(1:n, erreursSigmaFar[,11,2,1], lty = "dashed")
+# lines(1:n, erreursSigmaFar[,11,1,1], lty = "dotted")
+# # 
+# # # Axe Y logarithmique
+# log_ticks <- 10^seq(-1,10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+# x_ticks <- seq(0, n, by = 1000)
+# axis(1, at = x_ticks,las = 1) 
 
-#######################################################False positives and false negatives########################################
+#######################################################False positives and false negatives and Sigma error final########################################
 
 k = k1val[2]; l = l1valup1[2];rho1 = rho1val[2]
 
@@ -545,6 +545,39 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
+
+setwd("~")
+
+file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
+
+pdf(file, width = 8, height = 6)
+
+# Plot principal — axe Y en log (automatique)
+plot(rList, erreursSigmaNear[n, , 3, 1],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",                       # ✅ active l’échelle log pour Y
+     ylim = c(1e-1, 1e2)              # borne Y cohérente
+)
+
+# Autres courbes
+lines(rList, erreursSigmaNear[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList, erreursSigmaNear[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+
+# Axe Y logarithmique lisible
+log_ticks <- 10^seq(-1, 2, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 1.8)
+
+# Axe X (je suppose que tu veux une échelle régulière)
+x_ticks <- rList
+axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
+
+box()  # bordure
+dev.off()
+
 
 
 k = k1val[3]; l = l1valup1[3];rho1 = rho1val[3]
@@ -578,6 +611,38 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
+
+setwd("~")
+
+file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
+
+pdf(file, width = 8, height = 6)
+
+# Plot principal — axe Y en log (automatique)
+plot(rList, erreursSigmaMed[n, , 3, 1],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",                       # ✅ active l’échelle log pour Y
+     ylim = c(1e-1, 1e2)              # borne Y cohérente
+)
+
+# Autres courbes
+lines(rList, erreursSigmaMed[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList, erreursSigmaMed[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+
+# Axe Y logarithmique lisible
+log_ticks <- 10^seq(-1, 2, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 1.8)
+
+# Axe X (je suppose que tu veux une échelle régulière)
+x_ticks <- rList
+axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
+
+box()  # bordure
+dev.off()
 
 
 k = k1val[4]; l = l1valup1[4];rho1 = rho1val[4]
@@ -642,6 +707,40 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
+setwd("~")
+
+file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
+
+pdf(file, width = 8, height = 6)
+
+# Plot principal — axe Y en log (automatique)
+plot(rList, erreursSigmaMed2[n, , 3, 1],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",                       # ✅ active l’échelle log pour Y
+     ylim = c(1e-1, 1e2)              # borne Y cohérente
+)
+
+# Autres courbes
+lines(rList, erreursSigmaMed2[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList, erreursSigmaMed2[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+
+# Axe Y logarithmique lisible
+log_ticks <- 10^seq(-1, 2, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 1.8)
+
+# Axe X (je suppose que tu veux une échelle régulière)
+x_ticks <- rList
+axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
+
+box()  # bordure
+dev.off()
+
+
+
 
 k = k1val[6]; l = l1valup1[6];rho1 = rho1val[6]
 
@@ -674,27 +773,104 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
+file = paste0("erreurs_Sigma_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
 
-# 
-plot(1:n, erreursSigmaFar[,2,3,1],
-     type = "l", lwd = 2, 
+
+# Plot principal — axe Y en log (automatique)
+plot(rList, erreursSigmaMed3[n, , 3, 1],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",                       # ✅ active l’échelle log pour Y
+     ylim = c(1e-1, 1e2)              # borne Y cohérente
+)
+
+# Autres courbes
+lines(rList, erreursSigmaMed3[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList, erreursSigmaMed3[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+
+# Axe Y logarithmique lisible
+log_ticks <- 10^seq(-1, 2, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 1.8)
+
+# Axe X (je suppose que tu veux une échelle régulière)
+x_ticks <- rList
+axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
+
+box()  # bordure
+dev.off()
+
+
+
+k = k1val[7]; l = l1valup1[7];rho1 = rho1val[7]
+
+file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
+
+plot(rList[2:length(rList)], faux_negatifsMed4[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     log = "y",              # Échelle logarithmique Y
-     ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
 )
 # 
 # # Autres courbes
-lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
-lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
-# 
+lines(rList[2:length(rList)], faux_negatifsMed4[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:length(rList)], faux_negatifsMed4[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:length(rList)], faux_negatifsOracleMed4[2:length(rList),1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+
+#  
 # # Axe Y logarithmique
-log_ticks <- 10^seq(-1, 10, by = 1)
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:length(rList)]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
+dev.off()
+
+
+file = paste0("erreurs_Sigma_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
+
+
+# Plot principal — axe Y en log (automatique)
+plot(rList, erreursSigmaMed4[n, , 3, 1],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",                       
+     ylim = c(1e-1, 1e2)              
+)
+
+# Autres courbes
+lines(rList, erreursSigmaMed4[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList, erreursSigmaMed4[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+
+# Axe Y logarithmique lisible
+log_ticks <- 10^seq(-1, 2, by = 1)
 axis(2, at = log_ticks,
-     labels = parse(text = paste0("10^", -1:10)),
-     las = 1)
-x_ticks <- seq(0, n, by = 1000)
-axis(1, at = x_ticks,las = 1)
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 1.8)
+
+# Axe X (je suppose que tu veux une échelle régulière)
+x_ticks <- rList
+axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
+
+box()  # bordure
+dev.off()
+
+
+# 
 
 setwd("~")
 
