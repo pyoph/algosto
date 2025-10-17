@@ -1006,27 +1006,52 @@ for(m in seq_along(rList)){
   
   for (i in (1:n))
 {
-  if (labelsVraisMed5[i,m] == 1 & outliersLabelsMed5[i,m,1,1] == 0){faux_negatifsFarTrajMed5[i,m,1,1] = 1}
+    for(l in (1:3)){
+  if ( labelsVraisMed5[i,m] == 1 & outliersLabelsMed5[i,m,l,1] == 0){faux_negatifsFarTrajMed5[i,m,l,1] = 1}
     
-  if (labelsVraisMed5[i,m] == 0 & outliersLabelsMed5[i,m,1,1] == 1){faux_positifsFarTrajMed5[i,m,1,1] = 1}
+   if (labelsVraisMed5[i,m] == 0 & outliersLabelsMed5[i,m,l,1] == 1){faux_positifsFarTrajMed5[i,m,l,1] = 1}
+        
+      }
+        }
+
+    
+    
+  }
+
+for (i in (1:n)){
+  if (labelsVraisMed5[i,m] == 1 & outliersLabelsOracleMed5[i,m,1] == 0){faux_negatifsFarTrajMed5[i,m,4,1] = 1}
+  
+  if (labelsVraisMed5[i,m] == 0 & outliersLabelsOracleMed5[i,m,1] == 1){faux_positifsFarTrajMed5[i,m,4,1] = 1}
 }
 
-}
+faux_negatifs_cum = array(0, dim = c(n,length(rList),4))
 
+faux_positifs_cum = array(0, dim = c(n,length(rList),4))
 #Sommes cumulées
+for(l in (1:4)){
+for (m in seq_along(rList)){
+faux_negatifs_cum[,m,l] <- cumsum(faux_negatifsFarTrajMed5[,m,l,1])
+faux_positifs_cum[,m,l] <- cumsum(faux_positifsFarTrajMed5[,m,l,1])}
+}
+taux_fn_cum = array(0,dim= c(n,length(rList),l))
+taux_fp_cum = array(0,dim= c(n,length(rList),l))
 
-faux_negatifs_cum <- cumsum(faux_negatifsFarTrajMed5[,9,1,1])
-faux_positifs_cum <- cumsum(faux_positifsFarTrajMed5[,9,1,1])
-taux_fn_cum = array(0,dim= c(n))
 for (i in (1:n))
 {
-  n_outliers <- sum(labelsVraisMed5[1:i, 9] == 1)
-  n_inliers  <- sum(labelsVraisMed5[1:i, 9] == 0)
-  
+  for(m in seq_along(rList)){
+  n_outliers <- sum(labelsVraisMed5[1:i, m] == 1)
+  n_inliers  <- sum(labelsVraisMed5[1:i, m] == 0)
+  for(l in (1:4)){
   if(n_outliers > 0){
-  taux_fn_cum[i] = faux_negatifs_cum[i]/n_outliers
+  taux_fn_cum[i,m,l] = faux_negatifs_cum[i,m,l]/n_outliers
   }
-}
+  
+  
+  if(n_inliers > 0){
+    taux_fp_cum[i,m,l] = faux_positifs_cum[i,m,l]/n_inliers}
+  }}
+      }
+
 
 #########################Moyenne erreurs, faux négatifs, faux positifs###############################################################
 moyenne_erreursSigmaFar = apply(erreursSigmaFar,c(1,2,3),mean)

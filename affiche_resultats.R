@@ -898,7 +898,6 @@ file = paste0("false_positives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-setwd("~")
 
 plot(rList[1:9], faux_positifsMed5[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
@@ -929,14 +928,56 @@ dev.off()
 
 x_vals = 1:n
 
-plot(x_vals,taux_fn_cum,     type = "l", lwd = 4, 
+ind_rates = c(2,5,7,9)
+
+
+for(r in ind_rates){
+  file = paste0("false_negatives-traj-k",k,"-l",l,"-rho1",rho1,"-rate",r,".pdf")
+  setwd("~")
+  pdf(file,width = 8, height = 6) 
+  
+  
+  plot(x_vals,taux_fn_cum[,r,3]*100,     type = "l", lwd = 4, col= "red",
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
      #log = "y",              # Échelle logarithmique Y
-     ylim = c(0, 1)     # Plage Y adaptée à tes ticks log
+     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
 )
+lines(x_vals,taux_fn_cum[,m,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
+
+lines(x_vals,taux_fn_cum[,9,2]*100,lty = "dashed",col = "blue",lwd = 4)
+
+lines(x_vals,taux_fn_cum[,9,4]*100,lty = "dotted",col = "orange",lwd = 4)
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 1.8)
+
+axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
+dev.off()
+}
 
 
+for(r in ind_rates){
+  rate = rList[r]
+  file = paste0("false_positives-traj-k",k,"-l",l,"-rho1",rho1,"-rate",rate,".pdf")
+  setwd("~")
+  pdf(file,width = 8, height = 6) 
+  
+  
+  plot(x_vals,taux_fp_cum[,r,3]*100,     type = "l", lwd = 4, col= "red",
+       xlab = "", ylab = "",   # Pas de label
+       yaxt = "n", xaxt = "n", # On masque les axes par défaut
+       #log = "y",              # Échelle logarithmique Y
+       ylim = c(0, 10)     # Plage Y adaptée à tes ticks log
+  )
+  lines(x_vals,taux_fp_cum[,m,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
+  
+  lines(x_vals,taux_fp_cum[,9,2]*100,lty = "dashed",col = "blue",lwd = 4)
+  
+  lines(x_vals,taux_fp_cum[,9,4]*100,lty = "dotted",col = "orange",lwd = 4)
+  axis(2, at = seq(0, 10, by = 5), las = 1,cex.axis = 1.8)
+  
+  axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
+  dev.off()
+}
 ##################################Cumulative outlier detection###################################
 
 ########################Cumulative outlier detection###################
