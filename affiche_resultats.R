@@ -1,5 +1,3 @@
-
-
 ###################################################
 #Affiche contamination scenarios
 ##################################################
@@ -400,6 +398,8 @@ Sigma1 = contParam$Sigma1
 lambdaKL100 <- as.numeric(t(mu_1 - mu0) %*% solve(Sigma1) %*% (mu_1 - mu0))
 dens_noncentraleKL100 <- dchisq(x_vals, df = d, ncp = lambdaKL100)
 
+setwd("~")
+
 file = paste0("khi2density",".pdf")
 
 pdf(file, width = 8, height = 6)  # Ouvre un device PDF
@@ -425,94 +425,6 @@ dev.off()
 #######Affichage des erreurs d'estimation de Sigma
 ######################################################################
 
-# 
-# plot(1:n, erreursSigmaFar[,2,3,1],
-#      type = "l", lwd = 2, 
-#      xlab = "", ylab = "",   # Pas de label
-#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
-#      log = "y",              # Échelle logarithmique Y
-#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-# )
-# # 
-# # # Autres courbes
-# lines(1:n, erreursSigmaFar[,2,2,1], lty = "dashed")
-# lines(1:n, erreursSigmaFar[,2,1,1], lty = "dotted")
-# # 
-# # # Axe Y logarithmique
-# log_ticks <- 10^seq(-1, 10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-# x_ticks <- seq(0, n, by = 1000)
-# axis(1, at = x_ticks,las = 1)
-# 
-# 
-# 
-# 
-# plot(1:n, erreursSigmaFar[,5,3,1],
-#      type = "l", lwd = 2, 
-#      xlab = "", ylab = "",   # Pas de label
-#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
-#      log = "y",              # Échelle logarithmique Y
-#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-# )
-# # 
-# # # Autres courbes
-# lines(1:n, erreursSigmaFar[,5,2,1], lty = "dashed")
-# lines(1:n, erreursSigmaFar[,5,1,1], lty = "dotted")
-# # 
-# # # Axe Y logarithmique
-# log_ticks <- 10^seq(-1, 10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-# x_ticks <- seq(0, n, by = 1000)
-# axis(1, at = x_ticks,las = 1)
-# 
-# 
-# 
-# plot(1:n, erreursSigmaFar[,7,3,1],
-#      type = "l", lwd = 2, 
-#      xlab = "", ylab = "",   # Pas de label
-#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
-#      log = "y",              # Échelle logarithmique Y
-#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-# )
-# # 
-# # # Autres courbes
-# lines(1:n, erreursSigmaFar[,7,2,1], lty = "dashed")
-# lines(1:n, erreursSigmaFar[,7,1,1], lty = "dotted")
-# # 
-# # # Axe Y logarithmique
-# log_ticks <- 10^seq(-1, 10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-# x_ticks <- seq(0, n, by = 1000)
-# axis(1, at = x_ticks,las = 1) 
-# 
-# 
-# 
-# plot(1:n, erreursSigmaFar[,11,3,1],
-#      type = "l", lwd = 2, 
-#      xlab = "", ylab = "",   # Pas de label
-#      yaxt = "n", xaxt = "n", # On masque les axes par défaut
-#      log = "y",              # Échelle logarithmique Y
-#      ylim = c(1e-1, 1e10)     # Plage Y adaptée à tes ticks log
-# )
-# # 
-# # # Autres courbes
-# lines(1:n, erreursSigmaFar[,11,2,1], lty = "dashed")
-# lines(1:n, erreursSigmaFar[,11,1,1], lty = "dotted")
-# # 
-# # # Axe Y logarithmique
-# log_ticks <- 10^seq(-1,10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-# x_ticks <- seq(0, n, by = 1000)
-# axis(1, at = x_ticks,las = 1) 
-
 #######################################################False positives and false negatives and Sigma error final########################################
 
 k = k1val[2]; l = l1valup1[2];rho1 = rho1val[2]
@@ -521,7 +433,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:length(rList)], faux_negatifsNear[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+plot(rList[2:9], faux_negatifsNear[2:9,3,1]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -530,9 +442,41 @@ plot(rList[2:length(rList)], faux_negatifsNear[2:length(rList),3,1]/((rList[2:le
 )
 # 
 # # Autres courbes
-lines(rList[2:length(rList)], faux_negatifsNear[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:length(rList)], faux_negatifsNear[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:length(rList)], faux_negatifsOracle[2:length(rList),1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsNear[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], faux_negatifsNear[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracle[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:9]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
+dev.off()
+
+#False positives Near
+
+file = paste0("false_positives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
+
+
+plot(rList[1:9], faux_positifsNear[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 20)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], faux_positifsNear[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], faux_positifsNear[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], faux_positifsOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
 
 #  
 # # Axe Y logarithmique
@@ -546,6 +490,8 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
+
+
 setwd("~")
 
 file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
@@ -553,7 +499,7 @@ file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList, erreursSigmaNear[n, , 3, 1],
+plot(rList[1:9], erreursSigmaNear[n,1:9 , 3, 1],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -562,8 +508,8 @@ plot(rList, erreursSigmaNear[n, , 3, 1],
 )
 
 # Autres courbes
-lines(rList, erreursSigmaNear[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList, erreursSigmaNear[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], erreursSigmaNear[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], erreursSigmaNear[n, 1:9, 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -579,14 +525,13 @@ box()  # bordure
 dev.off()
 
 
-
 k = k1val[3]; l = l1valup1[3];rho1 = rho1val[3]
 
 file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:length(rList)], faux_negatifsMed[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+plot(rList[2:9], faux_negatifsMed[2:9,3,1]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -595,9 +540,9 @@ plot(rList[2:length(rList)], faux_negatifsMed[2:length(rList),3,1]/((rList[2:len
 )
 # 
 # # Autres courbes
-lines(rList[2:length(rList)], faux_negatifsMed[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:length(rList)], faux_negatifsMed[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:length(rList)], faux_negatifsOracleMed[2:length(rList),1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsMed[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], faux_negatifsMed[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
 
 #  
 # # Axe Y logarithmique
@@ -605,7 +550,40 @@ lines(rList[2:length(rList)], faux_negatifsOracleMed[2:length(rList),1]/((rList[
 # axis(2, at = log_ticks,
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
-x_ticks <- rList[2:length(rList)]
+x_ticks <- rList[2:9]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
+dev.off()
+
+
+#False positives Med
+
+file = paste0("false_positives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
+
+
+plot(rList[1:9], faux_positifsMed[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 20)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], faux_positifsMed[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], faux_positifsMed[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[1:9]
 axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
@@ -619,7 +597,7 @@ file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList, erreursSigmaMed[n, , 3, 1],
+plot(rList[1:9], erreursSigmaMed[n, 1:9, 3, 1],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -628,8 +606,8 @@ plot(rList, erreursSigmaMed[n, , 3, 1],
 )
 
 # Autres courbes
-lines(rList, erreursSigmaMed[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList, erreursSigmaMed[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], erreursSigmaMed[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], erreursSigmaMed[n,1:9 , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -651,7 +629,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:length(rList)], faux_negatifsMed2[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+plot(rList[2:9], faux_negatifsMed2[2:9,3,1]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -660,9 +638,9 @@ plot(rList[2:length(rList)], faux_negatifsMed2[2:length(rList),3,1]/((rList[2:le
 )
 # 
 # # Autres courbes
-lines(rList[2:length(rList)], faux_negatifsMed2[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:length(rList)], faux_negatifsMed2[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:length(rList)], faux_negatifsOracleMed2[2:length(rList),1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsMed2[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], faux_negatifsMed2[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed2[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
 
 #  
 # # Axe Y logarithmique
@@ -670,30 +648,29 @@ lines(rList[2:length(rList)], faux_negatifsOracleMed2[2:length(rList),1]/((rList
 # axis(2, at = log_ticks,
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
-x_ticks <- rList[2:length(rList)]
+x_ticks <- rList[2:9]
 axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
-k = k1val[5]; l = l1valup1[5];rho1 = rho1val[5]
-
-file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+file = paste0("false_positives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:length(rList)], faux_negatifsMed2[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+
+plot(rList[1:9], faux_positifsMed2[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
      #log = "y",              # Échelle logarithmique Y
-     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+     ylim = c(0, 20)     # Plage Y adaptée à tes ticks log
 )
 # 
 # # Autres courbes
-lines(rList[2:length(rList)], faux_negatifsMed2[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:length(rList)], faux_negatifsMed2[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:length(rList)], faux_negatifsOracleMed2[2:length(rList),1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], faux_positifsMed2[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], faux_positifsMed2[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed2[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
 
 #  
 # # Axe Y logarithmique
@@ -701,7 +678,7 @@ lines(rList[2:length(rList)], faux_negatifsOracleMed2[2:length(rList),1]/((rList
 # axis(2, at = log_ticks,
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
-x_ticks <- rList[2:length(rList)]
+x_ticks <- rList[1:9]
 axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
@@ -714,7 +691,7 @@ file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList, erreursSigmaMed2[n, , 3, 1],
+plot(rList[1:9], erreursSigmaMed[n, 1:9, 3, 1],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -723,8 +700,8 @@ plot(rList, erreursSigmaMed2[n, , 3, 1],
 )
 
 # Autres courbes
-lines(rList, erreursSigmaMed2[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList, erreursSigmaMed2[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], erreursSigmaMed[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], erreursSigmaMed[n,1:9 , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -741,14 +718,13 @@ dev.off()
 
 
 
-
-k = k1val[6]; l = l1valup1[6];rho1 = rho1val[6]
+k = k1val[5]; l = l1valup1[5];rho1 = rho1val[5]
 
 file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:length(rList)], faux_negatifsMed3[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+plot(rList[2:9], faux_negatifsMed3[2:9,3,1]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -757,9 +733,9 @@ plot(rList[2:length(rList)], faux_negatifsMed3[2:length(rList),3,1]/((rList[2:le
 )
 # 
 # # Autres courbes
-lines(rList[2:length(rList)], faux_negatifsMed3[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:length(rList)], faux_negatifsMed3[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:length(rList)], faux_negatifsOracleMed3[2:length(rList),1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsMed3[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], faux_negatifsMed3[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed3[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
 
 #  
 # # Axe Y logarithmique
@@ -773,13 +749,49 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
-file = paste0("erreurs_Sigma_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+
+file = paste0("false_positives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
+setwd("~")
+
+plot(rList[1:9], faux_positifsMed3[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 20)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], faux_positifsMed3[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], faux_positifsMed3[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed3[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[1:9]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
+dev.off()
+
+
+
+
+setwd("~")
+
+file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
+
+pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList, erreursSigmaMed3[n, , 3, 1],
+plot(rList[1:9], erreursSigmaMed3[n, 1:9, 3, 1],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -788,8 +800,104 @@ plot(rList, erreursSigmaMed3[n, , 3, 1],
 )
 
 # Autres courbes
-lines(rList, erreursSigmaMed3[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList, erreursSigmaMed3[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], erreursSigmaMed3[n,1:9 , 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], erreursSigmaMed3[n,1:9 , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+
+# Axe Y logarithmique lisible
+log_ticks <- 10^seq(-1, 2, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 1.8)
+
+# Axe X (je suppose que tu veux une échelle régulière)
+x_ticks <- rList[1:9]
+axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
+
+box()  # bordure
+dev.off()
+
+
+
+
+k = k1val[6]; l = l1valup1[6];rho1 = rho1val[6]
+
+file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
+
+plot(rList[2:9], faux_negatifsMed4[2:9,3,1]/((rList[2:9]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[2:9], faux_negatifsMed4[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], faux_negatifsMed4[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed4[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[2:9]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
+dev.off()
+
+
+
+file = paste0("false_positives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
+
+setwd("~")
+
+plot(rList[1:9], faux_positifsMed4[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 20)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], faux_positifsMed4[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], faux_positifsMed4[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed4[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+
+#  
+# # Axe Y logarithmique
+# log_ticks <- 10^seq(-1, 10, by = 1)
+# axis(2, at = log_ticks,
+#      labels = parse(text = paste0("10^", -1:10)),
+#      las = 1)
+x_ticks <- rList[1:9]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
+dev.off()
+
+
+
+
+# Plot principal — axe Y en log (automatique)
+plot(rList[1:9], erreursSigmaMed4[n,1:9 , 3, 1],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",                       # ✅ active l’échelle log pour Y
+     ylim = c(1e-1, 1e2)              # borne Y cohérente
+)
+
+# Autres courbes
+lines(rList[1:9], erreursSigmaMed4[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], erreursSigmaMed4[n, 1:9, 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -812,7 +920,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:length(rList)], faux_negatifsMed4[2:length(rList),3,1]/((rList[2:length(rList)]/100)*n)*100,
+plot(rList[2:9], faux_negatifsMed5[2:9,3,1]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -821,9 +929,9 @@ plot(rList[2:length(rList)], faux_negatifsMed4[2:length(rList),3,1]/((rList[2:le
 )
 # 
 # # Autres courbes
-lines(rList[2:length(rList)], faux_negatifsMed4[2:length(rList),2,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:length(rList)], faux_negatifsMed4[2:length(rList),1,1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:length(rList)], faux_negatifsOracleMed4[2:length(rList),1]/((rList[2:length(rList)]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsMed5[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], faux_negatifsMed5[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed5[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
 
 #  
 # # Axe Y logarithmique
@@ -831,7 +939,7 @@ lines(rList[2:length(rList)], faux_negatifsOracleMed4[2:length(rList),1]/((rList
 # axis(2, at = log_ticks,
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
-x_ticks <- rList[2:length(rList)]
+x_ticks <- rList[2:9]
 axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
@@ -844,7 +952,7 @@ pdf(file,width = 8, height = 6)
 
 
 # Plot principal — axe Y en log (automatique)
-plot(rList, erreursSigmaMed4[n, , 3, 1],
+plot(rList[1:9], erreursSigmaMed5[n,1:9 , 3, 1],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -853,8 +961,8 @@ plot(rList, erreursSigmaMed4[n, , 3, 1],
 )
 
 # Autres courbes
-lines(rList, erreursSigmaMed4[n, , 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList, erreursSigmaMed4[n, , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], erreursSigmaMed5[n,1:9 , 2, 1], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], erreursSigmaMed5[n, 1:9, 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -869,134 +977,36 @@ axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
 box()  # bordure
 dev.off()
 
-
-# 
+file = paste0("false_positives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
 
 setwd("~")
 
-png("falsepositives_id.png", width = 1800, height = 1200, res = 200)
-
-
-plot(rList[1:9], moyenne_faux_positifsId[1:9,3]/((1 - rList[1:9]/100)*n)*100,
-     type = "l", lwd = 4, 
-     col = "red",
+plot(rList[1:9], faux_positifsMed5[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
      #log = "y",              # Échelle logarithmique Y
-     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
+     ylim = c(0, 20)     # Plage Y adaptée à tes ticks log
 )
 # 
 # # Autres courbes
-lines(rList[1:9], moyenne_faux_positifsId[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
-lines(rList[1:9], moyenne_faux_positifsId[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
+lines(rList[1:9], faux_positifsMed5[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], faux_positifsMed5[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+
 #  
 # # Axe Y logarithmique
 # log_ticks <- 10^seq(-1, 10, by = 1)
 # axis(2, at = log_ticks,
 #      labels = parse(text = paste0("10^", -1:10)),
 #      las = 1)
-x_ticks <- rList[2:length(rList)]
-axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
+x_ticks <- rList[1:9]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 
-axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
-
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
-
-
-
-setwd("~")
-
-png("falsepositives_near.png", width = 1800, height = 1200, res = 200)
-
-
-plot(rList[1:9], moyenne_faux_positifsNear[1:9,3]/((1 - rList[1:9]/100)*n)*100,
-     type = "l", lwd = 4, 
-     col = "red",
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     #log = "y",              # Échelle logarithmique Y
-     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
-)
-# 
-# # Autres courbes
-lines(rList[1:9], moyenne_faux_positifsNear[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
-lines(rList[1:9], moyenne_faux_positifsNear[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
-#  
-# # Axe Y logarithmique
-# log_ticks <- 10^seq(-1, 10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-x_ticks <- rList[2:length(rList)]
-axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
-
-axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
-
-dev.off()
-
-
-
-setwd("~")
-
-png("falsepositives_med.png", width = 1800, height = 1200, res = 200)
-
-
-plot(rList[1:9], moyenne_faux_positifsMed[1:9,3]/((1 - rList[1:9]/100)*n)*100,
-     type = "l", lwd = 4, 
-     col = "red",
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     #log = "y",              # Échelle logarithmique Y
-     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
-)
-# 
-# # Autres courbes
-lines(rList[1:9], moyenne_faux_positifsMed[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
-lines(rList[1:9], moyenne_faux_positifsMed[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
-#  
-# # Axe Y logarithmique
-# log_ticks <- 10^seq(-1, 10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-x_ticks <- rList[2:length(rList)]
-axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
-
-axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
-
-dev.off()
-
-
-setwd("~")
-
-png("falsepositives_far.png", width = 1800, height = 1200, res = 200)
-
-
-plot(rList[1:9], moyenne_faux_positifsFar[1:9,3]/((1 - rList[1:9]/100)*n)*100,
-     type = "l", lwd = 4, 
-     col = "red",
-     xlab = "", ylab = "",   # Pas de label
-     yaxt = "n", xaxt = "n", # On masque les axes par défaut
-     #log = "y",              # Échelle logarithmique Y
-     ylim = c(0, 15)     # Plage Y adaptée à tes ticks log
-)
-# 
-# # Autres courbes
-lines(rList[1:9], moyenne_faux_positifsFar[1:9,2]/((1 - rList[1:9]/100)*n)*100, ,lwd = 4,lty = "dashed",col = "blue")
-lines(rList[1:9], moyenne_faux_positifsFar[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4,lty = "dotted",col = "darkgreen")
-#  
-# # Axe Y logarithmique
-# log_ticks <- 10^seq(-1, 10, by = 1)
-# axis(2, at = log_ticks,
-#      labels = parse(text = paste0("10^", -1:10)),
-#      las = 1)
-x_ticks <- rList[2:length(rList)]
-axis(2, at = seq(0, 15, by = 5), las = 1,cex.axis = 2.4)
-
-axis(1, at = x_ticks,las = 1,cex.axis = 2.7)
-
-dev.off()
-
 
 
 
