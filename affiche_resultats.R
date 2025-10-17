@@ -3,89 +3,6 @@
 ##################################################
 
 
-
-afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
-  contParam = ParmsF1(m1, k, l, rho1)
-  
-    data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
-    
- Z = data$Z
- # Création d'un dataframe pour ggplot
- df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
-                  Label = factor(data$labelsVrais, levels = c(0, 1)))
- #Création du plot
- # Create the plot (English version)
- p <- ggplot(df, aes(x = X1, y = X2, color = Label, alpha = Label)) +
-   geom_point(size = 3) +
-   ylim(a,b) +
-   xlim(a,b) +
-   scale_color_manual(
-     values = c("0" = "blue", "1" = "red"),
-     labels = c("Inlier", "Outlier"),
-     name = "Status"
-   ) +
-   scale_alpha_manual(
-     values = c("0" = 0.5, "1" = 0.5),  
-     guide = "none"  # Hide alpha from legend
-   ) +
-   labs(
-     title = "",
-     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
-     x = "",
-     y = ""
-   ) +
-   theme_minimal() +
-   theme(
-     legend.position = "bottom",
-     plot.title = element_text(face = "bold")
-   )
-  return(p)
-}
-
-a = -5
-b = 5
-
-k =k1val[1];l=l1val[1];rho1 = rho1val[1];
-rate  = 5
-contParam = ParmsF1(m1, k, l, rho1)
-
-data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
-
-
-Z = data$Z
-# Création d'un dataframe pour ggplot
-df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
-                 Label = factor(data$labelsVrais, levels = c(0, 1)))
-# Définir les couleurs selon le label
-cols <- ifelse(df$Label == 1, "red", "blue")
-
-# Définir les transparences (alpha = 0.5)
-# converti avec adjustcolor()
-cols <- adjustcolor(cols, alpha.f = 0.5)
-
-file = paste0("contaminScen_no_outlierr",rate,".pdf")
-
-pdf(file, width = 8, height = 6)  # Ouvre un device PDF
-
-# Créer le plot principal
-plot(df$X1, df$X2,
-     col = cols,
-     pch = 19,        # points pleins
-     cex = 1.2,       # taille des points
-     xlim = c(a, b),
-     ylim = c(a, b),
-     xlab = "",
-     ylab = "",
-     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
-     main = "",
-     xaxt = "n", yaxt = "n"  
-)
-
-axis(1,cex.axis = 1.8)
-
-axis(2,cex.axis = 1.8)
-dev.off()
-
 ######KL = 1##########
 
 k =k1val[2];l=l1valup1[2];rho1 = rho1val[2];
@@ -1008,8 +925,16 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
+################################################################################################
 
+x_vals = 1:n
 
+plot(x_vals,taux_fn_cum,     type = "l", lwd = 4, 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 1)     # Plage Y adaptée à tes ticks log
+)
 
 
 ##################################Cumulative outlier detection###################################
