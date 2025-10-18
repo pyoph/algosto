@@ -361,7 +361,7 @@ plot(rList[2:9], faux_negatifsNear[2:9,3,1]/((rList[2:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[2:9], faux_negatifsNear[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[2:9], faux_negatifsNear[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracle[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracle[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -393,7 +393,7 @@ plot(rList[1:9], faux_positifsNear[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[1:9], faux_positifsNear[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[1:9], faux_positifsNear[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], faux_positifsOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -459,7 +459,7 @@ plot(rList[2:9], faux_negatifsMed[2:9,3,1]/((rList[2:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[2:9], faux_negatifsMed[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[2:9], faux_negatifsMed[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -492,7 +492,7 @@ plot(rList[1:9], faux_positifsMed[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[1:9], faux_positifsMed[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[1:9], faux_positifsMed[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -557,7 +557,7 @@ plot(rList[2:9], faux_negatifsMed2[2:9,3,1]/((rList[2:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[2:9], faux_negatifsMed2[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[2:9], faux_negatifsMed2[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed2[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed2[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -587,7 +587,7 @@ plot(rList[1:9], faux_positifsMed2[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[1:9], faux_positifsMed2[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[1:9], faux_positifsMed2[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed2[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed2[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -652,7 +652,7 @@ plot(rList[2:9], faux_negatifsMed3[2:9,3,1]/((rList[2:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[2:9], faux_negatifsMed3[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[2:9], faux_negatifsMed3[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed3[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed3[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -684,7 +684,7 @@ plot(rList[1:9], faux_positifsMed3[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[1:9], faux_positifsMed3[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[1:9], faux_positifsMed3[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed3[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed3[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -753,7 +753,7 @@ plot(rList[2:9], faux_negatifsMed4[2:9,3,1]/((rList[2:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[2:9], faux_negatifsMed4[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[2:9], faux_negatifsMed4[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed4[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed4[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -786,7 +786,7 @@ plot(rList[1:9], faux_positifsMed4[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[1:9], faux_positifsMed4[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[1:9], faux_positifsMed4[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed4[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed4[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -848,7 +848,7 @@ plot(rList[2:9], faux_negatifsMed5[2:9,3,1]/((rList[2:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[2:9], faux_negatifsMed5[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[2:9], faux_negatifsMed5[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed5[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[2:9], faux_negatifsOracleMed5[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -910,7 +910,7 @@ plot(rList[1:9], faux_positifsMed5[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 # # Autres courbes
 lines(rList[1:9], faux_positifsMed5[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[1:9], faux_positifsMed5[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], faux_positifsOracleMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -931,8 +931,40 @@ x_vals = 1:n
 ind_rates = c(2,5,7,9)
 
 
+
+
 for(r in ind_rates){
-  file = paste0("false_negatives-traj-k",k,"-l",l,"-rho1",rho1,"-rate",r,".pdf")
+  rate = rList[r]
+  file = paste0("erreurSigma-traj-k",k,"-l",l,"-rho1",rho1,"-rate",rate,".pdf")
+  setwd("~")
+  pdf(file,width = 8, height = 6) 
+  
+  
+  plot(x_vals,erreursSigmaMed5[,r,3,1],     type = "l", lwd = 4, col= "red",
+       xlab = "", ylab = "",   # Pas de label
+       yaxt = "n", xaxt = "n", # On masque les axes par défaut
+       log = "y",              # Échelle logarithmique Y
+       ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
+  )
+  lines(x_vals,erreursSigmaMed5[,r,1,1],lty = "dotted",col = "darkgreen",lwd = 4)
+  
+  lines(x_vals,erreursSigmaMed5[,r,2,1],lty = "dashed",col = "blue",lwd = 4)
+  
+  #lines(x_vals,taux_fn_cum[,r,4]*100,lty = "dotted",col = "orange",lwd = 4)
+  # Axe Y logarithmique lisible
+  log_ticks <- 10^seq(-1, 2, by = 1)
+  axis(2, at = log_ticks,
+       labels = parse(text = paste0("10^", -1:2)),
+       las = 1, cex.axis = 2.3)
+  
+  axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis =2.3)
+  dev.off()
+}
+
+
+for(r in ind_rates){
+  rate = rList[r]
+  file = paste0("false_negatives-traj-k",k,"-l",l,"-rho1",rho1,"-rate",rate,".pdf")
   setwd("~")
   pdf(file,width = 8, height = 6) 
   
@@ -943,11 +975,11 @@ for(r in ind_rates){
      #log = "y",              # Échelle logarithmique Y
      ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
 )
-lines(x_vals,taux_fn_cum[,m,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
+lines(x_vals,taux_fn_cum[,r,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
 
-lines(x_vals,taux_fn_cum[,m,2]*100,lty = "dashed",col = "blue",lwd = 4)
+lines(x_vals,taux_fn_cum[,r,2]*100,lty = "dashed",col = "blue",lwd = 4)
 
-lines(x_vals,taux_fn_cum[,m,4]*100,lty = "dotted",col = "orange",lwd = 4)
+lines(x_vals, taux_fn_cum[,r,4]*100, lty = "longdash", col = "purple4", lwd = 4)
 axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 1.8)
 
 axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
@@ -968,11 +1000,11 @@ for(r in ind_rates){
        #log = "y",              # Échelle logarithmique Y
        ylim = c(0, 10)     # Plage Y adaptée à tes ticks log
   )
-  lines(x_vals,taux_fp_cum[,m,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
+  lines(x_vals,taux_fp_cum[,r,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
   
-  lines(x_vals,taux_fp_cum[,m,2]*100,lty = "dashed",col = "blue",lwd = 4)
+  lines(x_vals,taux_fp_cum[,r,2]*100,lty = "dashed",col = "blue",lwd = 4)
   
-  lines(x_vals,taux_fp_cum[,m,4]*100,lty = "dotted",col = "orange",lwd = 4)
+  lines(x_vals, taux_fp_cum[,r,4]*100, lty = "longdash", col = "purple4", lwd = 4)
   axis(2, at = seq(0, 10, by = 5), las = 1,cex.axis = 1.8)
   
   axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
@@ -1010,9 +1042,9 @@ lines(x_vals, resFar5Online$taux_outliers_detectes_vrais,
 lines(x_vals, resFar5Streaming$taux_outliers_detectes_vrais,
       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
 
-# Ligne invisible (orange)
+# Ligne invisible (purple4)
 lines(x_vals, resFar5Naive$taux_outliers_vrais,
-      lwd = 4, col = adjustcolor("orange", alpha.f = 0), type = "l")
+      lwd = 4, col = adjustcolor("purple4", alpha.f = 0), type = "l")
 
 # --- Axes manuels
 
@@ -1051,9 +1083,9 @@ lines(x_vals, resFar20Online$taux_outliers_detectes_vrais,
 lines(x_vals, resFar20Streaming$taux_outliers_detectes_vrais,
       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
 
-# Ligne invisible (orange)
+# Ligne invisible (purple4)
 lines(x_vals, resFar20Naive$taux_outliers_vrais,
-      lwd = 4, col = adjustcolor("orange", alpha.f = 0), type = "l")
+      lwd = 4, col = adjustcolor("purple4", alpha.f = 0), type = "l")
 
 # --- Axes manuels
 
