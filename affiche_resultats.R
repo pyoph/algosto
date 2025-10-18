@@ -945,9 +945,9 @@ for(r in ind_rates){
 )
 lines(x_vals,taux_fn_cum[,m,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
 
-lines(x_vals,taux_fn_cum[,9,2]*100,lty = "dashed",col = "blue",lwd = 4)
+lines(x_vals,taux_fn_cum[,m,2]*100,lty = "dashed",col = "blue",lwd = 4)
 
-lines(x_vals,taux_fn_cum[,9,4]*100,lty = "dotted",col = "orange",lwd = 4)
+lines(x_vals,taux_fn_cum[,m,4]*100,lty = "dotted",col = "orange",lwd = 4)
 axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 1.8)
 
 axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
@@ -970,9 +970,9 @@ for(r in ind_rates){
   )
   lines(x_vals,taux_fp_cum[,m,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
   
-  lines(x_vals,taux_fp_cum[,9,2]*100,lty = "dashed",col = "blue",lwd = 4)
+  lines(x_vals,taux_fp_cum[,m,2]*100,lty = "dashed",col = "blue",lwd = 4)
   
-  lines(x_vals,taux_fp_cum[,9,4]*100,lty = "dotted",col = "orange",lwd = 4)
+  lines(x_vals,taux_fp_cum[,m,4]*100,lty = "dotted",col = "orange",lwd = 4)
   axis(2, at = seq(0, 10, by = 5), las = 1,cex.axis = 1.8)
   
   axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
