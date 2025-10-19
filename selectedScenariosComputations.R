@@ -870,6 +870,46 @@ setwd("~")
 file = paste0("results-k-",k,"l-",l,"rho1",rho1,".Rdata")
 save(erreursSigmaMed5,faux_negatifsOracleMed5,faux_positifsOracleMed5,faux_negatifsMed5,faux_positifsMed5,outliersLabelsMed5,labelsVraisMed5,file = file)
 
+
+#########################Moyenne erreurs, faux négatifs, faux positifs###############################################################
+moyenne_erreursSigmaNear = apply(erreursSigmaNear,c(1,2,3),mean)
+moyenne_erreursSigmaMed = apply(erreursSigmaMed,c(1,2,3),mean)
+moyenne_erreursSigmaMed2 = apply(erreursSigmaMed2,c(1,2,3),mean)
+moyenne_erreursSigmaMed3 = apply(erreursSigmaMed3,c(1,2,3),mean)
+moyenne_erreursSigmaMed4 = apply(erreursSigmaMed4,c(1,2,3),mean)
+moyenne_erreursSigmaMed5 = apply(erreursSigmaMed5,c(1,2,3),mean)
+
+moyenne_faux_positifsNear = apply(faux_positifsNear,c(1,2),mean) 
+moyenne_faux_positifsOracleNear = apply(faux_positifsOracle,c(1,2),mean)
+moyenne_faux_positifsOracleMed  = apply(faux_positifsOracleMed,c(1,2),mean)
+moyenne_faux_positifsMed = apply(faux_positifsMed,c(1,2),mean) 
+moyenne_faux_positifsOracleMed2  = apply(faux_positifsOracleMed2,c(1,2),mean)
+moyenne_faux_positifsMed2 = apply(faux_positifsMed2,c(1,2),mean) 
+moyenne_faux_positifsOracleMed3  = apply(faux_positifsOracleMed3,c(1,2),mean)
+moyenne_faux_positifsMed3 = apply(faux_positifsMed3,c(1,2),mean) 
+moyenne_faux_positifsOracleMed4  = apply(faux_positifsOracleMed4,c(1,2),mean)
+moyenne_faux_positifsMed4 = apply(faux_positifsMed4,c(1,2),mean)
+moyenne_faux_positifsOracleMed5  = apply(faux_positifsOracleMed5,c(1,2),mean)
+moyenne_faux_positifsMed5 = apply(faux_positifsMed5,c(1,2),mean) 
+
+
+moyenne_faux_negatifsNear = apply(faux_negatifsNear,c(1,2),mean) 
+moyenne_faux_negatifsOracleNear = apply(faux_negatifsOracle,c(1,2),mean)
+moyenne_faux_negatifsMed = apply(faux_negatifsMed,c(1,2),mean) 
+moyenne_faux_negatifsOracleMed = apply(faux_negatifsOracleMed,c(1,2),mean)
+moyenne_faux_negatifsMed2 = apply(faux_negatifsMed2,c(1,2),mean) 
+moyenne_faux_negatifsOracleMed2 = apply(faux_negatifsOracleMed2,c(1,2),mean)
+moyenne_faux_negatifsMed3 = apply(faux_negatifsMed3,c(1,2),mean) 
+moyenne_faux_negatifsOracleMed3 = apply(faux_negatifsOracleMed3,c(1,2),mean)
+moyenne_faux_negatifsMed4 = apply(faux_negatifsMed4,c(1,2),mean) 
+moyenne_faux_negatifsOracleMed4 = apply(faux_negatifsOracleMed4,c(1,2),mean)
+moyenne_faux_negatifsMed5 = apply(faux_negatifsMed5,c(1,2),mean) 
+moyenne_faux_negatifsOracleMed5 = apply(faux_negatifsOracleMed5,c(1,2),mean)
+
+
+majority_vote_Far <- ifelse(apply(outliersLabelsMed5, c(1,2,3), function(x) sum(x) >= 50), 1, 0)
+
+
 #########################Trajectoires faux négatifs, faux positifs far#############################################
 
 faux_negatifsFarTrajMed5 = array(0,dim = c(n,length(rList),4,simNb))
@@ -882,9 +922,9 @@ for(m in seq_along(rList)){
   for (i in (1:n))
 {
     for(l in (1:3)){
-  if ( labelsVraisMed5[i,m] == 1 & outliersLabelsMed5[i,m,l,1] == 0){faux_negatifsFarTrajMed5[i,m,l,1] = 1}
+  if ( labelsVraisMed5[i,m] == 1 & majority_vote_Far[i,m,l] == 0){faux_negatifsFarTrajMed5[i,m,l,1] = 1}
     
-   if (labelsVraisMed5[i,m] == 0 & outliersLabelsMed5[i,m,l,1] == 1){faux_positifsFarTrajMed5[i,m,l,1] = 1
+   if (labelsVraisMed5[i,m] == 0 & majority_vote_Far[i,m,l] == 1){faux_positifsFarTrajMed5[i,m,l,1] = 1
    print(paste0("FP l =",l))}
         
       }
@@ -928,27 +968,5 @@ for (i in (1:n))
   }}
       }
 
-
-#########################Moyenne erreurs, faux négatifs, faux positifs###############################################################
-moyenne_erreursSigmaFar = apply(erreursSigmaFar,c(1,2,3),mean)
-moyenne_erreursSigmaMed = apply(erreursSigmaMed,c(1,2,3),mean)
-moyenne_erreursSigmaNear = apply(erreursSigmaNear,c(1,2,3),mean)
-moyenne_erreursSigmaId = apply(erreursSigmaId,c(1,2,3),mean)
-
-
-
-moyenne_faux_positifsFar = apply(faux_positifsFar,c(1,2),mean) 
-moyenne_faux_positifsMed = apply(faux_positifsMed,c(1,2),mean) 
-moyenne_faux_positifsNear = apply(faux_positifsNear,c(1,2),mean) 
-moyenne_faux_positifsId = apply(faux_positifsId,c(1,2),mean) 
-    
-
-moyenne_faux_negatifsFar = apply(faux_negatifsFar,c(1,2),mean) 
-moyenne_faux_negatifsMed = apply(faux_negatifsMed,c(1,2),mean) 
-moyenne_faux_negatifsNear = apply(faux_negatifsNear,c(1,2),mean) 
-moyenne_faux_negatifsId = apply(faux_negatifsId,c(1,2),mean) 
-
-
-majority_vote_Far <- ifelse(apply(outliersLabelsFar, c(1,2,3), function(x) sum(x) >= 50), 1, 0)
 
 

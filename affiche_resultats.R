@@ -338,10 +338,6 @@ axis(2)
 dev.off()
 
 
-######################################################################
-#######Affichage des erreurs d'estimation de Sigma
-######################################################################
-
 #######################################################False positives and false negatives and Sigma error final########################################
 
 k = k1val[2]; l = l1valup1[2];rho1 = rho1val[2]
@@ -350,7 +346,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:9], faux_negatifsNear[2:9,3,1]/((rList[2:9]/100)*n)*100,
+plot(rList[2:9], moyenne_faux_negatifsNear[2:9,3]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -359,9 +355,9 @@ plot(rList[2:9], faux_negatifsNear[2:9,3,1]/((rList[2:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[2:9], faux_negatifsNear[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:9], faux_negatifsNear[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracle[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[2:9], moyenne_faux_negatifsNear[2:9,2]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], moyennes_faux_negatifs_Near[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], moyenne_faux_negatifsOracleNear[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -382,7 +378,7 @@ setwd("~")
 pdf(file,width = 8, height = 6) 
 
 
-plot(rList[1:9], faux_positifsNear[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsNear[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -391,9 +387,9 @@ plot(rList[1:9], faux_positifsNear[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsNear[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsNear[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsNearOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -416,7 +412,7 @@ file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList[1:9], erreursSigmaNear[n,1:9 , 3, 1],
+plot(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 3],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -425,8 +421,8 @@ plot(rList[1:9], erreursSigmaNear[n,1:9 , 3, 1],
 )
 
 # Autres courbes
-lines(rList[1:9], erreursSigmaNear[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList[1:9], erreursSigmaNear[n, 1:9, 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n, 1:9, 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaNear[n, 1:9, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -448,7 +444,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:9], faux_negatifsMed[2:9,3,1]/((rList[2:9]/100)*n)*100,
+plot(rList[2:9], moyenne_faux_negatifsMed[2:9,3]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -457,9 +453,9 @@ plot(rList[2:9], faux_negatifsMed[2:9,3,1]/((rList[2:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[2:9], faux_negatifsMed[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:9], faux_negatifsMed[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[2:9], moyenne_faux_negatifsMed[2:9,2]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], moyenne_faux_negatifsMed[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], moyenne_faux_negatifsOracleMed[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -481,7 +477,7 @@ setwd("~")
 pdf(file,width = 8, height = 6) 
 
 
-plot(rList[1:9], faux_positifsMed[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsMed[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -490,9 +486,9 @@ plot(rList[1:9], faux_positifsMed[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsMed[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsMed[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsOracleMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -514,7 +510,7 @@ file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList[1:9], erreursSigmaMed[n, 1:9, 3, 1],
+plot(rList[1:9], moyenne_erreursSigmaMed[n, 1:9, 3],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -523,8 +519,8 @@ plot(rList[1:9], erreursSigmaMed[n, 1:9, 3, 1],
 )
 
 # Autres courbes
-lines(rList[1:9], erreursSigmaMed[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList[1:9], erreursSigmaMed[n,1:9 , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed[n, 1:9, 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaMed[n,1:9 , 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -546,7 +542,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:9], faux_negatifsMed2[2:9,3,1]/((rList[2:9]/100)*n)*100,
+plot(rList[2:9], moyenne_faux_negatifsMed2[2:9,3]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -555,9 +551,9 @@ plot(rList[2:9], faux_negatifsMed2[2:9,3,1]/((rList[2:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[2:9], faux_negatifsMed2[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:9], faux_negatifsMed2[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed2[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[2:9], moyenne_faux_negatifsMed2[2:9,2]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], moyenne_faux_negatifsMed2[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], moyenne_faux_negatifsOracleMed2[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -576,7 +572,7 @@ setwd("~")
 pdf(file,width = 8, height = 6) 
 
 
-plot(rList[1:9], faux_positifsMed2[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsMed2[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -585,9 +581,9 @@ plot(rList[1:9], faux_positifsMed2[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsMed2[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsMed2[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed2[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed2[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed2[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsOracleMed2[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -608,7 +604,7 @@ file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList[1:9], erreursSigmaMed[n, 1:9, 3, 1],
+plot(rList[1:9], moyenne_erreursSigmaMed2[n, 1:9, 3],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -617,8 +613,8 @@ plot(rList[1:9], erreursSigmaMed[n, 1:9, 3, 1],
 )
 
 # Autres courbes
-lines(rList[1:9], erreursSigmaMed[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList[1:9], erreursSigmaMed[n,1:9 , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed2[n, 1:9, 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaMed2[n,1:9 , 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -641,7 +637,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:9], faux_negatifsMed3[2:9,3,1]/((rList[2:9]/100)*n)*100,
+plot(rList[2:9], moyenne_faux_negatifsMed3[2:9,3]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -650,9 +646,9 @@ plot(rList[2:9], faux_negatifsMed3[2:9,3,1]/((rList[2:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[2:9], faux_negatifsMed3[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:9], faux_negatifsMed3[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed3[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[2:9], moyenne_faux_negatifsMed3[2:9,2]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], moyenne_faux_negatifsMed3[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], moyenne_faux_negatifsOracleMed3[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -673,7 +669,7 @@ pdf(file,width = 8, height = 6)
 
 setwd("~")
 
-plot(rList[1:9], faux_positifsMed3[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsMed3[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -682,9 +678,9 @@ plot(rList[1:9], faux_positifsMed3[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsMed3[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsMed3[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed3[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed3[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed3[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsOracleMed3[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -708,7 +704,7 @@ file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 pdf(file, width = 8, height = 6)
 
 # Plot principal — axe Y en log (automatique)
-plot(rList[1:9], erreursSigmaMed3[n, 1:9, 3, 1],
+plot(rList[1:9], moyenne_erreursSigmaMed3[n, 1:9, 3],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -717,8 +713,8 @@ plot(rList[1:9], erreursSigmaMed3[n, 1:9, 3, 1],
 )
 
 # Autres courbes
-lines(rList[1:9], erreursSigmaMed3[n,1:9 , 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList[1:9], erreursSigmaMed3[n,1:9 , 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed3[n,1:9 , 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaMed3[n,1:9 , 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -742,7 +738,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:9], faux_negatifsMed4[2:9,3,1]/((rList[2:9]/100)*n)*100,
+plot(rList[2:9], moyenne_faux_negatifsMed4[2:9,3]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -751,9 +747,9 @@ plot(rList[2:9], faux_negatifsMed4[2:9,3,1]/((rList[2:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[2:9], faux_negatifsMed4[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:9], faux_negatifsMed4[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed4[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[2:9], moyenne_faux_negatifsMed4[2:9,2]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], moyenne_faux_negatifsMed4[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], moyenne_faux_negatifsOracleMed4[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -775,7 +771,7 @@ pdf(file,width = 8, height = 6)
 
 setwd("~")
 
-plot(rList[1:9], faux_positifsMed4[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsMed4[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -784,9 +780,9 @@ plot(rList[1:9], faux_positifsMed4[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsMed4[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsMed4[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed4[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed4[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed4[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsOracleMed4[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -801,10 +797,15 @@ axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
 
+setwd("~")
+
+file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
+
+pdf(file, width = 8, height = 6)
 
 
 # Plot principal — axe Y en log (automatique)
-plot(rList[1:9], erreursSigmaMed4[n,1:9 , 3, 1],
+plot(rList[1:9], moyenne_erreursSigmaMed4[n,1:9 , 3],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -813,8 +814,8 @@ plot(rList[1:9], erreursSigmaMed4[n,1:9 , 3, 1],
 )
 
 # Autres courbes
-lines(rList[1:9], erreursSigmaMed4[n, 1:9, 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList[1:9], erreursSigmaMed4[n, 1:9, 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed4[n, 1:9, 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaMed4[n, 1:9, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -837,7 +838,7 @@ file = paste0("false_negatives_final-k",k,"-l",l,"-rho1",rho1,".pdf")
 setwd("~")
 pdf(file,width = 8, height = 6) 
 
-plot(rList[2:9], faux_negatifsMed5[2:9,3,1]/((rList[2:9]/100)*n)*100,
+plot(rList[2:9], moyenne_faux_negatifsMed5[2:9,3]/((rList[2:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -846,9 +847,9 @@ plot(rList[2:9], faux_negatifsMed5[2:9,3,1]/((rList[2:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[2:9], faux_negatifsMed5[2:9,2,1]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[2:9], faux_negatifsMed5[2:9,1,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[2:9], faux_negatifsOracleMed5[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[2:9], moyenne_faux_negatifsMed5[2:9,2]/((rList[2:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[2:9], moyenne_faux_negatifsMed5[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], moyenne_faux_negatifsOracleMed5[2:9,1]/((rList[2:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -869,7 +870,7 @@ pdf(file,width = 8, height = 6)
 
 
 # Plot principal — axe Y en log (automatique)
-plot(rList[1:9], erreursSigmaMed5[n,1:9 , 3, 1],
+plot(rList[1:9], moyenne_erreursSigmaMed5[n,1:9 , 3],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
      yaxt = "n", xaxt = "n",
@@ -878,8 +879,8 @@ plot(rList[1:9], erreursSigmaMed5[n,1:9 , 3, 1],
 )
 
 # Autres courbes
-lines(rList[1:9], erreursSigmaMed5[n,1:9 , 2, 1], lwd = 4, col = "blue", lty = "dashed")
-lines(rList[1:9], erreursSigmaMed5[n, 1:9, 1, 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9 , 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n, 1:9, 1], lwd = 4, col = "darkgreen", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -899,7 +900,7 @@ setwd("~")
 pdf(file,width = 8, height = 6) 
 
 
-plot(rList[1:9], faux_positifsMed5[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsMed5[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -908,9 +909,9 @@ plot(rList[1:9], faux_positifsMed5[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsMed5[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsMed5[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsOracleMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple4", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
@@ -1013,219 +1014,197 @@ for(r in ind_rates){
 ##################################Cumulative outlier detection###################################
 
 ########################Cumulative outlier detection###################
-
-
-resFar5Naive = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,1],5)
-resFar5Online = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,2],5)
-resFar5Streaming = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,3],5)
-
-# Données supposées : n correspond à la taille de resFar5Naive$taux_outliers_detectes_vrais
-x_vals <- 1:n
-
-setwd("~")
-
-file = paste0("cumulativeOutlierDetFarr5",".png")
-png(file, width = 1800, height = 1200, res = 200)
-# --- Plot principal (échelle log sur X)
-plot(x_vals, resFar5Naive$taux_outliers_detectes_vrais,
-     type = "l", lwd = 4, lty = "dotted",
-     xlab = "", ylab = "",
-     yaxt = "n", xaxt = "n",
-     ylim = c(0, 100),
-     col = "darkgreen",
-     log = "x"        # <=== Échelle logarithmique sur l’axe X
-)
-
-# --- Autres lignes
-lines(x_vals, resFar5Online$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
-lines(x_vals, resFar5Streaming$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
-
-# Ligne invisible (purple4)
-lines(x_vals, resFar5Naive$taux_outliers_vrais,
-      lwd = 4, col = adjustcolor("purple4", alpha.f = 0), type = "l")
-
-# --- Axes manuels
-
-# Axe X (logarithmique)
-log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
-axis(1, at = log_ticks_x,
-     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
-     las = 1, cex.axis = 2)
-
-# Axe Y (linéaire)
-axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
-dev.off() 
-
-setwd("~")
-
-file = paste0("cumulativeOutlierDetFarr20",".png")
-png(file, width = 1800, height = 1200, res = 200)
-resFar20Naive = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,1],20)
-resFar20Online = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,2],20)
-resFar20Streaming = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,3],20)
-x_vals <- 1:n
-
-# --- Plot principal (échelle log sur X)
-plot(x_vals, resFar20Naive$taux_outliers_detectes_vrais,
-     type = "l", lwd = 4, lty = "dotted",
-     xlab = "", ylab = "",
-     yaxt = "n", xaxt = "n",
-     ylim = c(0, 100),
-     col = "darkgreen",
-     log = "x"        # <=== Échelle logarithmique sur l’axe X
-)
-
-# --- Autres lignes
-lines(x_vals, resFar20Online$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
-lines(x_vals, resFar20Streaming$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
-
-# Ligne invisible (purple4)
-lines(x_vals, resFar20Naive$taux_outliers_vrais,
-      lwd = 4, col = adjustcolor("purple4", alpha.f = 0), type = "l")
-
-# --- Axes manuels
-
-# Axe X (logarithmique)
-log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
-axis(1, at = log_ticks_x,
-     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
-     las = 1, cex.axis = 2)
-
-# Axe Y (linéaire)
-axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
-
-dev.off()
-
-setwd("~")
-
-file = paste0("cumulativeOutlierDetFarr30",".png")
-png(file, width = 1800, height = 1200, res = 200)
-
-resFar30Naive = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,1],30)
-resFar30Online = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,2],30)
-resFar30Streaming = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,3],30)
-
-# --- Plot principal (échelle log sur X)
-plot(x_vals, resFar30Naive$taux_outliers_detectes_vrais,
-     type = "l", lwd = 4, lty = "dotted",
-     xlab = "", ylab = "",
-     yaxt = "n", xaxt = "n",
-     ylim = c(0, 100),
-     col = "darkgreen",
-     log = "x"        # <=== Échelle logarithmique sur l’axe X
-)
-
-# --- Autres lignes
-lines(x_vals, resFar30Online$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
-lines(x_vals, resFar30Streaming$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
-
-# Ligne invisible (orange)
-lines(x_vals, resFar30Naive$taux_outliers_vrais,
-      lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
-
-# --- Axes manuels
-
-# Axe X (logarithmique)
-log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
-axis(1, at = log_ticks_x,
-     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
-     las = 1, cex.axis = 2)
-
-# Axe Y (linéaire)
-axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
-
-dev.off()
-
-resFar40Naive = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,1],50)
-resFar40Online = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,2],50)
-resFar40Streaming = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,3],50)
-
-setwd("~")
-
-file = paste0("cumulativeOutlierDetFarr40",".png")
-png(file, width = 1800, height = 1200, res = 200)
-
-
-# --- Plot principal (échelle log sur X)
-
-
-
-plot(x_vals, resFar40Naive$taux_outliers_detectes_vrais,
-     type = "l", lwd = 4, lty = "dotted",
-     xlab = "", ylab = "",
-     yaxt = "n", xaxt = "n",
-     ylim = c(0, 100),
-     col = "darkgreen",
-     log = "x"        # <=== Échelle logarithmique sur l’axe X
-)
-
-# --- Autres lignes
-lines(x_vals, resFar40Online$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
-lines(x_vals, resFar40Streaming$taux_outliers_detectes_vrais,
-      lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
-
-# Ligne invisible (orange)
-lines(x_vals, resFar40Naive$taux_outliers_vrais,
-      lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
-
-# --- Axes manuels
-
-# Axe X (logarithmique)
-log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
-axis(1, at = log_ticks_x,
-     labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
-     las = 1, cex.axis = 2)
-
-# Axe Y (linéaire)
-axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
-
-dev.off()
+# 
+# 
+# resFar5Naive = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,1],5)
+# resFar5Online = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,2],5)
+# resFar5Streaming = cumulativeOutlierDetection(labelsVraisFar[,2],majority_vote_Far[,2,3],5)
+# 
+# # Données supposées : n correspond à la taille de resFar5Naive$taux_outliers_detectes_vrais
+# x_vals <- 1:n
+# 
+# setwd("~")
+# 
+# file = paste0("cumulativeOutlierDetFarr5",".png")
+# png(file, width = 1800, height = 1200, res = 200)
+# # --- Plot principal (échelle log sur X)
+# plot(x_vals, resFar5Naive$taux_outliers_detectes_vrais,
+#      type = "l", lwd = 4, lty = "dotted",
+#      xlab = "", ylab = "",
+#      yaxt = "n", xaxt = "n",
+#      ylim = c(0, 100),
+#      col = "darkgreen",
+#      log = "x"        # <=== Échelle logarithmique sur l’axe X
+# )
+# 
+# # --- Autres lignes
+# lines(x_vals, resFar5Online$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+# lines(x_vals, resFar5Streaming$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
+# 
+# # Ligne invisible (purple4)
+# lines(x_vals, resFar5Naive$taux_outliers_vrais,
+#       lwd = 4, col = adjustcolor("purple4", alpha.f = 0), type = "l")
+# 
+# # --- Axes manuels
+# 
+# # Axe X (logarithmique)
+# log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+# axis(1, at = log_ticks_x,
+#      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+#      las = 1, cex.axis = 2)
+# 
+# # Axe Y (linéaire)
+# axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+# dev.off() 
+# 
+# setwd("~")
+# 
+# file = paste0("cumulativeOutlierDetFarr20",".png")
+# png(file, width = 1800, height = 1200, res = 200)
+# resFar20Naive = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,1],20)
+# resFar20Online = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,2],20)
+# resFar20Streaming = cumulativeOutlierDetection(labelsVraisFar[,5],majority_vote_Far[,5,3],20)
+# x_vals <- 1:n
+# 
+# # --- Plot principal (échelle log sur X)
+# plot(x_vals, resFar20Naive$taux_outliers_detectes_vrais,
+#      type = "l", lwd = 4, lty = "dotted",
+#      xlab = "", ylab = "",
+#      yaxt = "n", xaxt = "n",
+#      ylim = c(0, 100),
+#      col = "darkgreen",
+#      log = "x"        # <=== Échelle logarithmique sur l’axe X
+# )
+# 
+# # --- Autres lignes
+# lines(x_vals, resFar20Online$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+# lines(x_vals, resFar20Streaming$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
+# 
+# # Ligne invisible (purple4)
+# lines(x_vals, resFar20Naive$taux_outliers_vrais,
+#       lwd = 4, col = adjustcolor("purple4", alpha.f = 0), type = "l")
+# 
+# # --- Axes manuels
+# 
+# # Axe X (logarithmique)
+# log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+# axis(1, at = log_ticks_x,
+#      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+#      las = 1, cex.axis = 2)
+# 
+# # Axe Y (linéaire)
+# axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+# 
+# dev.off()
+# 
+# setwd("~")
+# 
+# file = paste0("cumulativeOutlierDetFarr30",".png")
+# png(file, width = 1800, height = 1200, res = 200)
+# 
+# resFar30Naive = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,1],30)
+# resFar30Online = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,2],30)
+# resFar30Streaming = cumulativeOutlierDetection(labelsVraisFar[,7],majority_vote_Far[,7,3],30)
+# 
+# # --- Plot principal (échelle log sur X)
+# plot(x_vals, resFar30Naive$taux_outliers_detectes_vrais,
+#      type = "l", lwd = 4, lty = "dotted",
+#      xlab = "", ylab = "",
+#      yaxt = "n", xaxt = "n",
+#      ylim = c(0, 100),
+#      col = "darkgreen",
+#      log = "x"        # <=== Échelle logarithmique sur l’axe X
+# )
+# 
+# # --- Autres lignes
+# lines(x_vals, resFar30Online$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+# lines(x_vals, resFar30Streaming$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
+# 
+# # Ligne invisible (orange)
+# lines(x_vals, resFar30Naive$taux_outliers_vrais,
+#       lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
+# 
+# # --- Axes manuels
+# 
+# # Axe X (logarithmique)
+# log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+# axis(1, at = log_ticks_x,
+#      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+#      las = 1, cex.axis = 2)
+# 
+# # Axe Y (linéaire)
+# axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+# 
+# dev.off()
+# 
+# resFar40Naive = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,1],50)
+# resFar40Online = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,2],50)
+# resFar40Streaming = cumulativeOutlierDetection(labelsVraisFar[,11],majority_vote_Far[,11,3],50)
+# 
+# setwd("~")
+# 
+# file = paste0("cumulativeOutlierDetFarr40",".png")
+# png(file, width = 1800, height = 1200, res = 200)
+# 
+# 
+# # --- Plot principal (échelle log sur X)
+# 
+# 
+# 
+# plot(x_vals, resFar40Naive$taux_outliers_detectes_vrais,
+#      type = "l", lwd = 4, lty = "dotted",
+#      xlab = "", ylab = "",
+#      yaxt = "n", xaxt = "n",
+#      ylim = c(0, 100),
+#      col = "darkgreen",
+#      log = "x"        # <=== Échelle logarithmique sur l’axe X
+# )
+# 
+# # --- Autres lignes
+# lines(x_vals, resFar40Online$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("blue",alpha.f = 0.5), lty = "dashed")
+# lines(x_vals, resFar40Streaming$taux_outliers_detectes_vrais,
+#       lwd = 4, col = adjustcolor("red",alpha.f = 0.8), lty = "solid")
+# 
+# # Ligne invisible (orange)
+# lines(x_vals, resFar40Naive$taux_outliers_vrais,
+#       lwd = 4, col = adjustcolor("orange", alpha.f = 0.7), type = "l")
+# 
+# # --- Axes manuels
+# 
+# # Axe X (logarithmique)
+# log_ticks_x <- 10^seq(0, floor(log10(n)), by = 1)   # 1, 10, 100, 1000, ...
+# axis(1, at = log_ticks_x,
+#      labels = parse(text = paste0("10^", seq(0, floor(log10(n))))),
+#      las = 1, cex.axis = 2)
+# 
+# # Axe Y (linéaire)
+# axis(2, at = seq(0, 100, by = 10), las = 1, cex.axis = 2.5)
+# 
+# dev.off()
 
 
 # ##############################################
 # Temps calculs
 # ################# #############################
 
-temps_calculTout = res$temps_calcul
+boxplot(temps[1,], temps[2,], temps[3,], 
+        col = c("darkgreen", "blue", "red"), 
+        lwd = 2,
+        las = 1,
+        ylab = "",
+        xlab = "",
+        cex.axis = 2.2,
+        cex.lab = 2.5,
+        names = c("sample covariance", "online", "streaming"))
 
-
-# Méthodes et indices souhaités
-methodes <- c("sampleCovOnline", "samplecovTrimmed", "sampleCovOffline", "comedianeOffline",
-              "comedianeOfflineShrinkage", "OGK", "FASTMCD", "offline", "online", "streaming")
-
-# Indices à garder : 1, 2, 6 à 10
-indices_gardes <- c(1, 6, 7, 8, 9, 10)
-
-# Supposons que taux_index est défini
-taux_index <- 3  # par exemple
-
-# Extraction des données pour ce taux et méthodes sélectionnées
-temps_sel <- temps_calculTout[taux_index, indices_gardes, ]  # dims : méthodes sélectionnées x runs
-
-# Transformation en data frame long
-df_temps <- melt(temps_sel, varnames = c("MethodeIndex", "Run"), value.name = "Temps")
-
-# Remplacement par les noms des méthodes sélectionnées
-df_temps$Methode <- factor(df_temps$MethodeIndex, 
-                           levels = 1:length(indices_gardes), 
-                           labels = methodes[indices_gardes])
-
-# Plot boxplot
-ggplot(df_temps, aes(x = Methode, y = Temps)) +
-  geom_boxplot(fill = "lightblue", outlier.color = "red", outlier.shape = 1) +
-  labs(
-    title = "Boxplot of computation times",
-    x = "Method",
-    y = "Time (seconds)"
-  ) +
-  scale_y_log10() +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
+#   scale_y_log10() +
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# 
