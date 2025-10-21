@@ -100,6 +100,31 @@ KL <- function(parms1, parms2){
          t(parms2$mu-parms1$mu)%*%invSigma2%*%(parms2$mu-parms1$mu))[1, 1]
 }
 
+#Inverse with Shermann Morisson formula
+
+inverse_Schermann_Morisson = function(A,Z) 
+{
+  nbcol = ncol(A)
+  invA = diag(nbcol)
+  
+  
+  niter = nrow(Z)
+  
+  
+  for (i in (1:(niter-1)))
+  {
+    scal = 1 + t(Z[i+1,])%*%invA%*%Z[i+1,]
+    if(scal !=0){
+      invA = invA - 1/scal[1]*invA%*%(Z[i+1,]%*%t(Z[i+1,]))%*%invA}
+    
+  }
+  
+  
+  return (invA)
+  
+}
+
+
 test_outliers = function(distances,dim = 10,cutoff)
 {
   outlab = rep(0,length(distances))

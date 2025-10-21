@@ -81,7 +81,7 @@ SampleCovOnline = function(Z)
   
   meanIter[1,] = mean
   
-  
+  inSigma = diag(ncol(Z))  
   
   
 
@@ -105,27 +105,38 @@ SampleCovOnline = function(Z)
     meanOld = mean
     meanIter[i,] = mean
     SigmaIter[i,,] = Sigma
-    distances[i] = mahalanobis_generalizedRcpp(Z[i,],meanIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
+    #distances[i] = mahalanobis_generalizedRcpp(Z[i,],meanIter[i,],eigen(SigmaIter[i,,])$vectors, eigen(SigmaIter[i,,])$values)
     #distances[i] = mahalanobis(Z[i,],meanIter[i,],SigmaIter[i,,],inverted = FALSE)
+    #distances[i] = t(Z[i,] - meanIter[i,])%*%solve(SigmaIter[i,,])%*%(Z[i,] - meanIter[i,])
     
+    scal = 1 + t(Z[i+1,])%*%invSigma%*%Z[i+1,]
+    if(scal !=0){
+      invA = invA - 1/scal[1]*invSigma%*%(Z[i+1,]%*%t(Z[i+1,]))%*%invA}
+    distances[i] = t(Z[i,] - meanIter[i,])%*%invA%*%(Z[i,] - meanIter[i,])
     
     S = distances[i]
-
+    
+    if (S > cutoff) {outliers_labels[i] = 1
+    }  
+  }
+    
+    
+  
     # if(!is.nan(S)){
     # 
     # if (S > cutoff) {outliers_labels[i] = 1}}else{print("S = Nan ")}      
     # }
     # 
     #print(paste0("cutoff =",cutoff))
-    if (S > cutoff) {outliers_labels[i] = 1
-      }}
+    
   SigmaIter[nrow(Z),,] = Sigma
   meanIter[nrow(Z),] = mean
+  return(list(mean = mean, Sigma = Sigma, meanIter = meanIter, SigmaIter = SigmaIter,distances = distances, outliers_labels = outliers_labels))
   
+  }
 
   
-  return(list(mean = mean, Sigma = Sigma, meanIter = meanIter, SigmaIter = SigmaIter,distances = distances, outliers_labels = outliers_labels))
-}
+
 
 #Exclusion des valeurs propres trop grandes
 reduce_dimension = function(Sigma){
