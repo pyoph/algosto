@@ -111,7 +111,7 @@ SampleCovOnline = function(Z)
     
     scal = 1 + t(Z[i+1,])%*%invSigma%*%Z[i+1,]
     if(scal !=0){
-      invSigma = invSigma - 1/scal[1]*invSigma%*%(Z[i+1,]%*%t(Z[i+1,]))%*%invA}
+      invSigma = invSigma - 1/scal[1]*invSigma%*%(Z[i+1,]%*%t(Z[i+1,]))%*%invSigma}
     distances[i] = t(Z[i,] - meanIter[i,])%*%invSigma%*%(Z[i,] - meanIter[i,])
     
     S = distances[i]
