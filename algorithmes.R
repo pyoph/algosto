@@ -69,11 +69,24 @@ rep.row <- function(x, n){
 SampleCovOnline = function(Z)
 {
   nblignes = nrow(Z)
-  
+  n0 = 100 #Nombre données init
   # Initialisation avec les 2 premières données
-  mean = colMeans(Z[1:2, , drop = FALSE])        # moyenne empirique
+  mean = colMeans(Z[1:n0, , drop = FALSE])        # moyenne empirique
   meanOld = mean
-  Sigma = cov(Z[1:2, , drop = FALSE])            # covariance empirique
+  Sigma = cov(Z[1:n0, , drop = FALSE])            # covariance empirique
+  
+  M = 100*mean
+  
+  A = matrix(0,ncol(Z),ncol(Z))
+  
+  for (j in (1:n0))
+  {
+    A = A + (Z[j,] - mean)%*%t(Z[j,] - mean)
+  }
+  
+  B = solve(A)
+  
+  invSigma = n0*B
   
   meanIter = matrix(0, nrow(Z), ncol(Z))
   SigmaIter = array(0, dim = c(nrow(Z), ncol(Z), ncol(Z)))
@@ -97,9 +110,18 @@ SampleCovOnline = function(Z)
   outliers_labels = rep(0,nrow(Z))
   cutoff = qchisq(.95,df = ncol(Z))
   #nb_out= 0
-  for (i in (2:(nblignes-1)))
+  for (i in ((n0 + 1):(nblignes-1)))
   {
-
+    M = M + Z[i,]
+    Xbar = M/i
+    
+    U = Z[i,] - Xbar
+    
+    scal = 1 + t(U)%*%B%*%U
+    if(scal !=0){
+      
+      B = B - 1/scal[1]*(B%*%U)%*%(t(B%*%U))}
+    invSigma = i*B
     mean   = mean   + (1.0 / (i + 1)) * (Z[i+1,] - mean);
     Sigma = (i - 1)/i*Sigma + 1/(i + 1)*((Z[i+1,] - meanOld)%*%t(Z[i+1,] - meanOld))
     meanOld = mean
@@ -109,13 +131,10 @@ SampleCovOnline = function(Z)
     #distances[i] = mahalanobis(Z[i,],meanIter[i,],SigmaIter[i,,],inverted = FALSE)
     #distances[i] = t(Z[i,] - meanIter[i,])%*%solve(SigmaIter[i,,])%*%(Z[i,] - meanIter[i,])
     
-    scal = 1 + t(Z[i+1,])%*%invSigma%*%Z[i+1,]
-    if(scal !=0){
-      invSigma = invSigma - 1/scal[1]*invSigma%*%(Z[i+1,]%*%t(Z[i+1,]))%*%invSigma}
-    distances[i] = t(Z[i,] - meanIter[i,])%*%invSigma%*%(Z[i,] - meanIter[i,])
+      distances[i] = t(Z[i,] - meanIter[i,])%*%invSigma%*%(Z[i,] - meanIter[i,])
     
     S = distances[i]
-    
+  
     if (S > cutoff) {outliers_labels[i] = 1
     }  
   }
