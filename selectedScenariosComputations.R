@@ -36,6 +36,7 @@ faux_negatifsNear = array(0,dim = c(length(rList),3,simNb))
 faux_negatifsOracle = array(0,dim = c(length(rList),simNb))
 temps = array(0,dim = c(length(rList),3,simNb)) 
 
+cutoff = qchisq(.95,df = d)
 
 #Near scenario d = 10
 if(d == 10) {k = k1val[2];l=l1valup1[2];rho1 = rho1val[2]}
@@ -128,6 +129,7 @@ faux_negatifsNear[m,2,sim] = t[2,1]}
 if(r == 0){faux_positifsNear[m,2,sim] = t[1,2]}
 
 
+
 print(paste0("faux positifs near us online ",faux_positifsNear[m,2,sim]))
 
 print(paste0("faux négatifs near us online ",faux_negatifsNear[m,2,sim]))
@@ -142,15 +144,20 @@ resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)),cuto
 
 temps[m,3,sim] = temps_streaming[1]
 
+
+
 fitUSStreaming = resUsStreaming
 for(s in (1:n)){
 erreursSigmaNear[s,m,3,sim] =norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
+if(resUsOnline$distances[s] > cutoff){outliersLabelsNear[s,m,2,sim] = 1}
+if(resUsStreaming$distances[s] > cutoff){outliersLabelsNear[s,m,3,sim] = 1}
+}
 #outliersLabelsNear[s,m,3,sim] = resUsStreaming$outlier_labels[s]
-}
-if(d == 10){outliersLabelsNear[,m,3,sim]= resUsStreaming$outlier_labels}
-if(d == 100){
-outliersLabelsNear[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
-}
+# }
+# if(d == 10){outliersLabelsNear[,m,3,sim]= resUsStreaming$outlier_labels}
+# if(d == 100){
+# outliersLabelsNear[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
+# }
 print(paste0("Erreur us streaming near ",erreursSigmaNear[n,m,3,sim]))
 
 #t = table(data$labelsVrais,resUsStreaming$outlier_labels)
@@ -196,7 +203,7 @@ for (m in seq_along(rList)){
     r = rList[m]
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
     
-    print(dataFile)
+    print(dataFile )
     
     setwd(simDir)
     if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
