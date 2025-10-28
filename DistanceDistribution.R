@@ -63,84 +63,58 @@ compt = compt + 1
   }
 dev.off()
 
-contamin_rate = c(5,20,30,40)
-k = k1val[2]; l = l1valup1[2]; rho1 = rho1val[2]
+contamin_rate = c(0,5,20,40)
+k = k1val[3]; l = l1valup1[3]; rho1 = rho1val[3]
 # Distribution (log scale)
 U <- matrix(rnorm(d*B), B, d)
 X0 <- rmvnorm(B, mean=mu0, sigma=Sigma0)
 d0 <- rowSums((X0%*%Sigma0invHalf)^2)
 f0 <- density(log10(d0))
+
+cutoffcorr = rep(0,n)
+distancescorr = rep(0,n)
 xMin <- 1e-1; xMax <- 1e11
+distances = rep(0,n)
+outliers =matrix(0,n,length(contamin_rate))
+labelsvrais = matrix(0,n,length(contamin_rate))
+
 
 for (m in seq_along(contamin_rate) ){
 r = contamin_rate[m]
   contParam = ParmsF1(m1, k, l, rho1)
 data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
 resUsStreaming = StreamingOutlierDetection(data$Z,batch = ncol(data$Z))
-SigmaStr = resUsStreaming$Sigma[n,,]
-SigmaStreig <- eigen(SigmaStr)
-SigmaStrinvHalf <- SigmaStreig$vectors%*%diag(1/sqrt(SigmaStreig$values))%*%t(SigmaStreig$vectors)
-SigmaStrhalf <- SigmaStreig$vectors%*%diag(sqrt(SigmaStreig$values))%*%t(SigmaStreig$vectors)
+
+labelsvrais[,m] = data$labelsVrais
+
 file = paste0("distancedensity-r",r,".pdf")
 setwd("~")
 pdf(file,width = 8,height = 6)
 
-plot(f0, xlim=c(log10(xMin), log10(xMax)), ylim=c(0, 2.2),col = klcol[1], main='', lwd = "4")  
+plot(f0, xlim=c(log10(xMin), log10(xMax)), ylim=c(0, 2.2),col = "black", main='', lwd = "4")  
 
-d1 <- rowSums((X0%*%SigmaStrhalf)^2)
+d1 <- resUsStreaming$distances
 
 f1 = density(log10(d1))
-lines(f1$x,f1$y, col= "darkgreen",lwd = "4") 
+lines(f1$x,f1$y, col= adjustcolor("darkgreen", alpha.f = 0.6),lwd = "4") 
 
-d1corr = qchisq(p =.5,df = d)/median(resUsStreaming$distances[1:n])*d1
-
-f1corr = density(log10(d1corr))
-#lines(f1corr$x,f1corr$y, col= "darkred",lwd = "4")
-dev.off()
-
+for(j in (1:n)){
+  
+  cutoffcorr[j] = qchisq(p = .5,df = d)/median(d1[1:j])
+  
+  if (d1[j] > qchisq(p = .95,df = d)){outliers[j,m] = 1}
+  
+  distancescorr[j] = cutoffcorr[j]*d1[j]
 }
 
-# 
-# 
-# par(mar = c(4, 4, 2, 1))  # marges plus petites : bas, gauche, haut, droite
-# 
-# plot.new()
-# q0 <- quantile(d0, probs = .95)
-# 
-# abline(v = q0, lty = 2, col = 1)
-# 
-# # Stockage des quantiles
-# q95_vals <- numeric(klNb)
-# q95_vals[1] <- q0
-# 
-# # --- Boucle sur les distributions alternatives
-# for (kl in 2:klNb) {
-#   parms1 <- ParmsF1(m1 = m1, k1 = k1val[kl], l1 = l1val[kl], rho1 = rho1val[kl])
-#   X1 <- rmvnorm(B, mean = parms1$mu, sigma = parms1$Sigma)
-#   d1 <- rowSums((X1 %*% Sigma0invHalf)^2)
-#   f1 <- density(d1)
-#   
-#   lines(f1, col = kl)
-#   text(0.98 * f1$x[which.max(f1$y)], 1.02 * max(f1$y),
-#        labels = KLval[kl], col = kl)
-#   
-#   q95_vals[kl] <- quantile(d1, probs = .95)
-# }
-# 
-# legend("topright",
-#        legend = c("H0", paste0("KL=", KLval[2:klNb])),
-#        col = 1:klNb, lty = 1, cex = 0.8)
-# 
-# # --- Nouveau graphique : quantiles à 95 %
-# plot(1:klNb, q95_vals, type = "b", pch = 19, col = "blue",
-#      xlab = "Index du modèle (kl)",
-#      ylab = "Quantile à 95 %",
-#      main = "Quantiles 95% des distributions")
-# grid()
-# text(1:klNb, q95_vals,
-#      labels = round(q95_vals, 2),
-=======
-# KL divergence btw F0 and F1
+
+d1corr = distancescorr
+
+f1corr = density(log10(d1corr))
+lines(f1corr$x,f1corr$y, col= adjustcolor("darkred", alpha.f = 0.6),lwd = "4")
+dev.off()
+
+}#
 
 rm(list=ls()); par(pch=20, lwd=2)
 library(mvtnorm)
@@ -205,43 +179,3 @@ compt = compt + 1
   }
 dev.off()
 
-# 
-# 
-# par(mar = c(4, 4, 2, 1))  # marges plus petites : bas, gauche, haut, droite
-# 
-# plot.new()
-# q0 <- quantile(d0, probs = .95)
-# 
-# abline(v = q0, lty = 2, col = 1)
-# 
-# # Stockage des quantiles
-# q95_vals <- numeric(klNb)
-# q95_vals[1] <- q0
-# 
-# # --- Boucle sur les distributions alternatives
-# for (kl in 2:klNb) {
-#   parms1 <- ParmsF1(m1 = m1, k1 = k1val[kl], l1 = l1val[kl], rho1 = rho1val[kl])
-#   X1 <- rmvnorm(B, mean = parms1$mu, sigma = parms1$Sigma)
-#   d1 <- rowSums((X1 %*% Sigma0invHalf)^2)
-#   f1 <- density(d1)
-#   
-#   lines(f1, col = kl)
-#   text(0.98 * f1$x[which.max(f1$y)], 1.02 * max(f1$y),
-#        labels = KLval[kl], col = kl)
-#   
-#   q95_vals[kl] <- quantile(d1, probs = .95)
-# }
-# 
-# legend("topright",
-#        legend = c("H0", paste0("KL=", KLval[2:klNb])),
-#        col = 1:klNb, lty = 1, cex = 0.8)
-# 
-# # --- Nouveau graphique : quantiles à 95 %
-# plot(1:klNb, q95_vals, type = "b", pch = 19, col = "blue",
-#      xlab = "Index du modèle (kl)",
-#      ylab = "Quantile à 95 %",
-#      main = "Quantiles 95% des distributions")
-# grid()
-# text(1:klNb, q95_vals,
-#      labels = round(q95_vals, 2),
-#      pos = 3, cex = 0.8, col = "darkblue")
