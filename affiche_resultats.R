@@ -345,7 +345,91 @@ axis(1,cex.axis = 1.8)
 axis(2,cex.axis = 1.8)
 dev.off()
 
+########################Trajectoires####################
+x_vals = 1:n
 
+ind_rates = c(2,5,7,9)
+
+
+
+
+for(r in ind_rates){
+  rate = rList[r]
+  file = paste0("erreurSigma-traj-k",k,"-l",l,"-rho1",rho1,"-rate",rate,".pdf")
+  setwd("~")
+  pdf(file,width = 8, height = 6) 
+  
+  
+  plot(x_vals,erreursSigmaMed3[,r,3,1],     type = "l", lwd = 4, col= "red",
+       xlab = "", ylab = "",   # Pas de label
+       yaxt = "n", xaxt = "n", # On masque les axes par défaut
+       log = "y",              # Échelle logarithmique Y
+       ylim = c(1e-1, 1e2)     # Plage Y adaptée à tes ticks log
+  )
+  lines(x_vals,erreursSigmaMed3[,r,1,1],lty = "dotted",col = "darkgreen",lwd = 4)
+  
+  lines(x_vals,erreursSigmaMed3[,r,2,1],lty = "dashed",col = "blue",lwd = 4)
+  
+  #lines(x_vals,taux_fn_cum[,r,4]*100,lty = "dotted",col = "orange",lwd = 4)
+  # Axe Y logarithmique lisible
+  log_ticks <- 10^seq(-1, 2, by = 1)
+  axis(2, at = log_ticks,
+       labels = parse(text = paste0("10^", -1:2)),
+       las = 1, cex.axis = 2.3)
+  
+  axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis =2.3)
+  dev.off()
+}
+
+
+for(r in ind_rates){
+  rate = rList[r]
+  file = paste0("false_negatives-traj-k",k,"-l",l,"-rho1",rho1,"-rate",rate,".pdf")
+  setwd("~")
+  pdf(file,width = 8, height = 6) 
+  
+  
+  plot(x_vals,taux_fn_cum[,r,3]*100,     type = "l", lwd = 4, col= "red",
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 100)     # Plage Y adaptée à tes ticks log
+)
+lines(x_vals,taux_fn_cum[,r,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
+
+lines(x_vals,taux_fn_cum[,r,2]*100,lty = "dashed",col = "blue",lwd = 4)
+
+lines(x_vals, taux_fn_cum[,r,4]*100, lty = "longdash", col = "purple4", lwd = 4)
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 1.8)
+
+axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
+dev.off()
+}
+
+
+for(r in ind_rates){
+  rate = rList[r]
+  file = paste0("false_positives-traj-k",k,"-l",l,"-rho1",rho1,"-rate",rate,".pdf")
+  setwd("~")
+  pdf(file,width = 8, height = 6) 
+  
+  
+  plot(x_vals,taux_fp_cum[,r,3]*100,     type = "l", lwd = 4, col= "red",
+       xlab = "", ylab = "",   # Pas de label
+       yaxt = "n", xaxt = "n", # On masque les axes par défaut
+       #log = "y",              # Échelle logarithmique Y
+       ylim = c(0, 10)     # Plage Y adaptée à tes ticks log
+  )
+  lines(x_vals,taux_fp_cum[,r,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
+  
+  lines(x_vals,taux_fp_cum[,r,2]*100,lty = "dashed",col = "blue",lwd = 4)
+  
+  lines(x_vals, taux_fp_cum[,r,4]*100, lty = "longdash", col = "purple4", lwd = 4)
+  axis(2, at = seq(0, 10, by = 5), las = 1,cex.axis = 1.8)
+  
+  axis(1, at = seq(1000, max(x_vals), by = 1000), las = 1, cex.axis = 1.8)
+  dev.off()
+}
 ###########################Densités Khi2 pour différentes KL########################################
 
 ##############Densité Khi2 pour KL 1, 5,10,25################################################################
