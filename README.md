@@ -2,15 +2,15 @@
 
 
 
-Ce projet contient un pipeline de simulation en R destiné à estimer onlinede manière robuste la matrice de variance, et à détecter les outliers.
+Ce projet contient un pipeline de simulation en R destiné à estimer online de manière robuste la matrice de variance, et à détecter les outliers.
 
 ## Structure du projet
 
-Le projet s'articule autour de cinq fichiers principaux :
+Le projet s'articule autour de quatre fichiers principaux :
 
 ### 0. `loadnecessary.R`
 
-- **Rôle** : charge les packages et fonctions nécessaires et les packages nécessaires : Rcpp, RMM, Gmedian, MASS, ggplot2, cowplot, patchwork
+- **Rôle** : charge les packages et fonctions nécessaires et les packages nécessaires
 
 ### 1. `parametres.R`
 
@@ -24,15 +24,8 @@ Le projet s'articule autour de cinq fichiers principaux :
     ```
     où chaque variable représente un paramètre de simulation.
 
-### 2. `DataSimul.R`
 
-- **Rôle** : Génère les données simulées à partir des fichiers de paramètres.
-- **Entrée** :
-  - Fichiers `.Rdata` produits par `parametres.R`.
-- **Sortie** :
-  - Fichiers de données simulées (`dataFile`, au format `.Rdata`).
-
-### 3. `algorithmes.R`
+### 2. `algorithmes.R`
 
 - **Rôle** : Lance les méthodes d'estimation et de détection d'outlier concurrentes : cov online naïf, shrinkage selon les idées de Wolf et de Cabana.
 - **Entrée** :
@@ -40,24 +33,8 @@ Le projet s'articule autour de cinq fichiers principaux :
 - **Sortie** :
   - Estimateur de $\Sigma$ : $\widehat{\Sigma}$ final et à chaque itération pour méthodes online, outliers_labels (vecteurs où l'entrée $i$ si la donnée $i$ traitée est un outlier, $0$ sinon.
 
-### 3. `fitParameters.R`
-
-- **Rôle** : Ajuste les modèles aux données simulées.
-- **Entrée** :
-  - Fichier de données simulées (`dataFile`).
-- **Sortie** :
-  - Fichier de résultats d’ajustement (`fitFile`), contenant les paramètres estimés.
-
-### 4. `exploitationResults.R`
-
-- **Rôle** : Exploite les résultats de l’ajustement pour évaluer les performances.
-- **Entrée** :
-  - Fichier `fitFile` produit par `fitParameters.R`.
-- **Sortie** :
-  - Fichiers d’erreurs (ex. : erreurs de classification ou estimation).
-
   
-### 5. `affiche_resultats.R`
+### 3. `affiche_resultats.R`
 
 - **Rôle** : Graphiques (scénarios de contamination, erreurs norme de Frobenius matrice de covariance, faux positifs, faux négatifs)
 - **Entrée** :
