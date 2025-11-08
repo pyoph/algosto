@@ -895,12 +895,16 @@ moyenne_faux_positifsMed2Oracle = apply(faux_positifsOracleMed2,c(1,2),mean)
 moyenne_faux_positifsMed3Oracle = apply(faux_positifsOracleMed3,c(1,2),mean) 
 
 majority_vote_Med3 = array(0,dim = c(n,length(rList),4))
-majority_vote_Med3NotOracle = array(0,dim = c(n,rList,3))
-majority_vote_Med3NotOracle <- ifelse(apply(outliersLabelsMed3, c(1,2,3), function(x) sum(x) >= 50), 1, 0)
-majority_vote_Med3[,,1:3] = majority_vote_Med3NotOracle
-majority_vote_Med3Oracle <- ifelse(apply(outliersLabelsOracleMed3, c(1,2,3), function(x) sum(x) >= 50), 1, 0)
-majority_vote_Med3[,,4] = majority_vote_Med3Oracle
+majority_vote_Med3NotOracle <- array(0, dim = c(n, length(rList), 3))
+majority_vote_Med3NotOracle <- apply(outliersLabelsMed3, c(2, 3), function(x) {
+  ifelse(mean(x) >= 0.5, 1, 0)
+})
 
+majority_vote_Med3[,,1:3] <- majority_vote_Med3NotOracle
+majority_vote_Med3Oracle <- apply(outliersLabelsOracleMed3, c(2, 3), function(x) {
+  ifelse(mean(x) >= 0.5, 1, 0)
+})
+majority_vote_Med3[,,4] <- majority_vote_Med3Oracle
 
 ######################Trajectories#################################
 
