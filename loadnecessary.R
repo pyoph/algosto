@@ -21,8 +21,7 @@ library(RMM)
 library(Gmedian)
 library(MASS)
 library(ggplot2)
-library(cowplot)
-library(patchwork)
+library(mvtnorm)
 library(binom)
 library(reshape2)
 library(dplyr)
@@ -33,7 +32,7 @@ library(scales)
 #################################
 source("~/algosto/algorithmes.R")
 sourceCpp("~/algosto/src/CodesRCpp.cpp")
-
+source('~/algosto/FunctionsKLgauss.R')
 
 #######################################################################
 #Simulation of a dataset with different parameters####################
