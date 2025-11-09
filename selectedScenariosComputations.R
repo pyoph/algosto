@@ -17,8 +17,6 @@ lList = l1valup1
 
 rho1List = rho1val
 
-rho1ListNeg = rho1valNeg
-
 sim = 1
 simNb = 1e2
 
@@ -218,7 +216,7 @@ for (m in seq_along(rList)){
       }
       
     }
-    outliersLabelsMed[,m,1,sim] = resNaif$outliers_labels[s]
+    outliersLabelsMed[,m,1,sim] = resNaif$outliers_labels
     
     print(paste0("Erreur naive med ",erreursSigmaMed[n,m,1,sim]))
     
@@ -357,7 +355,7 @@ for (m in seq_along(rList)){
       }
       
     }
-    outliersLabelsMed2[,m,1,sim] = resNaif$outliers_labels[s]
+    outliersLabelsMed2[,m,1,sim] = resNaif$outliers_labels
     
     print(paste0("Erreur naive med ",erreursSigmaMed2[n,m,1,sim]))
     
@@ -496,7 +494,7 @@ for (m in seq_along(rList)){
       }
       
     }
-    outliersLabelsMed3[,m,1,sim] = resNaif$outliers_labels[s]
+    outliersLabelsMed3[,m,1,sim] = resNaif$outliers_labels
     
     print(paste0("Erreur naive med ",erreursSigmaMed2[n,m,1,sim]))
     
@@ -894,18 +892,17 @@ moyenne_faux_positifsMedOracle = apply(faux_positifsOracleMed,c(1,2),mean)
 moyenne_faux_positifsMed2Oracle = apply(faux_positifsOracleMed2,c(1,2),mean) 
 moyenne_faux_positifsMed3Oracle = apply(faux_positifsOracleMed3,c(1,2),mean) 
 
+
+
 majority_vote_Med3 = array(0,dim = c(n,length(rList),4))
 majority_vote_Med3NotOracle <- array(0, dim = c(n, length(rList), 3))
-majority_vote_Med3NotOracle <- apply(outliersLabelsMed3, c(2, 3), function(x) {
+majority_vote_Med3NotOracle <- apply(outliersLabelsMed3, c(1, 2, 3), function(x) {
   ifelse(mean(x) >= 0.5, 1, 0)
 })
 
 majority_vote_Med3[,,1:3] <- majority_vote_Med3NotOracle
-majority_vote_Med3Oracle <- apply(outliersLabelsOracleMed3, c(2, 3), function(x) {
-  ifelse(mean(x) >= 0.5, 1, 0)
-})
+majority_vote_Med3Oracle <- ifelse(apply(outliersLabelsOracleMed3, c(1,2), function(x) sum(x) >= 50), 1, 0)
 majority_vote_Med3[,,4] <- majority_vote_Med3Oracle
-
 ######################Trajectories#################################
 
 faux_negatifsFarTrajMed3 = array(0,dim = c(n,length(rList),4))
