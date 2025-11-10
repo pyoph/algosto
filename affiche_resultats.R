@@ -766,4 +766,41 @@ for(r in ind_rates){
 
 
 
+# ##############################################
+# Temps calculs
+# ################# #############################
+setwd("~")
+file = paste("boxplotn", n, "d", d, ".pdf", sep = "")
+
+pdf(file = file, width = 8, height = 6)
+
+# tracer le boxplot sans axe y
+boxplot(temps[2,], temps[3,],
+        col = c("blue", "red"),
+        lwd = 2,
+        las = 1,
+        ylab = "",
+        xlab = "",
+        cex.axis = 2.2,
+        cex.lab = 2.2,
+        log = "y",                      # axe Y en log
+        ylim = c(1e-1, 100),               # de 1 à 100
+        names = c("online", "streaming"),
+        axes = FALSE)                   # désactive les axes par défaut
+
+# tracer l'axe X
+axis(1, at = 1:2, labels = c("online", "streaming"), cex.axis = 2.2)
+
+# Axe Y logarithmique (0.1, 1, 10, 100)
+y_ticks <- c(0.1, 1, 10, 100)
+axis(2, at = y_ticks,
+     labels = parse(text = c("10^-1", "10^0", "10^1", "10^2")),
+     las = 1, cex.axis = 2.1)
+
+
+# cadre autour du graphe
+box()
+
+dev.off()
+
 
