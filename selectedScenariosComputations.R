@@ -875,14 +875,19 @@ moyenne_erreursSigmaNear = apply(erreursSigmaNear,c(1,2,3),mean)
 moyenne_erreursSigmaMed = apply(erreursSigmaMed,c(1,2,3),mean)
 moyenne_erreursSigmaMed2 = apply(erreursSigmaMed2,c(1,2,3),mean)
 moyenne_erreursSigmaMed3 = apply(erreursSigmaMed3,c(1,2,3),mean)
-moyenne_faux_positifsNear = apply(faux_positifsNear,c(1,2),mean) 
 
 moyenne_faux_positifsNear = apply(faux_positifsNear,c(1,2),mean) 
 moyenne_faux_positifsMed = apply(faux_positifsMed,c(1,2),mean) 
 moyenne_faux_positifsMed2 = apply(faux_positifsMed2,c(1,2),mean) 
 moyenne_faux_positifsMed3 = apply(faux_positifsMed3,c(1,2),mean) 
 
+
 moyenne_faux_negatifsNear = apply(faux_negatifsNear,c(1,2),mean) 
+moyenne_faux_negatifsMed = apply(faux_negatifsMed,c(1,2),mean) 
+moyenne_faux_negatifsMed2 = apply(faux_negatifsMed2,c(1,2),mean) 
+moyenne_faux_negatifsMed3 = apply(faux_negatifsMed3,c(1,2),mean) 
+
+moyenne_faux_negatifsNearOracle = apply(faux_negatifsOracle,c(1,2),mean) 
 moyenne_faux_negatifsMedOracle = apply(faux_negatifsOracleMed,c(1,2),mean) 
 moyenne_faux_negatifsMed2Oracle = apply(faux_negatifsOracleMed2,c(1,2),mean) 
 moyenne_faux_negatifsMed3Oracle = apply(faux_negatifsOracleMed3,c(1,2),mean) 
@@ -891,8 +896,6 @@ moyenne_faux_positifsNearOracle = apply(faux_positifsOracle,c(1,2),mean)
 moyenne_faux_positifsMedOracle = apply(faux_positifsOracleMed,c(1,2),mean) 
 moyenne_faux_positifsMed2Oracle = apply(faux_positifsOracleMed2,c(1,2),mean) 
 moyenne_faux_positifsMed3Oracle = apply(faux_positifsOracleMed3,c(1,2),mean) 
-
-
 
 majority_vote_Med3 = array(0,dim = c(n,length(rList),4))
 majority_vote_Med3NotOracle <- array(0, dim = c(n, length(rList), 3))
@@ -903,6 +906,7 @@ majority_vote_Med3NotOracle <- apply(outliersLabelsMed3, c(1, 2, 3), function(x)
 majority_vote_Med3[,,1:3] <- majority_vote_Med3NotOracle
 majority_vote_Med3Oracle <- ifelse(apply(outliersLabelsOracleMed3, c(1,2), function(x) sum(x) >= 50), 1, 0)
 majority_vote_Med3[,,4] <- majority_vote_Med3Oracle
+######################
 ######################Trajectories#################################
 
 faux_negatifsFarTrajMed3 = array(0,dim = c(n,length(rList),4))

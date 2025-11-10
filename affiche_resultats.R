@@ -2,93 +2,14 @@
 #Affiche contamination scenarios
 ##################################################
 
-
-
-afficherContaminationScenarios = function(k,l,rho1,contamination,rate,a,b){
-  contParam = ParmsF1(m1, k, l, rho1)
-  
-    data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
-    
- Z = data$Z
- # Création d'un dataframe pour ggplot
- df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
-                  Label = factor(data$labelsVrais, levels = c(0, 1)))
- #Création du plot
- # Create the plot (English version)
- p <- ggplot(df, aes(x = X1, y = X2, color = Label, alpha = Label)) +
-   geom_point(size = 3) +
-   ylim(a,b) +
-   xlim(a,b) +
-   scale_color_manual(
-     values = c("0" = "blue", "1" = "red"),
-     labels = c("Inlier", "Outlier"),
-     name = "Status"
-   ) +
-   scale_alpha_manual(
-     values = c("0" = 0.5, "1" = 0.5),  
-     guide = "none"  # Hide alpha from legend
-   ) +
-   labs(
-     title = "",
-     subtitle = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
-     x = "",
-     y = ""
-   ) +
-   theme_minimal() +
-   theme(
-     legend.position = "bottom",
-     plot.title = element_text(face = "bold")
-   )
-  return(p)
-}
-
-a = -5
-b = 5
-
-k =k1val[1];l=l1val[1];rho1 = rho1val[1];
-rate  = 5
-contParam = ParmsF1(m1, k, l, rho1)
-
-data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
-
-
-Z = data$Z
-# Création d'un dataframe pour ggplot
-df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
-                 Label = factor(data$labelsVrais, levels = c(0, 1)))
-# Définir les couleurs selon le label
-cols <- ifelse(df$Label == 1, "red", "blue")
-
-# Définir les transparences (alpha = 0.5)
-# converti avec adjustcolor()
-cols <- adjustcolor(cols, alpha.f = 0.5)
-
-file = paste0("contaminScen_no_outlierr",rate,".pdf")
-
-pdf(file, width = 8, height = 6)  # Ouvre un device PDF
-
-# Créer le plot principal
-plot(df$X1, df$X2,
-     col = cols,
-     pch = 19,        # points pleins
-     cex = 1.2,       # taille des points
-     xlim = c(a, b),
-     ylim = c(a, b),
-     xlab = "",
-     ylab = "",
-     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
-     main = "",
-     xaxt = "n", yaxt = "n"  
-)
-
-axis(1,cex.axis = 1.8)
-
-axis(2,cex.axis = 1.8)
-dev.off()
+rate = 5
 
 ######KL = 1##########
 
+
 k =k1val[2];l=l1valup1[2];rho1 = rho1val[2];
+
+
 
 contParam = ParmsF1(m1, k, l, rho1)
 
@@ -104,6 +25,9 @@ cols <- ifelse(df$Label == 1, "red", "blue")
 # Définir les transparences (alpha = 0.5)
 # converti avec adjustcolor()
 cols <- adjustcolor(cols, alpha.f = 0.5)
+
+pch_vals <- ifelse(df$Label == 1, 4, 19)
+
 
 file = paste0("contaminScen","-k",k,"-l",l,"-rho1",rho1,"-r",rate,".pdf")
 
@@ -112,7 +36,7 @@ pdf(file, width = 8, height = 6)  # Ouvre un device PDF
 # Créer le plot principal
 plot(df$X1, df$X2,
      col = cols,
-     pch = 19,        # points pleins
+     pch = pch_vals ,
      cex = 1.2,       # taille des points
      xlim = c(a, b),
      ylim = c(a, b),
@@ -148,6 +72,9 @@ cols <- ifelse(df$Label == 1, "red", "blue")
 # converti avec adjustcolor()
 cols <- adjustcolor(cols, alpha.f = 0.5)
 
+pch_vals <- ifelse(df$Label == 1, 4, 19)
+
+
 file = paste0("contaminScen","-k",k,"-l",l,"-rho1",rho1,"-r",rate,".pdf")
 
 pdf(file, width = 8, height = 6)  # Ouvre un device PDF
@@ -155,7 +82,7 @@ pdf(file, width = 8, height = 6)  # Ouvre un device PDF
 # Créer le plot principal
 plot(df$X1, df$X2,
      col = cols,
-     pch = 19,        # points pleins
+     pch = pch_vals,        # points pleins
      cex = 1.2,       # taille des points
      xlim = c(a, b),
      ylim = c(a, b),
@@ -190,6 +117,8 @@ cols <- ifelse(df$Label == 1, "red", "blue")
 # converti avec adjustcolor()
 cols <- adjustcolor(cols, alpha.f = 0.5)
 
+pch_vals <- ifelse(df$Label == 1, 4, 19)
+
 file = paste0("contaminScen","-k",k,"-l",l,"-rho1",rho1,"-r",rate,".pdf")
 
 pdf(file, width = 8, height = 6)  # Ouvre un device PDF
@@ -197,7 +126,7 @@ pdf(file, width = 8, height = 6)  # Ouvre un device PDF
 # Créer le plot principal
 plot(df$X1, df$X2,
      col = cols,
-     pch = 19,        # points pleins
+     pch = pch_vals,        # points pleins
      cex = 1.2,       # taille des points
      xlim = c(a, b),
      ylim = c(a, b),
@@ -232,6 +161,8 @@ cols <- ifelse(df$Label == 1, "red", "blue")
 # Définir les transparences (alpha = 0.5)
 # converti avec adjustcolor()
 cols <- adjustcolor(cols, alpha.f = 0.5)
+
+pch_vals <- ifelse(df$Label == 1, 4, 19)
 
 file = paste0("contaminScen","-k",k,"-l",l,"-rho1",rho1,"-r",rate,".pdf")
 
@@ -242,8 +173,8 @@ pdf(file, width = 8, height = 6)  # Ouvre un device PDF
 # Créer le plot principal
 plot(df$X1, df$X2,
      col = cols,
-     pch = 19,        # points pleins
-     cex = 1.2,       # taille des points
+     pch = pch_vals,
+     cex = 1.2, 
      xlim = c(a, b),
      ylim = c(a, b),
      xlab = "",
@@ -259,50 +190,7 @@ axis(2,cex.axis = 1.8)
 dev.off()
 
 
-
-#################KL 25####################
-
-k =k1val[5];l=l1valup1[5];rho1 = rho1val[5];
-
-contParam = ParmsF1(m1, k, l, rho1)
-
-data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,rate )
-
-Z = data$Z
-# Création d'un dataframe pour ggplot
-df <- data.frame(X1 = data$Z[,1], X2 = data$Z[,2], 
-                 Label = factor(data$labelsVrais, levels = c(0, 1)))
-# Définir les couleurs selon le label
-cols <- ifelse(df$Label == 1, "red", "blue")
-
-# Définir les transparences (alpha = 0.5)
-# converti avec adjustcolor()
-cols <- adjustcolor(cols, alpha.f = 0.5)
-
-file = paste0("contaminScen","-k",k,"-l",l,"-rho1",rho1,"-r",rate,".pdf")
-
-pdf(file, width = 8, height = 6)  # Ouvre un device PDF
-
-# Créer le plot principal
-plot(df$X1, df$X2,
-     col = cols,
-     pch = 19,        # points pleins
-     cex = 1.2,       # taille des points
-     xlim = c(a, b),
-     ylim = c(a, b),
-     xlab = "",
-     ylab = "",
-     #main = paste("Rate:", rate, "%, k =", k, ", l =", l, ", rho1 =", rho1),
-     main = "",
-     xaxt = "n", yaxt = "n"  
-)
-
-axis(1,cex.axis = 1.8)
-
-axis(2,cex.axis = 1.8)
-dev.off()
-
-
+#########################Khi2 densities########################################
 # Dims
 d <- 10; KLval <- c(0, 1, 5, 10, 25, 50, 100)
 
@@ -325,7 +213,7 @@ B <- 1e6
 klcol = c("black","darkgreen","blue","purple","orange","red","brown")
 
 scen_names = c("d","c","b","a")
-  
+
 # Distribution (log scale)
 U <- matrix(rnorm(d*B), B, d)
 X0 <- rmvnorm(B, mean=mu0, sigma=Sigma0)
@@ -359,9 +247,9 @@ for(kl in 2:(klNb-2)){
   #   cex = 0.8
   # )
   if(kl != 1){
-  text(0.98*f1$x[which.max(f1$y)], 1.02*max(f1$y), labels= scen_names[kl-1], col=klcol[compt+1])}
-compt = compt + 1
-  }
+    text(0.98*f1$x[which.max(f1$y)], 1.02*max(f1$y), labels= scen_names[kl-1], col=klcol[compt+1])}
+  compt = compt + 1
+}
 dev.off()
 
 
