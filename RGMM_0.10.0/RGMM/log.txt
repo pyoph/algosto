@@ -1,0 +1,1382 @@
+starting worker pid=7064 on localhost:11063 at 14:14:32.345
+starting worker pid=27052 on localhost:11063 at 14:14:32.496
+starting worker pid=19752 on localhost:11063 at 14:14:32.646
+starting worker pid=23124 on localhost:11063 at 14:14:32.791
+starting worker pid=22736 on localhost:11063 at 14:14:32.943
+starting worker pid=16552 on localhost:11063 at 14:14:33.112
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+Warning messages:
+' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.2: package 'Gmedian' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+starting worker pid=23696 on localhost:11063 at 14:16:25.942
+starting worker pid=10368 on localhost:11063 at 14:16:26.084
+starting worker pid=12980 on localhost:11063 at 14:16:26.227
+starting worker pid=25256 on localhost:11063 at 14:16:26.368
+starting worker pid=23944 on localhost:11063 at 14:16:26.525
+starting worker pid=14824 on localhost:11063 at 14:16:26.703
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+1: package 'mvtnorm1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+starting worker pid=21632 on localhost:11063 at 14:21:30.587
+starting worker pid=11340 on localhost:11063 at 14:21:30.734
+starting worker pid=15608 on localhost:11063 at 14:21:30.884
+starting worker pid=17200 on localhost:11063 at 14:21:31.033
+starting worker pid=22440 on localhost:11063 at 14:21:31.179
+starting worker pid=20180 on localhost:11063 at 14:21:31.347
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+starting worker pid=27368 on localhost:11063 at 14:24:51.981
+starting worker pid=26760 on localhost:11063 at 14:24:52.130
+starting worker pid=13276 on localhost:11063 at 14:24:52.275
+starting worker pid=21188 on localhost:11063 at 14:24:52.426
+starting worker pid=18584 on localhost:11063 at 14:24:52.579
+starting worker pid=4444 on localhost:11063 at 14:24:52.751
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+ R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Error in unserialize(node$con) : erreur de lecture de la connexion
+Calls: <Anonymous> ... doTryCatch -> recvData -> recvData.SOCKnode -> unserialize
+De plus : Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Exécution arrêtée
+Error in unserialize(node$con) : erreur de lecture de la connexion
+Calls: <Anonymous> ... doTryCatch -> recvData -> recvData.SOCKnode -> unserialize
+De plus : Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Exécution arrêtée
+Error in unserialize(node$con) : erreur de lecture de la connexion
+Calls: <Anonymous> ... doTryCatch -> recvData -> recvData.SOCKnode -> unserialize
+De plus : Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Exécution arrêtée
+Error in unserialize(node$con) : erreur de lecture de la connexion
+Calls: <Anonymous> ... doTryCatch -> recvData -> recvData.SOCKnode -> unserialize
+De plus : Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Exécution arrêtée
+Error in unserialize(node$con) : erreur de lecture de la connexion
+Calls: <Anonymous> ... doTryCatch -> recvData -> recvData.SOCKnode -> unserialize
+De plus : Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Exécution arrêtée
+Error in unserialize(node$con) : erreur de lecture de la connexion
+Calls: <Anonymous> ... doTryCatch -> recvData -> recvData.SOCKnode -> unserialize
+De plus : Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Exécution arrêtée
+starting worker pid=5948 on localhost:11375 at 14:31:34.428
+starting worker pid=26128 on localhost:11375 at 14:31:34.585
+starting worker pid=18164 on localhost:11375 at 14:31:34.724
+starting worker pid=19148 on localhost:11375 at 14:31:34.873
+starting worker pid=28480 on localhost:11375 at 14:31:35.012
+starting worker pid=22588 on localhost:11375 at 14:31:35.179
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+Running for : K= 2 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+Warning messages:
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+starting worker pid=14716 on localhost:11375 at 14:33:02.888
+starting worker pid=25184 on localhost:11375 at 14:33:03.026
+starting worker pid=19868 on localhost:11375 at 14:33:03.165
+starting worker pid=23200 on localhost:11375 at 14:33:03.314
+starting worker pid=16552 on localhost:11375 at 14:33:03.459
+starting worker pid=23124 on localhost:11375 at 14:33:03.620
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+Running for : K= 2 
+Running for : K= 3 
+Running for : K= 4 
+Running for : K= 5 
+Warning messages:
+Warning messages:
+' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+6.3 
+4: package 'mixtools' was built under R version 3.6.3 2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+Warning messages:
+s' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+starting worker pid=23076 on localhost:11952 at 14:38:38.540
+starting worker pid=13184 on localhost:11952 at 14:38:38.700
+starting worker pid=9712 on localhost:11952 at 14:38:38.847
+starting worker pid=17404 on localhost:11952 at 14:38:39.035
+starting worker pid=20636 on localhost:11952 at 14:38:39.185
+starting worker pid=14700 on localhost:11952 at 14:38:39.354
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+Running for : K= 2 
+Running for : K= 3 
+Running for : K= 4 
+Running for : K= 5 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+.3 
+4: package 'mixtools' was built under R version 3.6.3 
+starting worker pid=26632 on localhost:11426 at 14:40:56.964
+starting worker pid=8604 on localhost:11426 at 14:40:57.110
+starting worker pid=28608 on localhost:11426 at 14:40:57.252
+starting worker pid=22464 on localhost:11426 at 14:40:57.406
+starting worker pid=13580 on localhost:11426 at 14:40:57.551
+starting worker pid=23780 on localhost:11426 at 14:40:57.713
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+Loading required package: RGMM
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+loaded RGMM and set parent environment
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+mixtools package, version 1.2.0, Released 2020-02-05
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+
+Attaching package: 'mixtools'
+
+The following objects are masked from 'package:mvtnorm':
+
+    dmvnorm, rmvnorm
+
+Running for : K= 2 
+Running for : K= 3 
+Running for : K= 4 
+Running for : K= 5 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+Warning messages:
+adillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+Warning messages:
+adillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 
+Warning messages:
+1: package 'mvtnorm' was built under R version 3.6.3 
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+1: package 'mvtnorm' was built under R version 3.6.3 
+
+2: package 'Gmedian' was built under R version 3.6.3 
+3: package 'RcppArmadillo' was built under R version 3.6.3 
+4: package 'mixtools' was built under R version 3.6.3 

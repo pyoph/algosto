@@ -2,7 +2,7 @@
 ######################################
 ################Packages nécessaires#####
 #########################################
-setwd("~/work/algosto")
+setwd("~/algosto")
 packages = c("Rcpp","Gmedian","MASS","DescTools" ,"checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales')
 #
 for (p in packages) {
@@ -30,9 +30,9 @@ library(scales)
 ############################
 #############FIchiers nécessaires
 #################################
-source("~/work/algosto/algorithmes.R")
-sourceCpp("~/work/algosto/src/CodesRCpp.cpp")
-source('~/work/algosto/FunctionsKLgauss.R')
+source("~/algosto/algorithmes.R")
+sourceCpp("~/algosto/src/CodesRCpp.cpp")
+source('~/algosto/FunctionsKLgauss.R')
 
 #######################################################################
 #Simulation of a dataset with different parameters####################
