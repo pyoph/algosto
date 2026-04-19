@@ -3,7 +3,7 @@
 ################Packages nécessaires#####
 #########################################
 setwd("~/algosto")
-packages = c("Rcpp","Gmedian","MASS","DescTools" ,"checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales')
+packages = c("Rcpp","Gmedian","MASS","DescTools" ,"checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales',"bookdown")
 #
 for (p in packages) {
    if (!requireNamespace(p, quietly = TRUE)) {
@@ -15,6 +15,8 @@ for (p in packages) {
 
 install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 install.packages("binom")
+install.packages("STARRS_1.0.tar.gz")
+
 
 library(Rcpp)
 library(RMM)
@@ -27,6 +29,8 @@ library(reshape2)
 library(dplyr)
 library(tidyr)
 library(scales)
+library("robustbase")
+library(STARRS)
 ############################
 #############FIchiers nécessaires
 #################################

@@ -4,9 +4,6 @@ resDir = "~/Simus/FitSim"
 
 explDir = "~/Simus/exploitResults"
 
-#setwd(resDir)
-
-
 ##########################################
 ###Extraction of the parameters
 ##########################################
@@ -98,7 +95,8 @@ for (m in seq_along(rList)){
     
     temps_online = system.time(
       {
-        if(d == 10 | d == 40){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        #if(d == 10 | d == 40){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        if(d == 10 | d == 40){resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE)}
         
         if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
       }
@@ -106,11 +104,11 @@ for (m in seq_along(rList)){
     
     temps[2,sim] = temps_online[3]
     fitUsOnline = resUsOnline
-    for(s in (1:n)){
-      erreursSigmaNear[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-      #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
-    }
-    
+    # for(s in (1:n)){
+    #   erreursSigmaNear[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+    #   #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
+    # }
+    erreursSigmaNear[n,m,2,sim] = norm(resUsOnline$variance - Sigma0,"F")     
     if(d == 10 | d == 40){outliersLabelsNear[,m,2,sim] = resUsOnline$outlier_labels}
     if(d == 100){outliersLabelsNear[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
     
@@ -131,6 +129,7 @@ for (m in seq_along(rList)){
     
     temps_streaming = system.time({
       if(d == 10 ){resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z))}
+      #if(d == 10 ){resUsStreaming= onlineRobustVariance(data$Z,batch = 10,computeOutliers = TRUE)}
       if(d == 40 ){resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z)/2)}
       
       if(d == 100){
@@ -140,10 +139,11 @@ for (m in seq_along(rList)){
     temps[3,sim] = temps_streaming[3]
     
     fitUSStreaming = resUsStreaming
-    for(s in (1:n)){
-      erreursSigmaNear[s,m,3,sim] =norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
-      #outliersLabelsNear[s,m,3,sim] = resUsStreaming$outlier_labels[s]
-    }
+     for(s in (1:n)){
+       erreursSigmaNear[s,m,3,sim] =norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
+      outliersLabelsNear[s,m,3,sim] = resUsStreaming$outlier_labels[s]
+     }
+    #erreursSigmaNear[n,m,3,sim] =norm(resUsStreaming$variance - Sigma0,"F")
     if(d ==10 | d == 40){outliersLabelsNear[,m,3,sim]= resUsStreaming$outlier_labels}
     if(d ==100){
       outliersLabelsNear[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
@@ -165,8 +165,9 @@ for (m in seq_along(rList)){
     Sigma_str = fitUSStreaming$Sigma
     
     
-    temps_offline = system.time({
-      resOffline = OfflineOutlierDetection(data$Z)}
+    temps_offline = system.time(
+      #{resOffline = OfflineOutlierDetection(data$Z)}
+      {resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE)}
     )
     
     erreursSigmaNear[n,m,4,sim] =norm(resOffline$variance - Sigma0,"F")
