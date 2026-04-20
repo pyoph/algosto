@@ -338,16 +338,18 @@ for (m in seq_along(rList)){
     
     temps_online = (
       {
-        if(d == 10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        #if(d == 10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        if(d == 10){resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE)}
         if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
       }
     )
     fitUsOnline = resUsOnline
-    for(s in (1:n)){
-      erreursSigmaMed[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-      #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
-    }
-    
+    # for(s in (1:n)){
+    #   erreursSigmaMed[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+    #   #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
+    # }
+    # 
+    erreursSigmaMed[n,m,2,sim] = norm(resUsOnline$variance - Sigma0,"F")
     if(d == 10){outliersLabelsMed[,m,2,sim] = resUsOnline$outlier_labels}
     if(d == 100){outliersLabelsMed[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
     
@@ -402,6 +404,7 @@ for (m in seq_along(rList)){
       resOffline = OfflineOutlierDetection(data$Z)}
     )
     
+   
     
     erreursSigmaMed[n,m,4,sim] =norm(resOffline$variance - Sigma0,"F")
     
@@ -577,16 +580,17 @@ for (m in seq_along(rList)){
     
     temps_online = (
       {
-        if(d ==10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        #if(d ==10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        if(d ==10){resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE)}
         if(d ==100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
       }
     )
     fitUsOnline = resUsOnline
-    for(s in (1:n)){
-      erreursSigmaMed2[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-      #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
-    }
-    
+    # for(s in (1:n)){
+    #   erreursSigmaMed2[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+    #   #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
+    # }
+    erreursSigmaMed2[n,m,2,sim] = norm(resUsOnline$variance - Sigma0,"F")
     if(d ==10){outliersLabelsMed2[,m,2,sim] = resUsOnline$outlier_labels}
     if(d ==100){outliersLabelsMed2[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
     
@@ -639,7 +643,7 @@ for (m in seq_along(rList)){
     
     
     temps_offline = system.time({
-      resOffline = OfflineOutlierDetection(data$Z)}
+      resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE)}
     )
     
     
@@ -796,6 +800,8 @@ for (m in seq_along(rList)){
     }
     print(paste0("Erreur naive med ",erreursSigmaMed3[n,m,1,sim]))
     
+    
+    
     t = table(data$labelsVrais,resNaif$outliers_labels)
      if (r != 0) {faux_positifsMed3[m,1,sim] =  t[1,2]
      faux_negatifsMed3[m,1,sim] = t[2,1]}
@@ -804,6 +810,13 @@ for (m in seq_along(rList)){
     print(paste0("faux positifs med naive ",faux_positifsMed3[m,1,sim]))
     
     print(paste0("faux négatifs med naive ",faux_negatifsMed3[m,1,sim]))
+    
+    for(s in (1:n)){
+      if(t(data$Z[s,])%*% solve(Sigma0)%*% data$Z[s,] > qchisq(.95,df = d)) {
+        outliersLabelsOracleMed3[s,m,sim] = 1
+      }
+      
+    }
     
     t = table(data$labelsVrais,outliersLabelsOracleMed3[,m,sim])
     if (r != 0) {faux_positifsOracleMed3[m,sim] =  t[1,2]
@@ -818,16 +831,17 @@ for (m in seq_along(rList)){
     
     temps_online = (
       {
-        if(d == 10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        #if(d == 10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+        if(d == 10){resUsOnline= onlineRobustVariance(data$Z,batch = 1, computeOutliers = TRUE)}
         if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
       }
     )
     fitUsOnline = resUsOnline
-    for(s in (1:n)){
-      erreursSigmaMed3[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
-      #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
-    }
-    
+    # for(s in (1:n)){
+    #   erreursSigmaMed3[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+    #   #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
+    # }
+    erreursSigmaMed3[n,m,2,sim] = norm(resUsOnline$variance - Sigma0,"F")
     if(d ==10){outliersLabelsMed3[,m,2,sim] = resUsOnline$outlier_labels}
     if(d ==100){outliersLabelsMed3[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
     
@@ -881,7 +895,9 @@ for (m in seq_along(rList)){
     
     
     temps_offline = system.time({
-      resOffline = OfflineOutlierDetection(data$Z)}
+     # resOffline = OfflineOutlierDetection(data$Z)
+      resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE)
+      }
     )
     
     
@@ -948,12 +964,9 @@ for (m in seq_along(rList)){
     
     print(paste0("temps OGK ",temps[6,sim]))
     
-    temps_ogk = system.time({
-      resOGK = covOGK(data$Z,sigmamu = scaleTau2)}
-    )
+ 
     
-    temps[6,sim] = temps_ogk[3]
-    
+
     erreursSigmaMed3[n,m,6,sim] =norm(resOGK$cov - Sigma0,"F")
     
     print(paste0("Erreur OGK med ",erreursSigmaMed3[n,m,6,sim]))
@@ -980,7 +993,6 @@ for (m in seq_along(rList)){
     #save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
   }
   
-}
 
 
 setwd("~")
