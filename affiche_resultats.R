@@ -269,11 +269,11 @@ k = k1val[2]; l = l1valup1[2]; rho1 = rho1val[2]
 
 setwd("~")
 
-file <- paste0("erreurs_Sigma_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
+file <- paste0("erreurs_Sigma_near-k", k, "-l", l, "-rho1", rho1, ".pdf")
 
 pdf(file, width = 8, height = 6)
 
-# Plot principal — axe Y en log (automatique)
+# Plot principal — axe Y en log 
 plot(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 3],
      type = "l", lwd = 4, col = "red",
      xlab = "", ylab = "",
@@ -283,16 +283,18 @@ plot(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 3],
 )
 
 # Autres courbes
-lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 3], lwd = 4, col = "blue", lty = "dashed")
-lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 3], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 4], lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 5], lwd = 5, col = "grey", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 6], lwd = 5, col = "brown", lty = "dotted")
 
-# Axe Y logarithmique lisible
+# Axe Y logarithmique 
 log_ticks <- 10^seq(-1, 2, by = 1)
 axis(2, at = log_ticks,
      labels = parse(text = paste0("10^", -1:2)),
      las = 1, cex.axis = 2.1)
 
-# Axe X (je suppose que tu veux une échelle régulière)
 x_ticks <- rList
 axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
 
@@ -302,7 +304,7 @@ dev.off()
 
 
 #False negatives
-
+""
 file = paste0("false_negatives_final-k", k, "-l", l, "-rho1", rho1, ".pdf")
 setwd("~")
 pdf(file, width = 8, height = 6)
@@ -311,8 +313,10 @@ epsilon <- 0
 y_red   <- moyenne_faux_negatifsNear[2:9,3]/((rList[2:9]/100)*n)*100
 y_blue  <- moyenne_faux_negatifsNear[2:9,2]/((rList[2:9]/100)*n)*100
 y_green <- moyenne_faux_negatifsNear[2:9,1]/((rList[2:9]/100)*n)*100
-y_purp  <- moyenne_faux_negatifsOracle[2:9,1]/((rList[2:9]/100)*n)*100
-
+y_purp  <- moyenne_faux_negatifsNearOracle[2:9,1]/((rList[2:9]/100)*n)*100
+y_orange <- moyenne_faux_negatifsNear[2:9,4]/((rList[2:9]/100)*n)*100
+y_grey <- moyenne_faux_negatifsNear[2:9,5]/((rList[2:9]/100)*n)*100
+y_brown <- moyenne_faux_negatifsNear[2:9,6]/((rList[2:9]/100)*n)*100
 
 # --- Échelle des ticks ---
 yticks <- c(0, 1, 10, 100)
@@ -323,9 +327,13 @@ plot(rList[2:9], pseudo_log(y_red),
      xlab = "", ylab = "", yaxt = "n", xaxt = "n",
      ylim = pseudo_log(c(0, 100))
 )
+
 lines(rList[2:9], pseudo_log(y_blue),  lwd = 4, col = "blue",      lty = "dashed")
 lines(rList[2:9], pseudo_log(y_green), lwd = 4, col = "darkgreen", lty = "dotted")
 lines(rList[2:9], pseudo_log(y_purp),  lwd = 4, col = "purple4",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_orange),  lwd = 4, col = "orange",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_grey),  lwd = 4, col = "grey",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_brown),  lwd = 4, col = "brown",    lty = "longdash")
 
 # --- Axes ---
 axis(1, at = rList[2:9], las = 1, cex.axis = 2.3)
@@ -343,7 +351,7 @@ setwd("~")
 pdf(file,width = 8, height = 6) 
 
 
-plot(rList[1:9], faux_positifsNear[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsNear[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -352,10 +360,12 @@ plot(rList[1:9], faux_positifsNear[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsNear[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsNear[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple", lty = "longdash")
-
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsNearOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,4]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,5]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "grey", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsNear[1:9,6]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "brown", lty = "longdash")
 
 x_ticks <- rList[2:length(rList)]
 axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
