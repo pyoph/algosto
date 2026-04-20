@@ -832,7 +832,7 @@ for (m in seq_along(rList)){
     temps_online = (
       {
         #if(d == 10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
-        if(d == 10){resUsOnline= onlineRobustVariance(data$Z,batch = 1, computeOutliers = TRUE)}
+        if(d == 10){resUsOnline= onlineRobustVariance(data$Z,batch = 1, nDataInit = 1e3,computeOutliers = TRUE)}
         if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
       }
     )

@@ -396,6 +396,9 @@ plot(rList[1:9], moyenne_erreursSigmaMed[n, 1:9, 3],
 # Autres courbes
 lines(rList[1:9], moyenne_erreursSigmaMed[n, 1:9, 2], lwd = 4, col = "blue", lty = "dashed")
 lines(rList[1:9], moyenne_erreursSigmaMed[n,1:9 ,1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 4], lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 5], lwd = 5, col = "grey", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaNear[n,1:9 , 6], lwd = 5, col = "brown", lty = "dotted")
 
 # Axe Y 
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -421,6 +424,9 @@ y_red   <- moyenne_faux_negatifsMed[2:9,3]/((rList[2:9]/100)*n)*100
 y_blue  <- moyenne_faux_negatifsMed[2:9,2]/((rList[2:9]/100)*n)*100
 y_green <- moyenne_faux_negatifsMed[2:9,1]/((rList[2:9]/100)*n)*100
 y_purp  <- moyenne_faux_negatifsMedOracle[2:9,1]/((rList[2:9]/100)*n)*100
+y_orange <- moyenne_faux_negatifsMed[2:9,4]/((rList[2:9]/100)*n)*100
+y_grey <- moyenne_faux_negatifsMed[2:9,5]/((rList[2:9]/100)*n)*100
+y_brown <- moyenne_faux_negatifsMed[2:9,6]/((rList[2:9]/100)*n)*100
 
 
 # --- Échelle des ticks ---
@@ -435,6 +441,9 @@ plot(rList[2:9], pseudo_log(y_red),
 lines(rList[2:9], pseudo_log(y_blue),  lwd = 4, col = "blue",      lty = "dashed")
 lines(rList[2:9], pseudo_log(y_green), lwd = 4, col = "darkgreen", lty = "dotted")
 lines(rList[2:9], pseudo_log(y_purp),  lwd = 4, col = "purple4",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_orange),  lwd = 4, col = "orange",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_grey),  lwd = 4, col = "grey",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_brown),  lwd = 4, col = "brown",    lty = "longdash")
 
 # --- Axes ---
 axis(1, at = rList[2:9], las = 1, cex.axis = 2.3)
@@ -452,7 +461,7 @@ setwd("~")
 pdf(file,width = 8, height = 6) 
 
 
-plot(rList[1:9], faux_positifsMed[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
+plot(rList[1:9], moyenne_faux_positifsMed[1:9,3]/((1 - rList[1:9]/100)*n)*100,
      type = "l", lwd = 4,col = "red", 
      xlab = "", ylab = "",   # Pas de label
      yaxt = "n", xaxt = "n", # On masque les axes par défaut
@@ -461,9 +470,12 @@ plot(rList[1:9], faux_positifsMed[1:9,3,1]/((1 - rList[1:9]/100)*n)*100,
 )
 # 
 # # Autres courbes
-lines(rList[1:9], faux_positifsMed[1:9,2,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
-lines(rList[1:9], faux_positifsMed[1:9,1,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
-lines(rList[1:9], faux_positifsOracleMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsMedOracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,4]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,5]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "grey", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed[1:9,6]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "brown", lty = "longdash")
 
 #  
 x_ticks <- rList[1:9]
@@ -492,6 +504,9 @@ plot(rList[1:9], moyenne_erreursSigmaMed2[n, 1:9, 3],
 # Autres courbes
 lines(rList[1:9], moyenne_erreursSigmaMed2[n, 1:9, 2], lwd = 4, col = "blue", lty = "dashed")
 lines(rList[1:9],moyenne_erreursSigmaMed2[n,1:9 , 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed2[n,1:9 , 4], lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed2[n,1:9 , 5], lwd = 5, col = "grey", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed2[n,1:9 , 6], lwd = 5, col = "brown", lty = "dotted")
 
 # Axe Y logarithmique lisible
 log_ticks <- 10^seq(-1, 2, by = 1)
@@ -518,6 +533,9 @@ y_red   <- moyenne_faux_negatifsMed2[2:9,3]/((rList[2:9]/100)*n)*100
 y_blue  <- moyenne_faux_negatifsMed2[2:9,2]/((rList[2:9]/100)*n)*100
 y_green <- moyenne_faux_negatifsMed2[2:9,1]/((rList[2:9]/100)*n)*100
 y_purp  <- moyenne_faux_negatifsMed2Oracle[2:9,1]/((rList[2:9]/100)*n)*100
+y_orange <- moyenne_faux_negatifsMed2[2:9,4]/((rList[2:9]/100)*n)*100
+y_grey <- moyenne_faux_negatifsMed2[2:9,5]/((rList[2:9]/100)*n)*100
+y_brown <- moyenne_faux_negatifsMed2[2:9,6]/((rList[2:9]/100)*n)*100
 
 
 # --- Échelle des ticks ---
@@ -532,6 +550,9 @@ plot(rList[2:9], pseudo_log(y_red),
 lines(rList[2:9], pseudo_log(y_blue),  lwd = 4, col = "blue",      lty = "dashed")
 lines(rList[2:9], pseudo_log(y_green), lwd = 4, col = "darkgreen", lty = "dotted")
 lines(rList[2:9], pseudo_log(y_purp),  lwd = 4, col = "purple4",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_orange),  lwd = 4, col = "orange",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_grey),  lwd = 4, col = "grey",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_brown),  lwd = 4, col = "brown",    lty = "longdash")
 
 # --- Axes ---
 axis(1, at = rList[2:9], las = 1, cex.axis = 2.3)
@@ -563,6 +584,9 @@ plot(rList[1:9], moyenne_faux_positifsMed2[1:9,3]/((1 - rList[1:9]/100)*n)*100,
 lines(rList[1:9], moyenne_faux_positifsMed2[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
 lines(rList[1:9], moyenne_faux_positifsMed2[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
 lines(rList[1:9], moyenne_faux_positifsMed2Oracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed2[1:9,4]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed2[1:9,5]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "grey", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed2[1:9,6]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "brown", lty = "longdash")
 
 #  
 # # Axe Y logarithmique
