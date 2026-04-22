@@ -80,6 +80,7 @@ genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
 genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers = NULL) {
   # InitialSisation
   Z = matrix(0,n,d)
+  
   n1 <- floor((1 -r/100) * n)  # Taille du groupe non contaminé
   n2 <- n - n1         # Taille du groupe contaminé
   labelsVrais = rep(0,n)
@@ -90,12 +91,15 @@ genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers =
  if(r > 0){ 
   # inliers
   idx_in <- setdiff(1:n, id_outliers)
-  print(paste0("length idx_in = ",length(idx_in)))
-  Z[idx_in, ] <- mvrnorm(n1, mu1, Sigma1)
+ # print(paste0("length idx_in = ",length(idx_in)))
+#  print(paste0("dim(Z) = ",dim(Z)[2]))
+  
+  Z[idx_in, ] <- mvrnorm(n1,mu1, Sigma1)
+  
   labelsVrais[idx_in] <- 0
   
   # outliers
-  Z[id_outliers, ] <- mvrnorm(n2, mu2, Sigma2)
+  Z[id_outliers, ] <- mvrnorm(n2,mu2, Sigma2)
   labelsVrais[id_outliers] <- 1
  }
   # 
@@ -120,7 +124,7 @@ genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers =
   
   
   
-  else {
+  else if (r == 0){
     # Pas de contamination
     Z <- mvrnorm(n, mu1, Sigma1)
     #labelsVrais <- rep(0, n)
