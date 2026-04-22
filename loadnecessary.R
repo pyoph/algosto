@@ -77,6 +77,64 @@ genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
 }
 
 
+genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers = NULL) {
+  # InitialSisation
+  Z = matrix(0,n,d)
+  n1 <- floor((1 -r/100) * n)  # Taille du groupe non contaminé
+  n2 <- n - n1         # Taille du groupe contaminé
+  labelsVrais = rep(0,n)
+  # labels_mu1 <- rep(0, n1)  # Labels pour les vecteurs avec moyenne mu1
+  # labels_mu2 <- rep(1, n2)  # Labels pour les vecteurs avec moyenne mu2
+  # 
+  #print(paste0("n1 = ",n1))
+ if(r > 0){ 
+  # inliers
+  idx_in <- setdiff(1:n, id_outliers)
+  print(paste0("length idx_in = ",length(idx_in)))
+  Z[idx_in, ] <- mvrnorm(n1, mu1, Sigma1)
+  labelsVrais[idx_in] <- 0
+  
+  # outliers
+  Z[id_outliers, ] <- mvrnorm(n2, mu2, Sigma2)
+  labelsVrais[id_outliers] <- 1
+ }
+  # 
+  # if (r > 0) {
+  #   # Générer les vecteurs selon le type de contamination
+  #   for (k in (1:n)){
+  #     if (k %in% id_outliers)
+  #       {
+  #      Z[k,] = mvrnorm(1, mu2, Sigma2)
+  #      labelsVrais[k] = 1
+  #     }
+  #     else {
+  #       Z[k,] = mvrnorm(1, mu1, Sigma1)
+  #     }
+  #   }
+  #   
+  #   
+    # # Combinaison des vecteurs
+    # Z <- rbind(vecteurs_mu1, vecteurs_mu2)
+    # labelsVrais <- c(labels_mu1, labels_mu2)  
+  
+  
+  
+  
+  else {
+    # Pas de contamination
+    Z <- mvrnorm(n, mu1, Sigma1)
+    #labelsVrais <- rep(0, n)
+  } # Mélanger aléatoirement les données
+#  set.seed(123)  # Pour garantir la reproductibilité
+  #indices <- sample(nrow(Z))
+  #Z <- Z[indices, ]
+  #labelsVrais <- labelsVrais[indices]
+  return(list(Z = Z,labelsVrais = labelsVrais))
+  
+  }
+  
+
+
 
 # Functions
 KL <- function(parms1, parms2){

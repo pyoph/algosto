@@ -7,7 +7,7 @@
 paramDir = "~/Documents/Simus/ParamsSim"
 
 
-rm(list=ls())
+#rm(list=ls())
 
 ###########################################################################
 ##########Output A file for parame   ters in d = 10 and in d = 100 such 
@@ -131,16 +131,16 @@ setwd("~/algosto")
 ######################################################################################################################
 #################################Parameter generations################################################################
 ######################################################################################################################
-
-
-# Saving of parameter files
-for(r in rList){for(k in k1val){for(l in l1val){for(rho1 in rho1val){
-  for(sim in 1:simNb){
-    set.seed(sim)
-    setwd(paramDir)
-    parmsFile <- paste0('Parms-d', d, '-n', n,  '-k', k, '-l', l, '-rho1', rho1, '-r', r,'-sim', sim,".Rdata")
-    # Sigma0 <- ; mu0 <- ; .....
-    save(n,d,k,l,rho1,r,file=parmsFile)
-  }
-}}}}
-
+# 
+# 
+# # Saving of parameter files
+# for(r in rList){for(k in k1val){for(l in l1val){for(rho1 in rho1val){
+#   for(sim in 1:simNb){
+#     set.seed(sim)
+#     setwd(paramDir)
+#     parmsFile <- paste0('Parms-d', d, '-n', n,  '-k', k, '-l', l, '-rho1', rho1, '-r', r,'-sim', sim,".Rdata")
+#     # Sigma0 <- ; mu0 <- ; .....
+#     save(n,d,k,l,rho1,r,file=parmsFile)
+#   }
+# }}}}
+# 
