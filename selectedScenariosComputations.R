@@ -999,6 +999,255 @@ setwd("~")
 
 file = paste0("results-k-",k,"l-",l,"rho1",rho1,"-d",d,".Rdata")
 save(erreursSigmaMed3,faux_negatifsOracleMed3,faux_positifsOracleMed3,faux_negatifsMed3,faux_positifsMed3,outliersLabelsOracleMed3,outliersLabelsMed3,labelsVraisMed3,file = file)
+
+
+
+k = k1val[4];l = l1valup1[1] ;rho1 = 0.995
+
+erreursSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
+erreursInvSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
+outliersLabelsMed5 = array(0,dim = c(n,length(rList),6,simNb))
+outliersLabelsOracleMed5 = array(0,dim = c(n,length(rList),simNb))
+labelsVraisMed5 = array(0,dim = c(n,length(rList)))
+faux_positifsMed5= array(0,dim = c(length(rList),6,simNb))
+faux_negatifsMed5 = array(0,dim = c(length(rList),6,simNb))
+faux_positifsOracleMed5 = array(0,dim = c(length(rList),simNb))
+faux_negatifsOracleMed5 = array(0,dim = c(length(rList),simNb))
+
+
+for (m in seq_along(rList)){
+  for(sim in(1:simNb)){
+    r = rList[m]
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
+    
+    print(dataFile)
+    
+    setwd(simDir)
+    if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
+    data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
+    #save(dataFile)
+    }
+    else{load(dataFile)}
+    labelsVraisMed5[,m] = data$labelsVrais
+    fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+    temps_naif = system.time(
+      
+      {resNaif = SampleCovOnline(data$Z)}
+    )
+    fitNaif = resNaif
+    erreursSigmaMed5[n,m,1,sim] = norm(resNaif$Sigma -Sigma0,"F")
+    outliersLabelsMed5[,m,1,sim] = resNaif$outliers_labels
+    # 
+    # for(s in (1:n)){
+    #   #   erreursSigmaMed3[s,m,1,sim] = norm(resNaif$SigmaIter[s,,] - Sigma0,"F")
+    #   if(t(data$Z[s,])%*% solve(Sigma0)%*% data$Z[s,] > qchisq(.95,df = d)) {
+    #     outliersLabelsOracleMed3[s,m,sim] = 1
+    #   }
+    
+  }
+  print(paste0("Erreur naive med ",erreursSigmaMed5[n,m,1,sim]))
+  
+  
+  
+  t = table(data$labelsVrais,resNaif$outliers_labels)
+  if (r != 0) {faux_positifsMed5[m,1,sim] =  t[1,2]
+  faux_negatifsMed5[m,1,sim] = t[2,1]}
+  if(r == 0){faux_positifsMed5[m,1,sim] =  t[1,2]}
+  # 
+  print(paste0("faux positifs med naive ",faux_positifsMed5[m,1,sim]))
+  
+  print(paste0("faux négatifs med naive ",faux_negatifsMed5[m,1,sim]))
+  
+  for(s in (1:n)){
+    if(t(data$Z[s,])%*% solve(Sigma0)%*% data$Z[s,] > qchisq(.95,df = d)) {
+      outliersLabelsOracleMed5[s,m,sim] = 1
+    }
+    
+  }
+  
+  t = table(data$labelsVrais,outliersLabelsOracleMed5[,m,sim])
+  if (r != 0) {faux_positifsOracleMed5[m,sim] =  t[1,2]
+  faux_negatifsOracleMed5[m,sim] = t[2,1]}
+  if(r == 0){faux_positifsOracleMed5[m,sim] =  t[1,2]}
+  
+  
+  print(paste0("faux positifs Oracle ",faux_positifsOracleMed5[m,sim]))
+  
+  print(paste0("faux négatifs Oracle ",faux_negatifsOracleMed5[m,sim]))
+  
+  
+  temps_online = (
+    {
+      #if(d == 10){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1)}
+      if(d == 10){resUsOnline= onlineRobustVariance(data$Z,batch = 1, nDataInit = 1e3,computeOutliers = TRUE)}
+      if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
+    }
+  )
+  fitUsOnline = resUsOnline
+  # for(s in (1:n)){
+  #   erreursSigmaMed3[s,m,2,sim] = norm(resUsOnline$Sigma[s,,] - Sigma0,"F")
+  #   #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
+  # }
+  erreursSigmaMed5[n,m,2,sim] = norm(resUsOnline$variance - Sigma0,"F")
+  if(d ==10){outliersLabelsMed5[,m,2,sim] = resUsOnline$outlier_labels}
+  if(d ==100){outliersLabelsMed5[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
+  
+  print(paste0("Erreur us online med ",erreursSigmaMed5[n,m,2,sim]))
+  
+  #t = table(data$labelsVrais,resUsOnline$outlier_labels)
+  t = table(data$labelsVrais,outliersLabelsMed5[,m,2,sim])
+  if (r != 0) {faux_positifsMed5[m,2,sim] =  t[1,2]
+  faux_negatifsMed5[m,2,sim] = t[2,1]}
+  if(r == 0){faux_positifsMed5[m,2,sim] = t[1,2]}
+  
+  
+  print(paste0("faux positifs med us online ",faux_positifsMed5[m,2,sim]))
+  
+  print(paste0("faux négatifs med us online ",faux_negatifsMed5[m,2,sim]))
+  
+  
+  
+  temps_streaming = system.time({
+    if(d == 10 ){
+      resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z))}
+    if(d == 100){
+      resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)))}
+  })
+  fitUSStreaming = resUsStreaming
+  for(s in (1:n)){
+    erreursSigmaMed5[s,m,3,sim] =norm(resUsStreaming$Sigma[s,,] - Sigma0,"F")
+    #outliersLabelsNear[s,m,3,sim] = resUsStreaming$outlier_labels[s]
+  }
+  if(d == 10){outliersLabelsMed5[,m,3,sim]= resUsStreaming$outlier_labels}
+  if(d == 100){
+    outliersLabelsMed5[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
+  }
+  print(paste0("Erreur us streaming med ",erreursSigmaMed5[n,m,3,sim]))
+  
+  #t = table(data$labelsVrais,resUsStreaming$outlier_labels)
+  t = table(data$labelsVrais,outliersLabelsMed5[,m,3,sim])
+  if(r == 0){faux_positifsMed5[m,3,sim] =  t[1,2]}
+  if (r != 0) {faux_positifsMed5[m,3,sim] =  t[1,2]
+  faux_negatifsMed5[m,3,sim] = t[2,1]}
+  
+  
+  print(paste0("faux positifs med us streaming ",faux_positifsMed5[m,3,sim]))
+  
+  print(paste0("faux négatifs med us streaming ",faux_negatifsMed5[m,3,sim]))
+  Sigma_naive = fitNaif$SigmaIter
+  Sigma_online = fitUsOnline$Sigma
+  Sigma_str = fitUSStreaming$Sigma
+  
+  print(paste0("Erreur mcd med  ",erreursSigmaMed5[n,m,5,sim]))
+  
+  
+  temps_offline = system.time({
+    # resOffline = OfflineOutlierDetection(data$Z)
+    resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE)
+  }
+  )
+  
+  
+  erreursSigmaMed5[n,m,4,sim] =norm(resOffline$variance - Sigma0,"F")
+  
+  print(paste0("Erreur us offline med ",erreursSigmaMed5[n,m,4,sim]))
+  
+  
+  outliersLabelsMed5[,m,4,sim]= resOffline$outlier_labels 
+  
+  # fitUsOnline = resUsOnline
+  temps[4,sim] = temps_offline[3]
+  
+  
+  print(paste0("temps offline ",temps[4,sim]))
+  
+  
+  t = table(data$labelsVrais,resOffline$outlier_labels)
+  if (r != 0) {faux_positifsMed5[m,4,sim] =  t[1,2]
+  faux_negatifsMed5[m,4,sim] = t[2,1]}
+  if(r == 0){faux_positifsMed5[m,4,sim] =  t[1,2]}
+  
+  print(paste0("faux positifs med offline ",faux_positifsMed5[m,4,sim]))
+  
+  print(paste0("faux négatifs med offline ",faux_negatifsMed5[m,4,sim]))
+  
+  
+  
+  temps_mcd = system.time({
+    resMcd = covMcd(data$Z)}
+  )
+  
+  erreursSigmaMed5[n,m,5,sim] =norm(resMcd$cov - Sigma0,"F")
+  
+  print(paste0("Erreur mcd med ",erreursSigmaMed5[n,m,5,sim]))
+  
+  for(s in (1:n))
+  {
+    if (t(data$Z[s,] - resMcd$center)%*%solve(resMcd$cov)%*%(data$Z[s,] - resMcd$center) > qchisq(.95,df = d)){outliersLabelsMed5[s,m,5,sim] = 1}
+  }
+  
+  
+  temps[5,sim] = temps_mcd[3]
+  
+  t = table(data$labelsVrais,outliersLabelsMed5[,m,5,sim] )
+  if (r != 0) {faux_positifsMed5[m,5,sim] =  t[1,2]
+  faux_negatifsMed5[m,5,sim] = t[2,1]}
+  if(r == 0){faux_positifsMed5[m,5,sim] =  t[1,2]}
+  
+  print(paste0("faux positifs med MCD ",faux_positifsMed5[m,5,sim]))
+  
+  print(paste0("faux négatifs med MCD ",faux_negatifsMed5[m,5,sim]))
+  
+  
+  
+  print(paste0("temps MCD ",temps[5,sim]))
+  
+  
+  temps_ogk = system.time({
+    resOGK = covOGK(data$Z,sigmamu = scaleTau2)}
+  )
+  
+  temps[6,sim] = temps_ogk[3]
+  
+  print(paste0("temps OGK ",temps[6,sim]))
+  
+  
+  
+  
+  erreursSigmaMed5[n,m,6,sim] =norm(resOGK$cov - Sigma0,"F")
+  
+  print(paste0("Erreur OGK med ",erreursSigmaMed5[n,m,6,sim]))
+  
+  
+  for(s in (1:n))
+  {
+    if (t(data$Z[s,] - resOGK$center)%*%solve(resOGK$cov)%*%(data$Z[s,] - resOGK$center) > qchisq(.95,df = d)){outliersLabelsMed5[s,m,6,sim] = 1}
+  }
+  
+  
+  t = table(data$labelsVrais,outliersLabelsMed5[,m,6,sim] )
+  if (r != 0) {faux_positifsMed5[m,6,sim] =  t[1,2]
+  faux_negatifsMed5[m,6,sim] = t[2,1]}
+  if(r == 0){faux_positifsMed5[m,6,sim] =  t[1,2]}
+  
+  print(paste0("faux positifs med OGK ",faux_positifsMed5[m,6,sim]))
+  
+  print(paste0("faux négatifs med OGK ",faux_negatifsMed5[m,6,sim]))
+  
+  
+  
+  setwd(resDir)
+  #save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
+}
+
+
+
+setwd("~")
+
+file = paste0("results-k-",k,"l-",l,"rho1",rho1,"-d",d,".Rdata")
+save(erreursSigmaMed5,faux_negatifsOracleMed5,faux_positifsOracleMed5,faux_negatifsMed5,faux_positifsMed5,outliersLabelsOracleMed5,outliersLabelsMed5,labelsVraisMed5,file = file)
+
+
 # 
 # #################Scen Med 4############################################
 # 

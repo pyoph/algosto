@@ -709,6 +709,114 @@ axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
 axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
 dev.off()
 
+k = k1val[4];l = l1valup1[1] ;rho1 = 0.995
+
+setwd("~")
+
+file <- paste0("erreurs_Sigma_final-am-k", k, "-l", l, "-rho1", rho1, ".pdf")
+
+pdf(file, width = 8, height = 6)
+
+# Plot principal — axe Y en log (automatique)
+plot(rList[1:9], moyenne_erreursSigmaMed5[n, 1:9, 3],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",                       # ✅ active l’échelle log pour Y
+     ylim = c(1e-1, 1e2)              # borne Y cohérente
+)
+
+# Autres courbes
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9 , 2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9 , 1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9 , 4], lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9 , 5], lwd = 5, col = "black", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9 , 6], lwd = 5, col = "brown", lty = "dotted")
+
+# Axe Y logarithmique lisible
+log_ticks <- 10^seq(-1, 2, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 2.1)
+
+# Axe X (je suppose que tu veux une échelle régulière)
+x_ticks <- rList[1:9]
+axis(1, at = x_ticks, las = 1, cex.axis = 2.3)
+
+box()  # bordure
+dev.off()
+
+
+
+
+#False negatives
+
+file = paste0("false_negatives_final-am-k", k, "-l", l, "-rho1", rho1, ".pdf")
+setwd("~")
+pdf(file, width = 8, height = 6)
+# --- Données transformées ---
+y_red   <- moyenne_faux_negatifsMed5[2:9,3]/((rList[2:9]/100)*n)*100
+y_blue  <- moyenne_faux_negatifsMed5[2:9,2]/((rList[2:9]/100)*n)*100
+y_green <- moyenne_faux_negatifsMed5[2:9,1]/((rList[2:9]/100)*n)*100
+y_purp  <- moyenne_faux_negatifsMed5Oracle[2:9,1]/((rList[2:9]/100)*n)*100
+y_orange <- moyenne_faux_negatifsMed5[2:9,4]/((rList[2:9]/100)*n)*100
+y_grey <- moyenne_faux_negatifsMed5[2:9,5]/((rList[2:9]/100)*n)*100
+y_brown <- moyenne_faux_negatifsMed5[2:9,6]/((rList[2:9]/100)*n)*100
+
+# --- Échelle des ticks ---
+yticks <- c(0, 1, 10, 100)
+
+# --- Plot principal ---
+plot(rList[2:9], pseudo_log(y_red),
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "", yaxt = "n", xaxt = "n",
+     ylim = pseudo_log(c(0, 100))
+)
+lines(rList[2:9], pseudo_log(y_blue),  lwd = 4, col = "blue",      lty = "dashed")
+lines(rList[2:9], pseudo_log(y_green), lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], pseudo_log(y_purp),  lwd = 4, col = "purple4",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_orange),  lwd = 4, col = "orange",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_grey),  lwd = 4, col = "black",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_brown),  lwd = 4, col = "brown",    lty = "longdash")
+
+# --- Axes ---
+axis(1, at = rList[2:9], las = 1, cex.axis = 2.3)
+axis(2, at = pseudo_log(yticks),
+     labels = c("0", expression(10^0), expression(10^1), expression(10^2)),
+     las = 1, cex.axis = 2.3)
+box()
+
+dev.off()
+
+file = paste0("false_positives_final-am-k",k,"-l",l,"-rho1",rho1,".pdf")
+setwd("~")
+pdf(file,width = 8, height = 6) 
+
+
+plot(rList[1:9], moyenne_faux_positifsMed5[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4,col = "red", 
+     xlab = "", ylab = "",   # Pas de label
+     yaxt = "n", xaxt = "n", # On masque les axes par défaut
+     #log = "y",              # Échelle logarithmique Y
+     ylim = c(0, 20)     # Plage Y adaptée à tes ticks log
+)
+# 
+# # Autres courbes
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,2]/((1 - rList[1:9]/100)*n)*100,lwd = 4,col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsMed5Oracle[1:9,1]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "purple", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,4]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "orange", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,5]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "black", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,6]/((1 - rList[1:9]/100)*n)*100,lwd = 4, col = "brown", lty = "longdash")
+
+#  
+x_ticks <- rList[1:9]
+axis(2, at = seq(0, 100, by = 5), las = 1,cex.axis = 2.3)
+
+axis(1, at = x_ticks,las = 1,cex.axis = 2.3)
+dev.off()
+
+
 
 
 
