@@ -818,7 +818,7 @@ dev.off()
 
 
 
-file <- paste0("plots_combined-k", k, "-l", l, "-rho1", rho1, ".pdf")
+file <- paste0("scen-k", k, "-l", l, "-rho1", rho1, ".pdf")
 
 pdf(file, width = 18, height = 6)  # largeur augmentée pour 3 plots
 par(mfrow = c(1, 3), mar = c(5, 5, 2, 1))  # 1 ligne, 3 colonnes
