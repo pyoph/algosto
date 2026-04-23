@@ -1009,7 +1009,7 @@ save(erreursSigmaMed3,faux_negatifsOracleMed3,faux_positifsOracleMed3,faux_negat
 
 
 
-k = 1e3;l = 0.1*l1valup1[1] ;rho1 = rho1val[7]
+k = KLval[3];l = l1val[6] ;rho1 = rho1val[1]
 erreursSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 erreursInvSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 outliersLabelsMed5 = array(0,dim = c(n,length(rList),6,simNb))
@@ -1114,7 +1114,7 @@ for (m in seq_along(rList)){
       #if(d == 10){
         #}
       #if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
-      resUsOnline= onlineRobustVariance(data$Z,batch = 1, nDataInit = 1e3,computeOutliers = TRUE)
+      resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE)
       
     })
   
@@ -1150,7 +1150,7 @@ for (m in seq_along(rList)){
     #   #resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z))
     # }
   #  if(d == 10 ){
-      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,nDataInit = 1e3)
+      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE)
    # }
     #if(d == 100){
     #  resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)))}
@@ -1189,7 +1189,7 @@ for (m in seq_along(rList)){
   
   
   temps_offline = system.time({
-    # resOffline = OfflineOutlierDetection(data$Z)
+    # resOffline = OfflineOutlierD etection(data$Z)
     resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE)
   }
   )
@@ -1200,7 +1200,7 @@ for (m in seq_along(rList)){
   print(paste0("Erreur us offline med ",erreursSigmaMed5[n,m,4,sim]))
   
   
-  outliersLabelsMed5[,m,4,sim]= resOffline$outlier_labels 
+  #outliersLabelsMed5[,m,4,sim]= resOffline$outlier_labels 
   
   # fitUsOnline = resUsOnline
   temps[4,sim] = temps_offline[3]
