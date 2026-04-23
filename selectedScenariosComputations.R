@@ -19,8 +19,8 @@ sim = 1
 simNb = 1
 
 
-for(k in k1val){
-l = l1val[1] ;rho1 = rho1val[1]
+for(l in l1valup1[2:(length(l1valup1)-1)]){
+k = k1val[1]; rho1 = rho1val[1]
 erreursSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 erreursInvSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 outliersLabelsMed5 = array(0,dim = c(n,length(rList),6,simNb))
