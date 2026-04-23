@@ -19,8 +19,8 @@ sim = 1
 simNb = 1
 
 
-
-k = KLval[3];l = l1val[6] ;rho1 = rho1val[1]
+for(k in k1val){
+l = l1val[1] ;rho1 = rho1val[1]
 erreursSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 erreursInvSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 outliersLabelsMed5 = array(0,dim = c(n,length(rList),6,simNb))
@@ -327,6 +327,97 @@ moyenne_faux_negatifsMed5Oracle = apply(faux_negatifsOracleMed5,c(1,2),mean)
 
 moyenne_faux_negatifsMed5Oracle = apply(faux_negatifsOracleMed5,c(1,2),mean) 
 
+
+# --- Transformation pseudo-log  ---
+pseudo_log <- function(y) {
+  return(log10(1+y))  
+}
+
+
+file <- paste0("scen-k", k, "-l", l, "-rho1", rho1, ".pdf")
+
+pdf(file, width = 18, height = 6)  # largeur augmentée pour 3 plots
+par(mfrow = c(1, 3), mar = c(5, 5, 2, 1))  # 1 ligne, 3 colonnes
+
+### --- 1. Sigma erreurs (log Y) ---
+plot(rList[1:9], moyenne_erreursSigmaMed5[n, 1:9, 3],
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     log = "y",
+     ylim = c(1e-1, 1e2)
+)
+
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9,2], lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9,1], lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9,4], lwd = 4, col = "orange", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9,5], lwd = 5, col = "black", lty = "dotted")
+lines(rList[1:9], moyenne_erreursSigmaMed5[n,1:9,6], lwd = 5, col = "brown", lty = "dotted")
+
+log_ticks <- 10^seq(-1, 2, by = 1)
+axis(2, at = log_ticks,
+     labels = parse(text = paste0("10^", -1:2)),
+     las = 1, cex.axis = 1.5)
+
+axis(1, at = rList[1:9], las = 1, cex.axis = 1.5)
+box()
+
+
+### --- 2. False negatives ---
+y_red   <- moyenne_faux_negatifsMed5[2:9,3]/((rList[2:9]/100)*n)*100
+y_blue  <- moyenne_faux_negatifsMed5[2:9,2]/((rList[2:9]/100)*n)*100
+y_green <- moyenne_faux_negatifsMed5[2:9,1]/((rList[2:9]/100)*n)*100
+y_purp  <- moyenne_faux_negatifsMed5Oracle[2:9,1]/((rList[2:9]/100)*n)*100
+y_orange <- moyenne_faux_negatifsMed5[2:9,4]/((rList[2:9]/100)*n)*100
+y_grey <- moyenne_faux_negatifsMed5[2:9,5]/((rList[2:9]/100)*n)*100
+y_brown <- moyenne_faux_negatifsMed5[2:9,6]/((rList[2:9]/100)*n)*100
+
+yticks <- c(0, 1, 10, 100)
+
+plot(rList[2:9], pseudo_log(y_red),
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     ylim = pseudo_log(c(0, 100))
+)
+
+lines(rList[2:9], pseudo_log(y_blue),  lwd = 4, col = "blue",      lty = "dashed")
+lines(rList[2:9], pseudo_log(y_green), lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[2:9], pseudo_log(y_purp),  lwd = 4, col = "purple4",   lty = "longdash")
+lines(rList[2:9], pseudo_log(y_orange),lwd = 4, col = "orange",    lty = "longdash")
+lines(rList[2:9], pseudo_log(y_grey),  lwd = 4, col = "black",     lty = "longdash")
+lines(rList[2:9], pseudo_log(y_brown), lwd = 4, col = "brown",     lty = "longdash")
+
+axis(1, at = rList[2:9], las = 1, cex.axis = 1.5)
+axis(2, at = pseudo_log(yticks),
+     labels = c("0", expression(10^0), expression(10^1), expression(10^2)),
+     las = 1, cex.axis = 1.5)
+box()
+
+
+### --- 3. False positives ---
+plot(rList[1:9], moyenne_faux_positifsMed5[1:9,3]/((1 - rList[1:9]/100)*n)*100,
+     type = "l", lwd = 4, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     ylim = c(0, 20)
+)
+
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,2]/((1 - rList[1:9]/100)*n)*100, lwd = 4, col = "blue", lty = "dashed")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4, col = "darkgreen", lty = "dotted")
+lines(rList[1:9], moyenne_faux_positifsMed5Oracle[1:9,1]/((1 - rList[1:9]/100)*n)*100, lwd = 4, col = "purple", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,4]/((1 - rList[1:9]/100)*n)*100, lwd = 4, col = "orange", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,5]/((1 - rList[1:9]/100)*n)*100, lwd = 4, col = "black", lty = "longdash")
+lines(rList[1:9], moyenne_faux_positifsMed5[1:9,6]/((1 - rList[1:9]/100)*n)*100, lwd = 4, col = "brown", lty = "longdash")
+
+axis(1, at = rList[1:9], las = 1, cex.axis = 1.5)
+axis(2, at = seq(0, 20, by = 5), las = 1, cex.axis = 1.5)
+box()
+
+
+dev.off()
+
+}
 ############################Trajectoires##########################################################"
 
 majority_vote_Med3 = array(0,dim = c(n,length(rList),4))
@@ -338,6 +429,9 @@ majority_vote_Med3NotOracle <- apply(outliersLabelsMed3, c(1, 2, 3), function(x)
 majority_vote_Med3[,,1:3] <- majority_vote_Med3NotOracle
 majority_vote_Med3Oracle <- ifelse(apply(outliersLabelsOracleMed3, c(1,2), function(x) sum(x) >= 50), 1, 0)
 majority_vote_Med3[,,4] <- majority_vote_Med3Oracle
+
+
+
 ######################Trajectories#################################
 
 faux_negatifsFarTrajMed3 = array(0,dim = c(n,length(rList),4))
