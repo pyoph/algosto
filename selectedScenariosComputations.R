@@ -18,9 +18,9 @@ rho1List = rho1val
 sim = 1
 simNb = 1
 
+k = k1val[1];rho1 = rho1val[1]
+for(l in l1val[2:length(l1val)]){
 
-for(rho1 in rho1val[2:length(rho1val)]){
-k = k1val[7];l = l1val[6];rho1 = rho1val[7]
 erreursSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 erreursInvSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 outliersLabelsMed5 = array(0,dim = c(n,length(rList),6,simNb))
@@ -418,6 +418,49 @@ box()
 dev.off()
 
 }
+
+###############################code lateX########################################################
+latex_file <- file("table_scenarios.tex", "w")
+
+writeLines("\\begin{figure}[ht!]", latex_file)
+writeLines("\\centering", latex_file)
+writeLines("\\renewcommand{\\arraystretch}{0.9}", latex_file)
+writeLines("\\setlength{\\tabcolsep}{3pt}", latex_file)
+
+writeLines("\\begin{tabular}{c c c c}", latex_file)
+
+# HEADER
+writeLines(
+  "\\raisebox{0.5\\height}{} &
+\\multicolumn{3}{c}{
+\\small \\textbf{Frobenius norm error \\hspace{1.5cm}
+False negatives \\hspace{1.5cm}
+False positives}
+} \\\\[6pt]",
+  latex_file
+)
+
+# LOOP
+for (l in l1val[2:length[l1val]]) {
+  
+  scen_name <- paste0("l = ", round(l, 3))
+  pdf_name <- paste0("graphiques/scen-k", k, "-l",l,"-rho1",rho1,".pdf")
+  
+  line <- paste0(
+    "\\raisebox{0.5\\height}{\\rotatebox{90}{", scen_name, "}} & ",
+    "\\multicolumn{3}{c}{\\includegraphics[width=0.95\\textwidth,height=4cm]{",
+    pdf_name,
+    "}} \\\\"
+  )
+  
+  writeLines(line, latex_file)
+}
+
+writeLines("\\end{tabular}", latex_file)
+writeLines("\\end{figure}", latex_file)
+
+close(latex_file)
+
 ############################Trajectoires##########################################################"
 
 majority_vote_Med3 = array(0,dim = c(n,length(rList),4))
