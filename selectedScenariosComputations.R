@@ -18,12 +18,24 @@ sim = 1
 simNb = 1
 
 
+
+
 scenarios <- list(
+  list(k =  k1val[4], l = 0.07, rho1 = 0.3),
   list(k = 0, l = 1e-6, rho1 = 0.3),
   list(k = 1e3, l = 1e-6, rho1 = 0.3),
-  list(k = 500, l = 0.05, rho1 = 0.9),
-  list(k = 200, l = 0.1, rho1 = 0.8)
-)
+  list(k = k1val[2], l = l1val[2], rho1 = rho1val[2]),
+  list(k = k1val[3], l = l1val[3], rho1 = rho1val[3]),
+  list(k = k1val[4], l = l1val[4], rho1 = rho1val[4]),
+  list(k = k1val[5], l = l1val[5], rho1 = rho1val[5]),
+  list(k = k1val[6], l = l1val[6], rho1 = rho1val[6]),
+  list(k = k1val[7], l = l1val[7], rho1 = rho1val[7]),
+  list(k = k1val[2], l = l1valup1[2], rho1 = rho1val[2]), 
+  list(k = k1val[3], l = l1valup1[3], rho1 = rho1val[3]),
+  list(k = k1val[4], l = l1valup1[4], rho1 = rho1val[4]),
+  list(k = k1val[5], l = l1valup1[5], rho1 = rho1val[5]),
+  list(k = k1val[6], l = l1valup1[6], rho1 = rho1val[6]),
+  list(k = k1val[7], l = l1valup1[7], rho1 = rho1val[7]))
 
 #k = 1e3;l = 0.01;rho1 = 0.995
 for(sc in scenarios){
@@ -54,12 +66,12 @@ r_max <- max(rList)
 
 outlier_sets = list()
 
-for (m in seq_along(rList)) {
+for (m in seq_along(rList[1:9])) {
   n_active = floor(rList[m]/100*n)
   outlier_sets[[m]] = id_pool[1:n_active]
 }
 
-for (m in seq_along(rList)){
+for (m in seq_along(rList[1:9])){
   for(sim in(1:simNb)){
     r = rList[m]
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
