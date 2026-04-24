@@ -443,7 +443,8 @@ dev.off()
 }
 
 ###############################code lateX########################################################
-latex_file <- file("table_scenarios.tex", "w")
+setwd("~")
+latex_file <- file("table_all_scenarios.tex", "w")
 
 writeLines("\\begin{figure}[ht!]", latex_file)
 writeLines("\\centering", latex_file)
@@ -469,7 +470,7 @@ for (sc in scenarios) {
   l = sc$l
   rho1 = sc$rho1
   #scen_name <- paste0("rho1 = ", round(rho1, 2))
-  scen_name <- "Scenario F"
+  scen_name <- paste0("KL ",round(KL(parms0,ParmsF1(m1,k,l,rho1)),2))
   pdf_name <- paste0("graphiques/scen-k", k, "-l",l,"-rho1",rho1,".pdf")
   
   line <- paste0(
