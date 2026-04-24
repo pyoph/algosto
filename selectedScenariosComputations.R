@@ -14,12 +14,23 @@ lList = l1valup1
 
 rho1List = rho1val
 
-
 sim = 1
 simNb = 1
 
-k = k1val[1];rho1 = rho1val[1]
-for(l in l1val[2:length(l1val)]){
+
+scenarios <- list(
+  list(k = 0, l = 1e-6, rho1 = 0.3),
+  list(k = 1e3, l = 1e-6, rho1 = 0.3),
+  list(k = 500, l = 0.05, rho1 = 0.9),
+  list(k = 200, l = 0.1, rho1 = 0.8)
+)
+
+#k = 1e3;l = 0.01;rho1 = 0.995
+for(sc in scenarios){
+
+k = sc$k
+l = sc$l
+rho1 = sc$rho1
 
 erreursSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
 erreursInvSigmaMed5 = array(0,dim = c(n,length(rList),6,simNb))
@@ -441,9 +452,12 @@ False positives}
 )
 
 # LOOP
-for (l in l1val[2:length[l1val]]) {
-  
-  scen_name <- paste0("l = ", round(l, 3))
+for (sc in scenarios) {
+  k = sc$k
+  l = sc$l
+  rho1 = sc$rho1
+  #scen_name <- paste0("rho1 = ", round(rho1, 2))
+  scen_name <- "Scenario F"
   pdf_name <- paste0("graphiques/scen-k", k, "-l",l,"-rho1",rho1,".pdf")
   
   line <- paste0(
