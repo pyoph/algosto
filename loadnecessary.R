@@ -77,7 +77,7 @@ genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
 }
 
 
-genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers = NULL) {
+genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers = NULL,dirac = FALSE) {
   # InitialSisation
   Z = matrix(0,n,d)
   
@@ -97,9 +97,10 @@ genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers =
   Z[idx_in, ] <- mvrnorm(n1,mu1, Sigma1)
   
   labelsVrais[idx_in] <- 0
-  
+  if(dirac == FALSE){
   # outliers
-  Z[id_outliers, ] <- mvrnorm(n2,mu2, Sigma2)
+  Z[id_outliers, ] <- mvrnorm(n2,mu2, Sigma2)}
+  else if (dirac == TRUE){Z[id_outliers, ] = mu2}
   labelsVrais[id_outliers] <- 1
  }
   # 

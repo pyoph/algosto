@@ -21,21 +21,20 @@ simNb = 1
 
 
 scenarios <- list(
-  list(k =  k1val[4], l = 0.07, rho1 = 0.3),
-  list(k = 0, l = 1e-6, rho1 = 0.3),
-  list(k = 1e3, l = 1e-6, rho1 = 0.3),
-  list(k = k1val[2], l = l1val[2], rho1 = rho1val[2]),
-  list(k = k1val[3], l = l1val[3], rho1 = rho1val[3]),
-  list(k = k1val[4], l = l1val[4], rho1 = rho1val[4]),
-  list(k = k1val[5], l = l1val[5], rho1 = rho1val[5]),
-  list(k = k1val[6], l = l1val[6], rho1 = rho1val[6]),
-  list(k = k1val[7], l = l1val[7], rho1 = rho1val[7]),
-  list(k = k1val[2], l = l1valup1[2], rho1 = rho1val[2]), 
-  list(k = k1val[3], l = l1valup1[3], rho1 = rho1val[3]),
-  list(k = k1val[4], l = l1valup1[4], rho1 = rho1val[4]),
-  list(k = k1val[5], l = l1valup1[5], rho1 = rho1val[5]),
-  list(k = k1val[6], l = l1valup1[6], rho1 = rho1val[6]),
-  list(k = k1val[7], l = l1valup1[7], rho1 = rho1val[7]))
+  list(k = 0, l = 0.07, rho1 = 0.3),
+  list(k = 1e3, l = 0.07,rho1 = 0.3))
+  # list(k = k1val[2], l = l1val[2], rho1 = rho1val[2]),
+  # list(k = k1val[3], l = l1val[3], rho1 = rho1val[3]),
+  # list(k = k1val[4], l = l1val[4], rho1 = rho1val[4]),
+  # list(k = k1val[5], l = l1val[5], rho1 = rho1val[5]),
+  # list(k = k1val[6], l = l1val[6], rho1 = rho1val[6]),
+  # list(k = k1val[7], l = l1val[7], rho1 = rho1val[7]),
+  # list(k = k1val[2], l = l1valup1[2], rho1 = rho1val[2]), 
+  # list(k = k1val[3], l = l1valup1[3], rho1 = rho1val[3]),
+  # list(k = k1val[4], l = l1valup1[4], rho1 = rho1val[4]),
+  # list(k = k1val[5], l = l1valup1[5], rho1 = rho1val[5]),
+  # list(k = k1val[6], l = l1valup1[6], rho1 = rho1val[6]),
+  # list(k = k1val[7], l = l1valup1[7], rho1 = rho1val[7]))
 
 #k = 1e3;l = 0.01;rho1 = 0.995
 for(sc in scenarios){
@@ -53,7 +52,7 @@ faux_positifsMed5= array(0,dim = c(length(rList),6,simNb))
 faux_negatifsMed5 = array(0,dim = c(length(rList),6,simNb))
 faux_positifsOracleMed5 = array(0,dim = c(length(rList),simNb))
 faux_negatifsOracleMed5 = array(0,dim = c(length(rList),simNb))
-
+temps = array(0,dim=c(6,simNb))
 #Pool d'outliers
 
 id_pool <- sample(1:n)
@@ -84,7 +83,7 @@ for (m in seq_along(rList[1:9])){
     
     if(r == 0){
       
-      data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
+      data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r,dirac = TRUE)
     }#save(dataFile)
     
     if(r != 0){
@@ -348,7 +347,7 @@ moyenne_faux_negatifsMed5Oracle = apply(faux_negatifsOracleMed5,c(1,2),mean)
 
 
 
-moyenne_faux_negatifsMed5Oracle = apply(faux_negatifsOracleMed5,c(1,2),mean) 
+moyenne_faux_positifsMed5Oracle = apply(faux_positifsOracleMed5,c(1,2),mean) 
 
 
 # --- Transformation pseudo-log  ---
