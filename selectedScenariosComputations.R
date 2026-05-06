@@ -38,7 +38,7 @@ scenarios <- list(
   list(k = k1val[7], l = l1valup1[7], rho1 = rho1val[7]))
 
 #k = 1e3;l = 0.01;rho1 = 0.995
-for(sc in scenarios){
+for(sc in scenarios[2]){
 
 k = sc$k
 l = sc$l
