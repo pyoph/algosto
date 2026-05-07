@@ -216,7 +216,7 @@ for(j in seq_along(k_values)){
   
   t = table(data$labelsVrais,resOffline$outlier_labels)
   if (r != 0) {faux_positifsMed5[j,4,sim] =  t[1,2]
-  faux_negatifsMed5[m,4,sim] = t[2,1]}
+  faux_negatifsMed5[j,4,sim] = t[2,1]}
   if(r == 0){faux_positifsMed5[j,4,sim] =  t[1,2]}
   
   print(paste0("faux positifs med offline ",faux_positifsMed5[j,4,sim]))
