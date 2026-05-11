@@ -3,6 +3,8 @@ dest <- "smd.zip"
 
 download.file(url, destfile = dest, mode = "wb")
 
+unzip(dest)
+
 # chercher tous les fichiers SMD
 files <- list.files(".", recursive = TRUE, full.names = TRUE)
 
@@ -84,6 +86,7 @@ resmcd = covMcd(Z)
 resogk = covOGK(Z, sigmamu = scaleTau2)
 distogk = rep(0,nrow(Z))
 distoffl = rep(0,nrow(Z))
+distmcd = rep(0,nrow(Z))
 invSigmaOGK = solve(resogk$cov)
 invSigmaMCD = solve(resmcd$cov)
 
