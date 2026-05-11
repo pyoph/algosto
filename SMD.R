@@ -77,7 +77,7 @@ print(rank1[1:10])
 Z <- Z[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37", "V38")), drop = FALSE]
 
 
-
+resSamplecov= SampleCovOnline(Z)
 resStrm = onlineRobustVariance(Z,batch = ncol(Z),computeOutliers = TRUE)
 resOnline = onlineRobustVariance(Z,batch = 1,computeOutliers = TRUE)
 resOffline = offlineRobustVariance(Z,computeOutliers = TRUE)
@@ -154,19 +154,25 @@ compute_roc <- function(score, labels) {
   
 }
 
-
+roc_samplecov <- compute_roc(resSamplecov$distances,labels)
 roc_strm    <- compute_roc(resStrm$distances, labels)
 roc_online  <- compute_roc(resOnline$distances, labels)
 roc_offline <- compute_roc(resOffline$distances, labels)
 roc_mcd     <- compute_roc(distmcd, labels)
 roc_ogk     <- compute_roc(distogk, labels)
-dev.off()
+
+
+file <- paste0("roc", ".pdf")
+
+pdf(file, width = 18, height = 6) 
+
+
 plot(roc_strm$FPR, roc_strm$TPR,
      type = "l", col = "red", lwd = 2,
      xlim = c(0,1), ylim = c(0,1),
      xlab = "FPR", ylab = "TPR",
-     main = "ROC Comparison")
-
+     main = "",cex = 2.5)
+lines(roc_samplecov$FPR, roc_samplecov$TPR, col = "darkgreen", lwd = 2)
 lines(roc_online$FPR, roc_online$TPR, col = "blue", lwd = 2)
 lines(roc_offline$FPR, roc_offline$TPR, col = "orange", lwd = 2)
 lines(roc_mcd$FPR, roc_mcd$TPR, col = "black", lwd = 2)
@@ -174,63 +180,157 @@ lines(roc_ogk$FPR, roc_ogk$TPR, col = "brown", lwd = 2)
 
 abline(0,1,lty=2)
 
+dev.off()
+save(roc_samplecov,roc_strm,roc_online,roc_offline,roc_mcd,roc_ogk,file = "roc.RData")
 
-save(roc_strm,roc_online,roc_offline,roc_mcd,roc_ogk,file = "roc.RData")
+
+#######################TRUE LABELS FALSE NEGATIVES AND FALSE POSITVES AND THRESHOLDS TRAJECTORIES ####################
+
+compute_rates <- function(pred, labels) {
+
+  n <- length(pred)
+  
+  FP_rate <- rep(0, n)
+  FN_rate <- rep(0, n)
+  fp <- 0
+  tn <- 0
+  tp <- 0
+  fn <- 0
+  
+  for (t in 1:n) {
+    
+    if (pred[t] == 1 && labels[t] == 0) fp <- fp + 1
+    if (pred[t] == 0 && labels[t] == 1) fn <- fn + 1
+    if (pred[t] == 1 && labels[t] == 1) tp <- tp + 1
+    if (pred[t] == 0 && labels[t] == 0) tn <- tn + 1
+    
+    # vrai taux streaming
+    FP_rate[t] <- fp / (fp + tn + 1e-10)
+    FN_rate[t] <- fn / (fn + tp + 1e-10)
+  }
+  
+  list(FP_rate = FP_rate,
+       FN_rate = FN_rate)
+}
+
+####Calcul pour les 3 méthodes online######
 
 
-################Choix du meilleur seuil##############################################
-# =========================
-# GRID DE SEUILS
-# =========================
+rates_samplecov = compute_rates(resSamplecov$outliers_labels, labels)
+rates_online  <- compute_rates(resOnline$outlier_labels, labels)
+rates_strm <- compute_rates(resStrm$outlier_labels, labels)
 
-thresholds <- seq(
-  min(scores),
-  max(scores),
-  length.out = 200
+
+##################################Trajectoire des seuils################################"
+
+distonl = resOnline$distances
+
+distStrm = resStrm$distances
+
+scal_factor_onl = rep(0,nrow(Z))
+scal_factor_str = rep(0,nrow(Z))
+
+for (i in 1:nrow(Z)){
+  scal_factor_onl[i] = qchisq(.5,df = ncol(Z))/median(distonl[1:i])
+  scal_factor_str[i] = qchisq(.5,df = ncol(Z))/median(distStrm[1:i])
+  
+}
+setwd("~")
+pdf("trajectories_SMD.pdf", width = 14, height = 10)
+
+par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+
+x_vals = 1:nrow(Z)
+
+# =====================================================
+# 1. LABELS
+# =====================================================
+
+plot(x_vals, labels,
+     col = "purple",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     ylim = c(0, 1),
+     main = "Ground truth"
 )
 
-# =========================
-# FONCTION F1
-# =========================
+axis(2, at = c(0, 1), las = 1, cex.axis = 1.2)
+axis(1, at = seq(1000, max(x_vals), by = 1000),
+     las = 1, cex.axis = 1.2)
+box()
 
-f1_score <- function(pred, true) {
-  
-  TP <- sum(pred == 1 & true == 1)
-  FP <- sum(pred == 1 & true == 0)
-  FN <- sum(pred == 0 & true == 1)
-  
-  precision <- ifelse(TP + FP == 0, 0, TP / (TP + FP))
-  recall    <- ifelse(TP + FN == 0, 0, TP / (TP + FN))
-  
-  if (precision + recall == 0) return(0)
-  
-  2 * precision * recall / (precision + recall)
-}
+# =====================================================
+# 2. SCALE FACTORS
+# =====================================================
 
-# =========================
-# OPTIMISATION SEUIL
-# =========================
+plot(x_vals, scal_factor_onl,
+     type = "l", lwd = 3, col = "blue",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     main = "Scale factors",
+     ylim = range(c(scal_factor_onl, scal_factor_str))
+)
 
-f1_values <- numeric(length(thresholds))
+lines(x_vals, scal_factor_str,
+      col = "red", lwd = 3)
 
-for (i in seq_along(thresholds)) {
-  
-  tau <- thresholds[i]
-  
-  pred <- as.integer(scores > tau)
-  
-  f1_values[i] <- f1_score(pred, labels)
-}
+axis(2, las = 1, cex.axis = 1.2)
+axis(1, at = seq(1000, max(x_vals), by = 1000),
+     las = 1, cex.axis = 1.2)
+box()
 
-# =========================
-# MEILLEUR SEUIL
-# =========================
+# =====================================================
+# 3. FALSE NEGATIVE RATE
+# =====================================================
 
-best_idx <- which.max(f1_values)
+plot(x_vals, rates_strm$FN_rate,
+     type = "l", lwd = 3, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     main = "False Negative Rate",
+     ylim = range(c(rates_strm$FN_rate,
+                    rates_samplecov$FN_rate,
+                    rates_online$FN_rate))
+)
 
-best_threshold <- thresholds[best_idx]
+lines(x_vals, rates_samplecov$FN_rate,
+      lty = "dotted", col = "darkgreen", lwd = 3)
 
-best_f1 <- f1_values[best_idx]
+lines(x_vals, rates_online$FN_rate,
+      lty = "dashed", col = "blue", lwd = 3)
 
-best_threshold
-best_f1
+axis(2, las = 1, cex.axis = 1.2)
+axis(1, at = seq(1000, max(x_vals), by = 1000),
+     las = 1, cex.axis = 1.2)
+box()
+
+# =====================================================
+# 4. FALSE POSITIVE RATE
+# =====================================================
+
+plot(x_vals, rates_strm$FP_rate,
+     type = "l", lwd = 3, col = "red",
+     xlab = "", ylab = "",
+     yaxt = "n", xaxt = "n",
+     main = "False Positive Rate",
+     ylim = range(c(rates_strm$FP_rate,
+                    rates_samplecov$FP_rate,
+                    rates_online$FP_rate))
+)
+
+lines(x_vals, rates_samplecov$FP_rate,
+      lty = "dotted", col = "darkgreen", lwd = 3)
+
+lines(x_vals, rates_online$FP_rate,
+      lty = "dashed", col = "blue", lwd = 3)
+
+axis(2, las = 1, cex.axis = 1.2)
+axis(1, at = seq(1000, max(x_vals), by = 1000),
+     las = 1, cex.axis = 1.2)
+box()
+
+# =====================================================
+# END
+# =====================================================
+
+dev.off()

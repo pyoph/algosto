@@ -290,7 +290,7 @@ for(r in ind_rates){
        xlab = "", ylab = "",   # Pas de label
        yaxt = "n", xaxt = "n", # On masque les axes par défaut
        #log = "y",              # Échelle logarithmique Y
-       ylim = c(0, 10)     # Plage Y adaptée à tes ticks log
+       ylim = c(0, 10)     
   )
   lines(x_vals,taux_fp_cum[,r,1]*100,lty = "dotted",col = "darkgreen",lwd = 4)
   
