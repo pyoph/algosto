@@ -73,9 +73,15 @@ print(rank1[1:10])
 
 
 
+###################Extraction de la matrice de covariance sans outliers###########################
+
+Z_clean = Z[labels == 0,]
+Sigma_true = cov(Z_clean)
+
+
 #Enlèvement des colonnes qui posent problème d'inversibilité
 Z <- Z[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37", "V38")), drop = FALSE]
-
+Z_clean = Z_clean[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37", "V38")), drop = FALSE]
 
 resSamplecov= SampleCovOnline(Z)
 resStrm = onlineRobustVariance(Z,batch = ncol(Z),computeOutliers = TRUE)
@@ -328,9 +334,5 @@ axis(2, las = 1, cex.axis = 1.2)
 axis(1, at = seq(1000, max(x_vals), by = 1000),
      las = 1, cex.axis = 1.2)
 box()
-
-# =====================================================
-# END
-# =====================================================
 
 dev.off()
