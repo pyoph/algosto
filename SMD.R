@@ -110,25 +110,26 @@ for(i in 1:nrow(Z))
  distoffl[i] =t(Z[i,] - med)%*%invSigmaOffl%*%(Z[i,] - med)
 
 }
-oracle = rep(0,nrow(Z_clean))
-quantemp = quantile(distoffl,.95)
 
-table(oracle,labels[labels == 0])
+oracle = rep(0,nrow(Z))
 
 quantemp = median(distoffl)
 pred = rep(0,nrow(Z))
 
 disttrue = rep(0,nrow(Z))
+qt = quantile(disttrue,.95)
 for(i in (1:nrow(Z))){
-quantemp <- quantemp - (1 + i )^(-0.75) * (as.numeric(distoffl[i] <= quantemp) - 
-                                              0.8)
-if (distoffl[i] > quantemp){pred[i] = 1}
-distrue = t(Z[i,] - meanTrue)%*%invSigmaTrue%*%(Z[i,] - meanTrue)
-if(distrue[i] > quantemp) {oracle[i] = 1}
+quantemp <- quantemp - quantemp*(i )^(-0.75) * (as.numeric(distoffl[i] <= quantemp) - 
+                                              0.9)
+if (distoffl[i] > qt){pred[i] = 1}
+distrue[i] = t(Z[i,] - meanTrue)%*%invSigmaTrue%*%(Z[i,] - meanTrue)
+if(distrue[i] > qt) {oracle[i] = 1}
 }
 #pred = distoffl > quantemp
 
 table(pred,labels)
+
+table(oracle,labels)
 
 # =========================================================
 # Recherche automatique du meilleur n0
