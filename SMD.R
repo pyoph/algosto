@@ -75,19 +75,18 @@ print(rank1[1:10])
 
 ###################Extraction de la matrice de covariance sans outliers###########################
 
-Z_clean = Z[labels == 0,]
-Sigma_true = cov(Z_clean)
-
 
 #Enlèvement des colonnes qui posent problème d'inversibilité
-Z <- Z[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37", "V38")), drop = FALSE]
-Z_clean = Z_clean[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37", "V38")), drop = FALSE]
-
+Z <- Z[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37","V38")), drop = FALSE]
+Z_clean = Z[labels == 0,]
+Sigma_true = cov(Z_clean)
 resSamplecov= SampleCovOnline(Z)
 resStrm = onlineRobustVariance(Z,batch = ncol(Z),computeOutliers = TRUE)
 resOnline = onlineRobustVariance(Z,batch = 1,computeOutliers = TRUE)
 resOffline = offlineRobustVariance(Z,computeOutliers = TRUE)
 resmcd = covMcd(Z)
+
+resOfflineClean = offlineRobustVariance(Z_clean,computeOutliers = TRUE)
 
 resogk = covOGK(Z, sigmamu = scaleTau2)
 distogk = rep(0,nrow(Z))
@@ -95,16 +94,128 @@ distoffl = rep(0,nrow(Z))
 distmcd = rep(0,nrow(Z))
 invSigmaOGK = solve(resogk$cov)
 invSigmaMCD = solve(resmcd$cov)
+invSigmaOffl = solve(resOffline$variance)
+invSigmaTrue = solve(Sigma_true)
+med = t(WeiszfeldMedian(Z))
+quantemp = 0
+distrue = rep(0,nrow(Z_clean))
+meanTrue = colMeans(Z_clean)
+#Calcul destinations de Mahalanobis
 
-#Calcule destinations de Mahalanobis
 
 for(i in 1:nrow(Z))
 {
-  distmcd[i] = t(Z[i,] - resmcd$center)%*%invSigmaMCD%*%(Z[i,] - resmcd$center)
+  distmcd[i] = t(Z[i,] - (resmcd$center))%*%invSigmaMCD%*%(Z[i,] - (resmcd$center))
   distogk[i] = t(Z[i,] - resogk$center)%*%invSigmaOGK%*%(Z[i,] - resogk$center)
- # distoffl[i] = t(Z[i,] - t(resOffline$median))%*%invSigmaOffl%*%(Z[i,] - t(resOffline$median))
-  }
+ distoffl[i] =t(Z[i,] - med)%*%invSigmaOffl%*%(Z[i,] - med)
 
+}
+oracle = rep(0,nrow(Z_clean))
+quantemp = quantile(distoffl,.95)
+
+table(oracle,labels[labels == 0])
+
+quantemp = median(distoffl)
+pred = rep(0,nrow(Z))
+
+disttrue = rep(0,nrow(Z))
+for(i in (1:nrow(Z))){
+quantemp <- quantemp - (1 + i )^(-0.75) * (as.numeric(distoffl[i] <= quantemp) - 
+                                              0.8)
+if (distoffl[i] > quantemp){pred[i] = 1}
+distrue = t(Z[i,] - meanTrue)%*%invSigmaTrue%*%(Z[i,] - meanTrue)
+if(distrue[i] > quantemp) {oracle[i] = 1}
+}
+#pred = distoffl > quantemp
+
+table(pred,labels)
+
+# =========================================================
+# Recherche automatique du meilleur n0
+# =========================================================
+
+beta <- 0.75
+target_quantile <- 0.9
+
+n0_grid <- seq(1, 5000, by = 10)
+
+results <- data.frame(
+  n0 = numeric(),
+  TP = numeric(),
+  FP = numeric(),
+  TN = numeric(),
+  FN = numeric(),
+  Recall = numeric(),
+  Precision = numeric(),
+  FPR = numeric(),
+  F1 = numeric()
+)
+
+for(n0 in n0_grid){
+  
+  quantemp <- median(distoffl)
+  
+  pred <- rep(0, length(distoffl))
+  
+  for(i in 1:length(distoffl)){
+    
+    gamma <- (i + n0)^(-beta)
+    
+    quantemp <- quantemp -
+      gamma *
+      (as.numeric(distoffl[i] <= quantemp) - target_quantile)
+    
+    if(distoffl[i] > quantemp){
+      pred[i] <- 1
+    }
+  }
+  
+  # matrice confusion
+  TP <- sum(pred == 1 & labels == 1)
+  FP <- sum(pred == 1 & labels == 0)
+  
+  TN <- sum(pred == 0 & labels == 0)
+  FN <- sum(pred == 0 & labels == 1)
+  
+  # métriques
+  Recall <- TP / (TP + FN + 1e-12)
+  
+  Precision <- TP / (TP + FP + 1e-12)
+  
+  FPR <- FP / (FP + TN + 1e-12)
+  
+  F1 <- 2 * Precision * Recall /
+    (Precision + Recall + 1e-12)
+  
+  results <- rbind(
+    results,
+    data.frame(
+      n0,
+      TP,
+      FP,
+      TN,
+      FN,
+      Recall,
+      Precision,
+      FPR,
+      F1
+    )
+  )
+}
+
+# =========================================================
+# Meilleur n0 selon F1
+# =========================================================
+
+best <- results[which.max(results$F1), ]
+
+print(best)
+
+# =========================================================
+# top résultats
+# =========================================================
+
+results[order(-results$F1), ][1:10, ]
 
 # 
 # library(pROC)
