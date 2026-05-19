@@ -34,11 +34,3 @@ Le projet s'articule autour de quatre fichiers principaux :
   - Estimateur de $\Sigma$ : $\widehat{\Sigma}$ final et à chaque itération pour méthodes online, outliers_labels (vecteurs où l'entrée $i$ si la donnée $i$ traitée est un outlier, $0$ sinon.
 
   
-### 3. `affiche_resultats.R`
-
-- **Rôle** : Graphiques (scénarios de contamination, erreurs norme de Frobenius matrice de covariance, faux positifs, faux négatifs)
-- **Entrée** :
-  - Résultats des runs 
-- **Sortie** :
-  - Graphiques.
-  
