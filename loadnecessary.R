@@ -3,7 +3,7 @@
 ################Packages nécessaires#####
 #########################################
 setwd("~/algosto")
-packages = c("Rcpp","Gmedian","MASS","DescTools" ,"checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales',"bookdown")
+packages = c("Rcpp","Gmedian","MASS","DescTools" ,"capushe","checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales',"bookdown")
 #
 for (p in packages) {
    if (!requireNamespace(p, quietly = TRUE)) {
@@ -12,7 +12,7 @@ for (p in packages) {
    library(p, character.only = TRUE)
  }
 #
-
+setwd("~/algosto")
 install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 install.packages("binom")
 install.packages("STARRS_1.0.tar.gz")
@@ -191,14 +191,24 @@ inverse_Schermann_Morisson = function(A,Z)
 }
 
 
-test_outliers = function(distances,dim = 10,cutoff)
+calcule_cutoff = function(distances,c_m = 2, n,cutinit = 0.6,cutoff = .9)
 {
-  outlab = rep(0,length(distances))
-  
-  
-  for (i in (1:length(distances)))
-  {
-    if(distances[i] > cutoff){outlab[i] = 1}
+  cutoffcor=quantile(distances[1:n],probs=cutinit)
+  c_med=median(distances[1:n])
+  for (i in 1 :n) {
+    cutoffcor <- cutoffcor - c_m*c_med*(i+1)^(-0.75)*( as.numeric(distances[i] <= cutoffcor) - cutoff)
   }
-  return(outlab)
+  return(cutoffcor)
 }
+  # }
+# test_outliers = function(distances,dim = 10,cutoff)
+# {
+#   outlab = rep(0,length(distances))
+#   
+#   
+#   for (i in (1:length(distances)))
+#   {
+#     if(distances[i] > cutoff){outlab[i] = 1}
+#   }
+#   return(outlab)
+# }
