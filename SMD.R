@@ -15,16 +15,85 @@ length(test_files)
 length(label_files)
 
 
-load_smd_machine <- function(test_path, label_path) {
+
+sequential_clean_columns <- function(Z, begin = 1, cut = NULL) {
   
-  Z <- as.matrix(read.table(test_path, sep = ","))
-  labels <- scan(label_path)
+  Z <- as.matrix(Z)
+  p <- ncol(Z)
   
-  list(
-    Z = Z,
-    labels = labels,
-    name = basename(test_path)
-  )
+  if (is.null(cut)) cut <- 0.95
+  
+  start <- NULL
+  
+  # =========================
+  # 1) trouver prefix stable
+  # =========================
+  
+  for (k in (begin + 1):p) {
+    
+    ok <- tryCatch({
+      
+      onlineRobustVariance(
+        Z[, begin:k, drop = FALSE],
+        computeOutliers = TRUE,
+        cutoff = cut,
+        cutinit = 0.6,
+        nDataInit = 200,
+        c_m = 2,
+        batch = 3
+      )
+      
+      TRUE
+      
+    }, error = function(e) {
+      FALSE
+    })
+    
+    if (ok) {
+      start <- k
+      cat("✔ first stable prefix found at:", k, "\n")
+      break
+    }
+  }
+  
+  if (is.null(start)) {
+    stop("No stable prefix found")
+  }
+  
+  keep <- c(begin, start)
+  
+  for (j in (start + 1):p) {
+    
+    cat("j =", j, "keep =", keep, "\n")
+    
+    ok <- tryCatch({
+      
+      onlineRobustVariance(
+        Z[, c(keep, j), drop = FALSE],
+        computeOutliers = TRUE,
+        cutoff = cut,
+        cutinit = 0.6,
+        nDataInit = 200,
+        c_m = 2,
+        batch = 3
+      )
+      
+      TRUE
+      
+    }, error = function(e) FALSE)
+    
+    if (ok) {
+      keep <- c(keep, j)
+      cat("✔ col:", j, "OK\n")
+    } else {
+      cat("✘ col:", j, "KO\n")
+    }
+  }
+  
+  return(list(
+    Z = Z[, keep, drop = FALSE],
+    keep = keep
+  ))
 }
 
 smd_data <- list()
@@ -37,207 +106,178 @@ for (i in seq_along(test_files)) {
   )
 }
 
-Z <- smd_data[[1]]$Z
-labels <- smd_data[[1]]$labels
+nbmachines = length(smd_data)
+
+erreursSigmaSMD = array(0,dim = c(6,nbmachines))
+faux_positifsSMD= array(0,dim = c(7,nbmachines))
+faux_negatifsSMD = array(0,dim = c(7,nbmachines))
+outliersLabelsSMD = array(0,dim = c(nrow(Z),7,nbmachines))
+temps = array(0,dim=c(7))
+keep_columns_ok = list()
+
+for(j in 1:(nbmachines)){
+  
+  cat("\n====================\n")
+  cat("Machine", j, "\n")
+  cat("====================\n")
+  
+  
+Z <- smd_data[[j]]$Z
+labels <- smd_data[[j]]$labels
 Z <- as.matrix(Z)
 
-
-# =========================================================
-# ANALYSE VARIABLES SMD
-# =========================================================
-
-# 
-Z <- scale(Z)
-labels <- as.numeric(labels)
-
-n <- min(nrow(Z), length(labels))
-Z <- Z[1:n, ]
-labels <- labels[1:n]
+#Enlèvement des colonnes qui posent problème d'inversibilité
+#Z <- Z[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37","V38")), drop = FALSE]
 
 
-effect_size <- sapply(1:ncol(Z), function(j) {
+#Filtre 1 : enlever les colonnes qui font planter onlineRobustVariance
+
+tryCatch({
   
-  mu1 <- mean(Z[labels == 1, j])
-  mu0 <- mean(Z[labels == 0, j])
-  sdj <- sd(Z[, j])
+  # essai normal
   
-  abs(mu1 - mu0) / sdj
+  clean_cols = sequential_clean_columns(Z)
+  Z = clean_cols$Z
+  keep_columns_ok[[j]] = clean_cols$keep
+  
+  
+}, error = function(e) {
+  
+  cat("Erreur détectée -> retry sans colonne 1\n")
+  Z = Z[,-1]
+  # retry avec suppression colonne 1
+  clean_cols = sequential_clean_columns(Z)
+  Z = clean_cols$Z
+  keep_columns_ok[[j]] = clean_cols$keep + 1
+  
+  
 })
 
 
-rank1 <- order(effect_size, decreasing = TRUE)
+clean_cols = sequential_clean_columns(Z)
+Z = clean_cols$Z
+keep_columns_ok[[j]] = clean_cols$keep
 
 
-cat("\nTop variables (effect size):\n")
-print(rank1[1:10])
+#Filtre 2 : enlever les colonnes avec MAD ~ 0
 
 
+tol = 1e-4
 
-###################Extraction de la matrice de covariance sans outliers###########################
+mad_cols <- apply(Z, 2, mad, na.rm = TRUE)
 
+keep <- which(mad_cols > tol)
 
-#Enlèvement des colonnes qui posent problème d'inversibilité
-Z <- Z[, !(colnames(Z) %in% c("V5","V8","V9","V10","V11", "V13","V17","V18","V23","V25","V27", "V29", "V30","V32","V33","V35","V36","V37","V38")), drop = FALSE]
+removed <- setdiff(1:ncol(Z), keep)
+
+if (length(removed) > 0) {
+  cat("Colonnes retirées (MAD ~ 0):", removed, "\n")
+}
+
+keep_columns_ok[[j]] = keep
+
+Z = Z[,keep_columns_ok[[j]],drop = FALSE]
+
 Z_clean = Z[labels == 0,]
+
+###########Extraction moyenne et covariance sans outliers
+meanTrue = colMeans(Z_clean)
+
 Sigma_true = cov(Z_clean)
+#############################################"
+
+
 resSamplecov= SampleCovOnline(Z)
-resStrm = onlineRobustVariance(Z,batch = ncol(Z),computeOutliers = TRUE)
-resOnline = onlineRobustVariance(Z,batch = 1,computeOutliers = TRUE)
-resOffline = offlineRobustVariance(Z,computeOutliers = TRUE)
+
+erreursSigmaSMD[1,j] = norm(resSamplecov$Sigma - Sigma_true,"F")
+
+
+# resStrm = onlineRobustVariance(Z,batch = ncol(Z),computeOutliers = TRUE)
+# resOnline = onlineRobustVariance(Z,batch = 1,computeOutliers = TRUE)
+# resOffline = offlineRobustVariance(Z,computeOutliers = TRUE)
 resmcd = covMcd(Z)
 
-resOfflineClean = offlineRobustVariance(Z_clean,computeOutliers = TRUE)
+erreursSigmaSMD[2,j] = norm(resmcd$cov - Sigma_true,"F")
+
+#resOfflineClean = offlineRobustVariance(Z_clean,computeOutliers = TRUE)
 
 resogk = covOGK(Z, sigmamu = scaleTau2)
+
+erreursSigmaSMD[3,j] = norm(resogk$cov - Sigma_true,"F")
+
 distogk = rep(0,nrow(Z))
 distoffl = rep(0,nrow(Z))
 distmcd = rep(0,nrow(Z))
 invSigmaOGK = solve(resogk$cov)
 invSigmaMCD = solve(resmcd$cov)
-invSigmaOffl = solve(resOffline$variance)
 invSigmaTrue = solve(Sigma_true)
-med = t(WeiszfeldMedian(Z))
-quantemp = 0
-distrue = rep(0,nrow(Z_clean))
-meanTrue = colMeans(Z_clean)
-#Calcul destinations de Mahalanobis
+#med = t(WeiszfeldMedian(Z))
+#quantemp = 0
 
+distrue = rep(0,nrow(Z_clean))
 
 for(i in 1:nrow(Z))
 {
   distmcd[i] = t(Z[i,] - (resmcd$center))%*%invSigmaMCD%*%(Z[i,] - (resmcd$center))
   distogk[i] = t(Z[i,] - resogk$center)%*%invSigmaOGK%*%(Z[i,] - resogk$center)
- distoffl[i] =t(Z[i,] - med)%*%invSigmaOffl%*%(Z[i,] - med)
-
+  distrue[i] = t(Z[i,] - meanTrue)%*%invSigmaTrue%*%(Z[i,] - meanTrue)
+  
 }
 
 oracle = rep(0,nrow(Z))
 
-quantemp = median(distoffl)
-pred = rep(0,nrow(Z))
+#quantemp = median(distoffl)
+#pred = rep(0,nrow(Z))
 
-disttrue = rep(0,nrow(Z))
-qt = quantile(disttrue,.95)
+cutoff_true = calcule_cutoff(distrue,c_m = 2,cutinit=0.6,n = nrow(Z))
+cut_off_ogk = calcule_cutoff(distogk,c_m = 2,cutinit=0.6,n = nrow(Z))
+cut_off_mcd = calcule_cutoff(distmcd,c_m = 2,cutinit=0.6,n = nrow(Z))
+
+
+
 for(i in (1:nrow(Z))){
-quantemp <- quantemp - quantemp*(i )^(-0.75) * (as.numeric(distoffl[i] <= quantemp) - 
-                                              0.9)
-if (distoffl[i] > qt){pred[i] = 1}
-distrue[i] = t(Z[i,] - meanTrue)%*%invSigmaTrue%*%(Z[i,] - meanTrue)
-if(distrue[i] > qt) {oracle[i] = 1}
-}
+# quantemp <- quantemp - quantemp*(i )^(-0.75) * (as.numeric(distoffl[i] <= quantemp) - 
+#                                               0.9)
+#if (distoffl[i] > qt){pred[i] = 1}
+  if(distrue[i] > cutoff_true) {outliersLabelsSMD[i,7,j] = 1}
+  if(distogk[i] > cutoff_ogk) {outliersLabelsSMD[i,3,j] = 1}
+  if(distmcd[i] > cutoff_mcd) {outliersLabelsSMD[i,2,j] = 1}
+  
+  
+  
+  }
 #pred = distoffl > quantemp
 
-table(pred,labels)
+#table(pred,labels)
 
 table(oracle,labels)
+cut=0.9
+res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,c_m=2)
 
-# =========================================================
-# Recherche automatique du meilleur n0
-# =========================================================
+erreursSigmaSMD[4,j] = norm(res0$variance - Sigma_true,"F")
 
-beta <- 0.75
-target_quantile <- 0.9
 
-n0_grid <- seq(1, 5000, by = 10)
+table(res0$outlier_labels,labels)
+resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 200,c_m=2,batch = 3)
+erreursSigmaSMD[5,j] = norm(resStrm$variance - Sigma_true,"F")
 
-results <- data.frame(
-  n0 = numeric(),
-  TP = numeric(),
-  FP = numeric(),
-  TN = numeric(),
-  FN = numeric(),
-  Recall = numeric(),
-  Precision = numeric(),
-  FPR = numeric(),
-  F1 = numeric()
-)
+table(resStrm$outlier_labels,labels)
 
-for(n0 in n0_grid){
-  
-  quantemp <- median(distoffl)
-  
-  pred <- rep(0, length(distoffl))
-  
-  for(i in 1:length(distoffl)){
-    
-    gamma <- (i + n0)^(-beta)
-    
-    quantemp <- quantemp -
-      gamma *
-      (as.numeric(distoffl[i] <= quantemp) - target_quantile)
-    
-    if(distoffl[i] > quantemp){
-      pred[i] <- 1
-    }
-  }
-  
-  # matrice confusion
-  TP <- sum(pred == 1 & labels == 1)
-  FP <- sum(pred == 1 & labels == 0)
-  
-  TN <- sum(pred == 0 & labels == 0)
-  FN <- sum(pred == 0 & labels == 1)
-  
-  # métriques
-  Recall <- TP / (TP + FN + 1e-12)
-  
-  Precision <- TP / (TP + FP + 1e-12)
-  
-  FPR <- FP / (FP + TN + 1e-12)
-  
-  F1 <- 2 * Precision * Recall /
-    (Precision + Recall + 1e-12)
-  
-  results <- rbind(
-    results,
-    data.frame(
-      n0,
-      TP,
-      FP,
-      TN,
-      FN,
-      Recall,
-      Precision,
-      FPR,
-      F1
-    )
-  )
+resOnline <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 200,c_m=2,batch = 1)
+erreursSigmaSMD[6,j] = norm(resOnline$variance - Sigma_true,"F")
+
+table(resOnline$outlier_labels,labels)
+
 }
-
-# =========================================================
-# Meilleur n0 selon F1
-# =========================================================
-
-best <- results[which.max(results$F1), ]
-
-print(best)
-
-# =========================================================
-# top résultats
-# =========================================================
-
-results[order(-results$F1), ][1:10, ]
-
-# 
-# library(pROC)
-# 
-# roc_obj <- roc(res$outlier_labels,distoffl)
-# auc_value <- auc(roc_obj)
-# 
-# cat("AUC :", auc_value, "\n")
-# 
-
-# =========================================================
-# 14. COURBE ROC
-# =========================================================
-
-# plot(roc_obj,
-#      xlim = c(0,1),
-#      ylim = c(0,1),
-#      )
-
-# labels : vecteur 0/1
-# score  : score anomalie (ex: Mahalanobis)
+boxplot(
+  erreursSigmaSMD,
+  log = "y",                     # échelle logarithmique sur Y
+  names = colnames(erreursSigmaSMD),
+  main = "Erreurs covariance SMD",
+  ylab = "Erreur (log scale)",
+  col = rainbow(ncol(erreursSigmaSMD))
+)
+#############################ROC#######################################
 
 
 compute_roc <- function(score, labels) {
