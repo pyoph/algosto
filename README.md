@@ -27,10 +27,10 @@ Le projet s'articule autour de quatre fichiers principaux :
 
 ### 2. `algorithmes.R`
 
-- **Rôle** : Lance les méthodes d'estimation et de détection d'outlier concurrentes : cov online naïf, shrinkage selon les idées de Wolf et de Cabana.
+- **Rôle** : Lance la méthode d'estimation et de détection d'outlier concurrente : cov online naïf.
 - **Entrée** :
   - Dataset $Z \in \mathcal{M}_{n,d}(\mathbb{R})$.
 - **Sortie** :
-  - Estimateur de $\Sigma$ : $\widehat{\Sigma}$ final et à chaque itération pour méthodes online, outliers_labels (vecteurs où l'entrée $i$ si la donnée $i$ traitée est un outlier, $0$ sinon.
+  - Estimateur de $\Sigma$ : $\widehat{\Sigma}$ final et à chaque itération pour méthode online, outliers_labels (vecteurs où l'entrée $i$ si la donnée $i$ traitée est un outlier, $0$ sinon.
 
   
