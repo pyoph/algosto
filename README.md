@@ -6,7 +6,7 @@ Ce projet contient un pipeline de simulation en R destiné à estimer online de 
 
 ## Structure du projet
 
-Le projet s'articule autour de quatre fichiers principaux :
+Le projet s'articule autour de trois fichiers principaux :
 
 ### 0. `loadnecessary.R`
 
