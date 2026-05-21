@@ -21,9 +21,133 @@ simNb = 1
 
 
 scenarios <- list(
-  list(k = 5, l = 0.1, rho1 = 0)
+  #scenarios <- list(
+    
+    # =====================================================
+    # CONCENTRATION
+    # =====================================================
+    
+    # Concentration faible
+    list(k = 0, l = 0.5, rho1 = 0.3),
+    
+    # Concentration moyenne
+    list(k = 0, l = 0.1, rho1 = 0.3),
+    
+    # Concentration forte
+    list(k = 0, l = 0.01, rho1 = 0.3),
+    
+    
+    # =====================================================
+    # DECENTRAGE
+    # =====================================================
+    
+    # Décentrage faible
+    list(k = 1, l = 1, rho1 = 0.3),
+    
+    # Décentrage moyen
+    list(k = 5, l = 1, rho1 = 0.3),
+    
+    # Décentrage fort
+    list(k = 20, l = 1, rho1 = 0.3),
+    
+    
+    # =====================================================
+    # DECENTRAGE + CONCENTRATION
+    # =====================================================
+    
+    # Décentrage + concentration faible
+    list(k = 5, l = 0.5, rho1 = 0.3),
+    
+    # Décentrage + concentration moyenne
+    list(k = 10, l = 0.1, rho1 = 0.3),
+    
+    # Décentrage + concentration forte
+    list(k = 20, l = 0.01, rho1 = 0.3),
+    
+    
+    # =====================================================
+    # DILATATION
+    # =====================================================
+    
+    # Dilatation faible
+    list(k = 0, l = 2, rho1 = 0.3),
+    
+    # Dilatation moyenne
+    list(k = 0, l = 10, rho1 = 0.3),
+    
+    # Dilatation forte
+    list(k = 0, l = 100, rho1 = 0.3),
+    
+    
+    # =====================================================
+    # DECENTRAGE + DILATATION
+    # =====================================================
+    
+    # Décentrage + dilatation faible
+    list(k = 5, l = 2, rho1 = 0.3),
+    
+    # Décentrage + dilatation moyenne
+    list(k = 5, l = 10, rho1 = 0.3),
+    
+    # Décentrage + dilatation forte
+    list(k = 5, l = 100, rho1 = 0.3),
+    
+    
+    # =====================================================
+    # DEFORMATION
+    # =====================================================
+    
+    # Déformation faible
+    list(k = 0, l = 1, rho1 = 0.5),
+    
+    # Déformation moyenne
+    list(k = 0, l = 1, rho1 = 0.7),
+    
+    # Déformation forte
+    list(k = 0, l = 1, rho1 = 0.95),
+    
+    
+    # =====================================================
+    # DEFORMATION + CONCENTRATION
+    # =====================================================
+    
+    # Déformation + concentration faible
+    list(k = 0, l = 0.5, rho1 = 0.5),
+    
+    # Déformation + concentration moyenne
+    list(k = 0, l = 0.1, rho1 = 0.7),
+    
+    # Déformation + concentration forte
+    list(k = 0, l = 0.01, rho1 = 0.95),
+    
+    
+    # =====================================================
+    # DEFORMATION + DILATATION
+    # =====================================================
+    
+    # Déformation + dilatation faible
+    list(k = 0, l = 2, rho1 = 0.5),
+    
+    # Déformation + dilatation moyenne
+    list(k = 0, l = 10, rho1 = 0.7),
+    
+    # Déformation + dilatation forte
+    list(k = 0, l = 100, rho1 = 0.95),
+    
+    
+    # =====================================================
+    # CAS EXTREMES
+    # =====================================================
+    
+    # Anomalie extrême concentrée
+    list(k = 100, l = 0.01, rho1 = 0.99),
+    
+    # Anomalie extrême dilatée
+    list(k = 100, l = 100, rho1 = 0.99)
+    
+  )
   #list(k = 1e3, l = 0.07,rho1 = 0.3))
-   )
+   
 
 #k = 1e3;l = 0.01;rho1 = 0.995
 for(sc in scenarios){
@@ -65,7 +189,7 @@ for (m in seq_along(rList[1:9])){
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r , '-sim', sim,".RData")
     
     print(dataFile)
-    
+    #contParam = ParmsF1(m1, k, l, rho1)
     setwd(simDir)
     if(!file.exists(dataFile)){contParam = ParmsF1(m1, k, l, rho1)
     #data = genererEchantillon(n,n,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
@@ -77,7 +201,7 @@ for (m in seq_along(rList[1:9])){
     
     if(r != 0){
       
-      data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = l*diag(d),r, id_outliers =  outlier_sets[[m]])
+      data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r, id_outliers =  outlier_sets[[m]])
     }#save(dataFile)
     }
     else{load(dataFile)}
@@ -136,7 +260,7 @@ for (m in seq_along(rList[1:9])){
       #if(d == 10){
         #}
       #if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
-      resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE)
+      resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,c_m=1.5)
       
     })
   
@@ -172,7 +296,7 @@ for (m in seq_along(rList[1:9])){
     #   #resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z))
     # }
   #  if(d == 10 ){
-      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE)
+      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,c_m=1.5)
    # }
     #if(d == 100){
     #  resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)))}
