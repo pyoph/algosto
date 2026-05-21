@@ -18,11 +18,11 @@ return(Z)
 
 url <- "https://github.com/NetManAIOps/OmniAnomaly/archive/refs/heads/master.zip"
 dest <- "smd.zip"
+setwd("~")
 
 download.file(url, destfile = dest, mode = "wb")
 
 unzip(dest)
-setwd("~")
 # chercher tous les fichiers SMD
 files <- list.files(".", recursive = TRUE, full.names = TRUE)
 
@@ -111,6 +111,22 @@ sequential_clean_columns <- function(Z, begin = 1, cut = NULL) {
     Z = Z[, keep, drop = FALSE],
     keep = keep
   ))
+}
+
+
+load_smd_machine <- function(test_path, label_path) {
+  
+  Z <- as.matrix(
+    read.table(test_path, sep = ",")
+  )
+  
+  labels <- scan(label_path)
+  
+  list(
+    Z = Z,
+    labels = labels,
+    name = basename(test_path)
+  )
 }
 
 smd_data <- list()
@@ -219,15 +235,24 @@ Z = remove_high_corr(Z,threshold = 0.99)
 Z_clean = Z[labels == 0,]
 
 ###########Extraction moyenne et covariance sans outliers
-meanTrue = colMeans(Z_clean)
+meanTrueCov = colMeans(Z_clean)
 
-Sigma_true = cov(Z_clean)
-#############################################"
+Sigma_trueCov = cov(Z_clean)
+
+Sigma_trueMCD = covMcd(Z_clean)$cov
+
+Sigma_trueOGK = covOGK(Z_clean)$cov
+
+Sigma_trueOffl = offlineRobustVariance(Z_clean)$variance
+
+Sigma_trueOnl = onlineRobustVariance(Z_clean,batch = 1)$variance
+
+Sigma_trueStrm = onlineRobustVariance(Z_clean)$variance
 
 
 resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = 1e3 )
 
-erreursSigmaSMD[1,j] = norm(resSamplecov$Sigma - Sigma_true,"F")
+erreursSigmaSMD[1,j] = norm(resSamplecov$Sigma - Sigma_trueCov,"F")
 
 table(resSamplecov$outliers_labels,labels)
 
@@ -236,13 +261,13 @@ table(resSamplecov$outliers_labels,labels)
 # resOffline = offlineRobustVariance(Z,computeOutliers = TRUE)
 resmcd = covMcd(Z)
 
-erreursSigmaSMD[2,j] = norm(resmcd$cov - Sigma_true,"F")
+erreursSigmaSMD[2,j] = norm(resmcd$cov - Sigma_trueMCD,"F")
 
 #resOfflineClean = offlineRobustVariance(Z_clean,computeOutliers = TRUE)
 
 resogk = covOGK(Z, sigmamu = scaleTau2)
 
-erreursSigmaSMD[3,j] = norm(resogk$cov - Sigma_true,"F")
+erreursSigmaSMD[3,j] = norm(resogk$cov - Sigma_trueOGK,"F")
 
 distogk = rep(0,nrow(Z))
 distoffl = rep(0,nrow(Z))
@@ -262,6 +287,10 @@ for(i in 1:nrow(Z))
   distrue[i] = t(Z[i,] - meanTrue)%*%invSigmaTrue%*%(Z[i,] - meanTrue)
   
 }
+
+#############################################Quantile oracle###############################
+quantoracle = quantile(distrue,.95)
+###########################################################################################
 
 #oracle = rep(0,nrow(Z))
 
@@ -296,12 +325,12 @@ for (i in 1:nrow(Z)) {
 cut=0.9
 res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,c_m=1.5)
 
-erreursSigmaSMD[4,j] = norm(res0$variance - Sigma_true,"F")
+erreursSigmaSMD[4,j] = norm(res0$variance - Sigma_trueOffl,"F")
 outliersLabelsSMD[[j]][, 4] = res0$outlier_labels
 
 
 table(res0$outlier_labels,labels)
-resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 200,c_m=2,batch = 3)
+resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 200,c_m=2,batch = floor(nrow(Z)/ncol(Z)))
 erreursSigmaSMD[5,j] = norm(resStrm$variance - Sigma_true,"F")
 outliersLabelsSMD[[j]][, 5] = resStrm$outlier_labels
 table(resStrm$outlier_labels,labels)
@@ -309,7 +338,7 @@ table(resStrm$outlier_labels,labels)
 resOnline <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 200,c_m=2,batch = 1)
 outliersLabelsSMD[[j]][, 6] = resOnline$outlier_labels
 
-erreursSigmaSMD[6,j] = norm(resOnline$variance - Sigma_true,"F")
+erreursSigmaSMD[6,j] = norm(resOnline$variance - Sigma_trueOnl,"F")
 
 table(resOnline$outlier_labels,labels)
 
