@@ -47,7 +47,7 @@ sequential_clean_columns <- function(Z, begin = 1, cut = NULL) {
   # =========================
   
   for (k in (begin + 1):p) {
-    
+      
     ok <- tryCatch({
       
        onlineRobustVariance(
@@ -160,7 +160,7 @@ outliersLabelsSMD <- vector("list", nbmachines)
 temps = array(0,dim=c(6,nbmachines))
 keep_columns_ok = list()
 
-for(j in list(11)){
+for(j in 1:nbmachines){
   
   cat("\n====================\n")
   cat("Machine", j, "\n")
@@ -242,7 +242,7 @@ for(j in list(11)){
   
   # mise à jour des colonnes globales gardées
   keep_columns_ok[[j]] <- keep_columns_ok[[j]][keep_idx]
-  
+  #Z = Z[,keep_columns_ok[[j]],drop = FALSE]
   Z_clean = Z[labels == 0,]
   
   ##############Calcul taille batch
@@ -267,13 +267,13 @@ for(j in list(11)){
   
   Sigma_trueOffl = offlineRobustVariance(Z_clean)$variance
   
-  Sigma_trueOnl = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 1e3,c_m=2,batch = 1)$variance
+  Sigma_trueOnl = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 2e3,c_m=1,batch = 1)$variance
   
-  Sigma_trueStrm = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 1e3,c_m=2,batch = batchStrm)$variance
+  Sigma_trueStrm = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 2e3,c_m=1,batch = batchStrm)$variance
   
   temps_covonline = system.time(
   {
-    resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = 2e3,cutoffquant =  .95)
+    resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = 2e3,cutoffquant =  .95,c_m = .1)
   })
   temps[1,j]= temps_covonline[3]
   
@@ -434,7 +434,7 @@ for(j in list(11)){
   
   
   temps_strm = system.time(
-  resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 2e3,c_m=2,batch = batchStrm)
+  resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 2e3,c_m= 2,batch = batchStrm)
   #  resStrm <- onlineRobustVariance_old(Z,computeOutliers = TRUE,batch = batchStrm)
     )
   temps[5,j] = temps_strm[3]
@@ -442,7 +442,7 @@ for(j in list(11)){
   outliersLabelsSMD[[j]][, 5] = resStrm$outlier_labels
   #table(resStrm$outlier_labels,labels)
   temps_online = system.time(
-  resOnline <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 2e3,c_m=2,batch = 1)
+  resOnline <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.5,nDataInit = 2e3,c_m=1,batch = 1)
     #resOnline <- onlineRobustVariance_old(Z,computeOutliers = TRUE,batch = 1)
     
   )
@@ -450,51 +450,53 @@ for(j in list(11)){
   outliersLabelsSMD[[j]][, 6] = resOnline$outlier_labels
   #table(resOnline$outlier_labels,labels)
   erreursSigmaSMD[6,j] = norm(resOnline$variance - Sigma_trueOnl,"F")
+  setwd("~/figures")
+  
+  file <- paste0("histogram_densityStrm-mach-",j,".pdf")
+  pdf(file, width = 18, height = 6)
+  
+  x <- resStrm$distances
+  x <- x[is.finite(x)]
+  
+  df <- ncol(Z)
+  
+  # quantile 95%
+  q95 <- qchisq(0.95, df = df)
+  
+  # histogramme
+  hist(x,
+       probability = TRUE,
+       breaks = 80,
+       col = "lightblue",
+       border = "white",
+       main = "",
+       xlab = "",
+       ylab = "",
+       xlim = c(0, 1e3),
+       ylim = c(0,0.003))
+  
+  # densité χ²
+  curve(dchisq(x, df = df),
+        add = TRUE,
+        col = "red",
+        lwd = 3)
+  
+  # seuil théorique 95%
+  abline(v = q95,
+         col = "black",
+         lwd = 3,
+         lty = 2)
+  
+  dev.off()
   
   #table(resOnline$outlier_labels,labels)
-  
+  fileres = paste0("res-mach-",j,".RData")
+  setwd("~/res")
+  save(resSamplecov,resogk,resmcd,res0,resOnline,resStrm,file = fileres)
   
 }
 
 
-setwd("~/figures")
-
-file <- "histogram_densityStrm.pdf"
-pdf(file, width = 18, height = 6)
-
-x <- resStrm$distances
-x <- x[is.finite(x)]
-
-df <- ncol(Z)
-
-# quantile 95%
-q95 <- qchisq(0.95, df = df)
-
-# histogramme
-hist(x,
-     probability = TRUE,
-     breaks = 80,
-     col = "lightblue",
-     border = "white",
-     main = "",
-     xlab = "",
-     ylab = "",
-     xlim = c(0, 1e3),
-     ylim = c(0,0.003))
-
-# densité χ²
-curve(dchisq(x, df = df),
-      add = TRUE,
-      col = "red",
-      lwd = 3)
-
-# seuil théorique 95%
-abline(v = q95,
-       col = "black",
-       lwd = 3,
-       lty = 2)
-
-dev.off()
 
 ################Avec la correction#############
 
@@ -999,34 +1001,21 @@ compute_rates <- function(pred, labels) {
 }
 
 ####Calcul des trajectoires pour les 3 méthodes online et l'oracle######
-for(j in 11:11){
+for(j in 1:nbmachines){
   outlmach = outliersLabelsSMD[[j]]
   labels = smd_data[[j]]$labels
   
-  #rates_samplecov = compute_rates(outlmach[,1], labels)
-  rates_samplecov = compute_rates(outliersSampleCov_old, labels)
-  #rates_strm  <- compute_rates(outlmach[,5], labels)
-  rates_strm = compute_rates(outliersStrm_old,labels)
-  #rates_online <- compute_rates(outlmach[,6], labels)
-  rates_online <- compute_rates(outliersOnl_old, labels)
+  rates_samplecov = compute_rates(outlmach[,1], labels)
+  #rates_samplecov = compute_rates(outliersSampleCov_old, labels)
+  rates_strm  <- compute_rates(outlmach[,5], labels)
+  #rates_strm = compute_rates(outliersStrm_old,labels)
+  rates_online <- compute_rates(outlmach[,6], labels)
+  #rates_online <- compute_rates(outliersOnl_old, labels)
   rates_oracle <- compute_rates(outlmach[,7], labels)
   
-  ##################################Trajectoire des seuils################################"
-  # 
-  # distonl = resOnline$distances
-  # 
-  # distStrm = resStrm$distances
-  # 
-  # scal_factor_onl = rep(0,nrow(Z))
-  # scal_factor_str = rep(0,nrow(Z))
-  # 
-  # for (i in 1:nrow(Z)){
-  #   scal_factor_onl[i] = qchisq(.5,df = ncol(Z))/median(distonl[1:i])
-  #   scal_factor_str[i] = qchisq(.5,df = ncol(Z))/median(distStrm[1:i])
-  #   
-  # }
+  ##################################Trajectoires################################"
   setwd("~/figures")
-  nom_fichier = paste0("trajectories_SMD_mach-",j,"-Ninit2e3",".pdf")
+  nom_fichier = paste0("trajectories_SMD_mach-",j,"-Ninit2e3cm1",".pdf")
   pdf(nom_fichier, width = 14, height = 10)
   
   par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
@@ -1123,4 +1112,121 @@ for(j in 11:11){
   box()
   
   dev.off()
+  
+  setwd("~/res")
+  fileres= paste0("res-mach-",j,".RData")
+  load(fileres)
+  cutoff = qchisq(.95,df =ncol(resStrm$variance))
+  outliersSampleCov_old = as.integer(resSamplecov$distances > cutoff )
+  outliersStrm_old = as.integer(resStrm$distances > cutoff )
+  outliersOnl_old = as.integer(resOnline$distances > cutoff )
+  
+  #rates_samplecov = compute_rates(outlmach[,1], labels)
+  rates_samplecov = compute_rates(outliersSampleCov_old, labels)
+  #rates_strm  <- compute_rates(outlmach[,5], labels)
+  rates_strm = compute_rates(outliersStrm_old,labels)
+  #rates_online <- compute_rates(outlmach[,6], labels)
+  rates_online <- compute_rates(outliersOnl_old, labels)
+  rates_oracle <- compute_rates(outlmach[,7], labels)
+  
+  ##################################Trajectoires################################"
+  setwd("~/figures")
+  nom_fichier = paste0("trajectories_SMD_mach-",j,"-old",".pdf")
+  pdf(nom_fichier, width = 14, height = 10)
+  
+  par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+  
+  x_vals = 1:length(rates_strm$FN_rate)
+  
+  
+  # =====================================================
+  # 1. LABELS
+  # =====================================================
+  
+  plot(x_vals, labels,
+       col = "purple",
+       xlab = "", ylab = "",
+       yaxt = "n", xaxt = "n",
+       ylim = c(0, 1),
+       main = "Ground truth"
+  )
+  
+  axis(2, at = c(0, 1), las = 1, cex.axis = 1.2)
+  axis(1, at = seq(1000, max(x_vals), by = 1000),
+       las = 1, cex.axis = 1.2)
+  box()
+  
+  # =====================================================
+  # 2. SCALE FACTORS
+  # =====================================================
+  # 
+  # plot(x_vals, scal_factor_onl,
+  #      type = "l", lwd = 3, col = "blue",
+  #      xlab = "", ylab = "",
+  #      yaxt = "n", xaxt = "n",
+  #      main = "Scale factors",
+  #      ylim = range(c(scal_factor_onl, scal_factor_str))
+  # )
+  # 
+  # lines(x_vals, scal_factor_str,
+  #       col = "red", lwd = 3)
+  # 
+  # axis(2, las = 1, cex.axis = 1.2)
+  # axis(1, at = seq(1000, max(x_vals), by = 1000),
+  #      las = 1, cex.axis = 1.2)
+  # box()
+  
+  # =====================================================
+  # 2. FALSE NEGATIVE RATE
+  # =====================================================
+  
+  plot(x_vals, rates_strm$FN_rate*100,
+       type = "l", lwd = 3, col = "red",
+       xlab = "", ylab = "",
+       yaxt = "n", xaxt = "n",
+       main = "False Negative Rate",
+       ylim = c(0,100)
+  )
+  
+  lines(x_vals, rates_samplecov$FN_rate*100,
+        lty = "dotted", col = "darkgreen", lwd = 3)
+  
+  lines(x_vals, rates_online$FN_rate*100,
+        lty = "dashed", col = "blue", lwd = 3)
+  lines(x_vals, rates_oracle$FN_rate*100,
+        lty = "dashed", col = "purple", lwd = 3)
+  
+  axis(2, las = 1, cex.axis = 1.2)
+  axis(1, at = seq(1000, max(x_vals), by = 1000),
+       las = 1, cex.axis = 1.2)
+  box()
+  
+  # =====================================================
+  # 3. FALSE POSITIVE RATE
+  # =====================================================
+  
+  plot(x_vals, rates_strm$FP_rate*100,
+       type = "l", lwd = 3, col = "red",
+       xlab = "", ylab = "",
+       yaxt = "n", xaxt = "n",
+       main = "False Positive Rate",
+       ylim = range(c(0,40))
+  )
+  
+  lines(x_vals, rates_samplecov$FP_rate*100,
+        lty = "dotted", col = "darkgreen", lwd = 3)
+  
+  lines(x_vals, rates_online$FP_rate*100,
+        lty = "dashed", col = "blue", lwd = 3)
+  
+  lines(x_vals, rates_oracle$FP_rate*100,
+        lty = "dashed", col = "purple", lwd = 3)
+  
+  axis(2, las = 1, cex.axis = 1.2)
+  axis(1, at = seq(1000, max(x_vals), by = 1000),
+       las = 1, cex.axis = 1.2)
+  box()
+  
+  dev.off()
+  
 }
