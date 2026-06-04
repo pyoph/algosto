@@ -14,6 +14,11 @@ lList = l1valup1
 
 rho1List = rho1val
 
+gamma_grid <- seq(0.55, 0.95, by = 0.05)
+
+param_grid
+
+
 sim = 1
 simNb = 1
 
@@ -28,27 +33,13 @@ scenarios <- list(
     # =====================================================
     
     # Concentration faible
-    list(k = 0, l = 0.5, rho1 = 0.3),
+    #list(k = 0, l = 0.5, rho1 = 0.3),
     
     # Concentration moyenne
-    list(k = 0, l = 0.1, rho1 = 0.3),
+    #list(k = 0, l = 0.1, rho1 = 0.3),
     
     # Concentration forte
-    list(k = 0, l = 0.01, rho1 = 0.3),
-    
-    
-    # =====================================================
-    # DECENTRAGE
-    # =====================================================
-    
-    # Décentrage faible
-    list(k = 1, l = 1, rho1 = 0.3),
-    
-    # Décentrage moyen
-    list(k = 5, l = 1, rho1 = 0.3),
-    
-    # Décentrage fort
-    list(k = 20, l = 1, rho1 = 0.3),
+    #list(k = 0, l = 0.01, rho1 = 0.3),
     
     
     # =====================================================
@@ -62,7 +53,7 @@ scenarios <- list(
     list(k = 10, l = 0.1, rho1 = 0.3),
     
     # Décentrage + concentration forte
-    list(k = 20, l = 0.01, rho1 = 0.3),
+    list(k = 50, l = 0.01, rho1 = 0.3),
     
     
     # =====================================================
@@ -70,13 +61,13 @@ scenarios <- list(
     # =====================================================
     
     # Dilatation faible
-    list(k = 0, l = 2, rho1 = 0.3),
+    #list(k = 0, l = 2, rho1 = 0.3),
     
     # Dilatation moyenne
-    list(k = 0, l = 10, rho1 = 0.3),
+    #list(k = 0, l = 10, rho1 = 0.3),
     
     # Dilatation forte
-    list(k = 0, l = 100, rho1 = 0.3),
+    #list(k = 0, l = 100, rho1 = 0.3),
     
     
     # =====================================================
@@ -96,15 +87,7 @@ scenarios <- list(
     # =====================================================
     # DEFORMATION
     # =====================================================
-    
-    # Déformation faible
-    list(k = 0, l = 1, rho1 = 0.5),
-    
-    # Déformation moyenne
-    list(k = 0, l = 1, rho1 = 0.7),
-    
-    # Déformation forte
-    list(k = 0, l = 1, rho1 = 0.95),
+  
     
     
     # =====================================================
@@ -132,23 +115,37 @@ scenarios <- list(
     list(k = 0, l = 10, rho1 = 0.7),
     
     # Déformation + dilatation forte
-    list(k = 0, l = 100, rho1 = 0.95),
+    list(k = 0, l = 100, rho1 = 0.95)
+    #,
     
     
     # =====================================================
     # CAS EXTREMES
     # =====================================================
-    
-    # Anomalie extrême concentrée
-    list(k = 100, l = 0.01, rho1 = 0.99),
-    
-    # Anomalie extrême dilatée
-    list(k = 100, l = 100, rho1 = 0.99)
-    
+    # 
+    # # Anomalie extrême concentrée
+    # list(k = 100, l = 0.01, rho1 = 0.99),
+    # 
+    # # Anomalie extrême dilatée
+    # list(k = 100, l = 100, rho1 = 0.99)
+    # 
   )
   #list(k = 1e3, l = 0.07,rho1 = 0.3))
-   
+sctests = list(
+  
+  # Déformation + dilatation faible
+  list(k = 0, l = 2, rho1 = 0.5),
+  
+  # Déformation + dilatation moyenne
+  list(k = 0, l = 10, rho1 = 0.7),
+  
+  # Déformation + dilatation forte
+  list(k = 0, l = 100, rho1 = 0.95)
+  
+  
+)
 
+for(gamma in gamma_grid){
 #k = 1e3;l = 0.01;rho1 = 0.995
 for(sc in scenarios){
 
@@ -207,10 +204,19 @@ for (m in seq_along(rList[1:9])){
     else{load(dataFile)}
     labelsVraisMed5[,m] = data$labelsVrais
     fitFile <- paste0('FitParms-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-    temps_naif = system.time(
-      
-      {resNaif = SampleCovOnline(data$Z)}
+    temps_naif <- system.time(
+    resNaif <- tryCatch(
+      {
+        SampleCovOnline(data$Z, quantcutoff = TRUE)
+      },
+      error = function(e) {
+        message("SampleCovOnline failed: ", e$message)
+        NULL
+      }
     )
+    
+  )
+    
     fitNaif = resNaif
     erreursSigmaMed5[n,m,1,sim] = norm(resNaif$Sigma -Sigma0,"F")
     outliersLabelsMed5[,m,1,sim] = resNaif$outliers_labels
@@ -222,7 +228,12 @@ for (m in seq_along(rList[1:9])){
     #   }
     
   }
+  
+  
+  
+  
   print(paste0("Erreur naive med ",erreursSigmaMed5[n,m,1,sim]))
+  
   
   temps[1,sim] = temps_naif[3]
   
@@ -235,9 +246,9 @@ for (m in seq_along(rList[1:9])){
   print(paste0("faux positifs med naive ",faux_positifsMed5[m,1,sim]))
   
   print(paste0("faux négatifs med naive ",faux_negatifsMed5[m,1,sim]))
-  
+  invSigmaOracle = solve(Sigma0)
   for(s in (1:n)){
-    if(t(data$Z[s,])%*% solve(Sigma0)%*% data$Z[s,] > qchisq(.95,df = d)) {
+    if(t(data$Z[s,])%*% invSigmaOracle%*% data$Z[s,] > qchisq(.95,df = d)) {
       outliersLabelsOracleMed5[s,m,sim] = 1
     }
     
@@ -260,7 +271,7 @@ for (m in seq_along(rList[1:9])){
       #if(d == 10){
         #}
       #if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
-      resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,c_m=1.5)
+      resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE,c_m = .5)
       
     })
   
@@ -271,8 +282,8 @@ for (m in seq_along(rList[1:9])){
   #   #outliersLabelsNear[s,m,2,sim] = resUsOnline$outlier_labels[s]
   # }
   erreursSigmaMed5[n,m,2,sim] = norm(resUsOnline$variance - Sigma0,"F")
-  if(d ==10){outliersLabelsMed5[,m,2,sim] = resUsOnline$outlier_labels}
-  if(d ==100){outliersLabelsMed5[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
+  outliersLabelsMed5[,m,2,sim] = resUsOnline$outlier_labels
+  #if(d ==100){outliersLabelsMed5[,m,2,sim] = test_outliers(distances = resUsOnline$distances,cutoff = 1.29*qchisq(.95,df = 100))}
   
   print(paste0("Erreur us online med ",erreursSigmaMed5[n,m,2,sim]))
   
@@ -296,7 +307,7 @@ for (m in seq_along(rList[1:9])){
     #   #resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z))
     # }
   #  if(d == 10 ){
-      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,c_m=1.5)
+      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,c_m = .5)
    # }
     #if(d == 100){
     #  resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)))}
@@ -309,10 +320,8 @@ for (m in seq_along(rList[1:9])){
   #   #outliersLabelsNear[s,m,3,sim] = resUsStreaming$outlier_labels[s]
   # }
   erreursSigmaMed5[n,m,3,sim] =norm(resUsStreaming$variance - Sigma0,"F")
-  if(d == 10){outliersLabelsMed5[,m,3,sim]= resUsStreaming$outlier_labels}
-  if(d == 100){
-    outliersLabelsMed5[,m,3,sim] = test_outliers(distances = resUsStreaming$distances,cutoff = 1.38*qchisq(.95,df = 100))
-  }
+  outliersLabelsMed5[,m,3,sim]= resUsStreaming$outlier_labels
+  
   print(paste0("Erreur us streaming med ",erreursSigmaMed5[n,m,3,sim]))
   
   #t = table(data$labelsVrais,resUsStreaming$outlier_labels)
@@ -336,7 +345,7 @@ for (m in seq_along(rList[1:9])){
   
   temps_offline = system.time({
     # resOffline = OfflineOutlierD etection(data$Z)
-    resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE)
+    resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE,c_m = 1,cutoff = .95)
   }
   )
   
@@ -400,11 +409,13 @@ for (m in seq_along(rList[1:9])){
   
   temps_ogk = system.time({
     resOGK = covOGK(data$Z,sigmamu = scaleTau2)
-    invSigmaOGK = solve(resOGK$cov)
+    #invSigmaOGK = solve(resOGK$cov)
+    qtogk = 
     for(s in (1:n))
     {
-      if (t(data$Z[s,] - resOGK$center)%*%invSigmaOGK%*%(data$Z[s,] - resOGK$center) > qchisq(.95,df = d)){outliersLabelsMed5[s,m,6,sim] = 1}
-    }
+      #if (t(data$Z[s,] - resOGK$center)%*%invSigmaOGK%*%(data$Z[s,] - resOGK$center) > qchisq(.95,df = d)){outliersLabelsMed5[s,m,6,sim] = 1}
+    if(resOGK$distances[s] >qchisq(.95,df = d)){outliersLabelsMed5[s,m,6,sim] = 1}
+      }
     
     }
   )
@@ -435,13 +446,13 @@ for (m in seq_along(rList[1:9])){
   
   setwd(resDir)
   #save(Sigma_naive, Sigma_online, Sigma_str,temps_naif,temps_online,temps_streaming,file=fitFile)
-}
 
 
 
-setwd("~")
 
-file = paste0("results-k-",k,"l-",l,"rho1",rho1,"-d",d,".Rdata")
+setwd("~/figures")
+
+file = paste0("results-k-",k,"l-",l,"rho1",rho1,"-d",d,"-gammaRMC-",gammaRMC,".Rdata")
 save(erreursSigmaMed5,faux_negatifsOracleMed5,faux_positifsOracleMed5,faux_negatifsMed5,faux_positifsMed5,outliersLabelsOracleMed5,outliersLabelsMed5,labelsVraisMed5,file = file)
 
 
@@ -469,7 +480,7 @@ pseudo_log <- function(y) {
 }
 
 
-file <- paste0("scen-k", k, "-l", l, "-rho1", rho1, ".pdf")
+file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,"-gammaRMC",gamma ,".pdf")
 
 pdf(file, width = 18, height = 6)  # largeur augmentée pour 3 plots
 par(mfrow = c(1, 3), mar = c(5, 5, 2, 1))  # 1 ligne, 3 colonnes
@@ -552,54 +563,53 @@ box()
 
 dev.off()
 
-}
+}}}
 
 ###############################code lateX########################################################
 setwd("~")
-latex_file <- file("table_all_scenarios.tex", "w")
-
-writeLines("\\begin{figure}[ht!]", latex_file)
-writeLines("\\centering", latex_file)
-writeLines("\\renewcommand{\\arraystretch}{0.9}", latex_file)
-writeLines("\\setlength{\\tabcolsep}{3pt}", latex_file)
-
-writeLines("\\begin{tabular}{c c c c}", latex_file)
-
-# HEADER
-writeLines(
-  "\\raisebox{0.5\\height}{} &
-\\multicolumn{3}{c}{
-\\small \\textbf{Frobenius norm error \\hspace{1.5cm}
-False negatives \\hspace{1.5cm}
-False positives}
-} \\\\[6pt]",
-  latex_file
+# Paramètres des scénarios
+scenarios <- list(
+  list(name = "Mild",   file = "graphiques/scen-k5-l0.5-rho10.3.pdf"),
+  list(name = "Strong", file = "graphiques/scen-k10-l0.1-rho10.3.pdf"),
+  list(name = "Stronger", file = "graphiques/scen-k50-l0.01-rho10.3.pdf")
 )
 
-# LOOP
+# Nom du fichier LaTeX de sortie
+latex_file <- "tableau_scenarios.tex"
+
+# Ouvrir connexion pour écrire le fichier
+con <- file(latex_file, "w")
+
+# En-tête du tableau
+writeLines("\\begin{figure}[ht!]", con)
+writeLines("\\centering", con)
+writeLines("\\textbf{Shift Concentration} \\\\[6pt]", con)
+writeLines("\\renewcommand{\\arraystretch}{0.9}", con)
+writeLines("\\setlength{\\tabcolsep}{3pt}", con)
+writeLines("\\begin{tabular}{c c c c}", con)
+writeLines("", con)
+
+# Titres des colonnes au-dessus des images
+writeLines("\\raisebox{0.5\\height}{} & \\multicolumn{3}{c}{\\small \\textbf{Frobenius norm error \\hspace{1.5cm} False negatives \\hspace{1.5cm} False positives}} \\\\[6pt]", con)
+
+# Boucle pour chaque scénario
 for (sc in scenarios) {
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
-  #scen_name <- paste0("rho1 = ", round(rho1, 2))
-  scen_name <- paste0("KL ",round(KL(parms0,ParmsF1(m1,k,l,rho1)),2))
-  pdf_name <- paste0("graphiques/scen-k", k, "-l",l,"-rho1",rho1,".pdf")
-  
   line <- paste0(
-    "\\raisebox{0.5\\height}{\\rotatebox{90}{", scen_name, "}} & ",
+    "\\raisebox{0.5\\height}{\\rotatebox{90}{", sc$name, "}} & ",
     "\\multicolumn{3}{c}{\\includegraphics[width=0.95\\textwidth,height=4cm]{",
-    pdf_name,
+    sc$file,
     "}} \\\\"
   )
-  
-  writeLines(line, latex_file)
+  writeLines(line, con)
 }
 
-writeLines("\\end{tabular}", latex_file)
-writeLines("\\end{figure}", latex_file)
+# Fin du tableau
+writeLines("\\end{tabular}", con)
+writeLines("\\caption{Concentration}", con)
+writeLines("\\end{figure}", con)
 
-close(latex_file)
-
+# Fermer le fichier
+close(con)
 ############################Trajectoires##########################################################"
 
 majority_vote_Med3 = array(0,dim = c(n,length(rList),4))
