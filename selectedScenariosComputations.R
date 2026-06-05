@@ -16,7 +16,7 @@ rho1List = rho1val
 
 gamma_grid <- seq(0.55, 0.95, by = 0.05)
 
-param_grid
+c_m_grid = seq(0.1, 2.1, by = 0.2)
 
 
 sim = 1
@@ -145,8 +145,7 @@ sctests = list(
   
 )
 
-for(gamma in gamma_grid){
-#k = 1e3;l = 0.01;rho1 = 0.995
+for(c_m in c_m_grid){
 for(sc in scenarios){
 
 k = sc$k
@@ -271,7 +270,7 @@ for (m in seq_along(rList[1:9])){
       #if(d == 10){
         #}
       #if(d == 100){resUsOnline= StreamingOutlierDetection(data$Z,batch = 1,cutoff = 1.27 * qchisq(0.95, df = d))}
-      resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE,c_m = .5)
+      resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE,c_m = c_m)
       
     })
   
@@ -307,7 +306,7 @@ for (m in seq_along(rList[1:9])){
     #   #resUsStreaming= StreamingOutlierDetection(data$Z,batch = ncol(data$Z))
     # }
   #  if(d == 10 ){
-      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,c_m = .5)
+      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,c_m = c_m)
    # }
     #if(d == 100){
     #  resUsStreaming= StreamingOutlierDetection(data$Z,batch = sqrt(ncol(data$Z)))}
@@ -345,7 +344,7 @@ for (m in seq_along(rList[1:9])){
   
   temps_offline = system.time({
     # resOffline = OfflineOutlierD etection(data$Z)
-    resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE,c_m = 1,cutoff = .95)
+    resOffline = offlineRobustVariance(data$Z,computeOutliers = TRUE,c_m = c_m,cutoff = .95)
   }
   )
   
@@ -452,7 +451,7 @@ for (m in seq_along(rList[1:9])){
 
 setwd("~/figures")
 
-file = paste0("results-k-",k,"l-",l,"rho1",rho1,"-d",d,"-gammaRMC-",gammaRMC,".Rdata")
+file = paste0("results-k-",k,"l-",l,"rho1",rho1,"-d",d,"-c_m-",c_m,".Rdata")
 save(erreursSigmaMed5,faux_negatifsOracleMed5,faux_positifsOracleMed5,faux_negatifsMed5,faux_positifsMed5,outliersLabelsOracleMed5,outliersLabelsMed5,labelsVraisMed5,file = file)
 
 
@@ -480,7 +479,7 @@ pseudo_log <- function(y) {
 }
 
 
-file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,"-gammaRMC",gamma ,".pdf")
+file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,"-c_m",c_m,".pdf")
 
 pdf(file, width = 18, height = 6)  # largeur augmentée pour 3 plots
 par(mfrow = c(1, 3), mar = c(5, 5, 2, 1))  # 1 ligne, 3 colonnes
@@ -614,7 +613,7 @@ close(con)
 
 majority_vote_Med3 = array(0,dim = c(n,length(rList),4))
 majority_vote_Med3NotOracle <- array(0, dim = c(n, length(rList), 3))
-majority_vote_Med3NotOracle <- apply(outliersLabelsMed3, c(1, 2, 3), function(x) {
+majority_vote_Med3NotOracle <- apply(outliersLabelsMed5, c(1, 2, 3), function(x) {
   ifelse(mean(x) >= 0.5, 1, 0)
 })
 
@@ -636,9 +635,9 @@ for(m in seq_along(rList)){
   for (i in (1:n))
   {
     for(l in (1:3)){
-      if ( labelsVraisMed3[i,m] == 1 & majority_vote_Med3[i,m,l] == 0){faux_negatifsFarTrajMed3[i,m,l] = 1}
+      if ( labelsVraisMed5[i,m] == 1 & majority_vote_Med3[i,m,l] == 0){faux_negatifsFarTrajMed3[i,m,l] = 1}
       
-      if (labelsVraisMed3[i,m] == 0 & majority_vote_Med3[i,m,l] == 1){faux_positifsFarTrajMed3[i,m,l] = 1
+      if (labelsVraisMed5[i,m] == 0 & majority_vote_Med3[i,m,l] == 1){faux_positifsFarTrajMed3[i,m,l] = 1
       print(paste0("FP l =",l))}
       
     }
@@ -652,9 +651,9 @@ for(m in seq_along(rList)){
   
   for (i in (1:n))
   {
-    if ( labelsVraisMed3[i,m] == 1 & outliersLabelsMed3[i,m,1,1] == 0){faux_negatifsFarTrajMed3[i,m,1] = 1}
+    if ( labelsVraisMed5[i,m] == 1 & outliersLabelsMed5[i,m,1,1] == 0){faux_negatifsFarTrajMed3[i,m,1] = 1}
     
-    if (labelsVraisMed3[i,m] == 0 & outliersLabelsMed3[i,m,1,1] == 1){faux_positifsFarTrajMed3[i,m,1] = 1
+    if (labelsVraisMed5[i,m] == 0 & outliersLabelsMed5[i,m,1,1] == 1){faux_positifsFarTrajMed3[i,m,1] = 1
     print(paste0("FP l =",l))}
     
   }
@@ -665,9 +664,9 @@ for(m in seq_along(rList)){
 
 for(m in seq_along(rList)){
   for (i in (1:n)){
-    if (labelsVraisMed3[i,m] == 1 &  majority_vote_Med3[i,m,4] == 0){faux_negatifsFarTrajMed3[i,m,4] = 1}
+    if (labelsVraisMed5[i,m] == 1 &  majority_vote_Med3[i,m,4] == 0){faux_negatifsFarTrajMed3[i,m,4] = 1}
     
-    if (labelsVraisMed3[i,m] == 0 & majority_vote_Med3[i,m,4] == 1){faux_positifsFarTrajMed3[i,m,4] = 1}
+    if (labelsVraisMed5[i,m] == 0 & majority_vote_Med3[i,m,4] == 1){faux_positifsFarTrajMed3[i,m,4] = 1}
   }
 }
 faux_negatifs_cum = array(0, dim = c(n,length(rList),4))
@@ -685,8 +684,8 @@ taux_fp_cum = array(0,dim= c(n,length(rList),4))
 for (i in (1:n))
 {
   for(m in seq_along(rList)){
-    n_outliers <- sum(labelsVraisMed3[1:i, m] == 1)
-    n_inliers  <- sum(labelsVraisMed3[1:i, m] == 0)
+    n_outliers <- sum(labelsVraisMed5[1:i, m] == 1)
+    n_inliers  <- sum(labelsVraisMed5[1:i, m] == 0)
     for(l in (1:4)){
       if(n_outliers > 0){
         taux_fn_cum[i,m,l] = faux_negatifs_cum[i,m,l]/n_outliers
