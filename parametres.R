@@ -3,8 +3,11 @@
 #############################################################
 
 
-###Saving of simulation parameters
-paramDir = "~/Documents/Simus/ParamsSim"
+###Directories
+SimDir = "~/dataSimuls"
+resAlgo = "~/res"
+criteres = "~/criteres"
+figures = "~/figures"
 
 
 #rm(list=ls())
@@ -25,6 +28,19 @@ rList <- 5*(0:10)
 simNb <- 1
 n <- 1e4
 #############################################################
+
+#################Algorithms parameters################
+
+gamma_grid <- seq(0.55, 0.95, by = 0.05)
+
+c_m_grid = seq(0.1, 2.1, by = 0.2)
+
+batch_size_grid = list(2,4,5,8,10)
+
+ninit_grid = seq(1e2,5*1e3, by = 1e2)
+
+
+
 
 # KL divergence btw F0 and F1
 
@@ -113,16 +129,129 @@ l1val[length(l1val)] = 1.321931e+09
 
 rho1valNeg[1] = 0.3
 
+####################################Scenarios##############################################"
+
+
+
+scenarios <- list(
+  #scenarios <- list(
+  
+  # =====================================================
+  # CONCENTRATION
+  # =====================================================
+  
+  # Concentration faible
+  list(k = 0, l = 0.5, rho1 = 0.3),
+  
+  # Concentration moyenne
+  list(k = 0, l = 0.1, rho1 = 0.3),
+  
+  # Concentration forte
+  list(k = 0, l = 0.01, rho1 = 0.3),
+  
+  
+  # =====================================================
+  # DECENTRAGE + CONCENTRATION
+  # =====================================================
+  
+  # Décentrage + concentration faible
+  list(k = 5, l = 0.5, rho1 = 0.3),
+  
+  # Décentrage + concentration moyenne
+  list(k = 10, l = 0.1, rho1 = 0.3),
+  
+  # Décentrage + concentration forte
+  list(k = 50, l = 0.01, rho1 = 0.3),
+  
+  
+  # =====================================================
+  # DILATATION
+  # =====================================================
+  
+  # Dilatation faible
+  #list(k = 0, l = 2, rho1 = 0.3),
+  
+  # Dilatation moyenne
+  #list(k = 0, l = 10, rho1 = 0.3),
+  
+  # Dilatation forte
+  #list(k = 0, l = 100, rho1 = 0.3),
+  
+  
+  # =====================================================
+  # DECENTRAGE + DILATATION
+  # =====================================================
+  
+  # Décentrage + dilatation faible
+  list(k = 5, l = 2, rho1 = 0.3),
+  
+  # Décentrage + dilatation moyenne
+  list(k = 5, l = 10, rho1 = 0.3),
+  
+  # Décentrage + dilatation forte
+  list(k = 5, l = 100, rho1 = 0.3),
+  
+  
+  # =====================================================
+  # DEFORMATION
+  # =====================================================
+  
+  
+  
+  # =====================================================
+  # DEFORMATION + CONCENTRATION
+  # =====================================================
+  
+  # Déformation + concentration faible
+  list(k = 0, l = 0.5, rho1 = 0.5),
+  
+  # Déformation + concentration moyenne
+  list(k = 0, l = 0.1, rho1 = 0.7),
+  
+  # Déformation + concentration forte
+  list(k = 0, l = 0.01, rho1 = 0.95),
+  
+  
+  # =====================================================
+  # DEFORMATION + DILATATION
+  # =====================================================
+  
+  # Déformation + dilatation faible
+  list(k = 0, l = 2, rho1 = 0.5),
+  
+  # Déformation + dilatation moyenne
+  list(k = 0, l = 10, rho1 = 0.7),
+  
+  # Déformation + dilatation forte
+  list(k = 0, l = 100, rho1 = 0.95),
+  #
+  
+  
+  # =====================================================
+  # CAS EXTREMES
+  # =====================================================
+  # 
+  # # Anomalie extrême concentrée
+  list(k = 100, l = 0.01, rho1 = 0.99),
+  # 
+  # # Anomalie extrême dilatée
+  list(k = 100, l = 100, rho1 = 0.99)
+  # 
+)
+
+
+
 #####################################################################################################################
-################################# Export of the parameter file one for d = 10 and one for d=100######################
-#####################################################################################################################
+################################# Export of the parameter file one for d = 10######################
+####################################################################################################################
+
 
 
 setwd("~/algosto")
   save(d, KLval, 
      mu0, sigmaSq0, Sigma0, rho0, 
      m1, 
-     k1val, l1val, l1valup1,rho1val,rho1valNeg,n,d,rList,
+     k1val, l1val, l1valup1,rho1val,rho1valNeg,n,d,rList, scenarios,
      file=paste0('SimParmsGrid-n', n,'-d',d, '.Rdata'))
 
 
