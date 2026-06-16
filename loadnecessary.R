@@ -38,7 +38,6 @@ library(pROC)
 #################################
 source("~/algosto/algorithmes.R")
 sourceCpp("~/algosto/src/CodesRCpp.cpp")
-source('~/algosto/FunctionsKLgauss.R')
 
 #######################################################################
 #Simulation of a dataset with different parameters####################
@@ -434,3 +433,170 @@ compute_rates <- function(pred, labels) {
   list(FP_rate = FP_rate,
        FN_rate = FN_rate)
 }
+
+
+#################SMD data preprocessing functions###########################"
+
+
+load_smd_machine <- function(test_path, label_path) {
+  
+  Z <- as.matrix(
+    read.table(test_path, sep = ",")
+  )
+  
+  labels <- scan(label_path)
+  
+  list(
+    Z = Z,
+    labels = labels,
+    name = basename(test_path)
+  )
+}
+
+
+
+
+
+remove_high_corr <- function(Z, threshold = 0.9999)
+{
+  C <- cor(Z)
+  
+  C[lower.tri(C, diag = TRUE)] <- 0
+  
+  remove <- which(apply(abs(C) > threshold, 2, any))
+  
+  if(length(remove) > 0)
+  {
+    cat("Removing cols:", remove, "\n")
+  }
+  
+  Z[, -remove, drop = FALSE]
+  return(Z)
+}
+
+sequential_clean_columns <- function(Z, begin = 1, cut = NULL) {
+  
+  Z <- as.matrix(Z)
+  p <- ncol(Z)
+  
+  if (is.null(cut)) cut <- 0.95
+  
+  start <- NULL
+  
+  # =========================
+  # 1) trouver prefix stable
+  # =========================
+  
+  for (k in (begin + 1):p) {
+    
+    ok <- tryCatch({
+      
+      onlineRobustVariance(
+        Z[, begin:k, drop = FALSE],
+        computeOutliers = TRUE,
+        cutoff = cut,
+        cutinit = 0.6,
+        nDataInit = 1e3,
+        c_m = 1,
+        batch = 3
+      )
+      
+      TRUE
+      
+    }, error = function(e) {
+      FALSE
+    })
+    
+    if (ok) {
+      start <- k
+      cat("✔ first stable prefix found at:", k, "\n")
+      break
+    }
+  }
+  
+  if (is.null(start)) {
+    stop("No stable prefix found")
+  }
+  
+  keep <- c(begin, start)
+  
+  for (j in (start + 1):p) {
+    
+    cat("j =", j, "keep =", keep, "\n")
+    
+    ok <- tryCatch({
+      # 
+      onlineRobustVariance(
+        Z[, c(keep, j), drop = FALSE],
+        computeOutliers = TRUE,
+        cutoff = cut,
+        cutinit = 0.6,
+        nDataInit = 1e3,
+        c_m = 1,
+        batch = 3
+      )
+      TRUE
+      
+    }, error = function(e) FALSE)
+    
+    if (ok) {
+      keep <- c(keep, j)
+      cat("✔ col:", j, "OK\n")
+    } else {
+      cat("✘ col:", j, "KO\n")
+    }
+  }
+  
+  return(list(
+    Z = Z[, keep, drop = FALSE],
+    keep = keep
+  ))
+}
+
+
+KL <- function(parms1, parms2){
+  invSigma2 <- solve(parms2$Sigma)
+  0.5*(log(det(parms2$Sigma)/det(parms1$Sigma)) - d + sum(diag(invSigma2%*%parms1$Sigma)) +
+         t(parms2$mu-parms1$mu)%*%invSigma2%*%(parms2$mu-parms1$mu))[1, 1]
+}
+
+FrobeniusNormError = function(Sigmahat,Sigma){
+  return (norm(Sigmahat - Sigma,"F"))
+}
+
+taux_detection <- function(vrais_labels, labels_predits) {
+  # S'assurer que les entrées sont binaires
+  if (!all(vrais_labels %in% c(0, 1)) || !all(labels_predits %in% c(0, 1))) {
+    stop("Les vecteurs doivent contenir uniquement 0 (normal) ou 1 (outlier).")
+  }
+  
+  # Calcul des éléments de la matrice de confusion
+  VP <- sum(vrais_labels == 1 & labels_predits == 1)  # Vrai Positifs
+  FP <- sum(vrais_labels == 0 & labels_predits == 1)  # Faux Positifs
+  FN <- sum(vrais_labels == 1 & labels_predits == 0)  # Faux Négatifs
+  VN <- sum(vrais_labels == 0 & labels_predits == 0)  # Vrai Négatifs
+  
+  # Taux
+  TPR <- if ((VP + FN) > 0) VP / (VP + FN) else NA  # Sensibilité
+  FPR <- if ((FP + VN) > 0) FP / (FP + VN) else NA  # 1 - Spécificité
+  
+  return(list(
+    TPR = TPR,
+    FPR = FPR,
+    VP = VP,
+    FP = FP,
+    FN = FN,
+    VN = VN
+  ))
+}
+
+# Contamination parms: F1
+ParmsF1 <- function(m1, k1, l1, rho1){
+  d <- length(m1)
+  mu1 <- k1*m1
+  sigmaSq1 <- l1*sigmaSq0
+  Sigma1 <- diag(sqrt(sigmaSq1)) %*% toeplitz(rho1^(0:(d-1))) %*% diag(sqrt(sigmaSq1))
+  return(list(mu1=mu1, Sigma1=Sigma1))
+}
+
+

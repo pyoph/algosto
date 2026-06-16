@@ -1,4 +1,3 @@
-
 ###############Final Frobenius norm error, false positives, false negatives
 
 
@@ -419,7 +418,7 @@ lines(rList[1:9],
 
 lines(rList[1:9],
       faux_positifsPlot[1:9,1] /
-                   ((1 - rList[2:9]/100)*n)*100,
+                   ((1 - rList[1:9]/100)*n)*100,
       lwd=4, col="darkgreen", lty="dotted")
 
 
@@ -602,9 +601,6 @@ box()
 
 dev.off()
 
-
-
-
 }
 
 
@@ -722,14 +718,19 @@ for(sc in scenarios){
   # =====================================================
   # 1. LABELS
   # =====================================================
-  
   plot(x_vals, labels,
-       col = "purple",
+       type = "n",
+       ylim = c(-0.05,1.05),
+       yaxt = "n",
+       xaxt = "n",
        xlab = "", ylab = "",
-       yaxt = "n", xaxt = "n",
-       ylim = c(0, 1),
-       main = "Ground truth"
-  )
+       main = "Ground truth")
+  
+  points(x_vals[labels==0], labels[labels==0],
+         pch = 16, cex = .4, col = "blue")
+  
+  points(x_vals[labels==1], labels[labels==1],
+         pch = 16, cex = .6, col = "red")
   
   axis(2, at = c(0, 1), las = 1, cex.axis = 1.8)
   axis(1, at = seq(1000, max(x_vals), by = 1000),
