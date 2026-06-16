@@ -1,0 +1,52 @@
+
+#######################Génération des données#############################
+
+for(sc in scenarios){
+  
+  k = sc$k
+  l = sc$l
+  rho1 = sc$rho1
+  
+  
+  id_pool <- sample(1:n)
+  
+  outlier_sets <- vector("list", length(rList))
+  
+  id_pool <- sample(1:n)
+  
+  r_max <- max(rList)
+  
+  outlier_sets = list()
+  
+  for (m in seq_along(rList[1:9])) {
+    n_active = floor(rList[m]/100*n)
+    outlier_sets[[m]] = id_pool[1:n_active]
+  }
+  
+  for (m in seq_along(rList[1:9])){
+    
+      r = rList[m]
+      dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,".RData")
+      
+      print(dataFile)
+      #contParam = ParmsF1(m1, k, l, rho1)
+  setwd(SimDir)
+      contParam = ParmsF1(m1, k, l, rho1)
+
+      if(r == 0){
+        
+        data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
+      
+        save(data,file = dataFile)
+      }
+      
+      if(r != 0){
+        
+        data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r, id_outliers =  outlier_sets[[m]])
+        save(data,file = dataFile)
+          }
+      
+
+  
+}}
+
