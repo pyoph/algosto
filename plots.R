@@ -22,6 +22,9 @@ for (j in seq_along(rList[1:9]) ){
   setwd(criteres)
   
   r = rList[j]
+
+  
+  
   
   critFile <- paste0(
     'CritSampleNaiveQuantonlinecorr-d', d,
@@ -36,14 +39,13 @@ for (j in seq_along(rList[1:9]) ){
     '-sim', sim,
     ".RData"
   )
-  
   load(critFile)
   
-  erreursSigmaPlot[j,1] = erreurFrob
-  faux_negatifsPlot[j,1] = faux_negatifs
-  faux_positifsPlot[j,1] = faux_positifs
-  ariPlot[j,1] = ari
-  aucPlot[j,1] = auc_val
+  erreursSigmaPlot[j,1] = crit$erreurFrob
+  faux_negatifsPlot[j,1] = crit$FN
+  faux_positifsPlot[j,1] = crit$FP
+  ariPlot[j,1] = crit$ARI
+  aucPlot[j,1] = crit$AUC
   
   critFile <- paste0(
     'CritSampleNaivewithoutonlinequantilecorr-d', d,
@@ -59,10 +61,10 @@ for (j in seq_along(rList[1:9]) ){
   
   load(critFile)
   
-  faux_negatifsPlot[j,2] = faux_negatifs
-  faux_positifsPlot[j,2] = faux_positifs
-  ariPlot[j,2] = ari
-  aucPlot[j,2] = auc_val
+  faux_negatifsPlot[j,2] = crit$FN
+  faux_positifsPlot[j,2] = crit$FP
+  ariPlot[j,2] = crit$ARI
+  aucPlot[j,2] = crit$AUC
   
   
   setwd(criteres)
@@ -83,11 +85,11 @@ for (j in seq_along(rList[1:9]) ){
   )
   load(critFile)
   
-  erreursSigmaPlot[j,2] = erreurFrob
-  faux_negatifsPlot[j,3] = faux_negatifs
-  faux_positifsPlot[j,3] = faux_positifs
-  ariPlot[j,3] = ari
-  aucPlot[j,3] = auc_val
+  erreursSigmaPlot[j,2] = crit$erreurFrob
+  faux_negatifsPlot[j,3] = crit$FN
+  faux_positifsPlot[j,3] = crit$FP
+  ariPlot[j,3] = crit$ARI
+  aucPlot[j,3] = crit$AUC
   
   
   setwd(criteres)
@@ -108,10 +110,10 @@ for (j in seq_along(rList[1:9]) ){
   
   load(critFile)
   
-  faux_negatifsPlot[j,4] = faux_negatifs
-  faux_positifsPlot[j,4] = faux_positifs
-  ariPlot[j,4] = ari
-  aucPlot[j,4] = auc_val
+  faux_negatifsPlot[j,4] = crit$FN
+  faux_positifsPlot[j,4] = crit$FP
+  ariPlot[j,4] = crit$ARI
+  aucPlot[j,4] = crit$AUC
   
   
   critFile <- paste0(
@@ -131,12 +133,11 @@ for (j in seq_along(rList[1:9]) ){
   
   load(critFile)
   
-  erreursSigmaPlot[j,3] = erreurFrob
-  faux_negatifsPlot[j,5] = faux_negatifs
-  faux_positifsPlot[j,5] = faux_positifs
-  ariPlot[j,5] = ari
-  aucPlot[j,5] = auc_val
-  
+  erreursSigmaPlot[j,3] = crit$erreurFrob
+  faux_negatifsPlot[j,5] = crit$FN
+  faux_positifsPlot[j,5] = crit$FP
+  ariPlot[j,5] = crit$ARI
+  aucPlot[j,5] = crit$AUC
   
   setwd(criteres)
   
@@ -147,7 +148,7 @@ for (j in seq_along(rList[1:9]) ){
     '-l', l,
     '-rho', rho1,
     '-r', r,
-    "-cutoff", .95,
+    "-cutoff", 0.95,
     "Ninit-", Ninit,
     "-batch",batch,
     '-sim', sim,
@@ -156,10 +157,10 @@ for (j in seq_along(rList[1:9]) ){
   
   load(critFile)
   
-  faux_negatifsPlot[j,6] = faux_negatifs
-  faux_positifsPlot[j,6] = faux_positifs
-  ariPlot[j,6] = ari
-  aucPlot[j,6] = auc_val
+  faux_negatifsPlot[j,6] = crit$FN
+  faux_positifsPlot[j,6] = crit$FP
+  ariPlot[j,6] = crit$ARI
+  aucPlot[j,6] = crit$AUC
   
 
   
@@ -182,11 +183,11 @@ for (j in seq_along(rList[1:9]) ){
   load(critFile)
   
   
-  erreursSigmaPlot[j,4] = erreurFrob
-  faux_negatifsPlot[j,7] = faux_negatifs
-  faux_positifsPlot[j,7] = faux_positifs
-  ariPlot[j,7] = ari
-  aucPlot[j,7] = auc_val
+  erreursSigmaPlot[j,4] = crit$erreurFrob
+  faux_negatifsPlot[j,7] = crit$FN
+  faux_positifsPlot[j,7] = crit$FP
+  ariPlot[j,7] = crit$ARI
+  aucPlot[j,7] = crit$AUC
   
   
   setwd(criteres)  
@@ -205,10 +206,10 @@ for (j in seq_along(rList[1:9]) ){
   
   load(critFile)
   
-  faux_negatifsPlot[j,8] = faux_negatifs
-  faux_positifsPlot[j,8] = faux_positifs
-  ariPlot[j,8] = ari
-  aucPlot[j,8] = auc_val
+  faux_negatifsPlot[j,8] = crit$FN
+  faux_positifsPlot[j,8] = crit$FP
+  ariPlot[j,8] = crit$ARI
+  aucPlot[j,8] = crit$AUC
   
   setwd(criteres)  
   
@@ -227,11 +228,11 @@ for (j in seq_along(rList[1:9]) ){
 
   load(critFile)
   
-  erreursSigmaPlot[j,5] = erreurFrob
-  faux_negatifsPlot[j,9] = faux_negatifs
-  faux_positifsPlot[j,9] = faux_positifs
-  ariPlot[j,9] = ari
-  aucPlot[j,9] = auc_val
+  erreursSigmaPlot[j,5] = crit$erreurFrob
+  faux_negatifsPlot[j,9] = crit$FN
+  faux_positifsPlot[j,9] = crit$FP
+  ariPlot[j,9] = crit$ARI
+  aucPlot[j,9] = crit$AUC
   
   setwd(criteres)
 
@@ -249,11 +250,11 @@ for (j in seq_along(rList[1:9]) ){
   
   load(critFile)
   
-  erreursSigmaPlot[j,6] = erreurFrob
-  faux_negatifsPlot[j,10] = faux_negatifs
-  faux_positifsPlot[j,10] = faux_positifs
-  ariPlot[j,10] = ari
-  aucPlot[j,10] = auc_val
+  erreursSigmaPlot[j,6] = crit$erreurFrob
+  faux_negatifsPlot[j,10] = crit$FN
+  faux_positifsPlot[j,10] = crit$FP
+  ariPlot[j,10] = crit$ARI
+  aucPlot[j,10] = crit$AUC
   
   
   setwd(criteres)
@@ -271,11 +272,11 @@ for (j in seq_along(rList[1:9]) ){
   )
   
   load(critFile)
-  
-  faux_negatifsPlot[j,11] = faux_negatifs
-  faux_positifsPlot[j,11] = faux_positifs
-  ariPlot[j,11] = ari
-  aucPlot[j,11] = auc_val
+
+  faux_negatifsPlot[j,11] = crit$FN
+  faux_positifsPlot[j,11] = crit$FP
+  ariPlot[j,11] = crit$ARI
+  aucPlot[j,11] = crit$AUC
   
   
   }
@@ -283,7 +284,7 @@ for (j in seq_along(rList[1:9]) ){
 
 
 
-setwd("~/figuresRobustVariance/fig")
+setwd("~/figuresRobustVariance/fig/fig")
 
 file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,"-nInit",Ninit,"-cm",cm,".pdf")
 
@@ -325,79 +326,44 @@ box()
 ############################################################
 ################### FAUX NEGATIFS ##########################
 ############################################################
-yticks <- c(0, 1, 10, 100)
+pseudo_log <- function(x) log10(1 + x)
 
 plot(rList[2:9],
-     pseudo_log(faux_negatifsPlot[2:9,5] /
-                  ((rList[2:9]/100)*n)*100),
-     type="l", lwd=4, col="red",
-     ylim=pseudo_log(c(0,100)),
-     xlab="", ylab="",
-     xaxt="n", yaxt="n")
+     pseudo_log(faux_negatifsPlot[2:9,5] / ((rList[2:9]/100)*n) * 100),
+     type = "l", lwd = 4, col = "red",
+     ylim = range(pseudo_log(c(0, 100))),
+     xlab = "", ylab = "",
+     xaxt = "n", yaxt = "n")
 
 lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,6] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="red", lty="longdash")
-
+      pseudo_log(faux_negatifsPlot[2:9,6] / ((rList[2:9]/100)*n) * 100),
+      lwd = 4, col = "red", lty = "longdash")
 
 lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,1] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="darkgreen", lty="dotted")
-
-
+      pseudo_log(faux_negatifsPlot[2:9,1] / ((rList[2:9]/100)*n) * 100),
+      lwd = 4, col = "darkgreen", lty = "dotted")
 
 lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,2] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="darkgreen", lty="dotdash")
-
+      pseudo_log(faux_negatifsPlot[2:9,2] / ((rList[2:9]/100)*n) * 100),
+      lwd = 4, col = "darkgreen", lty = "dotdash")
 
 lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,3] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="blue", lty="longdash")
+      pseudo_log(faux_negatifsPlot[2:9,3] / ((rList[2:9]/100)*n) * 100),
+      lwd = 4, col = "blue", lty = "longdash")
 
 lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,4] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="blue", lty="twodash")
-
-lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,11] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="purple4", lty="longdash")
-
-lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,7] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="orange", lty="longdash")
-
-lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,8] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="orange", lty="twodash")
-
-
-lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,9] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="brown", lty="dotted")
-
-lines(rList[2:9],
-      pseudo_log(faux_negatifsPlot[2:9,10] /
-                   ((rList[2:9]/100)*n)*100),
-      lwd=4, col="black", lty="twodash")
-
+      pseudo_log(faux_negatifsPlot[2:9,4] / ((rList[2:9]/100)*n) * 100),
+      lwd = 4, col = "blue", lty = "twodash")
 
 axis(1, at = rList[2:9], las = 1, cex.axis = 1.8)
-axis(2, at = pseudo_log(yticks),
-     labels = c("0", expression(10^0), expression(10^1), expression(10^2)),
-     las = 1, cex.axis = 1.8)
+
+axis(2,
+     at = log10(1 + c(0, 1, 10, 100)),
+     labels = c("0", "1", "10", "100"),
+     las = 1,
+     cex.axis = 1.8)
 
 box()
-
 ############################################################
 ################### FAUX POSITIFS ##########################
 ############################################################
@@ -635,14 +601,14 @@ for(sc in scenarios){
   
   load(fitFile)
   
-  outlabTraj[,1] = resNaif$outliers_labels
+  outlabTraj[,1] = resultats$outliers_labels
   
   
   fitFile <- paste0('FitSampleNaivewithoutonlinequantilecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-Ninit",Ninit,'-sim', sim,".RData")
   
   load(fitFile)
   
-  outlabTraj[,2] = resNaif$outliers_labels
+  outlabTraj[,2] = resultats$outliers_labels
   
   
   fitFile <- paste0('FitOnlineUsQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",Ninit,"-batch",1,"-cm",cm,'-sim', sim,".RData")
@@ -650,20 +616,20 @@ for(sc in scenarios){
   
   load(fitFile)
   
-  outlabTraj[,3] = resUsOnline$outlier_labels
+  outlabTraj[,3] = resultats$outliers_labels
 
   fitFile <- paste0('FitOnlineUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",1e2,"-batch",1,'-sim', sim,".RData")
   
   load(fitFile)
   
-  outlabTraj[,4] = resUsOnline$outlier_labels
+  outlabTraj[,4] = resultats$outliers_labels
   
   fitFile <- paste0('FitStreamingUsonlineQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",Ninit,"-batch",batch,"-cm",cm,'-sim', sim,".RData")
   
   
   load(fitFile)
   
-  outlabTraj[,5] = resUsStreaming$outlier_labels
+  outlabTraj[,5] = resultats$outliers_labels
   
   
   fitFile <- paste0('FitStreamingUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"Ninit-",1e2,"-batch",batch,'-sim', sim,".RData")
@@ -671,7 +637,7 @@ for(sc in scenarios){
   
   load(fitFile)
   
-  outlabTraj[,6] = resUsStreaming$outlier_labels
+  outlabTraj[,6] = resultats$outliers_labels
   
   
   
@@ -679,14 +645,14 @@ for(sc in scenarios){
   
   load(fitFile)
   
-  outlabTraj[,6] = resUsStreaming$outlier_labels
+  outlabTraj[,6] = resultats$outliers_labels
   
   
   fitFile <- paste0('FitOracle-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,'-sim', sim,".RData")
   
   load(fitFile)
   
-  outlabTraj[,7] = outloracle
+  outlabTraj[,7] = resultats$outliers_labels
   
   
   #rates_samplecov = compute_rates(outlmach[,1], labels)
@@ -781,7 +747,7 @@ for(sc in scenarios){
        type = "l", lwd = 3, col = "red",
        xlab = "", ylab = "",
        yaxt = "n", xaxt = "n",
-       main = "False Negative Rate",
+       main = "False Positive Rate",
        ylim = c(0,20)
   )
   

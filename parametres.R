@@ -25,8 +25,12 @@ figures = "~/figures"
 d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
+sim = 1
 simNb <- 1
 n <- 1e4
+Ninit = 1e2
+cm = 2
+batch = ncol(d)
 #############################################################
 
 #################Algorithms parameters################
@@ -132,7 +136,6 @@ rho1valNeg[1] = 0.3
 ####################################Scenarios##############################################"
 
 
-
 scenarios <- list(
   #scenarios <- list(
   
@@ -236,7 +239,14 @@ scenarios <- list(
   # 
 )
 
-
+sc_test = list(  # Concentration faible
+  list(k = 0, l = 0.5, rho1 = 0.3),
+  
+  # Concentration moyenne
+  list(k = 0, l = 0.1, rho1 = 0.3),
+  
+  # Concentration forte
+  list(k = 0, l = 0.01, rho1 = 0.3))
 
 #####################################################################################################################
 ################################# Export of the parameter file one for d = 10######################

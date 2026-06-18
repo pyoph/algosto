@@ -5,7 +5,7 @@ Ninit = 1e2
 ########################################################################
 
 ################Computations of the algorithms#############################
-for(sim in 1:100){
+for(sim in 1:1e2){
 for(sc in scenarios){
   
   k = sc$k
@@ -50,9 +50,15 @@ for(sc in scenarios){
       
     )
     
-    fitNaif = resNaif
     
-    save(resNaif,temps_naif,file = fitFile)
+    resultats <- list(
+      variance = resNaif$Sigma,
+      outliers_labels = resNaif$outliers_labels,
+      distances = resNaif$distances,
+      temps = temps_naif
+    )
+    
+    save(resultats, file = fitFile)    
     
     
     #######################Sample cov without online quantile correction########################################
@@ -74,9 +80,14 @@ for(sc in scenarios){
       
     )
     
-    fitNaif = resNaif
+    resultats <- list(
+      variance = resNaif$Sigma,
+      outliers_labels = resNaif$outliers_labels,
+      distances = resNaif$distances,
+      temps = temps_naif
+    )
     
-    save(resNaif,temps_naif,file = fitFile)
+    save(resultats,temps_naif,file = fitFile)
     
     ###############################################Online us#########################################
     
@@ -90,9 +101,15 @@ for(sc in scenarios){
          
        })
      
-     fitUsOnline = resUsOnline
      
-     save(resUsOnline,temps_online,file = fitFile)
+     resultats <- list(
+       variance = resUsOnline$variance,
+       outliers_labels = resUsOnline$outlier_labels,
+       distances = resUsOnline$distances,
+       temps = temps_online
+     )
+     
+     save(resultats,file = fitFile)
      
      
      
@@ -106,12 +123,21 @@ for(sc in scenarios){
       
     })
   
-
-  save(resUsOnline,temps_online,file = fitFile)
-
+  
+  resultats <- list(
+    variance = resUsOnline$variance,
+    outliers_labels = resUsOnline$outlier_labels,
+    distances = resUsOnline$distances,
+    temps = temps_online
+  )
+  
+  save(resultats,file = fitFile)
+  
   
   ###############################################Streaming us#########################################
 
+  setwd(resAlgo)
+  
   fitFile <- paste0('FitStreamingUsonlineQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",Ninit,"-batch",batch,"-cm",cm,'-sim', sim,".RData")
   
   
@@ -123,7 +149,17 @@ for(sc in scenarios){
     })
   
 
-  save(resUsStreaming,temps_streaming,file = fitFile)
+  
+  resultats <- list(
+    variance = resUsStreaming$variance,
+    outliers_labels = resUsStreaming$outlier_labels,
+    distances = resUsStreaming$distances,
+    temps = temps_streaming
+  )
+  
+  save(resultats,file = fitFile)
+  
+  
   
 
   
@@ -137,8 +173,16 @@ for(sc in scenarios){
       
     })
   
-
-  save(resUsStreaming,temps_streaming,file = fitFile)
+  
+  
+  resultats <- list(
+    variance = resUsStreaming$variance,
+    outliers_labels = resUsStreaming$outlier_labels,
+    distances = resUsStreaming$distances,
+    temps = temps_streaming
+  )
+  
+  save(resultats,file = fitFile)
   
   
   #####################################################Offline Us########################################################
@@ -153,12 +197,21 @@ for(sc in scenarios){
       
     })
   
-
+  
+  
+  resultats <- list(
+    variance = resOffline$variance,
+    outliers_labels = resOffline$outlier_labels,
+    distances = resOffline$distances,
+    temps = temps_offline
+  )
+  
+  save(resultats,file = fitFile)
+  
+  
+  
   save(resOffline,temps_offline,file = fitFile)
-  
-  
-  
-  
+
   fitFile <- paste0('FitOfflineUswithoutQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"-cm",cm,'-sim', sim,".RData")
   
   temps_offline = system.time(
@@ -168,9 +221,14 @@ for(sc in scenarios){
       
     })
   
-  fitUsOffline = resUsOnline
+  resultats <- list(
+    variance = resOffline$variance,
+    outliers_labels = resOffline$outlier_labels,
+    distances = resOffline$distances,
+    temps = temps_offline
+  )
   
-  save(resOffline,temps_offline,file = fitFile)
+  save(resultats,file = fitFile)
   
   #############################OGK#########################################################################
   
@@ -186,7 +244,17 @@ for(sc in scenarios){
     if(resOGK$distances[s] >qchisq(.95,df = d)) {outlogk[s] = 1}
   }
   
-  save(resOGK,outlogk,temps_ogk,file = fitFile)
+  
+  resultats <- list(
+    variance = resOGK$cov,
+    outliers_labels = outlogk,
+    distances = resOGK$distances,
+    temps = temps_ogk
+  )
+  
+  save(resultats,file = fitFile)
+  
+  
   
   #############################MCD#########################################################################
   
@@ -204,7 +272,17 @@ for(sc in scenarios){
     }
   }
   )
-  save(resMcd,temps_mcd,distmcd,outlmcd,file = fitFile)
+  
+  resultats <- list(
+    variance = resMcd$cov,
+    outliers_labels = outlmcd,
+    distances = distmcd,
+    temps = temps_mcd
+  )
+  
+  save(resultats,file = fitFile)
+  
+  
   
   ################################Oracle###############################################################
   
@@ -222,7 +300,15 @@ for(sc in scenarios){
       }
   }
   
-  save(distoracle,outloracle,file = fitFile)
+  
+  resultats <- list(
+    variance = Sigma0,
+    outliers_labels = outloracle,
+    distances = distoracle,
+    temps = 0
+  )
+  
+  save(resultats,file = fitFile)
   
     
 }

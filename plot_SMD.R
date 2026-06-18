@@ -226,7 +226,7 @@ for(j in 1:nbmachines){
        type = "l", lwd = 3, col = "red",
        xlab = "", ylab = "",
        yaxt = "n", xaxt = "n",
-       main = "False Negative Rate",
+       main = "False Positive Rate",
        ylim = c(0,20)
   )
   

@@ -36,7 +36,6 @@ library(pROC)
 ############################
 #############FIchiers nécessaires
 #################################
-source("~/algosto/algorithmes.R")
 sourceCpp("~/algosto/src/CodesRCpp.cpp")
 
 #######################################################################
@@ -329,11 +328,9 @@ SampleCovOnline = function(Z,quantcutoff = FALSE,nDataInit=100,cutoffquant =.9,c
     }  
   }
   
-  niterr = 0 
-  
+  niterr = 0
   for (i in ((n0 + 1):(nblignes-1)))
   {
-    niterr = niterr + 1
     
     M = M + Z[i,]
     Xbar = M/i
@@ -373,14 +370,12 @@ SampleCovOnline = function(Z,quantcutoff = FALSE,nDataInit=100,cutoffquant =.9,c
         outliers_labels[i] = 1
       }
     }
-    else
-    {
+    else{
       cutoffcor <- cutoffcor -
         c_m*c_med*(n0 + (niterr-1) + j)^(-0.75)*
         (as.numeric(S <= cutoffcor) - cutoffquant)
       
-      if(S > cutoffcor)
-      {
+      if(S > cutoffcor){
         outliers_labels[i] = 1
       }
     }
@@ -599,4 +594,99 @@ ParmsF1 <- function(m1, k1, l1, rho1){
   return(list(mu1=mu1, Sigma1=Sigma1))
 }
 
+ARI_manual <- function(true_labels, pred_labels) {
+  
+  n <- length(true_labels)
+  
+  # matrices de comparaison paire-à-paire
+  comb <- function(x) outer(x, x, FUN = "==")
+  
+  TP <- sum(comb(true_labels) & comb(pred_labels)) / 2
+  TN <- sum(!comb(true_labels) & !comb(pred_labels)) / 2
+  FP <- sum(!comb(true_labels) & comb(pred_labels)) / 2
+  FN <- sum(comb(true_labels) & !comb(pred_labels)) / 2
+  
+  index <- TP + TN
+  expected <- ((TP + FP) * (TP + FN) + (FN + TN) * (FP + TN)) / choose(n, 2)
+  max_index <- (TP + FP + FN + TN + index) / 2
+  
+  ARI <- (index - expected) / (max_index - expected)
+  
+  return(ARI)
+}
+
+
+auc_manual <- function(score, labels) {
+  
+  thresholds <- sort(unique(score))
+  
+  TPR <- numeric(length(thresholds))
+  FPR <- numeric(length(thresholds))
+  
+  for (i in seq_along(thresholds)) {
+    
+    th <- thresholds[i]
+    pred <- ifelse(score >= th, 1, 0)
+    
+    TP <- sum(pred == 1 & labels == 1)
+    TN <- sum(pred == 0 & labels == 0)
+    FP <- sum(pred == 1 & labels == 0)
+    FN <- sum(pred == 0 & labels == 1)
+    
+    TPR[i] <- TP / (TP + FN + 1e-12)
+    FPR[i] <- FP / (FP + TN + 1e-12)
+  }
+  
+  ord <- order(FPR, TPR)
+  
+  FPR <- c(0, FPR[ord], 1)
+  TPR <- c(0, TPR[ord], 1)
+  
+  auc <- sum(diff(FPR) * (head(TPR, -1) + tail(TPR, -1)) / 2)
+  
+  return(list(
+    FPR = FPR,
+    TPR = TPR,
+    auc = auc
+  ))
+}
+
+#####Calcule critères
+
+compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = Sigma0,r){
+  
+  erreurFrob <- norm(variance - Sigma0, "F")
+  FP <- sum(outlab == 1 & labels_vrais == 0)
+  FN <- sum(outlab == 0 & labels_vrais == 1)
+  if(r != 0){
+    
+    # ARI
+     ari <- adjustedRandIndex(
+       labels_vrais,
+       outlab
+     )
+  
+    
+    #ari = ARI_manual(labels_vrais,outlab)  
+    print(paste0("ARI ",ari))
+      # AUC
+    auc_val <- auc(roc(labels_vrais, as.numeric(distances)))
+    
+    #auc_val <- auc_manual(as.numeric(distances),labels_vrais)$auc
+    
+    print(paste0("AUC ",auc_val))
+    
+  }
+  else{
+    auc_val = .5
+    ari = 0
+  }
+  
+  return(list(
+    erreurFrob = erreurFrob,
+    FP = FP,
+    FN = FN,
+    ARI = ari,
+    AUC = auc_val  ))
+}
 
