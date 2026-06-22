@@ -19,7 +19,7 @@ for(k in seq_along(0:100))
   
 
   
-  for (m in seq_along(rList[7])){
+  for (m in list(7)){
   setwd(SimDir)
     r = rList[m]
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")

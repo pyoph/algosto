@@ -13,12 +13,12 @@ for (p in packages) {
  }
 #
 setwd("~/algosto")
-#install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
+install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 install.packages("binom")
 install.packages("STARRS_1.0.tar.gz")
 
 library(Rcpp)
-#library(RMM)
+library(RMM)
 library(Gmedian)
 library(MASS)
 library(ggplot2)
