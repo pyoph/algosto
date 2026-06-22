@@ -3,7 +3,7 @@
 ################Packages nécessaires#####
 #########################################
 setwd("~/algosto")
-packages = c("Rcpp","Gmedian","MASS","DescTools" ,"capushe","checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales',"bookdown")
+packages = c("Rcpp","Gmedian","MASS","DescTools" ,"capushe","checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales',"bookdown","xfun","dplyr")
 #
 for (p in packages) {
    if (!requireNamespace(p, quietly = TRUE)) {
@@ -13,12 +13,12 @@ for (p in packages) {
  }
 #
 setwd("~/algosto")
-install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
+#install.packages("RMM_1.0.tar.gz",repos = NULL,type = "source")
 install.packages("binom")
 install.packages("STARRS_1.0.tar.gz")
 
 library(Rcpp)
-library(RMM)
+#library(RMM)
 library(Gmedian)
 library(MASS)
 library(ggplot2)
@@ -318,7 +318,7 @@ SampleCovOnline = function(Z,quantcutoff = FALSE,nDataInit=100,cutoffquant =.9,c
     }
     else
     {  
-      cutoffcor <- cutoffcor - c_m*c_med*(i+1)^(-0.75)*
+      cutoffcor <- cutoffcor - c_m*c_med*(j+1)^(-0.75)*
         (as.numeric(distances[j] <= cutoffcor) - cutoffquant)
       
       if (distances[j] > cutoffcor)

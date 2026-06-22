@@ -5,22 +5,24 @@ Ninit = 1e2
 ########################################################################
 
 ################Computations of the algorithms#############################
-for(sim in 1:1e2){
-for(sc in scenarios){
+for(sim in 1:1){
   
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
+for(k in seq_along(0:100))
+  {
+  
+  #k = sc$k
+  l = 1
+  rho1 = 0.3
   
 
   
   
 
   
-  for (m in seq_along(rList[1:9])){
+  for (m in seq_along(rList[7])){
   setwd(SimDir)
     r = rList[m]
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,".RData")
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")
     
     
     print(dataFile)

@@ -5,7 +5,7 @@
 
 ###Directories
 SimDir = "~/dataSimuls"
-resAlgo = "~/res"
+resAlgo = "~/res2"
 criteres = "~/criteres"
 figures = "~/figures"
 
@@ -135,6 +135,16 @@ rho1valNeg[1] = 0.3
 
 ####################################Scenarios##############################################"
 
+sc_conc_only = list(
+  # Concentration faible
+  list(k = 0, l = 0.5, rho1 = 0.3),
+
+# Concentration moyenne
+list(k = 0, l = 0.1, rho1 = 0.3),
+
+# Concentration forte
+list(k = 0, l = 0.01, rho1 = 0.3)
+)
 
 scenarios <- list(
   #scenarios <- list(

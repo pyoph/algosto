@@ -16,7 +16,7 @@ for (sc in scenarios){
     
     setwd(SimDir)
     
-    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,".RData")
+    dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")
     
     load(dataFile)
     
