@@ -1,292 +1,62 @@
-###############Final Frobenius norm error, false positives, false negatives
+#############################Final Frobenius norm error, false positives, false negatives V2##############################
 
+methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
 
 for (sc in scenarios){
-
-k = sc$k
-
-l = sc$l
-
-rho1 = sc$rho1
-
-erreursSigmaPlot = array(0,dim = c(length(rList[1:9]),6))
-faux_positifsPlot= array(0,dim = c(length(rList[1:9]),11))
-faux_negatifsPlot= array(0,dim = c(length(rList[1:9]),11))
-ariPlot = array(0,dim = c(length(rList[1:9]),11))
-aucPlot = array(0,dim = c(length(rList[1:9]),11))
-
-
-###################Extraction des critères########################
- 
-for (j in seq_along(rList[1:9]) ){
-  setwd(criteres)
+  k = sc$k
+  l = sc$l
+  rho1 = sc$rho1
   
-  r = rList[j]
-
+  erreursSigmaPlot = array(0,dim = c(length(rList[1:9]),6))
+  faux_positifsPlot= array(0,dim = c(length(rList[1:9]),11))
+  faux_negatifsPlot= array(0,dim = c(length(rList[1:9]),11))
+  ariPlot = array(0,dim = c(length(rList[1:9]),11))
+  aucPlot = array(0,dim = c(length(rList[1:9]),11))
   
+  for (m in seq_along(rList[1:9])){
+    
+    ###############################Sample covonline#################################
+    
+    for(j in seq_along(methodes)){
+      
+      r = rList[m]
+      
+      methode = methodes[j]
+      
+      setwd(criteres)
+      
+      critFile <- paste0(
+        'Crit-',methode, "-d",d,
+        '-n', n,
+        '-k', k,
+        '-l', l,
+        '-rho', rho1,
+        '-r', r,
+        '-sim', sim,
+        ".RData"
+      )
+      load(critFile)
+      
+      erreursSigmaPlot[m,j] = crit$erreurFrob
+      faux_negatifsPlot[m,j] = crit$FN
+      faux_positifsPlot[m,j] = crit$FP
+      ariPlot[m,j] = crit$ARI
+      aucPlot[m,j] = crit$AUC
+      
+    }
   
-  
-  critFile <- paste0(
-    'CritSampleNaiveQuantonlinecorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    "Ninit-", Ninit,
-    "-cm", cm,
-    '-sim', sim,
-    ".RData"
-  )
-  load(critFile)
-  
-  erreursSigmaPlot[j,1] = crit$erreurFrob
-  faux_negatifsPlot[j,1] = crit$FN
-  faux_positifsPlot[j,1] = crit$FP
-  ariPlot[j,1] = crit$ARI
-  aucPlot[j,1] = crit$AUC
-  
-  critFile <- paste0(
-    'CritSampleNaivewithoutonlinequantilecorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    "Ninit-", Ninit,
-    ".RData"
-  )
-  
-  load(critFile)
-  
-  faux_negatifsPlot[j,2] = crit$FN
-  faux_positifsPlot[j,2] = crit$FP
-  ariPlot[j,2] = crit$ARI
-  aucPlot[j,2] = crit$AUC
-  
-  
-  setwd(criteres)
-  
-  critFile <- paste0(
-    'CritOnlineUsonlinecorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    "Ninit-", Ninit,
-    "-batch",1,
-    "-cm", cm,
-    '-sim', sim,
-    ".RData"
-  )
-  load(critFile)
-  
-  erreursSigmaPlot[j,2] = crit$erreurFrob
-  faux_negatifsPlot[j,3] = crit$FN
-  faux_positifsPlot[j,3] = crit$FP
-  ariPlot[j,3] = crit$ARI
-  aucPlot[j,3] = crit$AUC
-  
-  
-  setwd(criteres)
-  
-  critFile <- paste0(
-    'CritOnlineUswithoutQuantonlinecorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    "Ninit-", Ninit,
-    "-batch",1,
-    '-sim', sim,
-    ".RData"
-  )  
-  
-  load(critFile)
-  
-  faux_negatifsPlot[j,4] = crit$FN
-  faux_positifsPlot[j,4] = crit$FP
-  ariPlot[j,4] = crit$ARI
-  aucPlot[j,4] = crit$AUC
-  
-  
-  critFile <- paste0(
-    'CritStreamingUsonlinecorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    "Ninit-", Ninit,
-    "-batch",batch,
-    "-cm", cm,
-    '-sim', sim,
-    ".RData"
-  )
-  
-  load(critFile)
-  
-  erreursSigmaPlot[j,3] = crit$erreurFrob
-  faux_negatifsPlot[j,5] = crit$FN
-  faux_positifsPlot[j,5] = crit$FP
-  ariPlot[j,5] = crit$ARI
-  aucPlot[j,5] = crit$AUC
-  
-  setwd(criteres)
-  
-  critFile <- paste0(
-    'CritStreamingUswithoutQuantonlinecorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", 0.95,
-    "Ninit-", Ninit,
-    "-batch",batch,
-    '-sim', sim,
-    ".RData"
-  ) 
-  
-  load(critFile)
-  
-  faux_negatifsPlot[j,6] = crit$FN
-  faux_positifsPlot[j,6] = crit$FP
-  ariPlot[j,6] = crit$ARI
-  aucPlot[j,6] = crit$AUC
-  
-
-  
-  setwd(criteres)
-  
-  
-  critFile <- paste0(
-    'CritOfflinewithQuantcorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    "-cm", cm,
-    '-sim', sim,
-    ".RData"
-  )
-  
-  load(critFile)
-  
-  
-  erreursSigmaPlot[j,4] = crit$erreurFrob
-  faux_negatifsPlot[j,7] = crit$FN
-  faux_positifsPlot[j,7] = crit$FP
-  ariPlot[j,7] = crit$ARI
-  aucPlot[j,7] = crit$AUC
-  
-  
-  setwd(criteres)  
-  
-  critFile <- paste0(
-    'CritOfflineUswithoutQuantcorr-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    '-sim', sim,
-    ".RData"
-  )
-  
-  load(critFile)
-  
-  faux_negatifsPlot[j,8] = crit$FN
-  faux_positifsPlot[j,8] = crit$FP
-  ariPlot[j,8] = crit$ARI
-  aucPlot[j,8] = crit$AUC
-  
-  setwd(criteres)  
-  
-  critFile <- paste0(
-    'CritOGK-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    '-sim', sim,
-    ".RData"
-  )
-  
-
-  load(critFile)
-  
-  erreursSigmaPlot[j,5] = crit$erreurFrob
-  faux_negatifsPlot[j,9] = crit$FN
-  faux_positifsPlot[j,9] = crit$FP
-  ariPlot[j,9] = crit$ARI
-  aucPlot[j,9] = crit$AUC
-  
-  setwd(criteres)
-
-    critFile <- paste0(
-    'CritMCD-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    '-sim', sim,
-    ".RData"
-  )
-  
-  load(critFile)
-  
-  erreursSigmaPlot[j,6] = crit$erreurFrob
-  faux_negatifsPlot[j,10] = crit$FN
-  faux_positifsPlot[j,10] = crit$FP
-  ariPlot[j,10] = crit$ARI
-  aucPlot[j,10] = crit$AUC
-  
-  
-  setwd(criteres)
-  
-  critFile <- paste0(
-    'CritOracle-d', d,
-    '-n', n,
-    '-k', k,
-    '-l', l,
-    '-rho', rho1,
-    '-r', r,
-    "-cutoff", .95,
-    '-sim', sim,
-    ".RData"
-  )
-  
-  load(critFile)
-
-  faux_negatifsPlot[j,11] = crit$FN
-  faux_positifsPlot[j,11] = crit$FP
-  ariPlot[j,11] = crit$ARI
-  aucPlot[j,11] = crit$AUC
-  
-  
-  }
+    }  
+}
 
 
 
-
+for(sc in scenarios){
+  k = sc$k
+  l = sc$l
+  rho1 = sc$rho1
 setwd("~/figuresRobustVariance/fig/fig")
 
-file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,"-nInit",Ninit,"-cm",cm,".pdf")
+file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,".pdf")
 
 pdf(file, width = 25, height = 4)
 par(mfrow = c(1,5), mar = c(4,4,2,1))
@@ -567,9 +337,8 @@ box()
 
 dev.off()
 
+
 }
-
-
 #######################Trajectoires##########################
 
 for(sc in scenarios){
