@@ -37,7 +37,8 @@ for (sc in scenarios){
       )
       load(critFile)
       
-      erreursSigmaPlot[m,j] = crit$erreurFrob
+      if(j <= 6){
+      erreursSigmaPlot[m,j] = crit$erreurFrob}
       faux_negatifsPlot[m,j] = crit$FN
       faux_positifsPlot[m,j] = crit$FP
       ariPlot[m,j] = crit$ARI
@@ -54,7 +55,7 @@ for(sc in scenarios){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
-setwd("~/figuresRobustVariance/fig/fig")
+setwd("~/figures")
 
 file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,".pdf")
 
@@ -339,6 +340,8 @@ dev.off()
 
 
 }
+
+
 #######################Trajectoires##########################
 
 for(sc in scenarios){
@@ -349,9 +352,13 @@ for(sc in scenarios){
   
 
   
-  for (r in rList[1:9]){
+  for (j in seq_along(rList[1:9])){
   
+    
+  r = rList[j]
+    
   outlabTraj= array(0, dim = c(n,7))
+  
   
   setwd(SimDir)  
   
@@ -359,70 +366,20 @@ for(sc in scenarios){
   
   print(dataFile)
   
-  
   load(dataFile)
+  
+  
+  for(methode in methodes){
+  
 
   labels = data$labelsVrais
   
   setwd(resAlgo)
   
-  fitFile <- paste0('FitSampleNaiveQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",Ninit,"-cm",cm,'-sim', sim,".RData")
+  fitFile <- paste0('Fit-',methode,'-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
   load(fitFile)
-  
-  outlabTraj[,1] = resultats$outliers_labels
-  
-  
-  fitFile <- paste0('FitSampleNaivewithoutonlinequantilecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-Ninit",Ninit,'-sim', sim,".RData")
-  
-  load(fitFile)
-  
-  outlabTraj[,2] = resultats$outliers_labels
-  
-  
-  fitFile <- paste0('FitOnlineUsQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",Ninit,"-batch",1,"-cm",cm,'-sim', sim,".RData")
-  
-  
-  load(fitFile)
-  
-  outlabTraj[,3] = resultats$outliers_labels
-
-  fitFile <- paste0('FitOnlineUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",1e2,"-batch",1,'-sim', sim,".RData")
-  
-  load(fitFile)
-  
-  outlabTraj[,4] = resultats$outliers_labels
-  
-  fitFile <- paste0('FitStreamingUsonlineQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,"Ninit-",Ninit,"-batch",batch,"-cm",cm,'-sim', sim,".RData")
-  
-  
-  load(fitFile)
-  
-  outlabTraj[,5] = resultats$outliers_labels
-  
-  
-  fitFile <- paste0('FitStreamingUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"Ninit-",1e2,"-batch",batch,'-sim', sim,".RData")
-  
-  
-  load(fitFile)
-  
-  outlabTraj[,6] = resultats$outliers_labels
-  
-  
-  
-  fitFile <- paste0('FitStreamingUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"Ninit-",1e2,"-batch",batch,'-sim', sim,".RData")
-  
-  load(fitFile)
-  
-  outlabTraj[,6] = resultats$outliers_labels
-  
-  
-  fitFile <- paste0('FitOracle-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,"-cutoff",.95,'-sim', sim,".RData")
-  
-  load(fitFile)
-  
-  outlabTraj[,7] = resultats$outliers_labels
-  
+  }
   
   #rates_samplecov = compute_rates(outlmach[,1], labels)
   
@@ -548,8 +505,8 @@ for(sc in scenarios){
 
   
   }
+}
   
-  }
 
 
 
