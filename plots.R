@@ -332,16 +332,6 @@ for (sc in scenarios){
 }
 
 
-
-for(sc in scenarios){
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
-
-
-}
-
-
 #######################Trajectoires##########################
 
 methodes_online = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","Oracle")
