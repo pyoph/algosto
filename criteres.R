@@ -1,19 +1,19 @@
 ################Calcul criteres###################
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
-for(sim in 1:1e2){
-for (sc in scenarios){
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
+for(sim in 1:1){
+for (rho1 in seq(-0.99,0.99,by = 0.01)){
+  k = 0
+  l = 1
+  #rho1 = 0.3
   
-  for (m in seq_along(rList[1:9])){
+  
+  
+  for (m in seq_along(rList[7])){
     
 
     for(methode in methodes){
-    
-    r = rList[m]
-    
+  
     setwd(SimDir)
     
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")
