@@ -5,7 +5,7 @@ Ninit = 1e2
 ########################################################################
 
 ################Computations of the algorithms#############################
-for(sim in 92:1e2){
+for(sim in 1:1e2){
   
 for(sc in scenarios)
   {

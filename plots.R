@@ -1,3 +1,48 @@
+###################################Boxplots inliers outliers##########
+
+r = 30
+
+for (sc in scenarios){
+  k = sc$k
+  l = sc$l
+  rho1 = sc$rho1
+  
+  setwd(SimDir)
+  
+  dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")
+  
+  print(dataFile)
+  
+  load(dataFile)
+  
+  setwd(resAlgo)
+  
+  fitFile = paste0('Fit-Oracle-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+  
+  load(fitFile)
+  
+  distances = resultats$distances
+  
+  setwd("~")
+  
+  file <- paste0("boxplot_inliers_outliers-k",k,"-l",l,"-rho",rho1,"-r",r,".pdf")
+  
+  pdf(file, width = 25, height = 4)
+  
+  
+  boxplot(
+    distances[data$labelsVrais == 0],
+    distances[data$labelsVrais == 1],
+    names = c("0", "1"),
+    col = c("blue", "red")
+  )  
+  dev.off()
+}
+
+
+
+
+
 #############################Final Frobenius norm error, false positives, false negatives V2##############################
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
