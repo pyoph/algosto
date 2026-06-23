@@ -670,7 +670,7 @@ compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = S
     #ari = ARI_manual(labels_vrais,outlab)  
     print(paste0("ARI ",ari))
       # AUC
-    auc_val <- auc(roc(labels_vrais, as.numeric(distances)))
+    auc_val <- auc(roc(labels_vrais, distances, direction='>'))
     
     #auc_val <- auc_manual(as.numeric(distances),labels_vrais)$auc
     
