@@ -250,14 +250,18 @@ scenarios <- list(
 )
 
 sc_test = list(  
-  # Décentrage + concentration faible
-  list(k = 5, l = 0.5, rho1 = 0.3),
+  # =====================================================
+  # DEFORMATION + DILATATION
+  # =====================================================
   
-  # Décentrage + concentration moyenne
-  list(k = 10, l = 0.1, rho1 = 0.3),
+  # Déformation + dilatation faible
+  list(k = 0, l = 2, rho1 = 0.5),
   
-  # Décentrage + concentration forte
-  list(k = 50, l = 0.01, rho1 = 0.3),
+  # Déformation + dilatation moyenne
+  list(k = 0, l = 10, rho1 = 0.7),
+  
+  # Déformation + dilatation forte
+  list(k = 0, l = 100, rho1 = 0.95)
 )
 
 #####################################################################################################################

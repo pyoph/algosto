@@ -63,6 +63,12 @@ for(sc in sc_test)
     save(resultats, file = fitFile)    
     
     
+    load(fitFile)
+    
+    
+    check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
+    
+    
     #######################Sample cov without online quantile correction########################################
     
     
@@ -91,6 +97,14 @@ for(sc in sc_test)
     
     save(resultats,file = fitFile)
     
+    
+    load(fitFile)
+    
+    
+    check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
+    
+    
+    
     ###############################################Online us#########################################
     
      fitFile <- paste0('Fit-OnlineUsQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -114,6 +128,10 @@ for(sc in sc_test)
      save(resultats,file = fitFile)
      
      
+
+     
+     check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+     
      
      
   fitFile <- paste0('Fit-OnlineUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -135,6 +153,10 @@ for(sc in sc_test)
   
   save(resultats,file = fitFile)
   
+  
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
   
   ###############################################Streaming us#########################################
 
@@ -161,6 +183,9 @@ for(sc in sc_test)
   
   save(resultats,file = fitFile)
   
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
   
   
 
@@ -187,6 +212,11 @@ for(sc in sc_test)
   save(resultats,file = fitFile)
   
   
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
+  
+  
   #####################################################Offline Us########################################################
   
   fitFile <- paste0('Fit-OfflinewithQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -210,6 +240,10 @@ for(sc in sc_test)
   
   save(resultats,file = fitFile)
   
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
+  
 
   fitFile <- paste0('Fit-OfflineUswithoutQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
@@ -228,6 +262,12 @@ for(sc in sc_test)
   )
   
   save(resultats,file = fitFile)
+  
+  
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
+  
   
   #############################OGK#########################################################################
   
@@ -252,6 +292,10 @@ for(sc in sc_test)
   )
   
   save(resultats,file = fitFile)
+  
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resOGK$cov,outliers_labels = outlogk,distances = resOGK$distances)
   
   
   
@@ -282,6 +326,11 @@ for(sc in sc_test)
   save(resultats,file = fitFile)
   
   
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resMcd$cov,outliers_labels = outlmcd,distances = distmcd)
+  
+  
   
   ################################Oracle###############################################################
   
@@ -308,6 +357,11 @@ for(sc in sc_test)
   )
   
   save(resultats,file = fitFile)
+
+  load(fitFile)
+  
+  check_fit(fitFile = fitFile,variance = Sigma0,outliers_labels = outloracle,distances = distoracle)
+  
   
     
 }}}

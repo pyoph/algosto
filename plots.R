@@ -864,13 +864,15 @@ for (k in k_values){
   lines(l_inf1_values,
         pseudo_log(faux_negatifsPlot[,4] / ((30/100)*n) * 100),
         lwd = 4, col = "blue", lty = "twodash")
+  
   lines(l_inf1_values,
-        faux_negatifsPlot[,7] / ((30/100) * n) * 100,
+        pseudo_log(faux_negatifsPlot[,7] / ((30/100)*n) * 100),
         lwd = 4, col = "orange", lty = "longdash")
   
   lines(l_inf1_values,
-        pseudo_log(faux_negatifsPlot[,8] / ((30/100) * n) * 100),
+        pseudo_log(faux_negatifsPlot[,8] / ((30/100)*n) * 100),
         lwd = 4, col = "orange", lty = "twodash")
+  
   lines(l_inf1_values,
         pseudo_log(faux_negatifsPlot[,11] / ((30/100) * n) * 100),
         lwd = 4, col = "purple", lty = "longdash")
@@ -1218,14 +1220,12 @@ for (k in k_values){
         lwd = 4, col = "blue", lty = "twodash")
   
   lines(l_up1_values,
-        faux_negatifsPlot[,7] /
-          ((30/100)*n)*100,
-        lwd=4, col="orange", lty="longdash")
+        pseudo_log(faux_negatifsPlot[,7] / ((30/100)*n) * 100),
+        lwd = 4, col = "orange", lty = "longdash")
   
   lines(l_up1_values,
-        pseudo_log(faux_negatifsPlot[,8] /
-                     (30/100)*n)*100,
-        lwd=4, col="orange", lty="twodash")
+        pseudo_log(faux_negatifsPlot[,8] / ((30/100)*n) * 100),
+        lwd = 4, col = "orange", lty = "twodash")
   
   
   axis(1, at = l_up1_values, las = 1, cex.axis = 1.8)

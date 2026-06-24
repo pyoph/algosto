@@ -1,5 +1,5 @@
 #######################Génération des données#############################
-for (sim in 1:1){
+for (sim in 1:1e2){
   for(sc in sc_test){
     
     k = sc$k
@@ -31,20 +31,31 @@ for (sim in 1:1){
       #contParam = ParmsF1(m1, k, l, rho1)
       setwd(SimDir)
       contParam = ParmsF1(m1, k, l, rho1)
-      
+      ok = FALSE
       if(r == 0){
         
         data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
         
         save(data,file = dataFile)
+        ok = check_simdata_groups(dataFile = dataFile,r = r)
+        
       }
       
       if(r != 0){
         
         data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r, id_outliers =  outlier_sets[[m]])
         save(data,file = dataFile)
+        
+        ok = check_simdata_groups(dataFile = dataFile,mu1 = contParam$mu1,Sigma1 = contParam$Sigma1,r = r)
       }
       
+      if (!ok) {
+        stop(paste0("❌ STOP: simulation failed at r=", r,
+                    ", sim=", sim,
+                    ", k=", k,
+                    ", l=", l,
+                    ", rho=", rho1))
+      }
       
       
     }}
