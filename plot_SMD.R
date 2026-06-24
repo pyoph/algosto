@@ -4,58 +4,42 @@ crit_SMD = "~/criteres_SMD"
 
 ########################Boxplot Sigma errors##############################
 
-erreursSigmasSMD = array(0, dim = c(6,length(nb_machines)))  
+methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","MCD","Offline-without_onlinequantile","Offline-without_onlinequantile","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr","OGK")
 
 
-for(j in 1:nb_machines){
+erreursSigmaSMD = array(0, dim = c(length(methodes),56))  
+
+
+for(j in 1:1){
 
 setwd(crit_SMD)
   
-critFile <- paste0('CritSampleNaiveQuantonlinecorr-',"machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
-
-load(critFile)
-
-erreursSigmaSMD[1,j] =   FrobeniusNormError
-
-critFile = paste0('CritMCD-machine-',j,".RData")
-
-load(critFile)
-
-erreursSigmaSMD[2,j] =   FrobeniusNormError
-
-critFile = paste0('CritOGK-machine-',j,".RData")
-
-load(critFile)
-
-erreursSigmaSMD[3,j] =   FrobeniusNormError
-
-critFile = paste0('CritOffline-withonlinequantile-machine-', j,".RData")
-
-load(critFile)
-
-erreursSigmaSMD[4,j] =   FrobeniusNormError
-
-critFile = paste0('CritStreamingUsonlineQuantcorr-machine-', j,"-cutoff",.95,"Ninit-",1e3,"-batch",batchStrm,"-cm",1,".RData")
-
-load(critFile)
-
-erreursSigmaSMD[5,j] =   FrobeniusNormError
-
-critFile = paste0('CritOnlineUswithoutQuantonlinecorr-machine-',j,"-cutoff",.95,"Ninit-",1e3,"-batch",1,"-cm",1,".RData")
-
-load(critFile)
-
-erreursSigmaSMD[6,j] =   FrobeniusNormError
-
+  
+  
+  for(s in seq_along(methodes)){
+    
+    methode = methodes[s]
+    
+    critFile <- paste0('Crit-',methode,"-machine-",j,".RData")
+    
+    load(critFile)
+    
+    erreursSigmaSMD[s,j] = crit$erreurFrob
+    
+    
+  }
+  
 }
 
+
+setwd("~/fig_SMD")
 
 file <- paste0("boxploterreursSigma_SMD-maj-",j ,".pdf")
 
 pdf(file, width = 18, height = 6) 
 
 boxplot(
-  erreursSigmaSMD[1,],erreursSigmaSMD[2,],erreursSigmaSMD[3,],erreursSigmaSMD[4,],erreursSigmaSMD[5,],erreursSigmaSMD[6,],
+  erreursSigmaSMD[1,],erreursSigmaSMD[3,],erreursSigmaSMD[length(methodes),],erreursSigmaSMD[4,],erreursSigmaSMD[8,],erreursSigmaSMD[6,],
   log = "y",                     # échelle logarithmique sur Y
   names = c("sample covariance online","mcd","ogk","offline","streaming","online"),
   main = "",
@@ -137,7 +121,7 @@ for(j in 1:nbmachines){
   
   load(fitFile)
   
-  outlmach[,7] = outloracle
+  outlmach[,7] = resultats$outliers_labels
   
   rates_oracle <- compute_rates(outlmach[,7], labels)
   

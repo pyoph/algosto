@@ -83,6 +83,7 @@ for(j in 1:28){
 
   resultats <- list(
     variance = Sigma_trueCov,
+    variance_ref = Sigma_trueCov,
     outliers_labels = outloracle,
     distances = distrue,
     temps = 0
@@ -117,7 +118,7 @@ for(j in 1:28){
   
   resultats <- list(
     variance = resSamplecov$Sigma,
-    variance_ref, resSamplecov_ref$Sigma,
+    variance_ref =  resSamplecov_ref$Sigma,
     outliers_labels = resSamplecov$outliers_labels,
     distances = resSamplecov$distances,
     temps = temps_covonline
@@ -208,7 +209,7 @@ for(j in 1:28){
    resultats <- list(
      variance = res0$variance,
      variance_ref = res0ref$variance,
-     outliers_labels = res0$outliers_labels,
+     outliers_labels = res0$outlier_labels,
      distances = res0$distances,
      temps = temps_offline
    )
@@ -234,7 +235,7 @@ for(j in 1:28){
    resultats <- list(
      variance = res0$variance,
      variance_ref = res0ref$variance,
-     outliers_labels = res0$outliers_labels,
+     outliers_labels = res0$outlier_labels,
      distances = res0$distances,
      temps = temps_offline
    )
@@ -263,7 +264,7 @@ for(j in 1:28){
   resultats <- list(
     variance = resUsOnline$variance,
     variance_ref = resUsOnlineref$variance,
-    outliers_labels = resUsOnline$outliers_labels,
+    outliers_labels = resUsOnline$outlier_labels,
     distances = resUsOnline$distances,
     temps = temps_online
   )
@@ -290,7 +291,7 @@ for(j in 1:28){
    resultats <- list(
      variance = resUsOnline$variance,
      variance_ref = resUsOnlineref$variance,
-     outliers_labels = resUsOnline$outliers_labels,
+     outliers_labels = resUsOnline$outlier_labels,
      distances = resUsOnline$distances,
      temps = temps_online
    )
@@ -318,7 +319,7 @@ for(j in 1:28){
   resultats <- list(
     variance = resStrm$variance,
     variance_ref = resStrmref$variance,
-    outliers_labels = resStrm$outliers_labels,
+    outliers_labels = resStrm$outlier_labels,
     distances = resStrm$distances,
     temps = temps_streaming
   )
@@ -345,8 +346,8 @@ for(j in 1:28){
    
    resultats <- list(
      variance = resStrm$variance,
-     variance_ref = restStrmref$variance,
-     outliers_labels = resStrm$outliers_labels,
+     variance_ref = resStrmref$variance,
+     outliers_labels = resStrm$outlier_labels,
      distances = resStrm$distances,
      temps = temps_streaming
    )
@@ -372,7 +373,7 @@ for(j in 1:28){
   
   resultats <- list(
     variance = resogk$cov,
-    variance_ref = resogkref$variance,
+    variance_ref = resogkref$cov,
     outliers_labels = outlogk,
     distances = resogk$distances,
     temps = temps_ogk
