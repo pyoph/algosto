@@ -2,7 +2,7 @@
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
 for(sim in 1:1){
-for (sc in sc_test){
+for (sc in scenarios){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1

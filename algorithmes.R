@@ -5,14 +5,17 @@ Ninit = 1e2
 ########################################################################
 
 ################Computations of the algorithms#############################
+k_values = seq(0,100,step = 1)
+
+
 for(sim in 1:1){
   
-for(sc in sc_test)
+for(k in k_values)
   {
   
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
+  #k = sc$k
+  l = 1
+  rho1 = 0.3
   
 
   
@@ -264,7 +267,6 @@ for(sc in sc_test)
   save(resultats,file = fitFile)
   
   
-  load(fitFile)
   
   check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
   
@@ -293,7 +295,6 @@ for(sc in sc_test)
   
   save(resultats,file = fitFile)
   
-  load(fitFile)
   
   check_fit(fitFile = fitFile,variance = resOGK$cov,outliers_labels = outlogk,distances = resOGK$distances)
   
@@ -326,7 +327,6 @@ for(sc in sc_test)
   save(resultats,file = fitFile)
   
   
-  load(fitFile)
   
   check_fit(fitFile = fitFile,variance = resMcd$cov,outliers_labels = outlmcd,distances = distmcd)
   
@@ -358,7 +358,6 @@ for(sc in sc_test)
   
   save(resultats,file = fitFile)
 
-  load(fitFile)
   
   check_fit(fitFile = fitFile,variance = Sigma0,outliers_labels = outloracle,distances = distoracle)
   

@@ -47,7 +47,7 @@ for (sc in scenarios){
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
 
-for (sc in sc_test){
+for (sc in scenarios){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
@@ -89,7 +89,7 @@ for (sc in sc_test){
       aucPlot[m,j] = crit$AUC
       
     }
-    setwd("~/figures")
+    setwd("~/figures2")
     
     file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,".pdf")
     

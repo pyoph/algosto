@@ -14,6 +14,7 @@ for(j in 1:28){
   
   setwd(res_SMD)
   
+
   
   #Calcul taille de batch
   
@@ -69,26 +70,51 @@ for(j in 1:28){
 ######################################################algorithms#######################  
   
   
-  fitFile <- paste0('FitOracle-',"-machine-",j,".RData")
+  fitFile <- paste0('FitOracle-',"machine-",j,".RData")
   
   
-  oultoracle = rep(0,nrow(Z))
+  outloracle = rep(0,nrow(Z))
   
   for(s in 1:nrow(Z)){
     if(distrue[s] > quantoracle){
       outloracle[s] = 1
     }
   }
+
+  resultats <- list(
+    variance = Sigma_trueCov,
+    outliers_labels = outloracle,
+    distances = distrue,
+    temps = 0
+  )
   
-save(distrue,distrueClean,outloracle,file = fitFile)    
+  save(resultats,file = fitFile)
+  
+  check_fit(fitFile = fitFile,variance = Sigma_trueCov,outliers_labels = outloracle,distances = distrue)
+  
+  
+    
+
+
   temps_covonline = system.time(
     {
       resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = 1e3,cutoffquant =  .95,c_m = 1)
     })
 
-  fitFile <- paste0('FitSampleNaiveQuantonlinecorr-',"-machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
+  fitFile <- paste0('FitSampleNaiveQuantonlinecorr-',"machine-",j,".RData")
   
-  save(temps_covonline,resSamplecov,file = fitFile)
+  
+  resultats <- list(
+    variance = resSamplecov$Sigma,
+    outliers_labels = resSamplecov$outliers_labels,
+    distances = resSamplecov$distances,
+    temps = temps_covonline
+  )
+  
+  save(resultats,file = fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resSamplecov$Sigma,outliers_labels = resSamplecov$outliers_labels,distances = resSamplecov$distances)
+  
   
   
   temps_covonline = system.time(
@@ -98,8 +124,18 @@ save(distrue,distrueClean,outloracle,file = fitFile)
 
   fitFile <- paste0('FitSampleNaivewithoutQuantonlinecorr-',"-machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
   
-  save(temps_covonline,resSamplecov,file = fitFile)
   
+  
+  resultats <- list(
+    variance = resSamplecov$Sigma,
+    outliers_labels = resSamplecov$outliers_labels,
+    distances = resSamplecov$distances,
+    temps = temps_covonline
+  )
+  
+  save(resultats,file = fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resSamplecov$Sigma,outliers_labels = resSamplecov$outliers_labels,distances = resSamplecov$distances)
   
   fitFile <- paste0('FitMCD-machine-',j,".RData")
   
@@ -125,10 +161,21 @@ save(distrue,distrueClean,outloracle,file = fitFile)
       }
     }
   )
-
+  
+  resultats <- list(
+    variance = resmcd$cov,
+    outliers_labels = outlmcd,
+    distances = distmcd,
+    temps = temps_mcd
+  )
+  
+  save(resultats,file = fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resmcd$cov,outliers_labels = outlmcd,distances = distmcd)
+  
   
 
-  save(temps_mcd,resmcd,distmcd,outlmcd,file = fitFile)
+  #save(temps_mcd,resmcd,distmcd,outlmcd,file = fitFile)
   
   temps_offline = system.time(
     {
@@ -138,19 +185,41 @@ save(distrue,distrueClean,outloracle,file = fitFile)
   
    fitFile <- paste0('FitOffline-withonlinequantile-machine-',j,".RData")
    
-   save(temps_offline,res0,file = fitFile)
+   
+   resultats <- list(
+     variance = res0$variance,
+     outliers_labels = res0$outliers_labels,
+     distances = res0$distances,
+     temps = temps_offline
+   )
+   
+   save(resultats,file = fitFile)
+
+   check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
+   
+   
   # 
    temps_offline = system.time(
      {
-       res0 <- offlineRobustVariance_old(Z)
+       res0 <- offlineRobustVariance_old(Z,computeOutliers = TRUE)
    
      }
    )
    
    fitFile <- paste0('FitOffline-without_onlinequantile-machine-',j,".RData")
    
-   save(temps_offline,res0,file = fitFile)
-  
+   
+   resultats <- list(
+     variance = res0$variance,
+     outliers_labels = res0$outliers_labels,
+     distances = res0$distances,
+     temps = temps_offline
+   )
+   
+   save(resultats,file = fitFile)
+   
+   check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
+   
   
   ###############################################Online us#########################################
   
@@ -160,15 +229,26 @@ save(distrue,distrueClean,outloracle,file = fitFile)
   temps_online = system.time(
     {
       
-      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=cut,cutinit=0.6,nDataInit = 1e3,c_m= 1)
+      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1)
 
       
     })
   
-
-  save(resUsOnline,temps_online,file = fitFile)
   
-  fitFile <- paste0('FitOnlineUsWithoutQuantonlinecorr-machine-',j,"-cutoff",.95,"Ninit-",1e3,"-batch",1,"-cm",1,".RData")
+  resultats <- list(
+    variance = resUsOnline$variance,
+    outliers_labels = resUsOnline$outliers_labels,
+    distances = resUsOnline$distances,
+    temps = temps_online
+  )
+  
+  save(resultats,file = fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+  
+
+  
+  fitFile <- paste0('FitOnlineUsWithoutQuantonlinecorr-machine-',j,".RData")
   
    temps_online = system.time(
      {
@@ -178,29 +258,47 @@ save(distrue,distrueClean,outloracle,file = fitFile)
      })
   # 
   # 
-  save(resUsOnline,temps_online,file = fitFile)
-  
+   resultats <- list(
+     variance = resUsOnline$variance,
+     outliers_labels = resUsOnline$outliers_labels,
+     distances = resUsOnline$distances,
+     temps = temps_online
+   )
+   
+   save(resultats,file = fitFile)
+   
+   check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+   
   
   
   ###############################################Streaming us#########################################
   
-  fitFile <- paste0('FitStreamingUsonlineQuantcorr-machine-', j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
+  fitFile <- paste0('FitStreamingUsonlineQuantcorr-machine-', j,".RData")
   
   
   temps_streaming = system.time(
     {
       
-      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=cut,cutinit=0.6,nDataInit = 1e3,c_m= 1,batch = batchStrm)
+      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1,batch = batchStrm)
       
     })
   
   
-  save(resStrm,temps_streaming,file = fitFile)
+  resultats <- list(
+    variance = resStrm$variance,
+    outliers_labels = resStrm$outliers_labels,
+    distances = resStrm$distances,
+    temps = temps_streaming
+  )
+  
+  save(resultats,file = fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resStrm$variance,outliers_labels = resStrm$outliers_labels,distances = resStrm$distances)
   
   
   
   # 
-  fitFile <- paste0('FitStreamingUs_without_onlineQuantcorr-machine-', j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
+  fitFile <- paste0('FitStreamingUs_without_onlineQuantcorr-machine-', j,".RData")
   # 
    temps_streaming = system.time(
      {
@@ -211,22 +309,43 @@ save(distrue,distrueClean,outloracle,file = fitFile)
      })
    
    
-   save(resStrm,temps_streaming,file = fitFile)
-  
+   
+   resultats <- list(
+     variance = resStrm$variance,
+     outliers_labels = resStrm$outliers_labels,
+     distances = resStrm$distances,
+     temps = temps_streaming
+   )
+   
+   save(resultats,file = fitFile)
+   
+   check_fit(fitFile = fitFile,variance = resStrm$variance,outliers_labels = resStrm$outliers_labels,distances = resStrm$distances)
+
+   fitFile <- paste0('FitOGK-machine-',j,".RData")
+   
+      
   outlogk = rep(0,nrow(Z))
   
   temps_ogk = system.time(
     {
       resogk = covOGK(Z, sigmamu = scaleTau2)
-      for (s in 1:nrow(Z))
-      if(resogk$distances[s] > cut_off_ogk){outlogk[s] = 1}    
+      for (s in 1:nrow(Z)){
+      if(resogk$distances[s] > cut_off_ogk){outlogk[s] = 1}    }
     }
   )
 
-  fitFile <- paste0('FitOGK-machine-',j,".RData")
   
   
-  save(resogk,outlogk,temps_ogk,file = fitFile)
+  resultats <- list(
+    variance = resogk$cov,
+    outliers_labels = outlogk,
+    distances = resogk$distances,
+    temps = temps_ogk
+  )
+  
+  save(resultats,file = fitFile)
+  
+  check_fit(fitFile = fitFile,variance = resogk$cov,outliers_labels = outlogk,distances = resogk$distances)
   
   
 

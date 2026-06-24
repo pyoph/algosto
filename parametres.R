@@ -5,7 +5,7 @@
 
 ###Directories
 SimDir = "~/dataSimuls"
-resAlgo = "~/res2"
+resAlgo = "~/res3"
 criteres = "~/criteres"
 figures = "~/figures"
 
@@ -146,6 +146,7 @@ list(k = 0, l = 0.1, rho1 = 0.3),
 list(k = 0, l = 0.01, rho1 = 0.3)
 )
 
+
 scenarios <- list(
   #scenarios <- list(
   
@@ -233,7 +234,7 @@ scenarios <- list(
   list(k = 0, l = 10, rho1 = 0.7),
   
   # Déformation + dilatation forte
-  list(k = 0, l = 100, rho1 = 0.95),
+  list(k = 0, l = 100, rho1 = 0.95)
   #
   
   
@@ -242,13 +243,12 @@ scenarios <- list(
   # =====================================================
   # 
   # # Anomalie extrême concentrée
-  list(k = 100, l = 0.01, rho1 = 0.99),
+  #list(k = 100, l = 0.01, rho1 = 0.99),
   # 
   # # Anomalie extrême dilatée
-  list(k = 100, l = 100, rho1 = 0.99)
+  #list(k = 100, l = 100, rho1 = 0.99)
   # 
 )
-
 sc_test = list(  
   # =====================================================
   # DEFORMATION + DILATATION
