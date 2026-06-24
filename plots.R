@@ -47,7 +47,7 @@ for (sc in scenarios){
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
 
-for (sc in scenarios){
+for (sc in sc_test){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
@@ -155,18 +155,19 @@ for (sc in scenarios){
     lines(rList[2:9],
           pseudo_log(faux_negatifsPlot[2:9,3] / ((rList[2:9]/100)*n) * 100),
           lwd = 4, col = "blue", lty = "longdash")
-    
     lines(rList[2:9],
-          faux_negatifsPlot[2:9,7] /
-            ((rList[2:9]/100)*n)*100,
+          pseudo_log(faux_negatifsPlot[2:9,7] / ((rList[2:9]/100) * n) * 100),
           lwd=4, col="orange", lty="longdash")
     
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,8] /
-                       (rList[2:9]/100)*n)*100,
+          pseudo_log(faux_negatifsPlot[2:9,8] / ((rList[2:9]/100) * n) * 100),
           lwd=4, col="orange", lty="twodash")
     
     
+    lines(rList[2:9],
+          pseudo_log(faux_negatifsPlot[2:9,11] /
+                       ((rList[2:9]/100) * n) * 100),
+          lwd=4, col="purple", lty="longdash")
     lines(rList[2:9],
           pseudo_log(faux_negatifsPlot[2:9,4] / ((rList[2:9]/100)*n) * 100),
           lwd = 4, col = "blue", lty = "twodash")
@@ -480,9 +481,6 @@ for (k in k_values){
        las=1)
   box()
   
-  ############################################################
-  ################### FAUX NEGATIFS ##########################
-  ############################################################
   pseudo_log <- function(x) log10(1 + x)
   
   plot(k_values,
@@ -495,10 +493,6 @@ for (k in k_values){
   lines(k_values,
         pseudo_log(faux_negatifsPlot[,6] / ((30/100)*n) * 100),
         lwd = 4, col = "red", lty = "longdash")
-  
-  
-  
-  
   
   lines(k_values,
         pseudo_log(faux_negatifsPlot[,1] / ((30/100)*n) * 100),
@@ -517,28 +511,29 @@ for (k in k_values){
         lwd = 4, col = "blue", lty = "twodash")
   
   lines(k_values,
-        faux_negatifsPlot[,7] /
-          ((30/100)*n)*100,
-        lwd=4, col="orange", lty="longdash")
+        pseudo_log(faux_negatifsPlot[,7] / ((30/100)*n) * 100),
+        lwd = 4, col = "orange", lty = "longdash")
   
   lines(k_values,
-        pseudo_log(faux_negatifsPlot[,8] /
-                     (30/100)*n)*100,
-        lwd=4, col="orange", lty="twodash")
+        pseudo_log(faux_negatifsPlot[,8] / ((30/100)*n) * 100),
+        lwd = 4, col = "orange", lty = "twodash")
   
-  
-  axis(1, at = k_values, las = 1, cex.axis = 1.8)
+  axis(1,
+       at = k_values,
+       labels = k_values,
+       las = 1,
+       cex.axis = 1.6)
   
   axis(2,
        at = log10(1 + c(0, 1, 10, 100)),
        labels = c("0", "1", "10", "100"),
        las = 1,
-       cex.axis = 1.8)
+       cex.axis = 1.6)
   
   box()
-  ############################################################
-  ################### FAUX POSITIFS ##########################
-  ############################################################
+  
+  
+  ##############Faux positifs
   
   plot(k_values,
        faux_positifsPlot[,5] /
@@ -588,8 +583,8 @@ for (k in k_values){
         lwd=4, col="orange", lty="longdash")
   
   lines(k_values,
-        pseudo_log(faux_positifsPlot[,8] /
-                     (1 - 30/100)*n)*100,
+        faux_positifsPlot[,8] /
+                     ((1 - 30/100)*n)*100,
         lwd=4, col="orange", lty="twodash")
   
   
@@ -869,18 +864,16 @@ for (k in k_values){
   lines(l_inf1_values,
         pseudo_log(faux_negatifsPlot[,4] / ((30/100)*n) * 100),
         lwd = 4, col = "blue", lty = "twodash")
+  lines(l_inf1_values,
+        faux_negatifsPlot[,7] / ((30/100) * n) * 100,
+        lwd = 4, col = "orange", lty = "longdash")
   
   lines(l_inf1_values,
-        faux_negatifsPlot[,7] /
-          ((30/100)*n)*100,
-        lwd=4, col="orange", lty="longdash")
-  
+        pseudo_log(faux_negatifsPlot[,8] / ((30/100) * n) * 100),
+        lwd = 4, col = "orange", lty = "twodash")
   lines(l_inf1_values,
-        pseudo_log(faux_negatifsPlot[,8] /
-                     (30/100)*n)*100,
-        lwd=4, col="orange", lty="twodash")
-  
-  
+        pseudo_log(faux_negatifsPlot[,11] / ((30/100) * n) * 100),
+        lwd = 4, col = "purple", lty = "longdash")
   axis(1, at = l_inf1_values, las = 1, cex.axis = 1.8)
   
   axis(2,

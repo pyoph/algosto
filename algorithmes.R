@@ -5,9 +5,9 @@ Ninit = 1e2
 ########################################################################
 
 ################Computations of the algorithms#############################
-for(sim in 1:1e2){
+for(sim in 1:1){
   
-for(sc in scenarios)
+for(sc in sc_test)
   {
   
   k = sc$k
@@ -89,7 +89,7 @@ for(sc in scenarios)
       temps = temps_naif
     )
     
-    save(resultats,temps_naif,file = fitFile)
+    save(resultats,file = fitFile)
     
     ###############################################Online us#########################################
     
@@ -210,9 +210,6 @@ for(sc in scenarios)
   
   save(resultats,file = fitFile)
   
-  
-  
-  save(resOffline,temps_offline,file = fitFile)
 
   fitFile <- paste0('Fit-OfflineUswithoutQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   

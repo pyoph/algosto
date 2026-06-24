@@ -1,8 +1,8 @@
 ################Calcul criteres###################
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
-for(sim in 48:1e2){
-for (sc in scenarios){
+for(sim in 1:1){
+for (sc in sc_test){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
@@ -11,7 +11,8 @@ for (sc in scenarios){
   
   for (m in seq_along(rList[1:9])){
     
-
+    r = rList[m]
+     
     for(methode in methodes){
   
     setwd(SimDir)

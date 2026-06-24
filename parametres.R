@@ -249,14 +249,16 @@ scenarios <- list(
   # 
 )
 
-sc_test = list(  # Concentration faible
-  list(k = 0, l = 0.5, rho1 = 0.3),
+sc_test = list(  
+  # Décentrage + concentration faible
+  list(k = 5, l = 0.5, rho1 = 0.3),
   
-  # Concentration moyenne
-  list(k = 0, l = 0.1, rho1 = 0.3),
+  # Décentrage + concentration moyenne
+  list(k = 10, l = 0.1, rho1 = 0.3),
   
-  # Concentration forte
-  list(k = 0, l = 0.01, rho1 = 0.3))
+  # Décentrage + concentration forte
+  list(k = 50, l = 0.01, rho1 = 0.3),
+)
 
 #####################################################################################################################
 ################################# Export of the parameter file one for d = 10######################
@@ -290,3 +292,5 @@ setwd("~/algosto")
 #   }
 # }}}}
 # 
+  
+  

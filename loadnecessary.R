@@ -84,7 +84,7 @@ genererEchantillon <- function(n, d, mu1, mu2,Sigma1, Sigma2,r) {
 
 
 genererEchantillon_new <- function(n, d, mu1, mu2,Sigma1, Sigma2,r,id_outliers = NULL,dirac = FALSE) {
-  # InitialSisation
+  # Initialisation
   Z = matrix(0,n,d)
   
   n1 <- floor((1 -r/100) * n)  # Taille du groupe non contaminé
