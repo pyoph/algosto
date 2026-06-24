@@ -661,9 +661,10 @@ auc_manual <- function(score, labels) {
 
 #####Calcule critères
 
-compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = Sigma0,r){
+compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = Sigma0,r,smd = FALSE, Sigma_ref = NULL){
   
-  erreurFrob <- norm(variance - Sigma0, "F")
+  if(smd == FALSE){erreurFrob <- norm(variance - Sigma0, "F")}
+  else{erreurFrob <- norm(variance - Sigma_ref, "F")}
   FP <- sum(outlab == 1 & labels_vrais == 0)
   FN <- sum(outlab == 0 & labels_vrais == 1)
   if(r != 0){

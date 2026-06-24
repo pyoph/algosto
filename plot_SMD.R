@@ -11,7 +11,7 @@ for(j in 1:nb_machines){
 
 setwd(crit_SMD)
   
-critFile <- paste0('CritSampleNaiveQuantonlinecorr-',"-machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
+critFile <- paste0('CritSampleNaiveQuantonlinecorr-',"machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
 
 load(critFile)
 
@@ -84,7 +84,7 @@ for(j in 1:nbmachines){
   
   setwd(res_SMD)
   
-  fitFile <- paste0('FitSampleNaiveQuantonlinecorr-',"-machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
+  fitFile <- paste0('FitSampleNaiveQuantonlinecorr-',"machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
   
   load(fitFile)
   
@@ -92,7 +92,7 @@ for(j in 1:nbmachines){
 
   rates_samplecov_quantcorr = compute_rates(outlmach[,1], labels)
   
-  fitFile <- paste0('FitSampleNaivewithoutQuantonlinecorr-',"-machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
+  fitFile <- paste0('FitSampleNaivewithoutQuantonlinecorr-',"machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
   
   load(fitFile)
   
@@ -100,7 +100,7 @@ for(j in 1:nbmachines){
 
   rates_samplecov_without_quantcorr = compute_rates(outlmach[,2], labels)
   
-  fitFile <- paste0('FitOnlineUsQuantonlinecorr-machine-',j,"-cutoff",.95,"Ninit-",1e3,"-batch",1,"-cm",1,".RData")
+  fitFile <- paste0('FitOnlineUsQuantonlinecorr-machine-',j,".RData")
   
   load(fitFile)
   
@@ -108,7 +108,7 @@ for(j in 1:nbmachines){
   
   rates_online_with_quantcorr = compute_rates(outlmach[,3], labels)
   
-  fitFile <- paste0('FitOnlineUsWithoutQuantonlinecorr-machine-',j,"-cutoff",.95,"Ninit-",1e3,"-batch",1,"-cm",1,".RData")
+  fitFile <- paste0('FitOnlineUsWithoutQuantonlinecorr-machine-',j,".RData")
   
   load(fitFile)
   
@@ -116,7 +116,7 @@ for(j in 1:nbmachines){
   
   rates_online_without_quantcorr = compute_rates(outlmach[,4], labels)
   
-  fitFile <- paste0('FitStreamingUsonlineQuantcorr-machine-', j,"-cutoff",.95,"Ninit-",1e3,"-batch",batchStrm,"-cm",1,".RData")
+  fitFile <- paste0('FitStreamingUsonlineQuantcorr-machine-', j,".RData")
   
   load(fitFile)
   
@@ -124,7 +124,7 @@ for(j in 1:nbmachines){
   
   rates_Strm_with_quantcorr = compute_rates(outlmach[,5], labels)
   
-  fitFile <- paste0('FitStreamingUs_without_onlineQuantcorr-machine-', j,"-cutoff",.95,"Ninit-",1e3,"-batch",batchStrm,"-cm",1,".RData")
+  fitFile <- paste0('FitStreamingUs_without_onlineQuantcorr-machine-', j,".RData")
   
   load(fitFile)
   
