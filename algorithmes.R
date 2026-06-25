@@ -2,16 +2,19 @@
 batch = d
 cm = 2
 Ninit = 1e2
-k_values = seq(0,100,step = 1)
 
-########################################################################
+################################Chargement des scénarios#################################
+
+setwd("~/algosto/")
+
+load("scenarios.RData")
 
 ################Computations of the algorithms#############################
 
 
 for(sim in 1:1){
   
-for(sc in sc_test)
+for(sc in scenarios_k)
   {
   
   k = sc$k

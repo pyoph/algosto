@@ -1,6 +1,7 @@
 smd_data_dir = "~/smd_data_dir"
 res_SMD = "~/res_SMD"
 crit_SMD = "~/criteres_SMD"
+fig_SMD = "~/fig_SMD/"
 
 ########################Boxplot Sigma errors##############################
 
@@ -32,9 +33,12 @@ setwd(crit_SMD)
 }
 
 
-setwd("~/fig_SMD")
 
-file <- paste0("boxploterreursSigma_SMD-maj-",j ,".pdf")
+
+
+setwd(fig_SMD)
+
+file <- paste0("boxploterreursSigma_SMD",".pdf")
 
 pdf(file, width = 18, height = 6) 
 
@@ -47,6 +51,91 @@ boxplot(
   col = rainbow(ncol(erreursSigmaSMD))
 )
 dev.off()
+
+#############################AUC ARI#################################
+
+methodes = c("Oracle","SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","MCD","Offline-without_onlinequantile","Offline-without_onlinequantile","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr","OGK")
+
+
+for(j in 1:2){
+  setwd(crit_SMD)
+  
+  ariPlot = array(0,dim = c(28,length(methodes)))
+  aucPlot = array(0,dim = c(28,length(methodes)))
+  
+  
+  for (s in seq_along(methodes)){
+    
+    methode = methodes[s]
+    
+    critFile <- paste0("Crit-",methode,"-machine-",j,".RData")
+  
+    load(critFile)
+    
+    ariPlot[j,s] = crit$ARI
+    aucPlot[j,s] = crit$AUC
+    
+      
+  }
+  
+}
+
+setwd(fig_SMD)
+
+file <- paste0("boxplotAUC_SMD",".pdf")
+
+pdf(file, width = 18, height = 6) 
+boxplot(
+  as.data.frame(aucPlot),
+  names = c(
+    "Oracle",
+    "Sample Naive\nQuant Corr",
+    "Sample Naive\nNo Quant Corr",
+    "MCD",
+    "Offline\nNo Quant Corr",
+    "Offline\nQuant Corr",
+    "Online US\nQuant Corr",
+    "Online US\nNo Quant Corr",
+    "Streaming US\nQuant Corr",
+    "Streaming US\nNo Quant Corr",
+    "OGK"
+  ),
+  las = 2,        # noms verticaux
+  col = rainbow(ncol(aucPlot)),
+  main = "AUC",
+  ylab = "AUC"
+)
+dev.off()
+
+
+
+setwd(fig_SMD)
+
+file <- paste0("boxplotARI_SMD",".pdf")
+
+pdf(file, width = 18, height = 6) 
+boxplot(
+  as.data.frame(aucPlot),
+  names = c(
+    "Oracle",
+    "Sample Naive\nQuant Corr",
+    "Sample Naive\nNo Quant Corr",
+    "MCD",
+    "Offline\nNo Quant Corr",
+    "Offline\nQuant Corr",
+    "Online US\nQuant Corr",
+    "Online US\nNo Quant Corr",
+    "Streaming US\nQuant Corr",
+    "Streaming US\nNo Quant Corr",
+    "OGK"
+  ),
+  las = 2,        # noms verticaux
+  col = rainbow(ncol(ariPlot)),
+  main = "ARI",
+  ylab = "ARI"
+)
+dev.off()
+
 
 
 ###############Trajectoires##################

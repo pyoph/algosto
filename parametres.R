@@ -5,7 +5,7 @@
 
 ###Directories
 SimDir = "~/dataSimuls"
-resAlgo = "~/res3"
+resAlgo = "~/res4"
 criteres = "~/criteres"
 figures = "~/figures"
 
