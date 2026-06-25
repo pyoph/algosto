@@ -1,6 +1,6 @@
 #######################Génération des données#############################
-for (sim in 1:1e2){
-  for(sc in sc_test){
+for (sim in 3:1e2){
+  for(sc in scenarios){
     
     k = sc$k
     l = sc$l

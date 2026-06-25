@@ -39,10 +39,19 @@ library(STARRS)
 library(mclust)
 library(pROC)
 
+
+
+
+
 ############################
 #############FIchiers nécessaires
 #################################
 sourceCpp("~/algosto/src/CodesRCpp.cpp")
+
+#Fichier des scénarios 
+
+
+
 
 #######################################################################
 #Simulation of a dataset with different parameters####################
@@ -678,7 +687,7 @@ compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = S
     #ari = ARI_manual(labels_vrais,outlab)  
     print(paste0("ARI ",ari))
       # AUC
-    auc_val <- auc(roc(labels_vrais, distances, direction='>'))
+    auc_val <- auc(roc(labels_vrais, distances, direction='<'))
     
     #auc_val <- auc_manual(as.numeric(distances),labels_vrais)$auc
     
@@ -765,8 +774,8 @@ check_simdata_groups <- function(dataFile,
       message("✖ FAILED : ", dataFile)
       
       if (!ok_nb_outliers) message("   Outlier number mismatch")
-      if (!ok_clean_maha) message("   Clean Mahalanobis failed")
-      if (!ok_cont_maha) message("   Cont Mahalanobis failed")
+      if (!ok_clean_maha_clean) message("   Clean Mahalanobis failed")
+      if (!ok_cont_maha_cont) message("   Cont Mahalanobis failed")
     }
     
     return(ok)
@@ -783,7 +792,8 @@ check_fit <- function(fitFile, variance, outliers_labels, distances) {
     load(fitFile)
     
     err_var  <- norm(variance - resultats$variance, type = "F")
-    err_dist <- max(abs(resultats$distances - distances))
+    err_dist <- max(abs(
+      resultats$distances - distances))
     
     n_mismatch_out <- sum(resultats$outliers_labels != outliers_labels)
     

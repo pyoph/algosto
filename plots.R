@@ -1,47 +1,7 @@
-###################################Boxplots inliers outliers##########
-
-r = 30
-
-for (sc in scenarios){
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
-  
-  setwd(SimDir)
-  
-  dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")
-  
-  print(dataFile)
-  
-  load(dataFile)
-  
-  setwd(resAlgo)
-  
-  fitFile = paste0('Fit-Oracle-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-  
-  load(fitFile)
-  
-  distances = resultats$distances
-  
-  setwd("~")
-  
-  file <- paste0("boxplot_inliers_outliers-k",k,"-l",l,"-rho",rho1,"-r",r,".pdf")
-  
-  pdf(file, width = 25, height = 4)
-  
-  
-  boxplot(
-    distances[data$labelsVrais == 0],
-    distances[data$labelsVrais == 1],
-    names = c("0", "1"),
-    col = c("blue", "red")
-  )  
-  dev.off()
-}
 
 
 
-
+setwd("~/figures")
 
 #############################Final Frobenius norm error, false positives, false negatives V2##############################
 
@@ -1800,8 +1760,8 @@ for (k in k_values){
 
 #######################Trajectoires##########################
 
-methodes_online = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","Oracle")
 
+methodes_online = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","Oracle")
 
 for(sc in scenarios){
   
@@ -1826,14 +1786,83 @@ for(sc in scenarios){
   print(dataFile)
   
   load(dataFile)
+  
+  Z_clean = data$Z[data$labelsVrais == 0,]
+  
+  if(r!= 0){
+  Z_cont = data$Z[data$labelsVrais == 1,]
+  }
+  
   labels = data$labelsVrais
+  # 
+  # nbinliers = (1 - r/100)*n
+  # 
+  # nboutliers = r/100*n
+  # 
+  # distinliers = rep(0,nbinliers)
+  # 
+  # distoutliers = rep(0,nboutliers)
+  # cat("k =", k, " l =", l, " rho =", rho1, " r =", r, "\n")
+  # 
+  # Z_clean = data$Z[data$labelsVrais == 0,]
+  # 
+  # print(paste0("moyenne Z_clean ", colMeans(Z_clean)))
+  # 
+  # print(paste0("déterminant covariance Z_clean ", det(cov(Z_clean))))
+  # 
+  # if(r != 0){
+  #   Z_cont = data$Z[data$labelsVrais == 1,]
+  #   
+  #   print(paste0("moyenne Z_cont ", colMeans(Z_cont)))
+  #   
+  #   print(paste0("déterminant covariance Z_cont ", det(cov(Z_cont))))
+  #   
+  # }
+  # invSigma0 = solve(Sigma0)
+  # if(r != 0){
+  #   contParam = ParmsF1(m1, k, l, rho1)
+  #   
+  #   invSigma1 = solve(contParam$Sigma1)
+  # }
+  # for(m in 1:nbinliers){
+  #   distinliers[m] = t(Z_clean[m,] - mu0)%*%invSigma0%*%(Z_clean[m,] - mu0)
+  #   
+  # }
+  # print(paste0("moyenne distance inliers ",mean(distinliers)))
+  # if(r != 0){
+  #   for(m in 1:nboutliers){
+  #     distoutliers[m] = t(Z_cont[m,] - contParam$mu1)%*%invSigma1%*%(Z_cont[m,] - contParam$mu1)
+  #   }
+  #   print(paste0("moyenne distance outliers ",mean(distoutliers)))
+  #   
   
   
+
+  nboutliers = r/100*n
+  
+  nbinliers = (1 - r/100)*n
+  
+  
+  distinliers = rep(0,nbinliers)
+  
+  invSigma0 = solve(Sigma0)
+  
+  for (m in (1:nbinliers)){
+    distinliers[m] = t(Z_clean[m,] - mu0)%*%invSigma0%*%(Z_clean[m,] - mu0)
+  }
+  
+  
+  if(r != 0){
+  distoutliers = rep(0,nboutliers)
+  
+  for (m in (1:nboutliers)){
+    distoutliers[m] = t(Z_cont[m,] - mu0)%*%invSigma0%*%(Z_cont[m,] - mu0)
+  }
+  }
   for(s in seq_along(methodes_online)){
   
   methode = methodes_online[s]
 
-  
   setwd(resAlgo)
   
   fitFile <- paste0('Fit-',methode,'-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -1860,6 +1889,7 @@ for(sc in scenarios){
   
   rates_oracle = compute_rates(outlabTraj[,7], labels)
   
+  
   setwd("~/figures")
   
   nom_fichier = paste0("trajectories_k-",k,"-l",l,"-rho1",rho1,"-r",r,"-sim",sim,".pdf")
@@ -1869,29 +1899,41 @@ for(sc in scenarios){
   
   x_vals = 1:length(rates_strm_corr$FN_rate)
   
-  
-  # =====================================================
-  # 1. LABELS
-  # =====================================================
-  plot(x_vals, labels,
-       type = "n",
-       ylim = c(-0.05,1.05),
-       yaxt = "n",
-       xaxt = "n",
-       xlab = "", ylab = "",
-       main = "Ground truth")
-  
-  points(x_vals[labels==0], labels[labels==0],
-         pch = 16, cex = .4, col = "blue")
-  
-  points(x_vals[labels==1], labels[labels==1],
-         pch = 16, cex = .6, col = "red")
-  
-  axis(2, at = c(0, 1), las = 1, cex.axis = 1.8)
-  axis(1, at = seq(1000, max(x_vals), by = 1000),
-       las = 1, cex.axis = 1.8)
-  box()
-  
+  if(r != 0){
+     boxplot(distinliers,distoutliers,col = c("lightblue", "red"),
+             names = c("0", "1"))  
+  }
+    # # =====================================================
+  # # 1. LABELS
+  # # =====================================================
+  # plot(x_vals, jitter(labels, amount = 0.08),
+  #      type = "n",
+  #      ylim = c(-0.2, 1.2),
+  #      yaxt = "n",
+  #      xaxt = "n",
+  #      xlab = "", ylab = "",
+  #      main = "Ground truth")
+  # 
+  # points(x_vals[labels == 0],
+  #        jitter(labels[labels == 0], amount = 0.08),
+  #        pch = 16, cex = .4, col = "blue")
+  # 
+  # points(x_vals[labels == 1],
+  #        jitter(labels[labels == 1], amount = 0.08),
+  #        pch = 16, cex = .6, col = "red")
+  # 
+  # axis(2,
+  #      at = c(0, 1),
+  #      labels = c("O", "X"),
+  #      las = 1,
+  #      cex.axis = 1.8)
+  # 
+  # axis(1,
+  #      at = seq(1000, max(x_vals), by = 1000),
+  #      las = 1,
+  #      cex.axis = 1.8)
+  # 
+  # box()
   # =====================================================
   # 2. FALSE NEGATIVE RATE
   # =====================================================
@@ -1967,8 +2009,8 @@ for(sc in scenarios){
   dev.off()
 
   
-  }
-}
+  }}
+
   
 
 

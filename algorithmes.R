@@ -2,20 +2,21 @@
 batch = d
 cm = 2
 Ninit = 1e2
+k_values = seq(0,100,step = 1)
+
 ########################################################################
 
 ################Computations of the algorithms#############################
-k_values = seq(0,100,step = 1)
 
 
 for(sim in 1:1){
   
-for(k in k_values)
+for(sc in sc_test)
   {
   
-  #k = sc$k
-  l = 1
-  rho1 = 0.3
+  k = sc$k
+  l = sc$l
+  rho1 = sc$rho1
   
 
   
