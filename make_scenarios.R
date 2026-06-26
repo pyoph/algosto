@@ -3,19 +3,7 @@
 scenarios <- list(
   #scenarios <- list(
   
-  # =====================================================
-  # CONCENTRATION
-  # =====================================================
-  
-  # Concentration faible
-  list(k = 0, l = 0.5, rho1 = 0.3),
-  
-  # Concentration moyenne
-  list(k = 0, l = 0.1, rho1 = 0.3),
-  
-  # Concentration forte
-  list(k = 0, l = 0.01, rho1 = 0.3),
-  
+
   
   # =====================================================
   # DECENTRAGE + CONCENTRATION
