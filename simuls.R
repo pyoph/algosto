@@ -34,19 +34,24 @@ for (sim in 1:1e1){
       ok = FALSE
       if(r == 0){
         
+        
+        if(!file.exists(dataFile)){
         data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
         
         save(data,file = dataFile)
         ok = check_simdata_groups(dataFile = dataFile,r = r)
-        
+        }
+        else {load(dataFile)}
       }
       
       if(r != 0){
         
+        if(!(file.exists(dataFile))){
         data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r, id_outliers =  outlier_sets[[m]])
         save(data,file = dataFile)
-        
-        ok = check_simdata_groups(dataFile = dataFile,mu1 = contParam$mu1,Sigma1 = contParam$Sigma1,r = r)
+        }
+        else{load(dataFile)
+        ok = check_simdata_groups(dataFile = dataFile,mu1 = contParam$mu1,Sigma1 = contParam$Sigma1,r = r)}
       }
       
       if (!ok) {

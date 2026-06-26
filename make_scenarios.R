@@ -1,6 +1,6 @@
 
 ####################################Scenarios##############################################"
-scenarios <- list(
+scenarios_2_param <- list(
   #scenarios <- list(
   
 
@@ -118,9 +118,6 @@ scenarios_1_param = list(
 setwd("~/algosto")
 
 save(
-  scenarios,
-  scenarios_k,
-  scenarios_l,
-  scenarios_rho1,
+  scenarios_2_param,scenarios_1_param,
   file = "scenarios.RData"
 )
