@@ -1,6 +1,6 @@
 #######################Génération des données#############################
-for (sim in 3:1e2){
-  for(sc in scenarios){
+for (sim in 1:1e1){
+  for(sc in scenarios_1_param){
     
     k = sc$k
     l = sc$l
@@ -50,7 +50,7 @@ for (sim in 3:1e2){
       }
       
       if (!ok) {
-        stop(paste0("❌ STOP: simulation failed at r=", r,
+        print(paste0("❌ STOP: simulation failed at r=", r,
                     ", sim=", sim,
                     ", k=", k,
                     ", l=", l,

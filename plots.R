@@ -1,8 +1,6 @@
 
 
 
-setwd("~/figures")
-
 #############################Final Frobenius norm error, false positives, false negatives V2##############################
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
@@ -49,7 +47,7 @@ for (sc in scenarios){
       aucPlot[m,j] = crit$AUC
       
     }
-    setwd("~/figures2")
+    setwd("~/figures3")
     
     file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,".pdf")
     

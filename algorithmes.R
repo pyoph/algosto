@@ -12,9 +12,9 @@ load("scenarios.RData")
 ################Computations of the algorithms#############################
 
 
-for(sim in 1:1){
+for(sim in 1:1e1){
   
-for(sc in scenarios_k)
+for(sc in scenarios_1_param)
   {
   
   k = sc$k

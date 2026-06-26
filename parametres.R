@@ -4,8 +4,8 @@
 
 
 ###Directories
-SimDir = "~/dataSimuls"
-resAlgo = "~/res4"
+SimDir = "~/datasimuls_1_param"
+resAlgo = "~/res5"
 criteres = "~/criteres"
 figures = "~/figures"
 
