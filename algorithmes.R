@@ -402,7 +402,7 @@ for(sc in scenarios){
     
     for(methode in methodes){
       
-      votes <- matrix(0, nrow = n, ncol = 20)
+      votes <- matrix(0, nrow = n, ncol = simNb)
       
       for(sim in 1:20){
         
@@ -427,6 +427,8 @@ for(sc in scenarios){
       }
       
       majority_labels <- as.integer(rowSums(votes) > floor(simNb/2))
+      
+      setwd(criteres)
       
       save(
         majority_labels,
