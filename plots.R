@@ -1,6 +1,6 @@
 
 
-
+scenarios = c(scenarios_1_param,scenarios_2_param)
 #############################Final Frobenius norm error, false positives, false negatives V2##############################
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
@@ -47,7 +47,7 @@ for (sc in scenarios){
       aucPlot[m,j] = crit$AUC
       
     }
-    setwd("~/figures3")
+    setwd(figures)
     
     file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,".pdf")
     
@@ -436,7 +436,7 @@ for(sc in scenarios){
   rates_oracle = compute_rates(outlabTraj[,7], labels)
   
   
-  setwd("~/figures")
+  setwd(figures)
   
   nom_fichier = paste0("trajectories_k-",k,"-l",l,"-rho1",rho1,"-r",r,"-sim",sim,".pdf")
   pdf(nom_fichier, width = 14, height = 10)

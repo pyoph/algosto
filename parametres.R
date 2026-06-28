@@ -4,8 +4,8 @@
 
 
 ###Directories
-SimDir = "~/datasimuls_1_param"
-resAlgo = "~/res5"
+SimDir = "~/data20runs"
+resAlgo = "~/res20runsallscen"
 criteres = "~/criteres"
 figures = "~/figures"
 
@@ -26,7 +26,7 @@ d <- 10
 rList <- 5*(0:10)
 #load(paste0('SimParmsGrid-d', d, '.Rdata'))
 sim = 1
-simNb <- 1
+simNb <- 20
 n <- 1e4
 Ninit = 1e2
 cm = 2

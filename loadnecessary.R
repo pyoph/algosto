@@ -43,12 +43,6 @@ library(pROC)
 
 
 
-############################
-#############FIchiers nécessaires
-#################################
-sourceCpp("~/algosto/src/CodesRCpp.cpp")
-
-#Fichier des scénarios 
 
 
 

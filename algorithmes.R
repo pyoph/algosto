@@ -9,12 +9,14 @@ setwd("~/algosto/")
 
 load("scenarios.RData")
 
+scenarios = c(scenarios_1_param,scenarios_2_param)
+
 ################Computations of the algorithms#############################
 
 
-for(sim in 1:1e1){
+for(sim in 1:20){
   
-for(sc in scenarios_1_param)
+for(sc in scenarios)
   {
   
   k = sc$k
@@ -73,7 +75,7 @@ for(sc in scenarios_1_param)
     load(fitFile)
     
     
-    check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
+    #check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
     
     
     #######################Sample cov without online quantile correction########################################
@@ -108,7 +110,7 @@ for(sc in scenarios_1_param)
     load(fitFile)
     
     
-    check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
+    #check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
     
     
     
@@ -137,7 +139,7 @@ for(sc in scenarios_1_param)
      
 
      
-     check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+     #check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
      
      
      
@@ -163,7 +165,7 @@ for(sc in scenarios_1_param)
   
   load(fitFile)
   
-  check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+  #check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
   
   ###############################################Streaming us#########################################
 
@@ -192,7 +194,7 @@ for(sc in scenarios_1_param)
   
   load(fitFile)
   
-  check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
+  #check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
   
   
 
@@ -221,7 +223,7 @@ for(sc in scenarios_1_param)
   
   load(fitFile)
   
-  check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
+  #check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
   
   
   #####################################################Offline Us########################################################
@@ -249,7 +251,7 @@ for(sc in scenarios_1_param)
   
   load(fitFile)
   
-  check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
+  #check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
   
 
   fitFile <- paste0('Fit-OfflineUswithoutQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -272,7 +274,7 @@ for(sc in scenarios_1_param)
   
   
   
-  check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
+  #check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
   
   
   #############################OGK#########################################################################
@@ -300,7 +302,7 @@ for(sc in scenarios_1_param)
   save(resultats,file = fitFile)
   
   
-  check_fit(fitFile = fitFile,variance = resOGK$cov,outliers_labels = outlogk,distances = resOGK$distances)
+  #check_fit(fitFile = fitFile,variance = resOGK$cov,outliers_labels = outlogk,distances = resOGK$distances)
   
   
   
@@ -332,7 +334,7 @@ for(sc in scenarios_1_param)
   
   
   
-  check_fit(fitFile = fitFile,variance = resMcd$cov,outliers_labels = outlmcd,distances = distmcd)
+  #check_fit(fitFile = fitFile,variance = resMcd$cov,outliers_labels = outlmcd,distances = distmcd)
   
   
   
@@ -363,13 +365,84 @@ for(sc in scenarios_1_param)
   save(resultats,file = fitFile)
 
   
-  check_fit(fitFile = fitFile,variance = Sigma0,outliers_labels = outloracle,distances = distoracle)
+  #check_fit(fitFile = fitFile,variance = Sigma0,outliers_labels = outloracle,distances = distoracle)
   
   
     
 }}}
   
 
+#################### Vote à la majorité sur les simulations ####################
 
+methodes <- c(
+  "SampleNaiveQuantonlinecorr",
+  "SampleNaivewithoutonlinequantilecorr",
+  "OnlineUsQuantonlinecorr",
+  "OnlineUswithoutQuantonlinecorr",
+  "StreamingUsonlineQuantcorr",
+  "StreamingUswithoutQuantonlinecorr",
+  "OfflinewithQuantcorr",
+  "OfflineUswithoutQuantcorr",
+  "OGK",
+  "MCD",
+  "Oracle"
+)
 
+setwd(criteres)
+
+for(sc in scenarios){
+  
+  k <- sc$k
+  l <- sc$l
+  rho1 <- sc$rho1
+  
+  for(m in seq_along(rList[1:9])){
+    
+    r <- rList[m]
+    
+    for(methode in methodes){
+      
+      votes <- matrix(0, nrow = n, ncol = 20)
+      
+      for(sim in 1:20){
+        
+        fitFile <- file.path(
+          resAlgo,
+          paste0(
+            "Fit-", methode,
+            "-d", d,
+            "-n", n,
+            "-k", k,
+            "-l", l,
+            "-rho", rho1,
+            "-r", r,
+            "-sim", sim,
+            ".RData"
+          )
+        )
+        
+        load(fitFile)
+        
+        votes[, sim] <- resultats$outliers_labels
+      }
+      
+      majority_labels <- as.integer(rowSums(votes) > floor(simNb/2))
+      
+      save(
+        majority_labels,
+        file = paste0(
+          "Crit-", methode,
+          "-n", n,
+          "-d", d,
+          "-k", k,
+          "-l", l,
+          "-rho", rho1,
+          "-majority", r,
+          ".RData"
+        )
+      )
+      
+    }
+  }
+}
 

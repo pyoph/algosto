@@ -1,8 +1,8 @@
 ################Calcul criteres###################
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
-for(sim in 1:1){
-for (sc in scenarios){
+for(sim in 12:12){
+for (sc in c(scenarios)){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
@@ -63,5 +63,58 @@ for (sc in scenarios){
   }  
 }
 
+}
+
+#######################Calcul moyenne erreur norme de Frobenius faux positifs faux négatifs, ari, auc
+
+
+for (sc in scenarios){
+  k = sc$k
+  l = sc$l
+  rho1 = sc$rho1
+  
+  erreurFrob = 0
+  FP = 0
+  FN = 0
+  ARI = 0
+  AUC = 0
+  for(r in rList[1:9]){
+   for(methode in methode){
+for (sim in 1:simNb){
+  
+  setwd(criteres)
+  
+  critFile <- paste0(
+    'Crit-',methode,"-d" ,d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+ load(critFile)
+
+  erreurFrob = erreurFrob + crit$erreurFrob
+  FP = FP + crit$FP
+  FN = FN + crit$FN
+  ARI = ARI + crit$ARI
+  AUC = AUC + crit$AUC
+}
+
+     
+     crit = list(
+       erreurFrob = erreurFrob/simNb,
+       FN = FN/simNb,
+       FP = FP/simNb,
+       ARI = ARI/simNb,
+       AUC = AUC/simNb)  
+     }
+
+  }
+
+    
 }
 
