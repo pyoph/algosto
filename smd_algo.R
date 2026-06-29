@@ -253,7 +253,7 @@ for(j in 1:28){
   temps_online = system.time(
     {
       
-      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 2)
+      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1)
 
       
     })
@@ -298,8 +298,7 @@ for(j in 1:28){
    
    save(resultats,file = fitFile)
    
-   #check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
-   
+
   
   
   ###############################################Streaming us#########################################
@@ -310,11 +309,11 @@ for(j in 1:28){
   temps_streaming = system.time(
     {
       
-      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 2,batch = batchStrm)
+      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1,batch = batchStrm)
       
     })
   
-  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 2,batch = batchStrm)
+  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m = 1 ,batch = batchStrm)
   
   resultats <- list(
     variance = resStrm$variance,
