@@ -40,11 +40,11 @@ for (sc in scenarios){
       )
       load(critFile)
       
-      erreursSigmaPlot[m,j] = crit$erreurFrob
-      faux_negatifsPlot[m,j] = crit$FN
-      faux_positifsPlot[m,j] = crit$FP
-      ariPlot[m,j] = crit$ARI
-      aucPlot[m,j] = crit$AUC
+      erreursSigmaPlot[m,j] = crit_mean$erreurFrob
+      faux_negatifsPlot[m,j] = crit_mean$FN
+      faux_positifsPlot[m,j] = crit_mean$FP
+      ariPlot[m,j] = crit_mean$ARI
+      aucPlot[m,j] = crit_mean$AUC
       
     }
     setwd(figures)
@@ -409,14 +409,23 @@ for(sc in scenarios){
   
   methode = methodes_online[s]
 
-  setwd(resAlgo)
-  
+  #setwd(resAlgo)
+  setwd(criteres)
   fitFile <- paste0('Fit-',methode,'-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-  
+  # majorityFile =  paste0(
+  #   "Crit-", methode,
+  #   "-n", n,
+  #   "-d", d,
+  #   "-k", k,
+  #   "-l", l,
+  #   "-rho", rho1,
+  #   "-majority", r,
+  #   ".RData"
+  # )
+  #load(majorityFile)
   load(fitFile)
-  
   outlabTraj[,s] = resultats$outliers_labels
-  
+  #outlabTraj[,s] = majority_labels
   }
   
   #rates_samplecov = compute_rates(outlmach[,1], labels)

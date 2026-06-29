@@ -100,10 +100,6 @@ for (sc in scenarios){
           ".RData"
         )
         
-        if (!file.exists(critFile)) {
-          warning("Missing file: ", critFile)
-          next
-        }
         
         load(critFile)
         

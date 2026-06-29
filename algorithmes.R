@@ -373,78 +373,63 @@ for(sc in scenarios)
   
 
 #################### Vote à la majorité sur les simulations ####################
-
-methodes <- c(
-  "SampleNaiveQuantonlinecorr",
-  "SampleNaivewithoutonlinequantilecorr",
-  "OnlineUsQuantonlinecorr",
-  "OnlineUswithoutQuantonlinecorr",
-  "StreamingUsonlineQuantcorr",
-  "StreamingUswithoutQuantonlinecorr",
-  "OfflinewithQuantcorr",
-  "OfflineUswithoutQuantcorr",
-  "OGK",
-  "MCD",
-  "Oracle"
-)
-
-setwd(criteres)
-
-for(sc in scenarios){
-  
-  k <- sc$k
-  l <- sc$l
-  rho1 <- sc$rho1
-  
-  for(m in seq_along(rList[1:9])){
-    
-    r <- rList[m]
-    
-    for(methode in methodes){
-      
-      votes <- matrix(0, nrow = n, ncol = simNb)
-      
-      for(sim in 1:20){
-        
-        fitFile <- file.path(
-          resAlgo,
-          paste0(
-            "Fit-", methode,
-            "-d", d,
-            "-n", n,
-            "-k", k,
-            "-l", l,
-            "-rho", rho1,
-            "-r", r,
-            "-sim", sim,
-            ".RData"
-          )
-        )
-        
-        load(fitFile)
-        
-        votes[, sim] <- resultats$outliers_labels
-      }
-      
-      majority_labels <- as.integer(rowSums(votes) > floor(simNb/2))
-      
-      setwd(criteres)
-      
-      save(
-        majority_labels,
-        file = paste0(
-          "Crit-", methode,
-          "-n", n,
-          "-d", d,
-          "-k", k,
-          "-l", l,
-          "-rho", rho1,
-          "-majority", r,
-          ".RData"
-        )
-      )
-      
-    }
-  }
-}
-
+# 
+# 
+# for(sc in scenarios){
+#   
+#   k <- sc$k
+#   l <- sc$l
+#   rho1 <- sc$rho1
+#   
+#   for(m in seq_along(rList[1:9])){
+#     
+#     r <- rList[m]
+#     
+#     for(methode in methodes){
+#       
+#       votes <- matrix(0, nrow = n, ncol = simNb)
+#       
+#       for(sim in 1:simNb){
+#         
+#         fitFile <- file.path(
+#           resAlgo,
+#           paste0(
+#             "Fit-", methode,
+#             "-d", d,
+#             "-n", n,
+#             "-k", k,
+#             "-l", l,
+#             "-rho", rho1,
+#             "-r", r,
+#             "-sim", sim,
+#             ".RData"
+#           )
+#         )
+#         
+#         load(fitFile)
+#         
+#         votes[, sim] <- resultats$outliers_labels
+#       }
+#       
+#       majority_labels <- as.integer(rowSums(votes) > ceiling(simNb/2))
+#       
+#       setwd(criteres)
+#       
+#       save(
+#         majority_labels,
+#         file = paste0(
+#           "Crit-", methode,
+#           "-n", n,
+#           "-d", d,
+#           "-k", k,
+#           "-l", l,
+#           "-rho", rho1,
+#           "-majority", r,
+#           ".RData"
+#         )
+#       )
+#       
+#     }
+#   }
+# }
+# 
