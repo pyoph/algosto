@@ -4,7 +4,7 @@
 
 
 ###Directories
-SimDir = "~/data20runs"
+SimDir = "~/dataSimuls"
 resAlgo = "~/res20runsallscen"
 criteres = "~/criteres"
 figures = "~/figures"

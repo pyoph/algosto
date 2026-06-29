@@ -1,7 +1,7 @@
 smd_data_dir = "~/smd_data_dir"
 res_SMD = "~/res_SMD"
 
-for(j in 1:28){
+for(j in 11:11){
   setwd(smd_data_dir)
   
   
@@ -152,8 +152,6 @@ for(j in 1:28){
   
   save(resultats,file = fitFile)
   
-  #check_fit(fitFile = fitFile,variance = resSamplecov$Sigma,outliers_labels = resSamplecov$outliers_labels,distances = resSamplecov$distances)
-  
   fitFile <- paste0('Fit-MCD-machine-',j,".RData")
   
   distmcd = rep(0,nrow(Z))
@@ -190,12 +188,6 @@ for(j in 1:28){
   
   save(resultats,file = fitFile)
   
-  #check_fit(fitFile = fitFile,variance = resmcd$cov,outliers_labels = outlmcd,distances = distmcd)
-  
-  
-
-  #save(temps_mcd,resmcd,distmcd,outlmcd,file = fitFile)
-  
   temps_offline = system.time(
     {
       res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutinit=0.6,c_m=2)
@@ -216,8 +208,6 @@ for(j in 1:28){
    
    save(resultats,file = fitFile)
 
-   #check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
-   
    
   
    temps_offline = system.time(
@@ -242,7 +232,6 @@ for(j in 1:28){
    
    save(resultats,file = fitFile)
    
-   #check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
    
   
   ###############################################Online us#########################################

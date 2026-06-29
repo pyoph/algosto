@@ -14,7 +14,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 ################Computations of the algorithms#############################
 
 
-for(sim in 1:20){
+for(sim in 78:78){
   
 for(sc in scenarios)
   {
@@ -25,20 +25,16 @@ for(sc in scenarios)
   
 
   
-  
-
-  
   for (m in seq_along(rList[1:9])){
-  setwd(SimDir)
+    setwd(SimDir)
     r = rList[m]
     dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")
     
     
     print(dataFile)
     
-    
     load(dataFile)
-        
+         
     
     setwd(resAlgo)
     
@@ -231,7 +227,7 @@ for(sc in scenarios)
   
   fitFile <- paste0('Fit-OfflinewithQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
-  if(!file.exists(fitFile)){}
+  if(!file.exists(fitFile)){
   temps_offline = system.time(
     {
       
@@ -248,8 +244,7 @@ for(sc in scenarios)
     temps = temps_offline
   )
   
-  save(resultats,file = fitFile)
-  }
+  save(resultats,file = fitFile)}
   else {load(fitFile)}
   
   fitFile <- paste0('Fit-OfflineUswithoutQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")

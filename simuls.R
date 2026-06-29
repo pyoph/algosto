@@ -1,6 +1,6 @@
 #######################Génération des données#############################
-for (sim in 90:91){
-  for(sc in scenarios_1_param){
+for (sim in 21:1e2){
+  for(sc in scenarios){
     
     k = sc$k
     l = sc$l
