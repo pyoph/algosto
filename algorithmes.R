@@ -46,6 +46,9 @@ for(sc in scenarios)
     #######################Sample cov with online quantile correction########################################
     
     fitFile <- paste0('Fit-SampleNaiveQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+    
+    if(!file.exists(fitFile)){
+    
     temps_naif <- system.time(
       resNaif <- tryCatch(
         {
@@ -70,9 +73,9 @@ for(sc in scenarios)
     )
     
     save(resultats, file = fitFile)    
+    }
     
-    
-    load(fitFile)
+    else{load(fitFile)}
     
     
     #check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
@@ -82,7 +85,9 @@ for(sc in scenarios)
     
     
     fitFile <- paste0('Fit-SampleNaivewithoutonlinequantilecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-    temps_naif <- system.time(
+    
+    if(!file.exists(fitFile)){
+      temps_naif <- system.time(
       resNaif <- tryCatch(
         {
           SampleCovOnline(data$Z, quantcutoff = FALSE,nDataInit = Ninit)
@@ -105,12 +110,11 @@ for(sc in scenarios)
     )
     
     save(resultats,file = fitFile)
-    
+    }
+    else{
     
     load(fitFile)
-    
-    
-    #check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
+    }
     
     
     
@@ -118,7 +122,7 @@ for(sc in scenarios)
     
      fitFile <- paste0('Fit-OnlineUsQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
      
-     
+      if(!file.exists(fitFile)){  
      temps_online = system.time(
        {
      
@@ -135,16 +139,16 @@ for(sc in scenarios)
      )
      
      save(resultats,file = fitFile)
-     
+      } else {load(fitFile)}
      
 
-     
-     #check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
      
      
      
   fitFile <- paste0('Fit-OnlineUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
+  
+  if(!file.exists(fitFile)){
   temps_online = system.time(
     {
       
@@ -161,11 +165,9 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
+  }
   
-  
-  load(fitFile)
-  
-  #check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+  else {load(fitFile)}
   
   ###############################################Streaming us#########################################
 
@@ -174,6 +176,7 @@ for(sc in scenarios)
   fitFile <- paste0('Fit-StreamingUsonlineQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
   
+  if(!file.exists(fitFile)){
   temps_streaming = system.time(
     {
       
@@ -191,16 +194,16 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
-  
-  load(fitFile)
-  
-  #check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
+  }
+  else {load(fitFile)}
   
   
 
   
   
   fitFile <- paste0('Fit-StreamingUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+  
+  if(!file.exists(fitFile)){
   
   temps_streaming = system.time(
     {
@@ -219,18 +222,16 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
+  }
   
-  
-  load(fitFile)
-  
-  #check_fit(fitFile = fitFile,variance = resUsStreaming$variance,outliers_labels = resUsStreaming$outliers_labels,distances = resUsStreaming$distances)
+  else{load(fitFile)}
   
   
   #####################################################Offline Us########################################################
   
   fitFile <- paste0('Fit-OfflinewithQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
-  
+  if(!file.exists(fitFile)){}
   temps_offline = system.time(
     {
       
@@ -248,14 +249,13 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
+  }
+  else {load(fitFile)}
   
-  load(fitFile)
-  
-  #check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
-  
-
   fitFile <- paste0('Fit-OfflineUswithoutQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
+  
+  if(!file.exists(fitFile)){
   temps_offline = system.time(
     {
       
@@ -271,16 +271,17 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
+  }
+  else{load(fitFile)}
   
-  
-  
-  #check_fit(fitFile = fitFile,variance = resOffline$variance,outliers_labels = resOffline$outliers_labels,distances = resOffline$distances)
   
   
   #############################OGK#########################################################################
   
   fitFile <- paste0('Fit-OGK-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
+  
+  if(!file.exists(fitFile)){
   outlogk = rep(0,n)
 
   temps_ogk = system.time({
@@ -300,16 +301,14 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
-  
-  
-  #check_fit(fitFile = fitFile,variance = resOGK$cov,outliers_labels = outlogk,distances = resOGK$distances)
-  
-  
+  }
+  else{load(fitFile)}
   
   #############################MCD#########################################################################
   
   fitFile <- paste0('Fit-MCD-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
+  if(!file.exists(fitFile)){
   distmcd = rep(0,n)
   outlmcd = rep(0,n)
   temps_mcd = system.time({
@@ -331,10 +330,7 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
-  
-  
-  
-  #check_fit(fitFile = fitFile,variance = resMcd$cov,outliers_labels = outlmcd,distances = distmcd)
+  } else{load(fitFile)}
   
   
   
@@ -342,7 +338,7 @@ for(sc in scenarios)
   
   fitFile <- paste0('Fit-Oracle-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
-    
+  if(!file.exists(fitFile)){  
   distoracle = rep(0,n)
   outloracle = rep(0,n)
   invSigma0 = solve(Sigma0)
@@ -364,72 +360,8 @@ for(sc in scenarios)
   
   save(resultats,file = fitFile)
 
-  
-  #check_fit(fitFile = fitFile,variance = Sigma0,outliers_labels = outloracle,distances = distoracle)
-  
+  } else{load(fitFile)}
   
     
 }}}
   
-
-#################### Vote à la majorité sur les simulations ####################
-# 
-# 
-# for(sc in scenarios){
-#   
-#   k <- sc$k
-#   l <- sc$l
-#   rho1 <- sc$rho1
-#   
-#   for(m in seq_along(rList[1:9])){
-#     
-#     r <- rList[m]
-#     
-#     for(methode in methodes){
-#       
-#       votes <- matrix(0, nrow = n, ncol = simNb)
-#       
-#       for(sim in 1:simNb){
-#         
-#         fitFile <- file.path(
-#           resAlgo,
-#           paste0(
-#             "Fit-", methode,
-#             "-d", d,
-#             "-n", n,
-#             "-k", k,
-#             "-l", l,
-#             "-rho", rho1,
-#             "-r", r,
-#             "-sim", sim,
-#             ".RData"
-#           )
-#         )
-#         
-#         load(fitFile)
-#         
-#         votes[, sim] <- resultats$outliers_labels
-#       }
-#       
-#       majority_labels <- as.integer(rowSums(votes) > ceiling(simNb/2))
-#       
-#       setwd(criteres)
-#       
-#       save(
-#         majority_labels,
-#         file = paste0(
-#           "Crit-", methode,
-#           "-n", n,
-#           "-d", d,
-#           "-k", k,
-#           "-l", l,
-#           "-rho", rho1,
-#           "-majority", r,
-#           ".RData"
-#         )
-#       )
-#       
-#     }
-#   }
-# }
-# 

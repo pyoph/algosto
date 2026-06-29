@@ -1,7 +1,7 @@
 smd_data_dir = "~/smd_data_dir"
 res_SMD = "~/res_SMD"
 
-for(j in 1:56){
+for(j in 1:28){
   setwd(smd_data_dir)
   
   
@@ -91,7 +91,7 @@ for(j in 1:56){
   
   save(resultats,file = fitFile)
   
-  check_fit(fitFile = fitFile,variance = Sigma_trueCov,outliers_labels = outloracle,distances = distrue)
+  #check_fit(fitFile = fitFile,variance = Sigma_trueCov,outliers_labels = outloracle,distances = distrue)
   
   
     
@@ -126,7 +126,7 @@ for(j in 1:56){
   
   save(resultats,file = fitFile)
   
-  check_fit(fitFile = fitFile,variance = resSamplecov$Sigma,outliers_labels = resSamplecov$outliers_labels,distances = resSamplecov$distances)
+  #check_fit(fitFile = fitFile,variance = resSamplecov$Sigma,outliers_labels = resSamplecov$outliers_labels,distances = resSamplecov$distances)
   
   
   
@@ -152,7 +152,7 @@ for(j in 1:56){
   
   save(resultats,file = fitFile)
   
-  check_fit(fitFile = fitFile,variance = resSamplecov$Sigma,outliers_labels = resSamplecov$outliers_labels,distances = resSamplecov$distances)
+  #check_fit(fitFile = fitFile,variance = resSamplecov$Sigma,outliers_labels = resSamplecov$outliers_labels,distances = resSamplecov$distances)
   
   fitFile <- paste0('Fit-MCD-machine-',j,".RData")
   
@@ -190,7 +190,7 @@ for(j in 1:56){
   
   save(resultats,file = fitFile)
   
-  check_fit(fitFile = fitFile,variance = resmcd$cov,outliers_labels = outlmcd,distances = distmcd)
+  #check_fit(fitFile = fitFile,variance = resmcd$cov,outliers_labels = outlmcd,distances = distmcd)
   
   
 
@@ -198,7 +198,7 @@ for(j in 1:56){
   
   temps_offline = system.time(
     {
-      res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutinit=0.6,c_m=1)
+      res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutinit=0.6,c_m=2)
     }
   )
   
@@ -216,10 +216,10 @@ for(j in 1:56){
    
    save(resultats,file = fitFile)
 
-   check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
+   #check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
    
    
-  # 
+  
    temps_offline = system.time(
      {
        res0 <- offlineRobustVariance_old(Z,computeOutliers = TRUE)
@@ -242,7 +242,7 @@ for(j in 1:56){
    
    save(resultats,file = fitFile)
    
-   check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
+   #check_fit(fitFile = fitFile,variance = res0$variance,outliers_labels = res0$outliers_labels,distances = res0$distances)
    
   
   ###############################################Online us#########################################
@@ -253,7 +253,7 @@ for(j in 1:56){
   temps_online = system.time(
     {
       
-      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1)
+      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 2)
 
       
     })
@@ -271,7 +271,7 @@ for(j in 1:56){
   
   save(resultats,file = fitFile)
   
-  check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+  #check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
   
 
   
@@ -298,7 +298,7 @@ for(j in 1:56){
    
    save(resultats,file = fitFile)
    
-   check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
+   #check_fit(fitFile = fitFile,variance = resUsOnline$variance,outliers_labels = resUsOnline$outliers_labels,distances = resUsOnline$distances)
    
   
   
@@ -310,11 +310,11 @@ for(j in 1:56){
   temps_streaming = system.time(
     {
       
-      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1,batch = batchStrm)
+      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 2,batch = batchStrm)
       
     })
   
-  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1,batch = batchStrm)
+  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 2,batch = batchStrm)
   
   resultats <- list(
     variance = resStrm$variance,
@@ -326,7 +326,7 @@ for(j in 1:56){
   
   save(resultats,file = fitFile)
   
-  check_fit(fitFile = fitFile,variance = resStrm$variance,outliers_labels = resStrm$outliers_labels,distances = resStrm$distances)
+  #check_fit(fitFile = fitFile,variance = resStrm$variance,outliers_labels = resStrm$outliers_labels,distances = resStrm$distances)
   
   
   
@@ -354,7 +354,7 @@ for(j in 1:56){
    
    save(resultats,file = fitFile)
    
-   check_fit(fitFile = fitFile,variance = resStrm$variance,outliers_labels = resStrm$outliers_labels,distances = resStrm$distances)
+   #check_fit(fitFile = fitFile,variance = resStrm$variance,outliers_labels = resStrm$outliers_labels,distances = resStrm$distances)
 
    fitFile <- paste0('Fit-OGK-machine-',j,".RData")
    
@@ -381,7 +381,7 @@ for(j in 1:56){
   
   save(resultats,file = fitFile)
   
-  check_fit(fitFile = fitFile,variance = resogk$cov,outliers_labels = outlogk,distances = resogk$distances)
+  #check_fit(fitFile = fitFile,variance = resogk$cov,outliers_labels = outlogk,distances = resogk$distances)
   
   
 

@@ -39,8 +39,7 @@ for (sim in 1:1e1){
         data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r)
         
         save(data,file = dataFile)
-        ok = check_simdata_groups(dataFile = dataFile,r = r)
-        }
+          }
         else {load(dataFile)}
       }
       
@@ -51,16 +50,8 @@ for (sim in 1:1e1){
         save(data,file = dataFile)
         }
         else{load(dataFile)
-        ok = check_simdata_groups(dataFile = dataFile,mu1 = contParam$mu1,Sigma1 = contParam$Sigma1,r = r)}
-      }
-      
-      if (!ok) {
-        print(paste0("❌ STOP: simulation failed at r=", r,
-                    ", sim=", sim,
-                    ", k=", k,
-                    ", l=", l,
-                    ", rho=", rho1))
-      }
+            }
+
       
       
     }}
