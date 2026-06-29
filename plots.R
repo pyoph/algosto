@@ -409,8 +409,8 @@ for(sc in scenarios){
   
   methode = methodes_online[s]
 
-  #setwd(resAlgo)
-  setwd(criteres)
+  setwd(resAlgo)
+  #setwd(criteres)
   fitFile <- paste0('Fit-',methode,'-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   # majorityFile =  paste0(
   #   "Crit-", methode,

@@ -5,13 +5,13 @@ fig_SMD = "~/fig_SMD/"
 
 ########################Boxplot Sigma errors##############################
 
-methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","MCD","Offline-without_onlinequantile","Offline-without_onlinequantile","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr","OGK")
+methodes = c("Oracle","SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","MCD","Offline-without_onlinequantile","Offline-without_onlinequantile","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr","OGK")
 
 
-erreursSigmaSMD = array(0, dim = c(length(methodes),56))  
+erreursSigmaSMD = array(0, dim = c(length(methodes),28))  
 
 
-for(j in 1:1){
+for(j in 1:28){
 
 setwd(crit_SMD)
   
@@ -32,116 +32,251 @@ setwd(crit_SMD)
   
 }
 
-
-
-
-
 setwd(fig_SMD)
 
-file <- paste0("boxploterreursSigma_SMD",".pdf")
+file <- paste0("boxploterreursSigma_SMD", ".pdf")
 
-pdf(file, width = 18, height = 6) 
+pdf(file, width = 18, height = 6)
 
+# -----------------------------
+# transformation
+# -----------------------------
+erreurs_log <- log1p(erreursSigmaSMD)
+
+# -----------------------------
+# données
+# -----------------------------
+data_plot <- list(
+  Streaming   = erreurs_log[8,],
+  MCD         = erreurs_log[3,],
+  OGK         = erreurs_log[length(methodes),],
+  Offline     = erreurs_log[4,],
+  Sample_cov  = erreurs_log[1,],
+  Online      = erreurs_log[6,]
+)
+
+# -----------------------------
+# couleurs
+# -----------------------------
+cols <- c(
+  Streaming  = "red",
+  Online     = "blue",
+  Sample_cov = "darkgreen",
+  Offline    = "orange",
+  OGK        = "brown",
+  MCD        = "black"
+)
+
+# -----------------------------
+# ticks (valeurs originales -> transformées)
+# -----------------------------
+ticks_raw <- c(0, 1e-2, 1e-1)
+ticks <- log1p(ticks_raw)
+
+# -----------------------------
+# boxplot
+# -----------------------------
 boxplot(
-  erreursSigmaSMD[1,],erreursSigmaSMD[3,],erreursSigmaSMD[length(methodes),],erreursSigmaSMD[4,],erreursSigmaSMD[8,],erreursSigmaSMD[6,],
-  log = "y",                     # échelle logarithmique sur Y
-  names = c("sample covariance online","mcd","ogk","offline","streaming","online"),
+  data_plot,
+  col = cols[names(data_plot)],
   main = "",
   ylab = "",
-  col = rainbow(ncol(erreursSigmaSMD))
+  names = c(
+    "Streaming",
+    "MCD",
+    "OGK",
+    "Offline",
+    "Sample covariance + correction",
+    "Online"
+  ),
+  ylim = c(0, max(unlist(erreurs_log), ticks)),
+  yaxt = "n"
 )
+
+# -----------------------------
+# axe Y propre (lecture en scale originale)
+# -----------------------------
+axis(
+  side = 2,
+  at = ticks,
+  labels = c("0", "1e-2", "1e-1"),
+  las = 1,
+  cex.axis = 0.85
+)
+
 dev.off()
 
-#############################AUC ARI#################################
 
-methodes = c("Oracle","SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","MCD","Offline-without_onlinequantile","Offline-without_onlinequantile","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr","OGK")
+####################AUC ARI#######################
+############################# AUC + ARI #################################
+############################# PARAM #################################
 
+methodes <- c(
+  "Oracle",
+  "SampleNaiveQuantonlinecorr",
+  "SampleNaivewithoutQuantonlinecorr",
+  "MCD",
+  "Offline-without_onlinequantile",
+  "Offline-without_onlinequantile",
+  "OnlineUsQuantonlinecorr",
+  "OnlineUsWithoutQuantonlinecorr",
+  "StreamingUsonlineQuantcorr",
+  "StreamingUs_without_onlineQuantcorr",
+  "OGK"
+)
 
-for(j in 1:2){
+n <- 28
+
+############################# STOCKAGE #################################
+
+ariPlot <- matrix(0, nrow = n, ncol = length(methodes))
+aucPlot <- matrix(0, nrow = n, ncol = length(methodes))
+temps   <- matrix(0, nrow = n, ncol = length(methodes))
+
+for (j in 1:n) {
+  
   setwd(crit_SMD)
   
-  ariPlot = array(0,dim = c(28,length(methodes)))
-  aucPlot = array(0,dim = c(28,length(methodes)))
-  
-  
-  for (s in seq_along(methodes)){
+  for (s in seq_along(methodes)) {
     
-    methode = methodes[s]
+    methode <- methodes[s]
     
-    critFile <- paste0("Crit-",methode,"-machine-",j,".RData")
-  
+    critFile <- paste0("Crit-", methode, "-machine-", j, ".RData")
+    
     load(critFile)
     
-    ariPlot[j,s] = crit$ARI
-    aucPlot[j,s] = crit$AUC
-    
-      
+    ariPlot[j, s] <- crit$ARI
+    aucPlot[j, s] <- crit$AUC
   }
   
+  setwd(res_SMD)
+  
+  for (s in seq_along(methodes)) {
+    
+    methode <- methodes[s]
+    
+    fitFile <- paste0("Fit-", methode, "-machine-", j, ".RData")
+    
+    load(fitFile)
+    
+    temps[j, s] <- resultats$temps[3]
+  }
 }
+
+############################# LABELS #################################
+
+names_plot <- c(
+  "Oracle",
+  "Sple QC",
+  "Sple no QC",
+  "MCD",
+  "Offl no QC",
+  "Offl QC",
+  "Onl QC",
+  "Onl no QC",
+  "Strm QC",
+  "Strm no QC",
+  "OGK"
+)
+
+############################# COULEURS #################################
+
+cols <- c(
+  "purple",
+  "darkgreen",
+  "darkgreen",
+  "black",
+  "orange",
+  "orange",
+  "blue",
+  "blue",
+  "red",
+  "red",
+  "brown"
+)
+
+############################# TICKS LOG (10^x style) ##################
+
+tick_vals <- c(0, 1e-3, 1e-2, 1e-1, 1)
+
+tick_pos <- log1p(tick_vals)
+
+tick_lab <- c("0", "1e-3", "1e-2", "1e-1", "1")
+
+############################# AUC #################################
 
 setwd(fig_SMD)
 
-file <- paste0("boxplotAUC_SMD",".pdf")
+pdf("boxplotAUC_SMD.pdf", width = 18, height = 6)
 
-pdf(file, width = 18, height = 6) 
 boxplot(
   as.data.frame(aucPlot),
-  names = c(
-    "Oracle",
-    "Sample Naive\nQuant Corr",
-    "Sample Naive\nNo Quant Corr",
-    "MCD",
-    "Offline\nNo Quant Corr",
-    "Offline\nQuant Corr",
-    "Online US\nQuant Corr",
-    "Online US\nNo Quant Corr",
-    "Streaming US\nQuant Corr",
-    "Streaming US\nNo Quant Corr",
-    "OGK"
-  ),
-  las = 2,        # noms verticaux
-  col = rainbow(ncol(aucPlot)),
+  names = names_plot,
+  las = 2,
+  col = cols,
   main = "AUC",
   ylab = "AUC"
 )
+
 dev.off()
 
+############################# ARI #################################
 
+pdf("boxplotARI_SMD.pdf", width = 18, height = 6)
 
-setwd(fig_SMD)
-
-file <- paste0("boxplotARI_SMD",".pdf")
-
-pdf(file, width = 18, height = 6) 
 boxplot(
-  as.data.frame(aucPlot),
-  names = c(
-    "Oracle",
-    "Sample Naive\nQuant Corr",
-    "Sample Naive\nNo Quant Corr",
-    "MCD",
-    "Offline\nNo Quant Corr",
-    "Offline\nQuant Corr",
-    "Online US\nQuant Corr",
-    "Online US\nNo Quant Corr",
-    "Streaming US\nQuant Corr",
-    "Streaming US\nNo Quant Corr",
-    "OGK"
-  ),
-  las = 2,        # noms verticaux
-  col = rainbow(ncol(ariPlot)),
+  as.data.frame(ariPlot),
+  names = names_plot,
+  las = 2,
+  col = cols,
   main = "ARI",
   ylab = "ARI"
 )
+
 dev.off()
+######################### TEMPS ##################################
 
+setwd(fig_SMD)
 
+pdf("boxplotTemps_SMD.pdf", width = 18, height = 6)
+
+# enlever Oracle
+temps_no_oracle <- temps[, -1]
+
+# log transformation
+temps_log <- log1p(temps_no_oracle)
+
+# ticks en échelle originale -> log1p
+tick_vals <- c(0, 1e-3, 1e-2, 1e-1, 1, 10)
+tick_pos <- log1p(tick_vals)
+tick_lab <- c("0", "1e-3", "1e-2", "1e-1", "1", "10")
+
+boxplot(
+  as.data.frame(temps_log),
+  names = names_plot[-1],
+  las = 2,
+  col = cols[-1],
+  main = "Time",
+  ylab = "",
+  yaxt = "n"
+)
+
+axis(
+  side = 2,
+  at = tick_pos,
+  labels = tick_lab
+)
+
+dev.off()
 
 ###############Trajectoires##################
 
+methodes_online = c("Oracle","SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr")
+
+
+
 ####Calcul des trajectoires pour les 3 méthodes online et l'oracle######
-for(j in 1:nbmachines){
+for(j in 1:28){
   
   
   setwd(smd_data_dir)
@@ -151,72 +286,38 @@ for(j in 1:nbmachines){
   
   
   load(data_smd_mach)
-  
-
-    
+  outlmach = matrix(0,nrow = nrow(Z),ncol = length(methodes_online))
   
   setwd(res_SMD)
   
-  fitFile <- paste0('FitSampleNaiveQuantonlinecorr-',"machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
+    for(s in seq_along(methodes_online)){
+  
+  methode = methodes_online[s]
+  
+  fitFile <- paste0('Fit-',methode,"-machine-",j,".RData")
   
   load(fitFile)
   
-  outlmach[,1] = resSamplecov$outliers_labels   
-
+  outlmach[,s] = resultats$outliers_labels   
+    }
+  
   rates_samplecov_quantcorr = compute_rates(outlmach[,1], labels)
   
-  fitFile <- paste0('FitSampleNaivewithoutQuantonlinecorr-',"machine-",j,"-cutoff",.95,"Ninit-",1e3,"-cm",1,".RData")
-  
-  load(fitFile)
-  
-  outlmach[,2] = resSamplecov$outliers_labels   
-
   rates_samplecov_without_quantcorr = compute_rates(outlmach[,2], labels)
-  
-  fitFile <- paste0('FitOnlineUsQuantonlinecorr-machine-',j,".RData")
-  
-  load(fitFile)
-  
-  outlmach[,3] = resUsOnline$outlier_labels  
   
   rates_online_with_quantcorr = compute_rates(outlmach[,3], labels)
   
-  fitFile <- paste0('FitOnlineUsWithoutQuantonlinecorr-machine-',j,".RData")
-  
-  load(fitFile)
-  
-  outlmach[,4] = resUsOnline$outlier_labels
-  
   rates_online_without_quantcorr = compute_rates(outlmach[,4], labels)
-  
-  fitFile <- paste0('FitStreamingUsonlineQuantcorr-machine-', j,".RData")
-  
-  load(fitFile)
-  
-  outlmach[,5] = resStrm$outlier_labels
   
   rates_Strm_with_quantcorr = compute_rates(outlmach[,5], labels)
   
-  fitFile <- paste0('FitStreamingUs_without_onlineQuantcorr-machine-', j,".RData")
-  
-  load(fitFile)
-  
-  outlmach[,6] = resStrm$outlier_labels
-  
   rates_Strm_without_quantcorr = compute_rates(outlmach[,6], labels)
-  
-  
-  fitFile <- paste0('FitOracle-',"-machine-",j,".RData")
-  
-  load(fitFile)
-  
-  outlmach[,7] = resultats$outliers_labels
   
   rates_oracle <- compute_rates(outlmach[,7], labels)
   
   ##################################Trajectoires################################"
-  setwd("~/figures")
-  nom_fichier = paste0("trajectories_SMD_mach-",j,"-Ninit1e3cm1",".pdf")
+  setwd(fig_SMD)
+  nom_fichier = paste0("trajectories_SMD_mach-",j,".pdf")
   pdf(nom_fichier, width = 14, height = 10)
   
   par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
@@ -230,7 +331,7 @@ for(j in 1:nbmachines){
   
   par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
   
-  x_vals = 1:length(rates_strm_corr$FN_rate)
+  x_vals = 1:nrow(Z)
   
   
   # =====================================================
