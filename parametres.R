@@ -5,7 +5,7 @@
 
 ###Directories
 SimDir = "~/dataSimuls"
-resAlgo = "~/res20runsallscen"
+resAlgo = "~/res1e2runsallscen"
 criteres = "~/criteres"
 figures = "~/figures"
 
@@ -17,8 +17,9 @@ figures = "~/figures"
 ################
 ###########################################################################
 
-
-
+source("~/algosto/make_scenarios.R")
+load("~/algosto/scenarios.RData")
+scenarios = c(scenarios_1_param,scenarios_2_param)
 #############################################################
 #####################sample size and number of runs###############
 ############################################################

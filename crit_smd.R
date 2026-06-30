@@ -18,14 +18,10 @@ for(j in 1:28){
   
   setwd(res_SMD)  
 
-    
   
     
       for(methode in methodes){
         
-        
-        
-
         setwd(res_SMD)
         
         fitFile = paste0("Fit-",methode,"-machine-",j,".RData")
@@ -34,8 +30,6 @@ for(j in 1:28){
         
         crit = compute_criteres(variance = resultats$variance, outlab = resultats$outliers_labels, distances = resultats$distances, labels = as.numeric(labels), SigmaTrue = resultats$variance_ref, r = 5)
       
-        
-        
         setwd(crit_SMD)
         
         critFile <- paste0("Crit-",methode,"-machine-",j,".RData")

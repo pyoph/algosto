@@ -273,10 +273,8 @@ dev.off()
 
 methodes_online = c("Oracle","SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr")
 
-
-
 ####Calcul des trajectoires pour les 3 méthodes online et l'oracle######
-for(j in 1:28){
+for(j in 11:11){
   
   
   setwd(smd_data_dir)
@@ -289,7 +287,7 @@ for(j in 1:28){
   outlmach = matrix(0,nrow = nrow(Z),ncol = length(methodes_online))
   
   setwd(res_SMD)
-  
+  distoracle = rep(0,n)
     for(s in seq_along(methodes_online)){
   
   methode = methodes_online[s]
@@ -299,6 +297,9 @@ for(j in 1:28){
   load(fitFile)
   
   outlmach[,s] = resultats$outliers_labels   
+  
+  if(s == 1){distoracle = resultats$distances}
+  
     }
   
   rates_samplecov_quantcorr = compute_rates(outlmach[,1], labels)
@@ -324,37 +325,38 @@ for(j in 1:28){
   
   x_vals = 1:length(rates_Strm_with_quantcorr$FN_rate)
   
+  #===============================
+  # 1. BOXPLOT INLIERS OUTLIERS
+  #==============================
+  
+  Z_clean <- Z[labels == 0, ]
+  Z_outliers <- Z[labels == 1, ]
+  
+  distinliers <- rep(0, nrow(Z_clean))
+  dstoutliers <- rep(0,nrow(Z_outliers))
+  
+  invSigmaTrueCov <- solve(cov(Z_clean))
+  
+  mu <- colMeans(Z_clean)
+  
+  for (m in 1:nrow(Z_clean)) {
+    diff <- Z_clean[m, ] - mu
+    distinliers[m] <- t(diff) %*% invSigmaTrueCov %*% diff
+  }
+  
+  
+  for (m in 1:nrow(Z_outliers)) {
+    diff <- Z_outliers[m, ] - mu
+    distoutliers[m] <- t(diff) %*% invSigmaTrueCov %*% diff
+  }
   
   # =====================================================
-  # 1. LABELS
+  # 1. FALSE NEGATIVE RATE
   # =====================================================
   
-  par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+    boxplot(distinliers,distoutliers,col = c("lightblue", "red"),
+          names = c("0", "1"),ylim = c(0,4e3)) 
   
-  x_vals = 1:nrow(Z)
-  
-  
-  # =====================================================
-  # 1. LABELS
-  # =====================================================
-  plot(x_vals, labels,
-       type = "n",
-       ylim = c(-0.05,1.05),
-       yaxt = "n",
-       xaxt = "n",
-       xlab = "", ylab = "",
-       main = "Ground truth")
-  
-  points(x_vals[labels==0], labels[labels==0],
-         pch = 16, cex = .4, col = "blue")
-  
-  points(x_vals[labels==1], labels[labels==1],
-         pch = 16, cex = .6, col = "red")
-  
-  axis(2, at = c(0, 1), las = 1, cex.axis = 1.8)
-  axis(1, at = seq(1000, max(x_vals), by = 1000),
-       las = 1, cex.axis = 1.8)
-  box()
   
   # =====================================================
   # 2. FALSE NEGATIVE RATE

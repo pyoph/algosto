@@ -5,7 +5,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
 
-for (sc in scenarios){
+for (sc in scenarios_2_param){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
@@ -352,7 +352,7 @@ for (sc in scenarios){
 
 methodes_online = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","Oracle")
 
-for(sc in scenarios){
+for(sc in scenarios_2_param){
   
   k = sc$k
   l = sc$l
