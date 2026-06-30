@@ -10,29 +10,46 @@ unzip(dest)
 # chercher tous les fichiers SMD
 files <- list.files(".", recursive = TRUE, full.names = TRUE)
 
+train_files  <- grep("train/machine", files, value = TRUE)
+
 test_files  <- grep("test/machine", files, value = TRUE)
 label_files <- grep("test_label/machine", files, value = TRUE)
 
-length(test_files)
+
+
+length(train_files)
 length(label_files)
 
 
 smd_data <- list()
 
-for (i in seq_along(test_files)) {
+# Train
+for (i in seq_along(train_files)) {
   
   smd_data[[i]] <- load_smd_machine(
+    train_files[i],
+    label_files[i]
+  )
+  
+}
+
+# Test
+offset <- length(train_files)
+
+for (i in seq_along(test_files)) {
+  
+  smd_data[[offset + i]] <- load_smd_machine(
     test_files[i],
     label_files[i]
   )
+  
 }
-
 
 nbmachines = length(smd_data)
 
 keep_columns_ok = list()
 
-for(j in 1:nbmachines){
+for(j in 23:23){
   
   cat("\n====================\n")
   cat("Machine", j, "\n")
@@ -104,6 +121,7 @@ for(j in 1:nbmachines){
   # mise à jour des colonnes globales gardées
   keep_columns_ok[[j]] <- keep_columns_ok[[j]][keep_idx]
   #Z = Z[,keep_columns_ok[[j]],drop = FALSE]
+  labels <- labels[1:nrow(Z)]
   Z_clean = Z[labels == 0,]
   
   data_smd_mach = paste0("data_machine-",j,".RData")

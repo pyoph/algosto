@@ -35,7 +35,7 @@ for (sc in scenarios_2_param){
         '-l', l,
         '-rho', rho1,
         '-r', r,
-        '-mean', 
+        '-sim',sim, 
         ".RData"
       )
       load(critFile)

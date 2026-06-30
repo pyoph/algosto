@@ -99,7 +99,7 @@ for(j in 11:11){
 
   temps_covonline = system.time(
     {
-      resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = 1e3,cutoffquant =  .95,c_m = 1)
+      resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = 1e3,cutoffquant =  .95,c_m = 2)
     })
 
   fitFile <- paste0('Fit-SampleNaiveQuantonlinecorr-',"machine-",j,".RData")
@@ -190,7 +190,7 @@ for(j in 11:11){
   
   temps_offline = system.time(
     {
-      res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutinit=0.6,c_m=2)
+      res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutinit=0.6,c_m=1)
     }
   )
   
@@ -302,7 +302,7 @@ for(j in 11:11){
       
     })
   
-  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m = 1 ,batch = batchStrm)
+  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m = 1,batch = batchStrm)
   
   resultats <- list(
     variance = resStrm$variance,

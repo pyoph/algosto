@@ -14,9 +14,9 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 ################Computations of the algorithms#############################
 
 
-for(sim in 78:78){
+for(sim in 21:40){
   
-for(sc in scenarios)
+for(sc in scenarios_1_param)
   {
   
   k = sc$k
@@ -74,8 +74,7 @@ for(sc in scenarios)
     else{load(fitFile)}
     
     
-    #check_fit(fitFile = fitFile,variance = resNaif$Sigma,outliers_labels = resNaif$outliers_labels,distances = resNaif$distances)
-    
+
     
     #######################Sample cov without online quantile correction########################################
     
@@ -108,7 +107,7 @@ for(sc in scenarios)
     save(resultats,file = fitFile)
     }
     else{
-    
+    print("File exists")
     load(fitFile)
     }
     
@@ -135,7 +134,10 @@ for(sc in scenarios)
      )
      
      save(resultats,file = fitFile)
-      } else {load(fitFile)}
+      } else {
+        print("File exists")
+        
+        load(fitFile)}
      
 
      
@@ -163,7 +165,10 @@ for(sc in scenarios)
   save(resultats,file = fitFile)
   }
   
-  else {load(fitFile)}
+  else {
+    print("File exists")
+    
+    load(fitFile)}
   
   ###############################################Streaming us#########################################
 
@@ -191,7 +196,10 @@ for(sc in scenarios)
   
   save(resultats,file = fitFile)
   }
-  else {load(fitFile)}
+  else {
+    print("File exists")
+    
+    load(fitFile)}
   
   
 
@@ -220,7 +228,10 @@ for(sc in scenarios)
   save(resultats,file = fitFile)
   }
   
-  else{load(fitFile)}
+  else{
+    print("File exists")
+    
+    load(fitFile)}
   
   
   #####################################################Offline Us########################################################
@@ -267,7 +278,10 @@ for(sc in scenarios)
   
   save(resultats,file = fitFile)
   }
-  else{load(fitFile)}
+  else{
+    print("File exists")
+    
+    load(fitFile)}
   
   
   
@@ -297,7 +311,10 @@ for(sc in scenarios)
   
   save(resultats,file = fitFile)
   }
-  else{load(fitFile)}
+  else{
+    print("File exists")
+    
+    load(fitFile)}
   
   #############################MCD#########################################################################
   
@@ -325,7 +342,10 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
-  } else{load(fitFile)}
+  } else{
+    print("File exists")
+    
+    load(fitFile)}
   
   
   
@@ -355,7 +375,10 @@ for(sc in scenarios)
   
   save(resultats,file = fitFile)
 
-  } else{load(fitFile)}
+  } else{
+    print("File exists")
+    
+    load(fitFile)}
   
     
 }}}

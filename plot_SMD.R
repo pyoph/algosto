@@ -11,7 +11,7 @@ methodes = c("Oracle","SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlin
 erreursSigmaSMD = array(0, dim = c(length(methodes),28))  
 
 
-for(j in 1:28){
+for(j in 11:1){
 
 setwd(crit_SMD)
   
@@ -302,19 +302,19 @@ for(j in 11:11){
   
     }
   
-  rates_samplecov_quantcorr = compute_rates(outlmach[,1], labels)
+  rates_samplecov_quantcorr = compute_rates(outlmach[,2], labels)
   
-  rates_samplecov_without_quantcorr = compute_rates(outlmach[,2], labels)
+  rates_samplecov_without_quantcorr = compute_rates(outlmach[,3], labels)
   
-  rates_online_with_quantcorr = compute_rates(outlmach[,3], labels)
+  rates_online_with_quantcorr = compute_rates(outlmach[,4], labels)
   
-  rates_online_without_quantcorr = compute_rates(outlmach[,4], labels)
+  rates_online_without_quantcorr = compute_rates(outlmach[,5], labels)
   
-  rates_Strm_with_quantcorr = compute_rates(outlmach[,5], labels)
+  rates_Strm_with_quantcorr = compute_rates(outlmach[,6], labels)
   
-  rates_Strm_without_quantcorr = compute_rates(outlmach[,6], labels)
+  rates_Strm_without_quantcorr = compute_rates(outlmach[,7], labels)
   
-  rates_oracle <- compute_rates(outlmach[,7], labels)
+  rates_oracle <- compute_rates(outlmach[,1], labels)
   
   ##################################Trajectoires################################"
   setwd(fig_SMD)
@@ -333,7 +333,7 @@ for(j in 11:11){
   Z_outliers <- Z[labels == 1, ]
   
   distinliers <- rep(0, nrow(Z_clean))
-  dstoutliers <- rep(0,nrow(Z_outliers))
+  distoutliers <- rep(0,nrow(Z_outliers))
   
   invSigmaTrueCov <- solve(cov(Z_clean))
   
@@ -355,7 +355,7 @@ for(j in 11:11){
   # =====================================================
   
     boxplot(distinliers,distoutliers,col = c("lightblue", "red"),
-          names = c("0", "1"),ylim = c(0,4e3)) 
+          names = c("0", "1"),ylim = c(0,400)) 
   
   
   # =====================================================

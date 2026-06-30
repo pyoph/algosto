@@ -1,6 +1,6 @@
 #######################Génération des données#############################
 for (sim in 21:1e2){
-  for(sc in scenarios){
+  for(sc in scenarios_1_param){
     
     k = sc$k
     l = sc$l
@@ -40,7 +40,9 @@ for (sim in 21:1e2){
         
         save(data,file = dataFile)
           }
-        else {load(dataFile)}
+        else {
+          print("File exists")
+          load(dataFile)}
       }
       
       if(r != 0){
@@ -49,7 +51,9 @@ for (sim in 21:1e2){
         data = genererEchantillon_new(n,d,mu1 = mu0,mu2 = contParam$mu1,Sigma1 = Sigma0,Sigma2 = contParam$Sigma1,r, id_outliers =  outlier_sets[[m]])
         save(data,file = dataFile)
         }
-        else{load(dataFile)
+        else{
+          print("File exists")
+          load(dataFile)
             }
 
       
