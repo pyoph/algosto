@@ -1,5 +1,5 @@
 #######################Génération des données#############################
-for (sim in 21:1e2){
+for (sim in 80:1e2){
   for(sc in scenarios_1_param){
     
     k = sc$k

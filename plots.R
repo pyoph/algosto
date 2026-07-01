@@ -40,11 +40,11 @@ for (sc in scenarios_2_param){
       )
       load(critFile)
       
-      erreursSigmaPlot[m,j] = crit_mean$erreurFrob
-      faux_negatifsPlot[m,j] = crit_mean$FN
-      faux_positifsPlot[m,j] = crit_mean$FP
-      ariPlot[m,j] = crit_mean$ARI
-      aucPlot[m,j] = crit_mean$AUC
+      erreursSigmaPlot[m,j] = crit$erreurFrob
+      faux_negatifsPlot[m,j] = crit$FN
+      faux_positifsPlot[m,j] = crit$FP
+      ariPlot[m,j] = crit$ARI
+      aucPlot[m,j] = crit$AUC
       
     }
     setwd(figures)

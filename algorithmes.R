@@ -14,7 +14,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 ################Computations of the algorithms#############################
 
 
-for(sim in 21:40){
+for(sim in 80:1e2){
   
 for(sc in scenarios_1_param)
   {

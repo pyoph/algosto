@@ -49,7 +49,7 @@ nbmachines = length(smd_data)
 
 keep_columns_ok = list()
 
-for(j in 23:23){
+for(j in 20:nbmachines){
   
   cat("\n====================\n")
   cat("Machine", j, "\n")

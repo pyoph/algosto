@@ -14,9 +14,9 @@ for (p in packages) {
 #
 setwd("~/algosto")
 
-packages_us = c("RMM_1.0.tar.gz","STARRS_1.0.tar.gz")
+packages_us = c("STARRS_1.0.tar.gz")
 
-for (p in packages) {
+for (p in packages_us) {
   if (!requireNamespace(p, quietly = TRUE)) {
     install.packages(p)
   }
@@ -24,7 +24,6 @@ for (p in packages) {
 }
 
 library(Rcpp)
-library(RMM)
 library(Gmedian)
 library(MASS)
 library(ggplot2)
