@@ -70,7 +70,7 @@ for(kl in 2:klNb){
 # 2 - the correction coeficient is smaller than one (which makes things worse) 
 par(mfrow=c(1, 1))
 n <- 1e5
-kl <- 4; rate <- .4
+kl <- 4; rate <- 0
 n0 <- round((1-rate)*n); n1 <- n - n0
 X0 <- rmvnorm(n0, mean=mu0, sigma=Sigma0)
 parms1 <- ParmsF1(m1=m1, k1=k1val[kl], l1=l1val[kl], rho1=rho1val[kl])
@@ -87,7 +87,10 @@ curve(dchisq(x, df=d), from=0, to=100, col=2, add=TRUE)
 alpha <- .5
 coefCor <- qchisq(p=alpha, df=d) / quantile(Dmaha, probs=alpha)
 Dcor <- Dmaha * coefCor
-lines(density(Dcor[1:n0]), col=4)
+mean(Dmaha > qchisq(p=0.95, df=d))
+qbinom(p=c(.025, .975), size=B, prob=0.05)/B
+# lines(density(Dmaha), col=1)
+# lines(density(Dcor), col=3)
 abline(v=qchisq(p=.95, df=d), col=2)
 c(mean(Dmaha[1:n0] > qchisq(p=.95, df=d)), 
   mean(Dcor[1:n0] > qchisq(p=.95, df=d)))
