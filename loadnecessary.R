@@ -20,7 +20,7 @@ for (p in packages_us) {
   if (!requireNamespace(p, quietly = TRUE)) {
     install.packages(p)
   }
-  library(p, character.only = TRUE)
+  
 }
 
 library(Rcpp)

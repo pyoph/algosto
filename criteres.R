@@ -1,8 +1,7 @@
 ################Calcul criteres###################
-
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
-for(sim in 17:17){
-for (sc in c(scenarios)){
+for(sim in 12:20){
+for (sc in scenarios){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1

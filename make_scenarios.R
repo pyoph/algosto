@@ -91,7 +91,20 @@ scenarios_2_param <- list(
   # 
 )
 
+scen_conc = list(
+  
+  list(k = 0, l = 0.01, rho1 = 0.3)
+)
 
+scen_shift = list(
+  list(k = 5, l = 1, rho1 = 0.3),
+  
+  
+  list(k = 10, l = 1, rho1 = 0.3),
+  
+  list(k = 50, l = 1, rho1 = 0.3)
+
+)
 #####################k, l and rho1 varying alone########################################
 
 scenarios_1_param = list(
@@ -101,7 +114,11 @@ scenarios_1_param = list(
   list(k = 10, l = 1, rho1 = 0.3),
   
   list(k = 50, l = 1, rho1 = 0.3),
- 
+  # list(k = 0, l = 0.5, rho1 = 0.3),
+  # 
+  # list(k = 0, l = 0.1, rho1 = 0.3),
+  # 
+  # list(k = 0, l = 0.01, rho1 = 0.3), 
   list(k = 0, l = 2, rho1 = 0.3),
   
   list(k = 0, l = 10, rho1 = 0.3),
