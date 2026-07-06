@@ -1,7 +1,7 @@
 smd_data_dir = "~/smd_data_dir"
 res_SMD = "~/res_SMD"
 
-for(j in 11:11){
+for(j in 1:56){
   setwd(smd_data_dir)
   
   

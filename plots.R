@@ -5,7 +5,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
 
-for (sc in scen_shift){
+for (sc in scenarios){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
@@ -35,16 +35,16 @@ for (sc in scen_shift){
         '-l', l,
         '-rho', rho1,
         '-r', r,
-        '-sim',sim, 
+        '-mean',
         ".RData"
       )
       load(critFile)
       
-      erreursSigmaPlot[m,j] = crit$erreurFrob
-      faux_negatifsPlot[m,j] = crit$FN
-      faux_positifsPlot[m,j] = crit$FP
-      ariPlot[m,j] = crit$ARI
-      aucPlot[m,j] = crit$AUC
+      erreursSigmaPlot[m,j] = crit_mean$erreurFrob
+      faux_negatifsPlot[m,j] = crit_mean$FN
+      faux_positifsPlot[m,j] = crit_mean$FP
+      ariPlot[m,j] = crit_mean$ARI
+      aucPlot[m,j] = crit_mean$AUC
       
     }
     setwd(figures)
@@ -95,7 +95,7 @@ for (sc in scen_shift){
          faux_negatifsPlot[2:9,5] / ((rList[2:9]/100)*n) * 100,
          type = "l", lwd = 4, col = "red",
          xlab = "", ylab = "",
-         xaxt = "n", yaxt = "n")
+         xaxt = "n", yaxt = "n", ylim = c(0,1e2))
     
     lines(rList[2:9],
           faux_negatifsPlot[2:9,6] / ((rList[2:9]/100)*n) * 100,
@@ -457,10 +457,12 @@ for(sc in scen_conc){
   
   if(r != 0){
   distoutliers = rep(0,nboutliers)
-  
+
   for (m in (1:nboutliers)){
     distoutliers[m] = t(Z_cont[m,] - mu0)%*%invSigma0%*%(Z_cont[m,] - mu0)
+    
   }
+  
   }
   for(s in seq_along(methodes_online)){
   
@@ -482,6 +484,10 @@ for(sc in scen_conc){
   #load(majorityFile)
   load(fitFile)
   outlabTraj[,s] = resultats$outliers_labels
+  
+  if(s == 5){
+    diststrmqc = resultats$distances
+    }
   #outlabTraj[,s] = majority_labels
   }
   
@@ -512,8 +518,8 @@ for(sc in scen_conc){
   x_vals = 1:length(rates_strm_corr$FN_rate)
   
   if(r != 0){
-     boxplot(distinliers,distoutliers,col = c("lightblue", "red"),
-             names = c("0", "1"))  
+     boxplot(distinliers,distoutliers, diststrmqc,col = c("lightblue", "darkred","red"),
+             names = c("0", "1","Strm QC"), ylim = c(0,1e2))  
   }
   plot(x_vals, rates_strm_corr$FN_rate*100,
        type = "l", lwd = 4, col = "red",

@@ -1,5 +1,7 @@
 
 ####################################Scenarios##############################################"
+
+scen_strong_conc = list(list(k = 0,l = .01,rho1=0.3))
 scenarios_2_param <- list(
   #scenarios <- list(
   

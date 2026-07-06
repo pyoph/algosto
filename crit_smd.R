@@ -4,7 +4,7 @@ crit_SMD = "~/criteres_SMD"
 
 methodes = c("Oracle","SampleNaiveQuantonlinecorr","SampleNaivewithoutQuantonlinecorr","MCD","Offline-without_onlinequantile","Offline-without_onlinequantile","OnlineUsQuantonlinecorr","OnlineUsWithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUs_without_onlineQuantcorr","OGK")
 
-for(j in 11:11){
+for(j in 1:28){
   
   
     

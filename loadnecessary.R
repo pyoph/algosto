@@ -201,14 +201,24 @@ inverse_Schermann_Morisson = function(A,Z)
 }
 
 
-calcule_cutoff = function(distances,c_m = 2, n,cutinit = 0.6,cutoff = .9)
+calcule_cutoff = function(distances,c_m = 2, n = 1e4,cutinit = 0.6,cutoff = .95,type = "raw",nbcol = 10)
 {
-  cutoffcor=quantile(distances[1:n],probs=cutinit)
-  c_med=median(distances[1:n])
-  for (i in 1 :n) {
-    cutoffcor <- cutoffcor - c_m*c_med*(i+1)^(-0.75)*( as.numeric(distances[i] <= cutoffcor) - cutoff)
+  
+  if(type == "raw"){return (qchisq(.95,df = nbcol))}
+  
+  if(type == "quantcorr"){
+    cutoffcor=quantile(distances[1:n],probs=cutinit)
+    c_med=median(distances[1:n])
+    for (i in 1 :n) {
+      cutoffcor <- cutoffcor - c_m*c_med*(i+1)^(-0.75)*( as.numeric(distances[i] <= cutoffcor) - cutoff)
+    }
+    return(cutoffcor)}
+  
+  if(type == "rescale_dist"){
+    
+    return(qchisq(.95,df = nbcol) * median(distances)/qchisq(0.5, df = nbcol))
+    
   }
-  return(cutoffcor)
 }
 inv_safe <- function(S, eps = 1e-4) {
   
@@ -680,7 +690,7 @@ compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = S
     #ari = ARI_manual(labels_vrais,outlab)  
     print(paste0("ARI ",ari))
       # AUC
-    auc_val <- auc(roc(labels_vrais, distances, direction='<'))
+    auc_val <- as.numeric(auc(roc(labels_vrais, distances, direction='<')))
     
     #auc_val <- auc_manual(as.numeric(distances),labels_vrais)$auc
     
@@ -699,5 +709,8 @@ compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = S
     ARI = ari,
     AUC = auc_val  ))
 }
+
+
+
 
 

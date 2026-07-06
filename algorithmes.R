@@ -14,9 +14,9 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 ################Computations of the algorithms#############################
 
 
-for(sim in 21:1e2){
+for(sim in 1:20){
   
-for(sc in scen_conc)
+for(sc in scen_strong_conc)
   {
   
   k = sc$k
@@ -121,7 +121,7 @@ for(sc in scen_conc)
      temps_online = system.time(
        {
      
-         resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE,cutoff = .95)
+         resUsOnline= onlineRobustVariance(data$Z,batch = 1,computeOutliers = TRUE,cutoff = .95,eps_lambda = .01)
          
        })
      
@@ -181,7 +181,7 @@ for(sc in scen_conc)
   temps_streaming = system.time(
     {
       
-      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,cutoff = .95)
+      resUsStreaming= onlineRobustVariance(data$Z,computeOutliers = TRUE,cutoff = .95,eps_lambda = .01)
       
     })
   
@@ -212,7 +212,7 @@ for(sc in scen_conc)
   temps_streaming = system.time(
     {
       
-      resUsStreaming= onlineRobustVariance_old(data$Z,computeOutliers = TRUE)
+      resUsStreaming= onlineRobustVariance_old(data$Z,computeOutliers = TRUE,eps_lambda = .01)
       
     })
   
