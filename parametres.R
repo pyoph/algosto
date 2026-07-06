@@ -5,8 +5,8 @@
 
 ###Directories
 SimDir = "~/dataSimuls"
-resAlgo = "~/res1e2runsallscen"
-criteres = "~/criteres"
+resAlgo = "~/resstrongconc"
+criteres = "~/crit_strongscen"
 figures = "~/figures"
 
 
@@ -24,8 +24,8 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 #####################sample size and number of runs###############
 ############################################################
 d <- 10
-rList <- 5*(0:10)
-#load(paste0('SimParmsGrid-d', d, '.Rdata'))
+rList <- c(2,4,6,8,rList)
+rList <- sort(rList)
 sim = 1
 simNb <- 20
 n <- 1e4

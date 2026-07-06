@@ -5,7 +5,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 
 methodes = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","OfflinewithQuantcorr","OfflineUswithoutQuantcorr","OGK","MCD","Oracle")
 
-for (sc in scenarios_2_param){
+for (sc in scenarios){
   k = sc$k
   l = sc$l
   rho1 = sc$rho1
@@ -35,16 +35,16 @@ for (sc in scenarios_2_param){
         '-l', l,
         '-rho', rho1,
         '-r', r,
-        '-sim',sim, 
+        '-mean',
         ".RData"
       )
       load(critFile)
       
-      erreursSigmaPlot[m,j] = crit$erreurFrob
-      faux_negatifsPlot[m,j] = crit$FN
-      faux_positifsPlot[m,j] = crit$FP
-      ariPlot[m,j] = crit$ARI
-      aucPlot[m,j] = crit$AUC
+      erreursSigmaPlot[m,j] = crit_mean$erreurFrob
+      faux_negatifsPlot[m,j] = crit_mean$FN
+      faux_positifsPlot[m,j] = crit_mean$FP
+      ariPlot[m,j] = crit_mean$ARI
+      aucPlot[m,j] = crit_mean$AUC
       
     }
     setwd(figures)
@@ -89,56 +89,113 @@ for (sc in scenarios_2_param){
     ############################################################
     ################### FAUX NEGATIFS ##########################
     ############################################################
-    pseudo_log <- function(x) log10(1 + x)
+    
     
     plot(rList[2:9],
-         pseudo_log(faux_negatifsPlot[2:9,5] / ((rList[2:9]/100)*n) * 100),
+         faux_negatifsPlot[2:9,5] / ((rList[2:9]/100)*n) * 100,
          type = "l", lwd = 4, col = "red",
-         ylim = range(pseudo_log(c(0, 100))),
          xlab = "", ylab = "",
-         xaxt = "n", yaxt = "n")
+         xaxt = "n", yaxt = "n", ylim = c(0,1e2))
     
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,6] / ((rList[2:9]/100)*n) * 100),
+          faux_negatifsPlot[2:9,6] / ((rList[2:9]/100)*n) * 100,
           lwd = 4, col = "red", lty = "longdash")
     
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,1] / ((rList[2:9]/100)*n) * 100),
+          faux_negatifsPlot[2:9,1] / ((rList[2:9]/100)*n) * 100,
           lwd = 4, col = "darkgreen", lty = "dotted")
     
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,2] / ((rList[2:9]/100)*n) * 100),
+          faux_negatifsPlot[2:9,2] / ((rList[2:9]/100)*n) * 100,
           lwd = 4, col = "darkgreen", lty = "dotdash")
     
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,3] / ((rList[2:9]/100)*n) * 100),
+          faux_negatifsPlot[2:9,3] / ((rList[2:9]/100)*n) * 100,
           lwd = 4, col = "blue", lty = "longdash")
-    lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,7] / ((rList[2:9]/100) * n) * 100),
-          lwd=4, col="orange", lty="longdash")
     
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,8] / ((rList[2:9]/100) * n) * 100),
-          lwd=4, col="orange", lty="twodash")
-    
+          faux_negatifsPlot[2:9,7] / ((rList[2:9]/100)*n) * 100,
+          lwd = 4, col = "orange", lty = "longdash")
     
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,11] /
-                       ((rList[2:9]/100) * n) * 100),
-          lwd=4, col="purple", lty="longdash")
+          faux_negatifsPlot[2:9,8] / ((rList[2:9]/100)*n) * 100,
+          lwd = 4, col = "orange", lty = "twodash")
+    
     lines(rList[2:9],
-          pseudo_log(faux_negatifsPlot[2:9,4] / ((rList[2:9]/100)*n) * 100),
+          faux_negatifsPlot[2:9,11] / ((rList[2:9]/100)*n) * 100,
+          lwd = 4, col = "purple", lty = "longdash")
+    
+    lines(rList[2:9],
+          faux_negatifsPlot[2:9,4] / ((rList[2:9]/100)*n) * 100,
           lwd = 4, col = "blue", lty = "twodash")
     
-    axis(1, at = rList[2:9], las = 1, cex.axis = 1.8)
+    lines(rList[2:9],
+          faux_negatifsPlot[2:9,10] / ((rList[2:9]/100)*n) * 100,
+          lwd = 4, col = "black", lty = "twodash")
+    lines(rList[2:9],
+          faux_negatifsPlot[2:9,9] / ((rList[2:9]/100)*n) * 100,
+          lwd = 4, col = "brown", lty = "twodash")
     
-    axis(2,
-         at = log10(1 + c(0, 1, 10, 100)),
-         labels = c("0", "1", "10", "100"),
-         las = 1,
-         cex.axis = 1.8)
+    axis(1, at = rList[2:9], las = 1, cex.axis = 1.8)
+    axis(2, las = 1, cex.axis = 1.8)
     
     box()
+    # pseudo_log <- function(x) log10(1 + x)
+    # 
+    # plot(rList[2:9],
+    #      pseudo_log(faux_negatifsPlot[2:9,5] / ((rList[2:9]/100)*n) * 100),
+    #      type = "l", lwd = 4, col = "red",
+    #      ylim = range(pseudo_log(c(0, 100))),
+    #      xlab = "", ylab = "",
+    #      xaxt = "n", yaxt = "n")
+    # 
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,6] / ((rList[2:9]/100)*n) * 100),
+    #       lwd = 4, col = "red", lty = "longdash")
+    # 
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,1] / ((rList[2:9]/100)*n) * 100),
+    #       lwd = 4, col = "darkgreen", lty = "dotted")
+    # 
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,2] / ((rList[2:9]/100)*n) * 100),
+    #       lwd = 4, col = "darkgreen", lty = "dotdash")
+    # 
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,3] / ((rList[2:9]/100)*n) * 100),
+    #       lwd = 4, col = "blue", lty = "longdash")
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,7] / ((rList[2:9]/100) * n) * 100),
+    #       lwd=4, col="orange", lty="longdash")
+    # 
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,8] / ((rList[2:9]/100) * n) * 100),
+    #       lwd=4, col="orange", lty="twodash")
+    # 
+    # 
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,11] /
+    #                    ((rList[2:9]/100) * n) * 100),
+    #       lwd=4, col="purple", lty="longdash")
+    # lines(rList[2:9],
+    #       pseudo_log(faux_negatifsPlot[2:9,4] / ((rList[2:9]/100)*n) * 100),
+    #       lwd = 4, col = "blue", lty = "twodash")
+    # lines(rList[2:9],
+    #       pseudo_log( faux_negatifsPlot[2:9,10] /
+    #         ((rList[2:9]/100)*n)*100),
+    #       lwd=4, col="black", lty="twodash")
+    # 
+    # 
+    # 
+    # axis(1, at = rList[2:9], las = 1, cex.axis = 1.8)
+    # 
+    # axis(2,
+    #      at = log10(1 + c(0, 1, 10, 100)),
+    #      labels = c("0", "1", "10", "100"),
+    #      las = 1,
+    #      cex.axis = 1.8)
+    # 
+    # box()
     ############################################################
     ################### FAUX POSITIFS ##########################
     ############################################################
@@ -352,7 +409,7 @@ for (sc in scenarios_2_param){
 
 methodes_online = c("SampleNaiveQuantonlinecorr","SampleNaivewithoutonlinequantilecorr","OnlineUsQuantonlinecorr","OnlineUswithoutQuantonlinecorr","StreamingUsonlineQuantcorr","StreamingUswithoutQuantonlinecorr","Oracle")
 
-for(sc in scenarios_2_param){
+for(sc in scen_conc){
   
   k = sc$k
   l = sc$l
@@ -400,10 +457,12 @@ for(sc in scenarios_2_param){
   
   if(r != 0){
   distoutliers = rep(0,nboutliers)
-  
+
   for (m in (1:nboutliers)){
     distoutliers[m] = t(Z_cont[m,] - mu0)%*%invSigma0%*%(Z_cont[m,] - mu0)
+    
   }
+  
   }
   for(s in seq_along(methodes_online)){
   
@@ -425,6 +484,10 @@ for(sc in scenarios_2_param){
   #load(majorityFile)
   load(fitFile)
   outlabTraj[,s] = resultats$outliers_labels
+  
+  if(s == 5){
+    diststrmqc = resultats$distances
+    }
   #outlabTraj[,s] = majority_labels
   }
   
@@ -455,8 +518,8 @@ for(sc in scenarios_2_param){
   x_vals = 1:length(rates_strm_corr$FN_rate)
   
   if(r != 0){
-     boxplot(distinliers,distoutliers,col = c("lightblue", "red"),
-             names = c("0", "1"))  
+     boxplot(distinliers,distoutliers, diststrmqc,col = c("lightblue", "darkred","red"),
+             names = c("0", "1","Strm QC"), ylim = c(0,1e2))  
   }
   plot(x_vals, rates_strm_corr$FN_rate*100,
        type = "l", lwd = 4, col = "red",

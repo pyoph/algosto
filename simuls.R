@@ -1,6 +1,6 @@
 #######################Génération des données#############################
-for (sim in 80:1e2){
-  for(sc in scenarios_1_param){
+for (sim in 1:1e2){
+  for(sc in scenarios){
     
     k = sc$k
     l = sc$l
@@ -17,12 +17,12 @@ for (sim in 80:1e2){
     
     outlier_sets = list()
     
-    for (m in seq_along(rList[1:9])) {
+    for (m in seq_along(rList)) {
       n_active = floor(rList[m]/100*n)
       outlier_sets[[m]] = id_pool[1:n_active]
     }
     
-    for (m in seq_along(rList[1:9])){
+    for (m in seq_along(rList)){
       
       r = rList[m]
       dataFile <- paste0('SimData-d', d, '-n', n, '-k', k, '-l', l, '-rho', rho1,'-r',r ,"-sim",sim,".RData")
@@ -30,7 +30,7 @@ for (sim in 80:1e2){
       print(dataFile)
       #contParam = ParmsF1(m1, k, l, rho1)
       setwd(SimDir)
-      contParam = ParmsF1(m1, k, l, rho1)
+        contParam = ParmsF1(m1, k, l, rho1)
       ok = FALSE
       if(r == 0){
         
