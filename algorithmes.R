@@ -14,7 +14,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 ################Computations of the algorithms#############################
 
 
-for(sim in 1:20){
+for(sim in 1:3){
   
 for(sc in scen_strong_conc)
   {
@@ -38,8 +38,8 @@ for(sc in scen_strong_conc)
     
     setwd(resAlgo)
     
+  ################################Sample naive########################################################################################
     
-    #######################Sample cov with online quantile correction########################################
     
     fitFile <- paste0('Fit-SampleNaiveQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
     
@@ -75,8 +75,42 @@ for(sc in scen_strong_conc)
     
     
 
+  
     
-    #######################Sample cov without online quantile correction########################################
+    fitFile <- paste0('Fit-SampleNaivewithoutonlinequantilecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+    
+    if(!file.exists(fitFile)){
+      temps_naif <- system.time(
+      resNaif <- tryCatch(
+        {
+          SampleCovOnline(data$Z, quantcutoff = FALSE,nDataInit = Ninit)
+        },
+        error = function(e) {
+          message("SampleCovOnline failed: ", e$message)
+          NULL
+        }
+      )
+      
+      
+      
+    )
+    
+    resultats <- list(
+      variance = resNaif$Sigma,
+      outliers_labels = resNaif$outliers_labels,
+      distances = resNaif$distances,
+      temps = temps_naif
+    )
+    
+    save(resultats,file = fitFile)
+    }
+    else{
+    print("File exists")
+    load(fitFile)
+    }
+    
+  
+    
     
     
     fitFile <- paste0('Fit-SampleNaivewithoutonlinequantilecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -111,7 +145,36 @@ for(sc in scen_strong_conc)
     load(fitFile)
     }
     
+  
+    fitFile <- paste0('Fit-SampleRaw-d', d,
+                      '-n', n,
+                      '-k', k,
+                      '-l', l,
+                      '-rho', rho1,
+                      '-r', r,
+                      '-sim', sim,
+                      ".RData")
     
+    if (!file.exists(fitFile)) {
+      
+      cutoff <- calcule_cutoff(resultats$distances, type = "raw")
+      outliers_labels <- as.integer(resultats$distances > cutoff)
+      
+      resultats <- list(
+        variance = resultats$variance,
+        outliers_labels = outliers_labels,
+        distances = resultats$distances,
+        temps = resultats$temps
+      )
+      
+      save(resultats, file = fitFile)
+      
+    } else {
+      
+      print("File exists")
+      load(fitFile)
+      
+    }
     
     ###############################################Online us#########################################
     
@@ -142,33 +205,76 @@ for(sc in scen_strong_conc)
 
      
      
-     
-  fitFile <- paste0('Fit-OnlineUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-  
-  
-  if(!file.exists(fitFile)){
-  temps_online = system.time(
-    {
+    fitFile <- paste0(
+      'Fit-OnlineUswithoutQuantonlinecorr-d', d,
+      '-n', n,
+      '-k', k,
+      '-l', l,
+      '-rho', rho1,
+      '-r', r,
+      '-sim', sim,
+      ".RData"
+    )
+    
+    if (!file.exists(fitFile)) {
       
-      resUsOnline= onlineRobustVariance_old(data$Z,batch = 1,computeOutliers = TRUE)
+      temps_online <- system.time({
+        
+        resUsOnline <- onlineRobustVariance_old(
+          data$Z,
+          batch = 1,
+          computeOutliers = TRUE
+        )
+        
+      })
       
-    })
+      resultats <- list(
+        variance = resUsOnline$variance,
+        outliers_labels = resUsOnline$outlier_labels,
+        distances = resUsOnline$distances,
+        temps = temps_online
+      )
+      
+      save(resultats, file = fitFile)
+      
+    } else {
+      
+      print("File exists")
+      load(fitFile)
+      
+    }
   
+  fitFile <- paste0('Fit-OnlRaw-d', d,
+                    '-n', n,
+                    '-k', k,
+                    '-l', l,
+                    '-rho', rho1,
+                    '-r', r,
+                    '-sim', sim,
+                    ".RData")
   
-  resultats <- list(
-    variance = resUsOnline$variance,
-    outliers_labels = resUsOnline$outlier_labels,
-    distances = resUsOnline$distances,
-    temps = temps_online
-  )
-  
-  save(resultats,file = fitFile)
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "raw")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
   }
   
-  else {
-    print("File exists")
-    
-    load(fitFile)}
+  
   
   ###############################################Streaming us#########################################
 
@@ -204,36 +310,76 @@ for(sc in scen_strong_conc)
   
 
   
+  fitFile <- paste0('Fit-StreamingUswithoutQuantonlinecorr-d', d,
+                    '-n', n,
+                    '-k', k,
+                    '-l', l,
+                    '-rho', rho1,
+                    '-r', r,
+                    '-sim', sim,
+                    ".RData")
   
-  fitFile <- paste0('Fit-StreamingUswithoutQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-  
-  if(!file.exists(fitFile)){
-  
-  temps_streaming = system.time(
-    {
+  if (!file.exists(fitFile)) {
+    
+    temps_streaming <- system.time({
       
-      resUsStreaming= onlineRobustVariance_old(data$Z,computeOutliers = TRUE,eps_lambda = .01)
+      resUsStreaming <- onlineRobustVariance_old(
+        data$Z,
+        computeOutliers = TRUE,
+        eps_lambda = 0.01
+      )
       
     })
+    
+    resultats <- list(
+      variance = resUsStreaming$variance,
+      outliers_labels = resUsStreaming$outlier_labels,
+      distances = resUsStreaming$distances,
+      temps = temps_streaming
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
+
+  fitFile <- paste0('Fit-StrmRaw-d', d,
+                    '-n', n,
+                    '-k', k,
+                    '-l', l,
+                    '-rho', rho1,
+                    '-r', r,
+                    '-sim', sim,
+                    ".RData")
   
-  
-  
-  resultats <- list(
-    variance = resUsStreaming$variance,
-    outliers_labels = resUsStreaming$outlier_labels,
-    distances = resUsStreaming$distances,
-    temps = temps_streaming
-  )
-  
-  save(resultats,file = fitFile)
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "raw")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
   }
   
-  else{
-    print("File exists")
+  
+  
     
-    load(fitFile)}
-  
-  
   #####################################################Offline Us########################################################
   
   fitFile <- paste0('Fit-OfflinewithQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -257,64 +403,190 @@ for(sc in scen_strong_conc)
   
   save(resultats,file = fitFile)}
   else {load(fitFile)}
+
   
-  fitFile <- paste0('Fit-OfflineUswithoutQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-  
-  
-  if(!file.exists(fitFile)){
-  temps_offline = system.time(
-    {
-      
-      resOffline= offlineRobustVariance_old(data$Z,computeOutliers = TRUE)
-      
-    })
-  
-  resultats <- list(
-    variance = resOffline$variance,
-    outliers_labels = resOffline$outlier_labels,
-    distances = resOffline$distances,
-    temps = temps_offline
+  fitFile <- paste0(
+    'Fit-OfflineUswithoutQuantcorr-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
   )
   
-  save(resultats,file = fitFile)
-  }
-  else{
-    print("File exists")
+  if (!file.exists(fitFile)) {
     
-    load(fitFile)}
+    temps_offline <- system.time({
+      
+      resOffline <- offlineRobustVariance_old(
+        data$Z,
+        computeOutliers = TRUE
+      )
+      
+    })
+    
+    resultats <- list(
+      variance = resOffline$variance,
+      outliers_labels = resOffline$outlier_labels,
+      distances = resOffline$distances,
+      temps = temps_offline
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
+  
+  
+  fitFile <- paste0(
+    'Fit-OfflRaw-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+  
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "raw")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
   
   
   
   #############################OGK#########################################################################
-  
-  fitFile <- paste0('Fit-OGK-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-  
-  
-  if(!file.exists(fitFile)){
-  outlogk = rep(0,n)
-
-  temps_ogk = system.time({
-    resOGK = covOGK(data$Z,sigmamu = scaleTau2)})
-  
-  for(s in 1:n)
-  {
-    if(resOGK$distances[s] >qchisq(.95,df = d)) {outlogk[s] = 1}
-  }
-  
-  
-  resultats <- list(
-    variance = resOGK$cov,
-    outliers_labels = outlogk,
-    distances = resOGK$distances,
-    temps = temps_ogk
+  fitFile <- paste0(
+    'Fit-OGK-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
   )
   
-  save(resultats,file = fitFile)
-  }
-  else{
-    print("File exists")
+  if (!file.exists(fitFile)) {
     
-    load(fitFile)}
+    temps_ogk <- system.time({
+      
+      resOGK <- covOGK(data$Z, sigmamu = scaleTau2)
+      
+    })
+    
+    cutoff <- qchisq(0.95, df = d)
+    
+    outlogk <- as.integer(resOGK$distances > cutoff)
+    
+    resultats <- list(
+      variance = resOGK$cov,
+      outliers_labels = outlogk,
+      distances = resOGK$distances,
+      temps = temps_ogk
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
+  
+  
+  fitFile <- paste0(
+    'Fit-OGKRD-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "rescale_dist")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
+  
+
+  
+  
+  fitFile <- paste0(
+    'Fit-OGKQC-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "quantcorr")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
+  
   
   #############################MCD#########################################################################
   
@@ -342,11 +614,77 @@ for(sc in scen_strong_conc)
   )
   
   save(resultats,file = fitFile)
-  } else{
+  } else {
     print("File exists")
     
-    load(fitFile)}
+    load(fitFile) }
   
+  fitFile <- paste0(
+    'Fit-MCDRD-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "rescale_dist")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
+  
+  
+  
+  
+  fitFile <- paste0(
+    'Fit-MCDQC-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "quantcorr")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
   
   
   ################################Oracle###############################################################
@@ -375,10 +713,77 @@ for(sc in scen_strong_conc)
   
   save(resultats,file = fitFile)
 
-  } else{
+  } else {
     print("File exists")
     
-    load(fitFile)}
+    load(fitFile) }
+  
+  fitFile <- paste0(
+    'Fit-OracleRD-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "rescale_dist")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
+  
+  
+  
+  
+  fitFile <- paste0(
+    'Fit-OracleQC-d', d,
+    '-n', n,
+    '-k', k,
+    '-l', l,
+    '-rho', rho1,
+    '-r', r,
+    '-sim', sim,
+    ".RData"
+  )
+  
+  if (!file.exists(fitFile)) {
+    
+    cutoff <- calcule_cutoff(resultats$distances, type = "quantcorr")
+    outliers_labels <- as.integer(resultats$distances > cutoff)
+    
+    resultats <- list(
+      variance = resultats$variance,
+      outliers_labels = outliers_labels,
+      distances = resultats$distances,
+      temps = resultats$temps
+    )
+    
+    save(resultats, file = fitFile)
+    
+  } else {
+    
+    print("File exists")
+    load(fitFile)
+    
+  }
   
     
 }}}
