@@ -24,6 +24,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 #####################sample size and number of runs###############
 ############################################################
 d <- 10
+rList = 5*0:10
 rList <- c(2,4,6,8,rList)
 rList <- sort(rList)
 sim = 1
@@ -133,6 +134,7 @@ rho1valNeg <- sapply(KLval, function(kl) {
 l1val[length(l1val)] = 1.321931e+09
 
 rho1valNeg[1] = 0.3
+
 
 
 #####################################################################################################################
