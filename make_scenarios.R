@@ -134,7 +134,7 @@ scenarios_1_param = list(
   
 )
 
-setwd("~/algosto")
+setwd("~/work/algosto")
 
 save(
   scenarios_2_param,scenarios_1_param,

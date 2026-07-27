@@ -1,0 +1,35 @@
+---
+title: "Regression techniques with STARRS"
+author: "Daphné Giorgi, Antoine Godichon-Baggioni, Stéphane Robin"
+output: 
+  bookdown::pdf_document2:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    toc: true
+    toc_depth: 3
+package: STARRS
+bibliography: STARRS.bib
+vignette: >
+  %\VignetteIndexEntry{Regression techniques with STARRS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+## Regression
+
+
+## References
+
+<div id="refs"></div>

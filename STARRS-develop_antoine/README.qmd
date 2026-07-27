@@ -1,0 +1,164 @@
+---
+title: "NOTES DAPHNE"
+format: html
+editor: visual
+---
+
+## IGNORE FILES
+
+Ajout de :
+
+-   un fichier `.gitignore` dans le dossier `Paper`
+-   un fichier `.gitignore` dans le répertoire du projet `RGMM`
+-   un fichier `.Rbuildignore` dans le répertoire du projet `RGMM`
+
+## Suppression fichiers
+
+Projet R :
+
+-   Fichiers de compilation (.dll, .so, .o)
+-   Fichier log.txt
+
+## Questions papier
+
+-   \delta\_d, v_p **p=d ? oui**
+-   somme sur i dans algo 2 ? jusqu'à N au lieu que n ?
+
+## Questions code
+
+### gradMC
+
+-   dans algo 2, où est 1/N ?
+-   Z \<-\> U ?
+-   qui donne delta et init a gradMC ?
+-   samp serait plutot true ou false ? --\> out_index
+-   revérifier la formule pour E1 et E2
+-   pourquoi on utilise pas epsilon comme critere --\> on va le faire
+-   proposition appeler init lambda_0 --\> ok TODO
+-   ajout de vplist en sortie de fix point --\> okok
+-   remplacement de \^(-1) par / parce que plus rapide et precis
+-   le premier sumlog n'est pas 0 ?
+-   dans tools.R avons nous vraiment besoin de la dependence en Rspectra ? Oui parce que ca permet de calculer les k premieres valeurs/vecteurs propres (scores que je peux renommer)
+
+pour grad fix et RM je passerais le vecteur des U en argument, parce que dans tools les fcts ne dependant pas des lois
+
+-   suppression des arguments non utilisés dans fontions_annexes --\> tools
+
+-   au lieu que passer U en argument, ajouter un argument 'model' par defaut egal à "gaussian" qui permet de générer le U --\> NON, je je génère le U avant l'appel, parce que dans tools il y a des fcts qui ne dépendent pas des lois, je passe model en arg de la fct R_GMM
+
+-   tous les fichiers fonctions_annexes\_\_.R sont regroupés dans tools.R, où le code ne dépend pas du modèle.\
+
+-   exporter les fix, grad, robbins MC OK
+
+-   ajout de Weisz et ASG rocust PCA avec les scores
+
+-   passage en Rcpp des 3 fcts \*MC
+
+### generation
+
+-   la convention pour les fcts qui font de la génération de VA en R est que ca commence par "r"
+-   rContaminatedGMM Z devrait etre de taille *3 ? si oui, I aussi size = size*3
+-   gen_K, Tgen_K et Lgen_K comprend pas et ne sont utilisés nulle autre part, je propose de les enlever
+-   rGMMcontStudent je passerais le moyennes comme c(mean_1, ..) au lieu que comme matrice
+-   les gen_ech sont utilisé dans essai_robust\_\*MM.R, les autres dans repo Codes
+-   gen_ech etc sont trop spécifiques, je propose de ne garder que le r*MMcont*
+-   on veut garder Laplace ? pas utilisé le Lgen_ech et autre version générique absente
+-   TODO ajouter les examples pour toutzs les fct de generation
+
+### geometric median and geometric median covariation matrix
+
+-   covariation matrix -\> covariance matrix ?
+
+-   rcpp ajout du passage per reference, enlever le const des double
+
+-   Weiszfeld_init n'est appelée nulle part
+
+-   rcpp : init manque en argument de Weiszfeld_init_rcpp, ajouté
+
+-   renommer Weiszfeld_init_rcpp -\> WeiszfeldMed_rcpp ?
+
+-   renommer WeiszfeldCovMat_rcpp -\> WeiszfeldMedCovMat_rcpp ?
+
+-   unifier les fct gmedian et weiszfield, et passer le init en argument 'initMCM' true/false
+
+-   ajouté les args par défaut directement dans les fct rcpp
+
+-   ajouté les controles avec try catch sur les args
+
+-   rmq : pour ASG median et mediancov j'utilise le meme gamma (alors qu'avant il y en avait 2)
+
+-   remplacer Gmedian par ASG OK
+
+-   valeurs par defaut que je n'arrive pas a faire passer: //const arma::rowvec& init = arma::zeros(X.n_cols), //const arma::rowvec& weights = arma::ones(X.n_rows),
+
+    ```         
+                           //const arma::mat& init_cov = arma::eye(X.n_cols),
+                                      //const arma::rowvec& weights = arma::ones(X.n_rows),x
+    ```
+
+### robustMM
+
+-   l 73 Sigma
+-   centers2 est utilisé seulement pour calculer la dist à la fin, on a vraiment besoin du if ? (NON?) j'ai remplacé
+-   length(which(Pi\[,k\]\>0))!=0 -\> any(Pi\[,k\]\>0)
+-   length(which(is.na(weisz$covmedian)==T))==0 -> !any(is.na(weisz$covmedian))
+-   centers est une matrice, pas besoin de vérifier si K\>1
+-   Phiik\[Phiik\<epsout\] \<- epsout ?
+-   renommer weisz en med_medcovmat
+-   I \<- apply(Phiik,1,max) outliers \<- which(I\<=epsout) ?
+-   arret n'est pas passé en arg de RGMM, mais il faudrait non ?
+-   appel parallel, quid de l'aléatoire, on vérifie qu'on donne des graines différentes ?
+-   relire https://dofuture.futureverse.org/reference/grapes-dofuture-grapes.html
+-   .inorder T par defaulft, pas besoin de le specifier
+-   R_GMM on a change le param init
+-   ajouter en sortie aussi la classif TODO
+-   !!! gros changement : on utilise V à la place de Sigma dans le update
+-   TODO verifier influence de init (genie/Mclust)
+
+#### Questions
+
+-   est ce qu'on se passe du epsvp et le fixe à zéro ?
+-   est ce qu'on fixe epsout et epspi dans le code ? OUI
+
+10/1/2025 : TODO list enlever les TODO et propager les modif dans Laplace et student --\> un seul fichier/fonction ?
+
+-   pour pour propager sur les autres fichiers les différence sont sur le df en arg, et l'appel des fct pour le mcm, le Pi,
+
+-   on peut voir l'ancien projet dans Robust...\_old/RGMM
+
+-   l 86 quand j'ai un initClust, je ne ferais pas mieux de mettre les prop qui lui correspondent ?
+
+-   l 156 est ce qu'on vérifie s'il y en a Nan ?
+
+-   l 170 on utilise le meme logPhiTol que après qu'on ait enleve le max
+
+### Final_functions
+
+-   Global variables ?
+-   TODO RobVar passer en robustMM et remettre tous les bosn appels
+-   TODO tester avec les données simulées avec le code de stéphane et utiliser comme critère ARI (a prendre dans le paquet de chiquet aricode)
+
+## Plot
+
+-   Images lourdes
+
+### Paquet construit avec roxygen2
+
+-   les fonctions sont documentées avec roxygen
+-   pour créer les fichiers de documentation dans `man`, créer le namespace et les exports taper roxygen2::roxygenize()
+
+## 7 avril
+
+-   ajouter la loglike en sortie de MultipleRMM
+-   class et plot comme mclust (séparer le plot aussi)
+-   vérifier les Pi etc dans robustMM
+
+## 9 octobre 2025
+
+Draft de plan :
+
+-   Intro
+-   Median et MCM et robust variance (pseudo code)
+-   Application pour detection outliers
+-   Robust clustering
+-   Regression

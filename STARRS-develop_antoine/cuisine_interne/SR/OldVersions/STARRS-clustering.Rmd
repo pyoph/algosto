@@ -1,0 +1,49 @@
+---
+title: "Clustering with STARRS"
+author: "Daphné Giorgi, Antoine Godichon-Baggioni, Stéphane Robin"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    toc: true
+    toc_depth: 3
+  bookdown::pdf_document2:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+package: STARRS
+bibliography: STARRS.bib
+vignette: >
+  %\VignetteIndexEntry{Clustering with STARRS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+Grouping observations into homogeneous groups is a recurrent task in statistical data analysis. 
+
+## Model-based clustering 
+
+Model-based clustering relies on the assumption that the observed data come from a mixture model, meaning that the observations can be divided into a finite (but often unknown) number of clusters, and that each cluster is characterized by a specific distribution, often called the emission distribution.
+One reason for the popularity of model-based clustering is that the emission distributions of the clusters are usually chosen with a parametric class (e.g. a multivariate Gaussian), which makes the interpretation of the results particularly easy.
+Another reason for this popularity is that the maximum likelihood estimates of the parameters can be obtained via the well-known EM algorithm [@DeLaRu1997], accompanied by statistical guarantees.
+Nevertheless, one of the weaknesses of model-based clustering methods is their sensitivity to misspecification
+of emission distributions or to the presence of (possibly numerous) outliers.
+
+This package focuses on the robustness of model-based clustering methods to the presence of outliers, meaning that we make no assumptions about how outliers deviate from prescribed emission distributions. To this end, we adopt a fully parametric model-based clustering framework, but modify the EM algorithm (more specifically, the M-step) to ensure robustness. 
+
+The method used is valid for any *symmetric emission distribution* and resorts to the estimation of the median vector and the median covariation matrix in place of the mean vector and the covariance matrix.
+
+## Robust clustering with STARRS
+
+
+## References
+
+<div id="refs"></div>

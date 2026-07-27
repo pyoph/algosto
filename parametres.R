@@ -4,10 +4,10 @@
 
 
 ###Directories
-SimDir = "~/dataSimuls"
-resAlgo = "~/resstrongconc"
-criteres = "~/crit_strongscen"
-figures = "~/figures"
+SimDir = "~/work/dataSimuls"
+resAlgo = "~/work/res1e2runsallscen"
+criteres = "~/work/criteres"
+figures = "~/work/figures"
 
 
 #rm(list=ls())
@@ -17,17 +17,18 @@ figures = "~/figures"
 ################
 ###########################################################################
 
-source("~/algosto/make_scenarios.R")
-load("~/algosto/scenarios.RData")
+source("~/work/algosto/make_scenarios.R")
+load("~/work/algosto/scenarios.RData")
 scenarios = c(scenarios_1_param,scenarios_2_param)
 #############################################################
 #####################sample size and number of runs###############
 ############################################################
 d <- 10
+rList = rList = 5*0:10
 rList <- c(2,4,6,8,rList)
 rList <- sort(rList)
 sim = 1
-simNb <- 20
+simNb <- 1e2
 n <- 1e4
 Ninit = 1e2
 cm = 2
@@ -141,7 +142,7 @@ rho1valNeg[1] = 0.3
 
 
 
-setwd("~/algosto")
+setwd("~/work/algosto")
   save(d, KLval, 
      mu0, sigmaSq0, Sigma0, rho0, 
      m1, 

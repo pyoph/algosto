@@ -1,0 +1,33 @@
+## Folders
+^docs$
+^pkgdown$
+^build$
+^check$
+^coverage$
+^ci$
+^temp_gitlabTemplates$
+^\.git$
+^\.vscode$
+^\.Rproj$
+^\.Rproj\.user$
+^inst/examplesdata/outputs$
+^tests/testthat/testoutputs$
+^README_files$
+
+## Files
+^\.gitlab-ci\.yml$
+^\.lintr$
+^devCommands\.R$
+^newProjectCommands\.R$
+^README\.
+^README\.qmd
+^README-newProject\.md$
+^_pkgdown\.yml$
+^.+\.Rproj$
+^\.Rhistory$
+^\.lintr$
+^.+\.pdf$
+^LICENSE.+$
+^cuisine_interne$
+^\.positai$
+^\.claude$

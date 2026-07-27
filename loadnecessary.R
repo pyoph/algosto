@@ -2,7 +2,7 @@
 ######################################
 ################Packages nécessaires#####
 #########################################
-setwd("~/algosto")
+setwd("~/work/algosto")
 packages = c("Rcpp","Gmedian","MASS","DescTools" ,"capushe","checkmate", "doFuture", "future",'mclust', 'LaplacesDemon', 'genieclust', 'reshape2','cowplot','scales',"bookdown","xfun","dplyr","binom","pROC","mclust")
 #
 for (p in packages) {
@@ -12,16 +12,16 @@ for (p in packages) {
    library(p, character.only = TRUE)
  }
 #
-setwd("~/algosto")
-
-packages_us = c("STARRS_1.0.tar.gz")
-
-for (p in packages_us) {
-  if (!requireNamespace(p, quietly = TRUE)) {
-    install.packages(p)
-  }
-  
-}
+setwd("~/work/algosto")
+# 
+# packages_us = c("STARRS_1.0.tar.gz")
+# 
+# for (p in packages_us) {
+#   if (!requireNamespace(p, quietly = TRUE)) {
+#     install.packages(p)
+#   }
+#   
+# }
 
 library(Rcpp)
 library(Gmedian)
@@ -676,9 +676,22 @@ auc_manual <- function(score, labels) {
 compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = Sigma0,r){
   
   erreurFrob <- norm(variance - SigmaTrue, "F")
+
+  
+  conf_mat <- table(Prediction = outlab, Vrai = labels_vrais)
+  
   FP <- sum(outlab == 1 & labels_vrais == 0)
   FN <- sum(outlab == 0 & labels_vrais == 1)
-  if(r != 0){
+  
+  
+  
+ 
+  
+  
+  prop_hors_diag <- (FP + FN) / sum(conf_mat)
+  
+  
+   if(r != 0){
     
     # ARI
      ari <- adjustedRandIndex(
@@ -688,13 +701,13 @@ compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = S
   
     
     #ari = ARI_manual(labels_vrais,outlab)  
-    print(paste0("ARI ",ari))
+    #print(paste0("ARI ",ari))
       # AUC
     auc_val <- as.numeric(auc(roc(labels_vrais, distances, direction='<')))
     
     #auc_val <- auc_manual(as.numeric(distances),labels_vrais)$auc
     
-    print(paste0("AUC ",auc_val))
+    #print(paste0("AUC ",auc_val))
     
   }
   else{
@@ -707,7 +720,9 @@ compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = S
     FP = FP,
     FN = FN,
     ARI = ari,
-    AUC = auc_val  ))
+    AUC = auc_val,
+    prop_hors_diag = prop_hors_diag
+  ))
 }
 
 

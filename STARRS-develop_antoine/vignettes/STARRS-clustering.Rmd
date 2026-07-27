@@ -1,0 +1,144 @@
+---
+title: "Clustering with STARRS"
+author: "Daphné Giorgi, Antoine Godichon-Baggioni, Stéphane Robin"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    toc: true
+    toc_depth: 3
+  bookdown::pdf_document2:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+package: STARRS
+bibliography: STARRS.bib
+vignette: >
+  %\VignetteIndexEntry{Clustering with STARRS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, include=TRUE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(STARRS)
+set.seed(1)
+```
+
+# Introduction
+
+Grouping observations into homogeneous groups is a recurrent task in statistical data analysis. 
+Unsupervised classification methods (also called clustering methods) are typically divided into two main classes: distance-based methods, and model-based methods. 
+The most representative examples in each category are, respectively, the $k$-means (@McQ67) algorithm and the Gaussian mixture model (@MaP00).
+The STARRS package propose robust counterparts of each of them, namely the $k$-medians algorithm (@CCM10) and a robust version of the EM algorithm for Gaussian mixtures (@godichon2024robust).
+
+# Model-based clustering: A first example
+
+## Synthetic data set
+
+A sample of $n=1500$ drawn from a multivariate Gaussian mixture model with $K=3$ components (with equal proportions) contaminated with outliers with student distribution can be obtained with the  function \texttt{rGMMcontStudent}, as follows.
+
+```{r simul, eval=TRUE}
+# Dimensions
+K <- 3; nk <- rep(500, K); d <- 5
+# Gaussian parameters
+mu <- rbind(mu1=rep(0, d), mu2=rep(3, d), mu3=rep(-3, d))
+sigma <- array(dim=c(K, d, d))
+sigma[1, , ] <- 2*diag(d); sigma[2, , ] <- diag(1:d); sigma[3, , ] <- diag(1/(1:d))
+# Student contamination
+fraction <- 0.3
+dfT <- 1; dfT <- 1; muT <- mu; sigmaT <- sigma
+# Simulation
+GMMcontStudent <- rGMMcontStudent(nk=nk, muG=mu, sigmaG=sigma,
+                                  delta=fraction,
+                                  dfT=dfT, muT=muT, sigmaT=sigmaT)
+print(head(STARRS::GMMcontStudent$X))
+print(head(STARRS::GMMcontStudent$Z))
+print(head(STARRS::GMMcontStudent$C))
+```
+
+## Robust clustering with STARRS
+
+The robust version of the EM algorithm proposed by \cite{GBR24} for the inference of Gaussian mixture models is implemented in the function \texttt{multipleRobustMM}.
+
+```{r rgmm, eval=TRUE}
+robustGMMOutput <- multipleRobustMM(GMMcontStudent$X, nclust=1:5)
+print(robustGMMOutput$bestresult$centers)
+```
+
+The number of components can be chosen with the BIC or ICL criterion.
+
+```{r selection, eval=TRUE}
+plot(robustGMMOutput, graph='BIC')
+plot(robustGMMOutput, graph='ICL')
+```
+
+The classification of the observations (in the first two dimensions of PCA) can be visualized with the \texttt{plot} function of the package, together with confidence of the classification uncertainty.
+
+```{r uncertainty, eval=TRUE}
+plot(robustGMMOutput, graph='Two_Dim_Uncertainty')
+```
+
+# Robustness study
+
+## Distance-based methods
+
+The first element of the list of datasets \texttt{homoGMMStudentCont_K3_d5_n1500} consists of an uncontaminated sample of $n=1500$ observations drawn from a multivariate Gaussian mixture with $K=3$ components, with equal proportions and variance matrices all equal to twice the identity. The next datasets from this list consists of the same data set contaminated with an increasing fraction $f$ of outliers: $f = 0, 10\%, \dots 50\%$ drawn from a multivariate student mixture. 
+
+Both the regular $k$-means algorithm and the $k$-medians algorithm can be applied to each element of this list.
+
+```{r kmeans, eval=TRUE}
+K <- 3; 
+# k-means
+kmeans <- lapply(1:length(homoGMMStudentCont_K3_d5_n1500), function(f){
+  kmeans(homoGMMStudentCont_K3_d5_n1500[[f]]$X, centers=K, nstart=20, iter.max=100)})
+# k-medians
+kmedians <- lapply(1:length(homoGMMStudentCont_K3_d5_n1500), function(f){
+  kmedians(homoGMMStudentCont_K3_d5_n1500[[f]]$X)})
+```
+
+The next plot illustrate the effect of contamination on the classification accuracy as measure by the adjusted Rand index (ARI).
+
+```{r kmeansAri, eval=TRUE}
+# Classification accuracy
+fractionList <- (0:5)/10; library(mclust)
+plot(fractionList, sapply(1:length(fractionList), function(ff){
+  adjustedRandIndex(heteroGMMStudentCont_K3_d5_n1500[[ff]]$Z, kmeans[[ff]]$cluster)
+  }), type='b', pch=20, xlab='fraction of outliers', ylab='ARI')
+points(fractionList, sapply(1:length(fractionList), function(ff){
+  adjustedRandIndex(heteroGMMStudentCont_K3_d5_n1500[[ff]]$Z, kmedians[[ff]]$bestresult$cluster)
+  }), type='b', pch=20, col='red')
+```
+
+## Distance-based methods
+
+The first element of the list of datasets \texttt{heteroGMMStudentCont_K3_d5_n1500} has been contructed is the same way as the \texttt{homoGMMStudentCont_K3_d5_n1500} except that the components of the multivariate Gaussian mixture have different variance matrices.
+
+Again, both the regular EM algorithm (as implemente in the \texttt{mclust} package: @SFM16) and its robust version can be applied to each element of this list.
+
+```{r gmm, eval=TRUE}
+# Regular EM
+gmm <- lapply(1:length(heteroGMMStudentCont_K3_d5_n1500), function(f){
+  Mclust(heteroGMMStudentCont_K3_d5_n1500[[f]]$X, G=K)})
+# Robust EM
+rgmm <- lapply(1:length(heteroGMMStudentCont_K3_d5_n1500), function(f){
+  multipleRobustMM(heteroGMMStudentCont_K3_d5_n1500[[f]]$X, nclust=K)})
+```
+
+Again, the effect of contamination on the classification accuracy (in terms of ARI) can be described as follows.
+
+```{r gmmAri, eval=TRUE}
+fractionList <- (0:5)/10
+plot(fractionList, sapply(1:length(fractionList), function(ff){
+  adjustedRandIndex(heteroGMMStudentCont_K3_d5_n1500[[ff]]$Z, gmm[[ff]]$classification)
+  }), type='b', pch=20, xlab='fraction of outliers', ylab='ARI')
+points(fractionList, sapply(1:length(fractionList), function(ff){
+  adjustedRandIndex(heteroGMMStudentCont_K3_d5_n1500[[ff]]$Z, rgmm[[ff]]$bestresult$clusters)
+  }), type='b', pch=20, col='red')
+```
+
+# References
+
+<div id="refs"></div>

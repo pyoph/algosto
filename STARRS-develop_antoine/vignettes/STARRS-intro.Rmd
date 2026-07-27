@@ -1,0 +1,74 @@
+---
+title: "A brief introduction to STARRS"
+author: "Daphné Giorgi, Antoine Godichon-Baggioni, Stéphane Robin"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    toc: true
+    toc_depth: 3
+  bookdown::pdf_document2:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+package: STARRS
+bibliography: STARRS.bib
+vignette: >
+  %\VignetteIndexEntry{A brief introduction to STARRS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+STARRS is a comprehensive package for STochastic Algorithms for Robust multivaRiate Statistics. 
+Robustness is a key aspect in statistical analysis, especially when dealing with real-world data that may contain outliers or be subject to various types of noise. STARRS provides a suite of tools and algorithms designed to enhance the robustness of multivariate statistical methods, replacing the use of traditional covariance matrices with more robust alternatives.
+The package includes implementations of several stochastic algorithms for the most common robust multivariate statistics, such as:
+
+- Robust Median and Median Covariance Matrix Estimation
+- Robust Outlier Detection Methods
+- Robust Clustering Algorithms
+- Robust Regression Techniques
+
+## First steps with STARRS
+
+To get started with STARRS, you can install the package from CRAN using the following command:
+
+```{r install, eval=FALSE}
+install.packages("STARRS")
+```
+Once installed, you can load the package into your R session
+```{r load}
+library(STARRS)
+```
+
+The basic functions in the STARRS package are the computation of median and the median covariance matrix. 
+These computations have several implementations, based on different algorithms, performed using 
+Online, Offline or Semi-Online approaches.
+Here is an example of how to compute the  median and median covariance matrix using the `STARRS` package:
+
+
+```{r example}
+# Load the STARRS package
+library(STARRS)
+# Generate some example data
+data <- rSphereGM(n=500,d=5,K=3)
+
+# Compute the median using the Weiszfeld algorithm
+median_est <- WeiszfeldMedian(data$X)
+print(median_est)
+
+# Compute the median covariance matrix
+medianCov <- WeiszfeldMedianCovariance(data$X,median_est=median_est)
+print(medianCov)
+```
+
+## References
+
+<div id="refs"></div>

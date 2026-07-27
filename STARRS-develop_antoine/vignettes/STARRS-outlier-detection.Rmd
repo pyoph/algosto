@@ -1,0 +1,39 @@
+---
+title: "Outlier detection with STARRS"
+author: "Daphné Giorgi, Antoine Godichon-Baggioni, Stéphane Robin"
+output: 
+  bookdown::pdf_document2:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    toc: true
+    toc_depth: 3
+package: STARRS
+bibliography: STARRS.bib
+vignette: >
+  %\VignetteIndexEntry{Outlier detection with STARRS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The robust estimation of the first two moments in one single cluster is a key step in many statistical methods, such as clustering, classification or regression.
+All robust methods provide accurate estimates of the variance, even in presence of a large fraction of outliers.
+Once these quantities being estimated, the detection of outliers is naturally performed using robust distances, such as the Mahalanobis distance.
+
+## Outlier detection
+
+
+## References
+
+<div id="refs"></div>
