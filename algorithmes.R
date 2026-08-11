@@ -30,7 +30,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 ################Computations of the algorithms#############################
 
 
-for(sim in 65:1e2){
+for(sim in 1:1e2){
   
 for(sc in scenarios)
   {
@@ -110,9 +110,9 @@ for(sc in scenarios)
       
     
     
-      
+    if(!file.exists(fitFile)){
      save_add_method(dist,fitFile,"rescale_dist")
-    
+    }
     
     
     fitFile <- paste0('Fit-SampleRaw-d', d,
@@ -124,7 +124,8 @@ for(sc in scenarios)
                       '-sim', sim,
                       ".RData")
     
-    save_add_method(dist, fitFile, "raw")
+    
+    if(!file.exists(fitFile)){save_add_method(dist, fitFile, "raw")}
     
     
     ###############################################Online us#########################################
@@ -165,7 +166,7 @@ for(sc in scenarios)
     )
     
     
-      if(!file.exists(fitFile)){
+      if(file.exists(fitFile)){
       temps_online <- system.time({
         
         resUsOnline <- onlineRobustVariance(
@@ -199,8 +200,9 @@ for(sc in scenarios)
                     ".RData")
   
   
+  if(!file.exists(fitFile)){
   save_add_method(dist, fitFile, "raw")
-  
+  }
   
   ###############################################Streaming us#########################################
 
@@ -208,7 +210,7 @@ for(sc in scenarios)
   
   fitFile <- paste0('Fit-StreamingUsonlineQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
-  if(!file.exists(fitFile)){
+  if(file.exists(fitFile)){
     temps_streaming = system.time(
     {
       
@@ -241,7 +243,7 @@ for(sc in scenarios)
                     '-sim', sim,
                     ".RData")
   
-  if(!file.exists(fitFile)){
+  if(file.exists(fitFile)){
     
     temps_streaming <- system.time({
       
@@ -276,9 +278,9 @@ for(sc in scenarios)
                     '-sim', sim,
                     ".RData")
   
-  
+  if(!file.exists(fitFile)){
   save_add_method(dist, fitFile, "raw")
-    
+  }
   #####################################################Offline Us########################################################
   
   fitFile <- paste0('Fit-OfflinewithQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -354,9 +356,9 @@ for(sc in scenarios)
     ".RData"
   )
   
-  
+  if(!file.exists(fitFile)){
   save_add_method(dist, fitFile, "raw")
-  
+  }
   #############################OGK#########################################################################
   fitFile <- paste0(
     'Fit-OGK-d', d,
@@ -404,9 +406,10 @@ for(sc in scenarios)
     ".RData"
   )
   
+  if(!file.exists(fitFile)){
   save_add_method(
   dist , fitFile, "rescale_dist")
-  
+  }
   fitFile <- paste0(
     'Fit-OGKQC-d', d,
     '-n', n,
@@ -418,10 +421,10 @@ for(sc in scenarios)
     ".RData"
   )
   
-  
+  if(!file.exists(fitFile)){
   save_add_method(
     dist , fitFile, "quantcorr")
-   
+  }
   #############################MCD#########################################################################
   
   fitFile <- paste0('Fit-MCD-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
@@ -463,9 +466,10 @@ for(sc in scenarios)
     '-sim', sim,
     ".RData"
   )
-
-  save_add_method(dist, fitFile, "rescale_dist")
   
+  if(!file.exists(fitFile)){
+  save_add_method(dist, fitFile, "rescale_dist")
+  }
   
   
   
@@ -481,8 +485,9 @@ for(sc in scenarios)
     ".RData"
   )
   
+  if(!file.exists(fitFile)){
   save_add_method(dist, fitFile, "quantcorr")
-  
+  }
   
   
   ################################Oracle###############################################################
@@ -523,8 +528,10 @@ for(sc in scenarios)
     ".RData"
   )
 
-  save_add_method(distoracle, fitFile, "rescale_dist")
   
+  if(!file.exists(fitFile)){
+  save_add_method(distoracle, fitFile, "rescale_dist")
+  }
   
   
   
@@ -541,9 +548,9 @@ for(sc in scenarios)
     ".RData"
   )
 
-  
+  if(!file.exists(fitFile)){
   save_add_method(distoracle, fitFile, "quantcorr")
-  
+  }
     
   }}
 }
