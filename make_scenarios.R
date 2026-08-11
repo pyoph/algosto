@@ -1,7 +1,17 @@
 
 ####################################Scenarios##############################################"
-
+scen_conc = list( list(k = 0, l = 0.5, rho1 = 0.3),
+                  # 
+                  list(k = 0, l = 0.1, rho1 = 0.3),
+                  # 
+                  list(k = 0, l = 0.01, rho1 = 0.3))
 scen_strong_conc = list(list(k = 0,l = .01,rho1=0.3))
+
+scen_dec_dil = list( list(k = 0, l = 0.5, rho1 = 0.3),
+                     # 
+                     list(k = 0, l = 0.1, rho1 = 0.3),
+                     # 
+                     list(k = 0, l = 0.01, rho1 = 0.3))
 scenarios_2_param <- list(
   #scenarios <- list(
   
@@ -116,11 +126,11 @@ scenarios_1_param = list(
   list(k = 10, l = 1, rho1 = 0.3),
   
   list(k = 50, l = 1, rho1 = 0.3),
-  # list(k = 0, l = 0.5, rho1 = 0.3),
+   list(k = 0, l = 0.5, rho1 = 0.3),
   # 
-  # list(k = 0, l = 0.1, rho1 = 0.3),
+   list(k = 0, l = 0.1, rho1 = 0.3),
   # 
-  # list(k = 0, l = 0.01, rho1 = 0.3), 
+   list(k = 0, l = 0.01, rho1 = 0.3), 
   list(k = 0, l = 2, rho1 = 0.3),
   
   list(k = 0, l = 10, rho1 = 0.3),

@@ -30,7 +30,7 @@ scenarios = c(scenarios_1_param,scenarios_2_param)
 ################Computations of the algorithms#############################
 
 
-for(sim in 78:1e2){
+for(sim in 65:1e2){
   
 for(sc in scenarios)
   {
@@ -55,7 +55,6 @@ for(sc in scenarios)
     setwd(resAlgo)
     
   ################################Sample naive########################################################################################
-    
     fitFile <- paste0(
       "Fit-SampleNaiveQuantonlinecorr-d", d,
       "-n", n,
@@ -67,6 +66,7 @@ for(sc in scenarios)
       ".RData"
     )
     
+    if(!file.exists(fitFile)){  
       
       temps_naif <- system.time(
         resNaif <- tryCatch(
@@ -93,7 +93,8 @@ for(sc in scenarios)
       )
       
       save(resultats, file = fitFile)
-    
+    }
+    else {load(fitFile)}
       dist = resultats$distances
       
       fitFile <- paste0(
@@ -108,49 +109,12 @@ for(sc in scenarios)
       )
       
     
-    # if(!file.exists(fitFile)){
-    #   temps_naif <- system.time(
+    
       
-     save(dist,file = fitFile)
-    # }
-    # else{
-    # print("File exists")
-    # load(fitFile)
-    # }
-    # 
+     save_add_method(dist,fitFile,"rescale_dist")
     
     
-    # if(!file.exists(fitFile)){
-    #   temps_naif <- system.time(
-    #   resNaif <- tryCatch(
-    #     {
-    #       SampleCovOnline(data$Z, quantcutoff = FALSE,nDataInit = Ninit)
-    #     },
-    #     error = function(e) {
-    #       message("SampleCovOnline failed: ", e$message)
-    #       NULL
-    #     }
-    #   )
-    #   
-    #   
-    #   
-    # )
-    # 
-    # resultats <- list(
-    #   #variance = resNaif$Sigma,
-    #   outliers_labels = resNaif$outliers_labels,
-    #   distances = resNaif$distances,
-    #   temps = temps_naif
-    # )
-    # 
-    # save(resultats,file = fitFile)
-    # }
-    # else{
-    # print("File exists")
-    # load(fitFile)
-    # }
-    # 
-
+    
     fitFile <- paste0('Fit-SampleRaw-d', d,
                       '-n', n,
                       '-k', k,
@@ -162,20 +126,11 @@ for(sc in scenarios)
     
     save_add_method(dist, fitFile, "raw")
     
-    # if (!file.exists(fitFile)) {
-    #   save_add_method(resultats, fitFile, "raw")
-    #       } 
-    # else {
-    #   
-    #   print("File exists")
-    #   load(fitFile)
-    #   
-    # }
     
     ###############################################Online us#########################################
     
      fitFile <- paste0('Fit-OnlineUsQuantonlinecorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
-     
+     if(!file.exists(fitFile)){
        temps_online = system.time(
        {
      
@@ -192,11 +147,11 @@ for(sc in scenarios)
      )
      
      save(resultats,file = fitFile)
-      
+     }
+    else {load(fitFile)}
     load(fitFile)
      
     dist = resultats$distances
-     
      
     fitFile <- paste0(
       'Fit-OnlineUswithoutQuantonlinecorr-d', d,
@@ -210,7 +165,7 @@ for(sc in scenarios)
     )
     
     
-      
+      if(!file.exists(fitFile)){
       temps_online <- system.time({
         
         resUsOnline <- onlineRobustVariance(
@@ -229,8 +184,9 @@ for(sc in scenarios)
         #temps = temps_online
       )
       
-      save(dist, file = fitFile)
-      
+      save(resultats, file = fitFile)
+      }
+    else{load(fitFile)}
 
     
   fitFile <- paste0('Fit-OnlRaw-d', d,
@@ -244,17 +200,6 @@ for(sc in scenarios)
   
   
   save_add_method(dist, fitFile, "raw")
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "raw")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
   
   
   ###############################################Streaming us#########################################
@@ -263,7 +208,7 @@ for(sc in scenarios)
   
   fitFile <- paste0('Fit-StreamingUsonlineQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
-  
+  if(!file.exists(fitFile)){
     temps_streaming = system.time(
     {
       
@@ -281,9 +226,11 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
-    
+  }
+  else {load(file = fitFile)}
   
   dist = resultats$distances
+  
   
   fitFile <- paste0('Fit-StreamingUswithoutQuantonlinecorr-d', d,
                     '-n', n,
@@ -294,7 +241,8 @@ for(sc in scenarios)
                     '-sim', sim,
                     ".RData")
   
-
+  if(!file.exists(fitFile)){
+    
     temps_streaming <- system.time({
       
       resUsStreaming <- onlineRobustVariance(
@@ -312,9 +260,9 @@ for(sc in scenarios)
       #temps = temps_streaming
     )
     
-    save(dist, file = fitFile)
+    save(resultats, file = fitFile)
     
-
+  } else{load(fitFile)}
     #print("File exists")
     #load(fitFile)
     
@@ -330,22 +278,12 @@ for(sc in scenarios)
   
   
   save_add_method(dist, fitFile, "raw")
-  
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "raw")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
     
   #####################################################Offline Us########################################################
   
   fitFile <- paste0('Fit-OfflinewithQuantcorr-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
+  
+  if(!file.exists(fitFile)){
   
     temps_offline = system.time(
     {
@@ -364,6 +302,9 @@ for(sc in scenarios)
   )
   
   save(resultats,file = fitFile)
+  }
+  else{load(fitFile)}
+  
   
   
   dist = resultats$distances
@@ -378,7 +319,8 @@ for(sc in scenarios)
     '-sim', sim,
     ".RData"
   )
-  
+    
+  if(!file.exists(fitFile)){
     temps_offline <- system.time({
       
       resOffline <- offlineRobustVariance(
@@ -396,7 +338,8 @@ for(sc in scenarios)
     )
     
     save(resultats, file = fitFile)
-    
+  }
+  else{load(fitFile)}
     
   
   
@@ -414,20 +357,6 @@ for(sc in scenarios)
   
   save_add_method(dist, fitFile, "raw")
   
-  # 
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "raw")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
-  # 
-  
   #############################OGK#########################################################################
   fitFile <- paste0(
     'Fit-OGK-d', d,
@@ -439,7 +368,7 @@ for(sc in scenarios)
     '-sim', sim,
     ".RData"
   )
-  
+  if(!file.exists(fitFile)){
     temps_ogk <- system.time({
       
       resOGK <- covOGK(data$Z, sigmamu = scaleTau2)
@@ -458,7 +387,8 @@ for(sc in scenarios)
     )
     
     save(resultats, file = fitFile)
-    
+  }
+  else{load(fitFile)}
     
     dist = resultats$distances
   
@@ -476,17 +406,6 @@ for(sc in scenarios)
   
   save_add_method(
   dist , fitFile, "rescale_dist")
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "rescale_dist")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
   
   fitFile <- paste0(
     'Fit-OGKQC-d', d,
@@ -502,22 +421,14 @@ for(sc in scenarios)
   
   save_add_method(
     dist , fitFile, "quantcorr")
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "quantcorr")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
+   
   #############################MCD#########################################################################
   
   fitFile <- paste0('Fit-MCD-d', d,  '-n', n, '-k', k, '-l', l, '-rho', rho1, '-r',r,'-sim', sim,".RData")
   
-    distmcd = rep(0,n)
+  if(!file.exists(fitFile)){
+  
+  distmcd = rep(0,n)
   outlmcd = rep(0,n)
   temps_mcd = system.time({
     resMcd = covMcd(data$Z)
@@ -537,7 +448,9 @@ for(sc in scenarios)
     temps = temps_mcd
   )
   
-  save(resultats,file = fitFile)
+  save(resultats,file = fitFile)}
+  else{load(fitFile)}
+  
   dist = resultats$distances
   
   fitFile <- paste0(
@@ -553,19 +466,6 @@ for(sc in scenarios)
 
   save_add_method(dist, fitFile, "rescale_dist")
   
-  # 
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "rescale_dist")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
-  # 
   
   
   
@@ -583,18 +483,6 @@ for(sc in scenarios)
   
   save_add_method(dist, fitFile, "quantcorr")
   
-  # 
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "quantcorr")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
   
   
   ################################Oracle###############################################################
@@ -637,18 +525,6 @@ for(sc in scenarios)
 
   save_add_method(distoracle, fitFile, "rescale_dist")
   
-  # 
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "rescale_dist")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  
   
   
   
@@ -668,20 +544,6 @@ for(sc in scenarios)
   
   save_add_method(distoracle, fitFile, "quantcorr")
   
-  #   
-  # if (!file.exists(fitFile)) {
-  #   
-  #   save_add_method(resultats, fitFile, "quantcorr")
-  #   
-  # } else {
-  #   
-  #   print("File exists")
-  #   load(fitFile)
-  #   
-  # }
-  # 
-  # 
-  # 
     
   }}
 }

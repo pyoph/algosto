@@ -1,8 +1,8 @@
 ################Calcul criteres###################
 methodes = c("SampleNaiveQuantonlinecorr","OnlineUsQuantonlinecorr","StreamingUsonlineQuantcorr","OfflinewithQuantcorr","OGK","MCD")
-methodes_add  = c("SampleNaivewithoutonlinequantilecorr","OnlineUswithoutQuantonlinecorr","StreamingUswithoutQuantonlinecorr","OfflineUswithoutQuantcorr","OracleRD","OracleQC","SampleRaw","OnlRaw","StrmRaw","OfflRaw","OGKRD","OGKQC","MCDRD","MCDQC","Oracle")
+methodes_add  = c("SampleNaivewithoutonlinequantilecorr","OnlineUswithoutQuantonlinecorr","StreamingUswithoutQuantonlinecorr","OfflineUswithoutQuantcorr","OracleRD","OracleQC","SampleRaw","OnlRaw","StrmRaw","OfflRaw","OGKRD","OGKQC","MCDRD","MCDQC")
 methode_oracle = c("Oracle")
-for(sim in 1:simNb){
+for(sim in 21:simNb){
 for (sc in scenarios){
   k = sc$k
   l = sc$l
@@ -14,7 +14,7 @@ for (sc in scenarios){
     
     r = rList[m]
      
-    for(methode in c("Oracle")){
+    for(methode in c(methodes,methodes_add,methode_oracle)){
   
     setwd(SimDir)
     
@@ -131,7 +131,7 @@ for (sc in scenarios){
   
   for (r in rList[1:13]){
     
-    for (methode in c("Oracle")){
+    for (methode in c(methodes,methodes_add,methode_oracle) ){
       
       erreurFrob <- 0
       FP <- 0

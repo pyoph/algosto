@@ -8,6 +8,11 @@ SimDir = "~/work/dataSimuls"
 resAlgo = "~/work/res1e2runsallscen"
 criteres = "~/work/criteres"
 figures = "~/work/figures"
+smd_data_dir = "~/work/smd_data_dir"
+res_SMD = "~/work/res_SMD"
+crit_SMD = "~/work/criteres_SMD"
+fig_SMD = "~/work/fig_SMD/"
+
 
 
 #rm(list=ls())

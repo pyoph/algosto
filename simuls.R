@@ -1,6 +1,6 @@
 #######################Génération des données#############################
 for (sim in 1:1e2){
-  for(sc in scen_strong_conc){
+  for(sc in scen_conc){
     
     k = sc$k
     l = sc$l

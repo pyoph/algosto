@@ -157,35 +157,54 @@ for (sc in scenarios){
       if(methode %in% methodes){
         
       erreursSigmaPlot[m,j] = crit_mean$erreurFrob
+      #faux_negatifsPlot[m,j] = crit_mean$FN
+      faux_positifsPlot[m,j] = crit_mean$FP
+      #ariPlot[m,j] = crit_mean$ARI
+      #propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag
+      
+      if( r!= 0){
+      aucPlot[m,j] = crit_mean$AUC
       faux_negatifsPlot[m,j] = crit_mean$FN
       faux_positifsPlot[m,j] = crit_mean$FP
       ariPlot[m,j] = crit_mean$ARI
       propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag
       
-      if( r!= 0){
-      aucPlot[m,j] = crit_mean$AUC}
+      }
+      
       }
       
       
       if (methode %in% c("Oracle")){
-        faux_negatifsPlot[m,j] = crit_mean$FN
-        faux_positifsPlot[m,j] = crit_mean$FP
-        ariPlot[m,j] = crit_mean$ARI
+                faux_positifsPlot[m,j] = crit_mean$FP
         if(r != 0){
+        
         aucPlot[m,j] = crit_mean$AUC
+        faux_negatifsPlot[m,j] = crit_mean$FN
         propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag
+        ariPlot[m,j] = crit_mean$ARI
         
         }
       }
       
       if (methode %in% methodes_add){
+        if(r == 0){
+          faux_positifsPlot[m,j] = crit_mean$FP
+          
+        }
+        if(r != 0){
         faux_negatifsPlot[m,j] = crit_mean$FN
         faux_positifsPlot[m,j] = crit_mean$FP
         ariPlot[m,j] = crit_mean$ARI
-        propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag
+        propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag}
       }
       
     } }
+  
+  
+  
+  
+  
+  #########################Graphiques##########################
   
   
   setwd(figures)
@@ -205,33 +224,27 @@ for (sc in scenarios){
        xaxt="n", yaxt="n",
        xlab="", ylab="")
   
-  points(rList[1:13],
-         erreursSigmaPlot[,idxFrob[1]],
-         pch=pchs[idxFrob[1]],
-         col=cols_alpha[idxFrob[1]],
-         cex=1.1)
-  
   for(i in idxFrob[-1]){
     lines(rList[1:13],
           erreursSigmaPlot[,i],
           lwd=2,
           col=cols_alpha[i])
-    
-    points(rList[1:13],
-           erreursSigmaPlot[,i],
-           pch=pchs[i],
-           col=cols_alpha[i],
-           cex=1.1)
   }
   
-  axis(1,at=rList[1:13],las=1,cex.axis=1.8)
+  axis(1,
+       at=rList[1:13],
+       las=1,
+       cex.axis=1.8)
+  
   axis(2,
        at=10^seq(-1,2),
        labels=parse(text=paste0("10^",-1:2)),
        las=1,
        cex.axis=1.8)
+  
   box()
-  ###########################Faux négatifs#######################
+  
+    ###########################Faux négatifs#######################
   
   plot(rList[2:13],
        faux_negatifsPlot[2:13,1]/((rList[2:13]/100)*n)*100,
@@ -306,7 +319,6 @@ for (sc in scenarios){
   box()
   
   ##############################AUC############################
-  
   plot(rList[2:13],
        aucPlot[2:13,idxAUC[1]],
        type="l",
@@ -319,30 +331,26 @@ for (sc in scenarios){
        ylab="")
   
   
-  points(rList[2:13],
-         aucPlot[2:13,idxAUC[1]],
-         pch=pchs[idxAUC[1]],
-         col=cols_alpha[idxAUC[1]],
-         cex=1.1)
-  
   for(i in idxAUC[-1]){
     
     lines(rList[2:13],
           aucPlot[2:13,i],
           lwd=2,
           col=cols_alpha[i])
-    
-    points(rList[2:13],
-           aucPlot[2:13,i],
-           pch=pchs[i],
-           col=cols_alpha[i],
-           cex=1.1)
   }
   
-  axis(1,at=rList[2:13],las=1,cex.axis=1.8)
-  axis(2,at=seq(0,1,0.1),las=1,cex.axis=1.8)
-  box()
   
+  axis(1,
+       at=rList[2:13],
+       las=1,
+       cex.axis=1.8)
+  
+  axis(2,
+       at=seq(0,1,0.1),
+       las=1,
+       cex.axis=1.8)
+  
+  box()
   #############################ARI#####################################
   # 
   # plot(rList[1:13],
@@ -431,6 +439,93 @@ for (sc in scenarios){
   }
     
   
+####################################Temps de calculs#########
+
+temps_calcul = array(0,dim = c(length(methodes_frob),simNb))
+
+####Extraction
+
+k = 0; l = 0.5;rho1 = 0.3; r= 2
+
+
+for(sim in 1:simNb){
+for (m in seq_along(methodes_frob)){
+  
+  methode = methodes_frob[m]
+  
+  setwd(resAlgo)
+  fitFile <- paste0(
+    "Fit-", methode,
+    "-d", d,
+    "-n", n,
+    "-k", k,
+    "-l", l,
+    "-rho", rho1,
+    "-r", r,
+    "-sim", sim,
+    ".RData"
+  )
+  
+  load(fitFile)
+  
+  temps_calcul[m,sim] = resultats$temps[3]
+  
+  
+  
+}}
+
+
+setwd(figures)
+
+
+noms <- c(
+  "Sample",
+  "Onl",
+  "Strm",
+  "Offl",
+  "OGK",
+  "MCD"
+)
+
+cols <- c(
+  "darkgreen", # Sample naive
+  "blue",      # Online
+  "red",       # Streaming
+  "orange",    # Offline
+  "brown",     # OGK
+  "black"      # MCD
+)
+
+
+file <- paste0("temps_calcul-n", n, "-d", d,".pdf")
+
+pdf(file, width = 25, height = 4)
+
+
+boxplot(
+  t(temps_calcul),
+  names = noms,
+  col = cols,
+  las = 2,
+  log = "y",
+  ylab = "",
+  xlab = "",
+  main = "",
+  yaxt = "n",
+  cex.axis = 1.3
+)
+
+axis(
+  2,
+  at = 10^seq(-2, 2),
+  labels = parse(text = paste0("10^", -2:2)),
+  las = 1,
+  cex.axis = 1.3
+)
+
+
+dev.off()
+
 #######################Trajectoires##########################
 
 methodes_online_quantile = c(
@@ -459,6 +554,20 @@ methodes_online = c(
   methodes_online_rescale,
   methodes_online_raw
 )
+
+
+# Symboles associés aux familles
+pch_methodes = rep(NA,length(methodes_online))
+
+# Correction quantile : étoile
+pch_methodes[methodes_online %in% methodes_online_quantile] = 8
+
+# Rescale distance : carré
+pch_methodes[methodes_online %in% methodes_online_rescale] = 15
+
+# Raw : triangle
+pch_methodes[methodes_online %in% methodes_online_raw] = 17
+
 
 
 # Symboles associés aux familles

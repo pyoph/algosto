@@ -726,6 +726,20 @@ compute_criteres = function(variance,outlab,distances,labels_vrais,SigmaTrue = S
 }
 
 
+save_add_method <- function(dist, fitFile, type) {
+  
+  cutoff <- calcule_cutoff(dist, type = type)
+  
+    
+  resultats <- list(
+    outliers_labels = as.integer(dist > cutoff)
+  )
+  
+  save(resultats, file = fitFile)
+}
+
+
+
 
 
 

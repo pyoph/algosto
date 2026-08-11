@@ -1,4 +1,4 @@
-smd_data_dir = "~/smd_data_dir"
+smd_data_dir = "~/work/smd_data_dir"
 
 url <- "https://github.com/NetManAIOps/OmniAnomaly/archive/refs/heads/master.zip"
 dest <- "smd.zip"
@@ -49,7 +49,7 @@ nbmachines = length(smd_data)
 
 keep_columns_ok = list()
 
-for(j in 20:nbmachines){
+for(j in 19:19){
   
   cat("\n====================\n")
   cat("Machine", j, "\n")
