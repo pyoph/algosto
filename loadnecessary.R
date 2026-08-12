@@ -1,4 +1,3 @@
-
 ######################################
 ################Packages nécessaires#####
 #########################################
@@ -14,14 +13,14 @@ for (p in packages) {
 #
 setwd("~/work/algosto")
 # 
-# packages_us = c("STARRS_1.0.tar.gz")
+ packages_us = c("STARRS_1.0.tar.gz")
 # 
-# for (p in packages_us) {
-#   if (!requireNamespace(p, quietly = TRUE)) {
-#     install.packages(p)
-#   }
-#   
-# }
+ for (p in packages_us) {
+   if (!requireNamespace(p, quietly = TRUE)) {
+     install.packages(p)
+   }
+   
+ }
 
 library(Rcpp)
 library(Gmedian)
@@ -507,13 +506,13 @@ sequential_clean_columns <- function(Z, begin = 1, cut = NULL) {
     ok <- tryCatch({
       
       onlineRobustVariance(
-        Z[, begin:k, drop = FALSE],
+        Z[1:23000, begin:k, drop = FALSE],
         computeOutliers = TRUE,
         cutoff = cut,
         cutinit = 0.6,
-        nDataInit = 1e3,
+        nDataInit = 500,
         c_m = 1,
-        batch = 3
+        batch = 10
       )
       
       TRUE
@@ -542,13 +541,13 @@ sequential_clean_columns <- function(Z, begin = 1, cut = NULL) {
     ok <- tryCatch({
       # 
       onlineRobustVariance(
-        Z[, c(keep, j), drop = FALSE],
+        Z[1:23000, c(keep, j), drop = FALSE],
         computeOutliers = TRUE,
         cutoff = cut,
         cutinit = 0.6,
-        nDataInit = 1e3,
+        nDataInit = 500,
         c_m = 1,
-        batch = 3
+        batch = 10
       )
       TRUE
       
@@ -563,11 +562,241 @@ sequential_clean_columns <- function(Z, begin = 1, cut = NULL) {
   }
   
   return(list(
-    Z = Z[, keep, drop = FALSE],
+    Z = Z[1:23000, keep, drop = FALSE],
     keep = keep
   ))
 }
 
+sequential_clean_columns_new <- function(
+    Z,
+    begin = 1,
+    cut = 0.95,
+    n_rows = 23000,
+    cutinit = 0.6,
+    nDataInit = 500,
+    c_m = 1,
+    batch = 10
+) {
+  
+  Z <- as.matrix(Z)
+  p <- ncol(Z)
+  n <- min(nrow(Z), n_rows)
+  
+  cat("Nombre de lignes utilisées :", n, "\n")
+  cat("Nombre total de colonnes :", p, "\n")
+  
+  
+  # ============================================================
+  # Test d'un ensemble de colonnes
+  # ============================================================
+  
+  test_columns <- function(cols) {
+    
+    Xtest <- Z[1:n, cols, drop = FALSE]
+    
+    # Vérification des valeurs non finies
+    if (any(!is.finite(Xtest))) {
+      cat(
+        "   ✘ Valeurs non finies dans les colonnes :",
+        paste(
+          cols[sapply(seq_along(cols), function(i)
+            any(!is.finite(Xtest[, i])))],
+          collapse = ", "
+        ),
+        "\n"
+      )
+      return(FALSE)
+    }
+    
+    # batch adapté au nombre de variables
+    batch_current <- min(batch, ncol(Xtest))
+    
+    tryCatch(
+      {
+        onlineRobustVariance(
+          Xtest,
+          computeOutliers = TRUE,
+          cutoff = cut,
+          cutinit = cutinit,
+          nDataInit = nDataInit,
+          c_m = c_m,
+          batch = batch_current
+        )
+        
+        TRUE
+      },
+      error = function(e) {
+        cat(
+          "   ✘ ERREUR :",
+          conditionMessage(e),
+          "\n"
+        )
+        FALSE
+      }
+    )
+  }
+  
+  
+  # ============================================================
+  # Essai à partir d'une colonne donnée
+  # ============================================================
+  
+  run_selection <- function(start_col) {
+    
+    cat(
+      "\n====================================\n",
+      "Tentative à partir de la colonne",
+      start_col,
+      "\n====================================\n"
+    )
+    
+    if (start_col >= p) {
+      return(NULL)
+    }
+    
+    start <- NULL
+    
+    # Recherche du premier préfixe stable :
+    # start_col:(start_col+1), start_col:(start_col+2), ...
+    
+    for (k in seq.int(start_col + 1, p)) {
+      
+      cat(
+        "\nTest du préfixe :",
+        start_col, ":", k,
+        "\n"
+      )
+      
+      if (test_columns(seq.int(start_col, k))) {
+        
+        start <- k
+        
+        cat(
+          "✔ Préfixe stable trouvé :",
+          start_col, ":", k,
+          "\n"
+        )
+        
+        break
+      }
+    }
+    
+    if (is.null(start)) {
+      return(NULL)
+    }
+    
+    keep <- seq.int(start_col, start)
+    
+    
+    # ==========================================================
+    # Ajout séquentiel des colonnes restantes
+    # ==========================================================
+    
+    if (start < p) {
+      
+      for (j in seq.int(start + 1, p)) {
+        
+        cat(
+          "\nTest colonne :", j,
+          "\nColonnes conservées :",
+          paste(keep, collapse = ", "),
+          "\n"
+        )
+        
+        if (test_columns(c(keep, j))) {
+          
+          keep <- c(keep, j)
+          
+          cat(
+            "✔ Colonne", j, "ajoutée\n"
+          )
+          
+        } else {
+          
+          cat(
+            "✘ Colonne", j, "rejetée\n"
+          )
+        }
+      }
+    }
+    
+    return(keep)
+  }
+  
+  
+  # ============================================================
+  # Recherche séquentielle du point de départ
+  # 1 -> 2 -> 3 -> ... -> p-1
+  # ============================================================
+  
+  keep <- NULL
+  
+  for (start_col in seq.int(begin, p - 1)) {
+    
+    keep <- run_selection(start_col)
+    
+    if (!is.null(keep)) {
+      
+      cat(
+        "\n====================================\n",
+        "✔ Sélection réussie à partir de la colonne",
+        start_col,
+        "\n====================================\n"
+      )
+      
+      break
+    }
+    
+    cat(
+      "\nÉchec à partir de la colonne",
+      start_col,
+      "-> tentative suivante.\n"
+    )
+  }
+  
+  
+  # ============================================================
+  # Aucun départ valide
+  # ============================================================
+  
+  if (is.null(keep)) {
+    stop(
+      "Aucun préfixe stable trouvé en essayant successivement ",
+      "les colonnes ", begin, " à ", p - 1, "."
+    )
+  }
+  
+  
+  # ============================================================
+  # Résultat final
+  # ============================================================
+  
+  cat(
+    "\n====================================\n",
+    "RESULTAT FINAL\n",
+    "====================================\n"
+  )
+  
+  cat(
+    "Colonnes conservées :",
+    paste(keep, collapse = ", "),
+    "\n"
+  )
+  
+  cat(
+    "Nombre de colonnes conservées :",
+    length(keep),
+    "\n"
+  )
+  
+  return(
+    list(
+      Z = Z[1:n, keep, drop = FALSE],
+      keep = keep,
+      start = min(keep)
+    )
+  )
+}
 
 KL <- function(parms1, parms2){
   invSigma2 <- solve(parms2$Sigma)
