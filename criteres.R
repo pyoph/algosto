@@ -2,7 +2,7 @@
 methodes = c("SampleNaiveQuantonlinecorr","OnlineUsQuantonlinecorr","StreamingUsonlineQuantcorr","OfflinewithQuantcorr","OGK","MCD")
 methodes_add  = c("SampleNaivewithoutonlinequantilecorr","OnlineUswithoutQuantonlinecorr","StreamingUswithoutQuantonlinecorr","OfflineUswithoutQuantcorr","OracleRD","OracleQC","SampleRaw","OnlRaw","StrmRaw","OfflRaw","OGKRD","OGKQC","MCDRD","MCDQC")
 methode_oracle = c("Oracle")
-for(sim in 21:simNb){
+for(sim in 1:simNb){
 for (sc in scenarios){
   k = sc$k
   l = sc$l

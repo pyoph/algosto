@@ -1,5 +1,5 @@
-Ninit = 1e3
-
+Ninit = 500
+batch = 10
 
 for(j in 1:nbmachines){
   setwd(smd_data_dir)
@@ -7,24 +7,24 @@ for(j in 1:nbmachines){
   
   data_smd_mach = paste0("data_machine-",j,".RData")
   
-
+  
   load(data_smd_mach)  
   
   print(data_smd_mach)
   
   setwd(res_SMD)
   
-
+  
   
   #Calcul taille de batch
   
-  possible_div <- which(nrow(Z) %% 1:nrow(Z) == 0)
+  #possible_div <- which(nrow(Z) %% 1:nrow(Z) == 0)
   
   # ne garder que ceux <= ncol(Z)
-  possible_div <- possible_div[possible_div <= ncol(Z)]
+  #possible_div <- possible_div[possible_div <= ncol(Z)]
   
   # prendre le plus grand
-  batchStrm <- max(possible_div)
+  #batchStrm <- max(possible_div)
   
   ###########Extraction moyenne et covariance sans outliers
   
@@ -33,17 +33,17 @@ for(j in 1:nbmachines){
   Sigma_trueCov = cov(Z_clean)
   
   invSigmaTrueCov = inv_safe(Sigma_trueCov)
+  # 
+  # Sigma_trueMCD = covMcd(Z_clean)$cov
+  # 
+  # Sigma_trueOGK = covOGK(Z_clean,sigmamu = scaleTau2)$cov
+  # 
+  # Sigma_trueOffl = offlineRobustVariance(Z_clean)$variance
+  # 
+  # Sigma_trueOnl = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 1e3,c_m=1,batch = 1)$variance
+  # 
+  # Sigma_trueStrm = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 1e3,c_m=1,batch = batch)$variance
   
-  Sigma_trueMCD = covMcd(Z_clean)$cov
-  
-  Sigma_trueOGK = covOGK(Z_clean,sigmamu = scaleTau2)$cov
-  
-  Sigma_trueOffl = offlineRobustVariance(Z_clean)$variance
-  
-  Sigma_trueOnl = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 1e3,c_m=1,batch = 1)$variance
-  
-  Sigma_trueStrm = onlineRobustVariance(Z_clean,computeOutliers = TRUE,cutoff=0.95,cutinit=0.6,nDataInit = 1e3,c_m=1,batch = batchStrm)$variance
-
   ################Distances without outliers and with sample mean and covariance without ourliers####################
   
   distrue = rep(0,nrow(Z))
@@ -59,11 +59,11 @@ for(j in 1:nbmachines){
     distrueClean[s] = t(Z_clean[s,] - meanTrueCov)%*%invSigmaTrueCov%*%(Z_clean[s,] - meanTrueCov)
   }
   
-
-######################################################algorithms#######################  
+  
+  ######################################################algorithms#######################  
   
   
-#################Oracle################  
+  #################Oracle################  
   
   fitFile <- paste0('Fit-Oracle-',"machine-",j,".RData")
   
@@ -75,7 +75,7 @@ for(j in 1:nbmachines){
       outloracle[s] = 1
     }
   }
-
+  
   resultats <- list(
     variance = Sigma_trueCov,
     variance_ref = Sigma_trueCov,
@@ -104,19 +104,19 @@ for(j in 1:nbmachines){
   
   save_add_method(distrue, fitFile, "quantcorr")
   
-##########################Cov online####################
-
+  ##########################Cov online####################
+  
   temps_covonline = system.time(
     {
-      resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = 1e3,cutoffquant =  .95,c_m = 2)
+      resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = Ninit,cutoffquant =  .95,c_m = 2)
     })
-
+  
   fitFile <- paste0('Fit-SampleNaiveQuantonlinecorr-',"machine-",j,".RData")
   
   #########Calcul sans les outliers#####################
-
-  resSamplecov_ref = SampleCovOnline(Z[labels == 0,],quantcutoff = TRUE,nDataInit = 1e3,cutoffquant =  .95,c_m = 1)
-
+  
+  resSamplecov_ref = SampleCovOnline(Z[labels == 0,],quantcutoff = TRUE,nDataInit = Ninit,cutoffquant =  .95,c_m = 1)
+  
   fitFile <- paste0('Fit-SampleNaiveQuantonlinecorr-',"machine-",j,".RData")
   
   
@@ -145,7 +145,7 @@ for(j in 1:nbmachines){
   
   
   fitFile <- paste0('Fit-SampleRaw-',"machine-",j,".RData")
-                    
+  
   
   save_add_method(dist, fitFile, "raw")
   
@@ -158,7 +158,7 @@ for(j in 1:nbmachines){
   distmcd = rep(0,nrow(Z))
   
   outlmcd = rep(0,nrow(Z))
-
+  
   resmcd_ref = covMcd(Z[labels == 0,])     
   
   temps_mcd = system.time(
@@ -174,7 +174,7 @@ for(j in 1:nbmachines){
         
         if (distmcd[s] > qchisq(.95,df = ncol(Z))){
           outlmcd[i] = 1
-          }
+        }
       }
     }
   )
@@ -213,59 +213,59 @@ for(j in 1:nbmachines){
     }
   )
   
-   fitFile <- paste0('Fit-Offline-withonlinequantile-machine-',j,".RData")
-   
-   res0ref <- offlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutinit=0.6,c_m=1,cutoff_method = "quantile")
-   
-   resultats <- list(
-     variance = res0$variance,
-     variance_ref = res0ref$variance,
-     outliers_labels = res0$outlier_labels,
-     distances = res0$distances,
-     temps = temps_offline
-   )
-   
-   save(resultats,file = fitFile)
-
-   dist = resultats$distances
-   
-   fitFile <- paste0(
-     'Fit-OfflineUswithoutQuantcorr-',"machine-",j,".RData"
-   )
-   
-   temps_offline <- system.time({
-     
-     resOffline <- offlineRobustVariance(
-       Z,
-       computeOutliers = TRUE,cutoff_method = "Chi-square"
-     )
-     
-   })
-   
-   resultats <- list(
-     #variance = resOffline$variance,
-     outliers_labels = resOffline$outlier_labels
-     #distances = resOffline$distances,
-     #temps = temps_offline
-   )
-   
-   save(resultats, file = fitFile)
-   
-   
-   
-   
-   fitFile <- paste0(
-     'Fit-OfflRaw-',"machine-",j,".RData"
-   )
-   
-   
-   save_add_method(dist, fitFile, "raw")
-   
-   
-   
-   
-   
-   
+  fitFile <- paste0('Fit-Offline-withonlinequantile-machine-',j,".RData")
+  
+  res0ref <- offlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutinit=0.6,c_m=1,cutoff_method = "quantile")
+  
+  resultats <- list(
+    variance = res0$variance,
+    variance_ref = res0ref$variance,
+    outliers_labels = res0$outlier_labels,
+    distances = res0$distances,
+    temps = temps_offline
+  )
+  
+  save(resultats,file = fitFile)
+  
+  dist = resultats$distances
+  
+  fitFile <- paste0(
+    'Fit-OfflineUswithoutQuantcorr-',"machine-",j,".RData"
+  )
+  
+  temps_offline <- system.time({
+    
+    resOffline <- offlineRobustVariance(
+      Z,
+      computeOutliers = TRUE,cutoff_method = "Chi-square"
+    )
+    
+  })
+  
+  resultats <- list(
+    #variance = resOffline$variance,
+    outliers_labels = resOffline$outlier_labels
+    #distances = resOffline$distances,
+    #temps = temps_offline
+  )
+  
+  save(resultats, file = fitFile)
+  
+  
+  
+  
+  fitFile <- paste0(
+    'Fit-OfflRaw-',"machine-",j,".RData"
+  )
+  
+  
+  save_add_method(dist, fitFile, "raw")
+  
+  
+  
+  
+  
+  
   
   ###############################################Online us#########################################
   
@@ -275,12 +275,12 @@ for(j in 1:nbmachines){
   temps_online = system.time(
     {
       
-      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1)
-
+      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m= 1)
+      
       
     })
-
-  resUsOnlineref= onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1)
+  
+  resUsOnlineref= onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m= 1)
   
   
   resultats <- list(
@@ -329,7 +329,7 @@ for(j in 1:nbmachines){
   
   
   fitFile <- paste0('Fit-OnlRaw-',"machine-",j,".RData"
-                    )
+  )
   
   
   save_add_method(dist, fitFile, "raw")
@@ -345,11 +345,11 @@ for(j in 1:nbmachines){
   temps_streaming = system.time(
     {
       
-      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m= 1,batch = batchStrm)
+      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m= 1,batch = batch)
       
     })
   
-  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = 1e3,c_m = 1,batch = batchStrm)
+  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m = 1,batch = batch)
   
   resultats <- list(
     variance = resStrm$variance,
@@ -366,7 +366,7 @@ for(j in 1:nbmachines){
   dist = resultats$distances
   
   fitFile <- paste0('Fit-StreamingUswithoutQuantonlinecorr-',"machine-",j,".RData"
-                    )
+  )
   
   
   temps_streaming <- system.time({
@@ -396,18 +396,18 @@ for(j in 1:nbmachines){
   #######OGK#####################
   
   fitFile <- paste0('Fit-OGK-machine-',j,".RData")
-   
-      
+  
+  
   outlogk = rep(0,nrow(Z))
   
   temps_ogk = system.time(
     {
       resogk = covOGK(Z, sigmamu = scaleTau2)
       for (s in 1:nrow(Z)){
-      if(resogk$distances[s] > qchisq(.95,df = ncol(Z))){outlogk[s] = 1}    }
+        if(resogk$distances[s] > qchisq(.95,df = ncol(Z))){outlogk[s] = 1}    }
     }
   )
-
+  
   resogkref = covOGK(Z[labels == 0,], sigmamu = scaleTau2)
   
   resultats <- list(
@@ -426,7 +426,7 @@ for(j in 1:nbmachines){
   
   fitFile <- paste0(
     'Fit-OGKRD-', "machine-",j,".RData"
-  
+    
   )
   
   save_add_method(
@@ -441,7 +441,7 @@ for(j in 1:nbmachines){
   save_add_method(
     dist , fitFile, "quantcorr")
   
-
+  
   
   
 }

@@ -445,7 +445,7 @@ temps_calcul = array(0,dim = c(length(methodes_frob),simNb))
 
 ####Extraction
 
-k = 0; l = 0.5;rho1 = 0.3; r= 2
+k = 0; l = 0.01;rho1 = 0.3; r= 2
 
 
 for(sim in 1:simNb){
@@ -479,7 +479,7 @@ setwd(figures)
 
 
 noms <- c(
-  "Sample",
+  "Sple",
   "Onl",
   "Strm",
   "Offl",
@@ -499,7 +499,7 @@ cols <- c(
 
 file <- paste0("temps_calcul-n", n, "-d", d,".pdf")
 
-pdf(file, width = 25, height = 4)
+pdf(file, width = 25, height = 7)
 
 
 boxplot(
@@ -512,7 +512,8 @@ boxplot(
   xlab = "",
   main = "",
   yaxt = "n",
-  cex.axis = 1.3
+  ylim = c(10^-2, 10^2),
+  cex.axis = 2.5
 )
 
 axis(
@@ -520,7 +521,7 @@ axis(
   at = 10^seq(-2, 2),
   labels = parse(text = paste0("10^", -2:2)),
   las = 1,
-  cex.axis = 1.3
+  cex.axis = 1.9
 )
 
 
