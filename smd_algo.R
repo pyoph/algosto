@@ -1,7 +1,9 @@
-Ninit = 500
+Ninit = 1e3
 batch = 10
+cm = 
+  cutinit = .9
 
-for(j in 1:nbmachines){
+for(j in nbmachines:nbmachines){
   setwd(smd_data_dir)
   
   
@@ -15,16 +17,7 @@ for(j in 1:nbmachines){
   setwd(res_SMD)
   
   
-  
-  #Calcul taille de batch
-  
-  #possible_div <- which(nrow(Z) %% 1:nrow(Z) == 0)
-  
-  # ne garder que ceux <= ncol(Z)
-  #possible_div <- possible_div[possible_div <= ncol(Z)]
-  
-  # prendre le plus grand
-  #batchStrm <- max(possible_div)
+  Z_clean = Z[labels == 0,]
   
   ###########Extraction moyenne et covariance sans outliers
   
@@ -108,14 +101,14 @@ for(j in 1:nbmachines){
   
   temps_covonline = system.time(
     {
-      resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = Ninit,cutoffquant =  .95,c_m = 2)
+      resSamplecov= SampleCovOnline(Z,quantcutoff = TRUE,nDataInit = Ninit,cutoffquant =  .95,c_m = cm)
     })
   
   fitFile <- paste0('Fit-SampleNaiveQuantonlinecorr-',"machine-",j,".RData")
   
   #########Calcul sans les outliers#####################
   
-  resSamplecov_ref = SampleCovOnline(Z[labels == 0,],quantcutoff = TRUE,nDataInit = Ninit,cutoffquant =  .95,c_m = 1)
+  resSamplecov_ref = SampleCovOnline(Z[labels == 0,],quantcutoff = TRUE,nDataInit = Ninit,cutoffquant =  .95,c_m = cm)
   
   fitFile <- paste0('Fit-SampleNaiveQuantonlinecorr-',"machine-",j,".RData")
   
@@ -209,13 +202,13 @@ for(j in 1:nbmachines){
   
   temps_offline = system.time(
     {
-      res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutinit=0.6,c_m=1)
+      res0 <- offlineRobustVariance(Z,computeOutliers = TRUE,cutoff_method = "quantile",cutinit = cutinit,c_m=cm)
     }
   )
   
   fitFile <- paste0('Fit-Offline-withonlinequantile-machine-',j,".RData")
   
-  res0ref <- offlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutinit=0.6,c_m=1,cutoff_method = "quantile")
+  res0ref <- offlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutinit=0.6,c_m=2,cutoff_method = "quantile")
   
   resultats <- list(
     variance = res0$variance,
@@ -275,12 +268,12 @@ for(j in 1:nbmachines){
   temps_online = system.time(
     {
       
-      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m= 1)
+      resUsOnline= onlineRobustVariance(Z,computeOutliers = TRUE,batch = 1,cutoff=.95,cutoff_method = "quantile",cutinit=cutinit,nDataInit = Ninit,c_m= 15)
       
       
     })
   
-  resUsOnlineref= onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m= 1)
+  resUsOnlineref= onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,batch = 1,cutoff=.95,cutinit=cutinit,nDataInit = Ninit,c_m= cm)
   
   
   resultats <- list(
@@ -345,11 +338,11 @@ for(j in 1:nbmachines){
   temps_streaming = system.time(
     {
       
-      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m= 1,batch = batch)
+      resStrm <- onlineRobustVariance(Z,computeOutliers = TRUE,cutoff=.95,nDataInit = Ninit,cutinit = cutinit,c_m= cm,batch = batch,cutoff_method = "quantile")
       
     })
   
-  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=0.6,nDataInit = Ninit,c_m = 1,batch = batch)
+  resStrmref <- onlineRobustVariance(Z[labels == 0,],computeOutliers = TRUE,cutoff=.95,cutinit=cutinit,nDataInit = Ninit,c_m = cm,batch = batch)
   
   resultats <- list(
     variance = resStrm$variance,
