@@ -658,8 +658,166 @@ save_add_method <- function(dist, fitFile, type) {
   save(resultats, file = fitFile)
 }
 
-
-
+classify_adaptive_cm <- function(
+    distances,
+    labels,
+    c_m_init = 2,
+    cutinit = 0.95,
+    cutoff = 0.95,
+    cm_min = 0.01,
+    cm_max = 200,
+    gamma = 5,
+    nDataInit = 1000,
+    recent_window = 100,
+    target_fp = 0.05,
+    cm_up = 1.05,
+    cm_down = 0.99
+) {
+  
+  n <- length(distances)
+  
+  if (length(labels) != n) {
+    stop("distances et labels doivent avoir la même longueur.")
+  }
+  
+  if (n <= nDataInit) {
+    stop("nDataInit doit être inférieur à length(distances).")
+  }
+  
+  # ----------------------------------------------------------
+  # Initialisation
+  # ----------------------------------------------------------
+  
+  cutoffcor <- quantile(
+    distances[1:nDataInit],
+    probs = cutinit,
+    na.rm = TRUE,
+    names = FALSE
+  )
+  
+  c_med <- median(
+    distances[1:nDataInit],
+    na.rm = TRUE
+  )
+  
+  cm <- c_m_init
+  
+  outlier_labels <- integer(n)
+  
+  cutoff_history <- rep(NA_real_, n)
+  cm_history <- rep(NA_real_, n)
+  fp_history <- rep(NA_real_, n)
+  
+  cutoff_history[1:nDataInit] <- cutoffcor
+  cm_history[1:nDataInit] <- cm
+  
+  # ----------------------------------------------------------
+  # Boucle séquentielle
+  # ----------------------------------------------------------
+  
+  for (i in (nDataInit + 1):n) {
+    
+    S <- distances[i]
+    
+    cutoff_previous <- cutoffcor
+    
+    # --------------------------------------------------------
+    # Mise à jour du seuil
+    # --------------------------------------------------------
+    
+    indicator <- as.numeric(S <= cutoffcor)
+    
+    cutoffcor <- cutoffcor -
+      cm *
+      c_med *
+      i^(-0.75) *
+      (indicator - cutoff)
+    
+    # --------------------------------------------------------
+    # Classification
+    # --------------------------------------------------------
+    
+    outlier_labels[i] <- as.integer(
+      S > cutoffcor
+    )
+    
+    # --------------------------------------------------------
+    # Drift du seuil
+    # --------------------------------------------------------
+    
+    threshold_drift <- abs(
+      cutoffcor - cutoff_previous
+    ) /
+      max(abs(cutoff_previous), 1e-12)
+    
+    # --------------------------------------------------------
+    # FP récent calculé UNIQUEMENT sur les vrais normaux
+    # --------------------------------------------------------
+    
+    idx_start <- max(
+      nDataInit + 1,
+      i - recent_window + 1
+    )
+    
+    idx <- idx_start:i
+    
+    normal_idx <- idx[
+      !is.na(labels[idx]) &
+        labels[idx] == 0
+    ]
+    
+    if (length(normal_idx) > 0) {
+      
+      recent_fp <- mean(
+        outlier_labels[normal_idx] == 1
+      )
+      
+      fp_history[i] <- recent_fp
+      
+      # Trop de FP -> adaptation plus forte
+      if (recent_fp > target_fp) {
+        cm <- cm * cm_up
+      }
+      
+      # FP suffisamment faible -> ralentissement
+      else {
+        cm <- cm * cm_down
+      }
+      
+    } else {
+      recent_fp <- NA_real_
+    }
+    
+    # --------------------------------------------------------
+    # Adaptation selon le drift
+    # --------------------------------------------------------
+    
+    cm <- cm * exp(
+      -gamma * threshold_drift
+    )
+    
+    # --------------------------------------------------------
+    # Bornes
+    # --------------------------------------------------------
+    
+    cm <- min(
+      max(cm, cm_min),
+      cm_max
+    )
+    
+    cutoff_history[i] <- cutoffcor
+    cm_history[i] <- cm
+  }
+  
+  list(
+    outlier_labels = outlier_labels,
+    cutoff_history = cutoff_history,
+    cm_history = cm_history,
+    fp_history = fp_history,
+    cutoff_final = cutoffcor,
+    cm_final = cm
+  )
+}
 
 
 

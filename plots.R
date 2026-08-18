@@ -1,7 +1,9 @@
 scenarios = c(scenarios_1_param,scenarios_2_param)
 #############################Final Frobenius norm error, false positives, false negatives V2##############################
 
-# Pour la norme de Frobenius
+# Pour la norme de Frobeniusmethodes = c("SampleNaiveQuantonlinecorr","OnlineUsQuantonlinecorr","StreamingUsonlineQuantcorr","OfflinewithQuantcorr","OGK","MCD")
+methodes_add  = c("SampleNaivewithoutonlinequantilecorr","OnlineUswithoutQuantonlinecorr","StreamingUswithoutQuantonlinecorr","OfflineUswithoutQuantcorr","OracleRD","OracleQC","SampleRaw","OnlRaw","StrmRaw","OfflRaw","OGKRD","OGKQC","MCDRD","MCDQC")
+methode_oracle = c("Oracle")
 methodes_frob <- c(
   "SampleNaiveQuantonlinecorr",
   "OnlineUsQuantonlinecorr",
