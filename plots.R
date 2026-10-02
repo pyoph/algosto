@@ -1,1070 +1,381 @@
-scenarios = c(scenarios_1_param,scenarios_2_param)
-#############################Final Frobenius norm error, false positives, false negatives V2##############################
+################################################################
+# 0) CONFIGURATION GLOBALE
+################################################################
 
-# Pour la norme de Frobeniusmethodes = c("SampleNaiveQuantonlinecorr","OnlineUsQuantonlinecorr","StreamingUsonlineQuantcorr","OfflinewithQuantcorr","OGK","MCD")
-methodes_add  = c("SampleNaivewithoutonlinequantilecorr","OnlineUswithoutQuantonlinecorr","StreamingUswithoutQuantonlinecorr","OfflineUswithoutQuantcorr","OracleRD","OracleQC","SampleRaw","OnlRaw","StrmRaw","OfflRaw","OGKRD","OGKQC","MCDRD","MCDQC")
-methode_oracle = c("Oracle")
-methodes_frob <- c(
-  "SampleNaiveQuantonlinecorr",
-  "OnlineUsQuantonlinecorr",
-  "StreamingUsonlineQuantcorr",
-  "OfflinewithQuantcorr",
-  "OGK",
-  "MCD"
+scenarios  <- c(scenarios_1_param)     # ou c(scenarios_1_param, scenarios_2_param)
+lwd_value  <- 4
+alpha_val  <- 0.8             # transparence globale
+
+################################################################
+# 1) MÉTADONNÉES DES MÉTHODES (courbes)
+################################################################
+
+
+methods_df <- data.frame(
+  method = c(
+    # --- QC ---
+    "SampleNaiveQuantonlinecorr",
+    "OnlineUsQuantonlinecorr",
+    "StreamingUsonlineQuantcorr",
+    "OfflinewithQuantcorr",
+    "OGKQC",
+    "MCDQC",
+    "OracleQC",
+    # --- RD ---
+    "SampleNaivewithoutonlinequantilecorr",
+    "OnlineUswithoutQuantonlinecorr",
+    "StreamingUswithoutQuantonlinecorr",
+    "OfflineUswithoutQuantcorr",
+    "OGKRD",
+    "MCDRD",
+    "OracleRD",
+    # --- Raw ---
+    "SampleRaw",
+    "OnlRaw",
+    "StrmRaw",
+    "OfflRaw",
+    "OGK",
+    "MCD",
+    "Oracle"
+  ),
+  group = c(rep("QC",  7),
+            rep("RD",  7),
+            rep("Raw", 7)),
+  color = c(
+    # QC
+    "darkgreen", "pink", "red", "purple4", "brown", "black", "blue",
+    # RD
+    "darkgreen", "pink", "red", "purple4", "brown", "black", "blue",
+    # Raw
+    "darkgreen", "pink", "red", "purple4", "brown", "black", "blue"
+  ),
+  pch = c(
+    rep(8,  7),   # QC  : étoiles
+    rep(15, 7),   # RD  : carrés
+    rep(17, 7)    # Raw : triangles
+  ),
+  lty = c(
+    # QC
+    3, 2, 1, 4, 5, 1, 1,
+    # RD
+    3, 2, 1, 4, 5, 1, 1,
+    # Raw
+    3, 2, 1, 4, 5, 1, 1
+  ),
+  stringsAsFactors = FALSE
 )
 
+methods_df$color_alpha <- adjustcolor(methods_df$color, alpha.f = alpha_val)
+rownames(methods_df)  <- methods_df$method
 
-# Méthodes QC
-methodes_qc <- c(
-  "SampleNaiveQuantonlinecorr",
-  "OnlineUsQuantonlinecorr",
-  "StreamingUsonlineQuantcorr",
-  "OfflinewithQuantcorr",
-  "OGKQC",
-  "MCDQC",
-  "OracleQC"
-)
+# Sous-ensembles (construits depuis le df, plus de vecteurs parallèles)
+subset_frob <- methods_df[methods_df$method %in%
+                            methods_df$method[methods_df$group %in% c("QC", "RD", "Raw")][1:6], ]
+# plus lisible : liste explicite
+methods_frob <- c("SampleNaiveQuantonlinecorr",
+                  "OnlineUsQuantonlinecorr",
+                  "StreamingUsonlineQuantcorr",
+                  "OfflinewithQuantcorr",
+                  "OGK", "MCD")
 
-# Méthodes RD
-methodes_rd <- c(
-  "SampleNaivewithoutonlinequantilecorr",
-  "OnlineUswithoutQuantonlinecorr",
-  "StreamingUswithoutQuantonlinecorr",
-  "OfflineUswithoutQuantcorr",
-  "OGKRD",
-  "MCDRD",
-  "OracleRD"
-)
+methodList <- c("SampleNaivewithoutonlinequantilecorr",
+                "OfflineUswithoutQuantcorr",
+                "OnlineUswithoutQuantonlinecorr",
+                "StreamingUswithoutQuantonlinecorr",
+                "MCD", "OGK", "Oracle")
 
-# Méthodes Raw
-methodes_raw <- c(
-  "SampleRaw",
-  "OnlRaw",
-  "StrmRaw",
-  "OfflRaw",
-  "OGK",
-  "MCD",
-  "Oracle"
-)
+methods_auc <- c(methods_frob, "Oracle")
 
+subset_frob <- methods_df[methods_df$method %in% methods_frob, ]
+subset_list <- methods_df[methods_df$method %in% methodList,  ]
+subset_auc  <- methods_df[methods_df$method %in% methods_auc, ]
 
-# Ordre global des méthodes
-all_methodes <- c(
-  methodes_qc,
-  methodes_rd,
-  methodes_raw
-)
+# Vérifications
+stopifnot(nrow(methods_df) == 21,
+          !any(is.na(methods_df$color)),
+          !any(is.na(methods_df$pch)))
 
+# Index (dans all_methodes = methods_df$method) des sous-ensembles :
+idxFrob <- which(methods_df$method %in% methods_frob)
+idxList <- which(methods_df$method %in% methodList)
+idxAUC  <- which(methods_df$method %in% methods_auc)
+all_methodes <- methods_df$method
 
-## Méthodes à afficher
-idxFrob <- which(all_methodes %in% methodes_frob)
-idxAll  <- seq_along(all_methodes)
-idxAUC  <- which(all_methodes %in% methodes_frob)
+################################################################
+# 2) FONCTION DE TRAÇAGE GÉNÉRIQUE
+################################################################
+# trace une courbe pour chaque ligne de `subset_df`
+# mat       : matrice [nR x length(all_methodes)]
+# x         : abscisses
+# subset_df : sous-ensemble de methods_df
+# ylim, log, ... : passés à plot()
 
-
-
-#############################
-# Couleurs
-#############################
-
-cols <- c(
-  # QC
-  "darkgreen", # SampleNaiveQuantonlinecorr
-  "blue",      # OnlineUsQuantonlinecorr
-  "red",       # StreamingUsonlineQuantcorr
-  "orange",    # OfflinewithQuantcorr
-  "brown",     # OGKQC
-  "black",     # MCDQC
-  "purple4",   # OracleQC
+plot_lines <- function(mat, x, subset_df, rows = seq_along(x),
+                       ylim, log = "", xaxt = "n", yaxt = "n",
+                       xlab = "", ylab = "", lwd = lwd_value) {
   
-  # RD
-  "darkgreen", # SampleNaivewithoutonlinequantilecorr
-  "blue",      # OnlineUswithoutQuantonlinecorr
-  "red",       # StreamingUswithoutQuantonlinecorr
-  "orange",    # OfflineUswithoutQuantcorr
-  "brown",     # OGKRD
-  "black",     # MCDRD
-  "purple4",   # OracleRD
+  idx <- which(methods_df$method %in% subset_df$method)
+  y   <- mat[rows, idx[1]]
   
-  # Raw
-  "darkgreen", # SampleRaw
-  "blue",      # OnlRaw
-  "red",       # StrmRaw
-  "orange",    # OfflRaw
-  "brown",     # OGK
-  "black",     # MCD
-  "purple4"    # Oracle
-)
-
-
-
-#############################
-# Symboles
-#############################
-
-pchs <- rep(NA, length(all_methodes))
-
-
-# Étoiles : correction quantile (QC)
-pchs[all_methodes %in% methodes_qc] <- 8
-
-
-# Carrés : rescale distances (RD)
-pchs[all_methodes %in% methodes_rd] <- 15
-
-
-# Triangles : Raw
-pchs[all_methodes %in% methodes_raw] <- 17
-
-
-
-# Transparence
-cols_alpha <- adjustcolor(cols, alpha.f = 0.65)
-for (sc in scenarios){
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
+  plot(x, y,
+       type = "l", log = log, lwd = lwd,
+       col  = methods_df$color_alpha[idx[1]],
+       lty  = methods_df$lty[idx[1]],
+       ylim = ylim, xaxt = xaxt, yaxt = yaxt,
+       xlab = xlab, ylab = ylab)
   
-  erreursSigmaPlot = array(0,dim = c(length(rList[1:13]),length(all_methodes)))
-  faux_positifsPlot= array(0,dim = c(length(rList[1:13]),length(all_methodes)))
-  faux_negatifsPlot= array(0,dim = c(length(rList[1:13]),length(all_methodes)))
-  ariPlot = array(0,dim = c(length(rList[1:13]),length(all_methodes)))
-  aucPlot = array(0,dim = c(length(rList[1:13]),length(all_methodes)))
-  propHorsDiagPlot = array(0,dim = c(length(rList[1:13]),length(all_methodes)))
+  if (length(idx) > 1) {
+    for (k in 2:length(idx)) {
+      i <- idx[k]
+      lines(x, mat[rows, i],
+            lwd = lwd,
+            col = methods_df$color_alpha[i],
+            lty = methods_df$lty[i])
+    }
+  }
+}
+################################################################
+# 3) BOUCLE SUR LES SCÉNARIOS
+################################################################
+
+for (sc in scenarios) {
   
+  k    <- sc$k
+  l    <- sc$l
+  rho1 <- sc$rho1
+  
+  nR <- length(rList[1:13])
+  
+  erreursSigmaPlot  <- array(0, dim = c(nR, length(all_methodes)))
+  faux_positifsPlot <- array(0, dim = c(nR, length(all_methodes)))
+  faux_negatifsPlot <- array(0, dim = c(nR, length(all_methodes)))
+  ariPlot           <- array(0, dim = c(nR, length(all_methodes)))
+  aucPlot           <- array(0, dim = c(nR, length(all_methodes)))
+  propHorsDiagPlot  <- array(0, dim = c(nR, length(all_methodes)))
+  
+  for (m in seq_along(rList[1:13])) {
+    r <- rList[m]
     
-  for (m in seq_along(rList[1:13])){
-    
-    r = rList[m]
-    
-    
-    for(j in seq_along(all_methodes)){
-      
-      
-      methode = all_methodes[j]
+    for (j in seq_along(all_methodes)) {
+      methode <- all_methodes[j]
       
       setwd(criteres)
-      
-      critFile <- paste0(
-        'Crit-',methode, "-d",d,
-        '-n', n,
-        '-k', k,
-        '-l', l,
-        '-rho', rho1,
-        '-r', r,
-        '-mean',
-        ".RData"
-      )
+      critFile <- paste0('Crit-', methode, "-d", d, '-n', n,
+                         '-k', k, '-l', l, '-rho', rho1,
+                         '-r', r, '-mean', ".RData")
       load(critFile)
-      if(methode %in% methodes){
-        
-      erreursSigmaPlot[m,j] = crit_mean$erreurFrob
-      #faux_negatifsPlot[m,j] = crit_mean$FN
-      faux_positifsPlot[m,j] = crit_mean$FP
-      #ariPlot[m,j] = crit_mean$ARI
-      #propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag
       
-      if( r!= 0){
-      aucPlot[m,j] = crit_mean$AUC
-      faux_negatifsPlot[m,j] = crit_mean$FN
-      faux_positifsPlot[m,j] = crit_mean$FP
-      ariPlot[m,j] = crit_mean$ARI
-      propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag
-      
-      }
-      
-      }
-      
-      
-      if (methode %in% c("Oracle")){
-                faux_positifsPlot[m,j] = crit_mean$FP
-        if(r != 0){
-        
-        aucPlot[m,j] = crit_mean$AUC
-        faux_negatifsPlot[m,j] = crit_mean$FN
-        propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag
-        ariPlot[m,j] = crit_mean$ARI
-        
+      if (methode %in% methods_frob) {
+        erreursSigmaPlot[m, j]  <- crit_mean$erreurFrob
+        faux_positifsPlot[m, j] <- crit_mean$FP
+        if (r != 0) {
+          aucPlot[m, j]           <- crit_mean$AUC
+          faux_negatifsPlot[m, j] <- crit_mean$FN
+          ariPlot[m, j]           <- crit_mean$ARI
+          propHorsDiagPlot[m, j]  <- crit_mean$prop_hors_diag
         }
       }
       
-      if (methode %in% methodes_add){
-        if(r == 0){
-          faux_positifsPlot[m,j] = crit_mean$FP
-          
+      if (methode == "Oracle") {
+        faux_positifsPlot[m, j] <- crit_mean$FP
+        if (r != 0) {
+          aucPlot[m, j]           <- crit_mean$AUC
+          faux_negatifsPlot[m, j] <- crit_mean$FN
+          propHorsDiagPlot[m, j]  <- crit_mean$prop_hors_diag
+          ariPlot[m, j]           <- crit_mean$ARI
         }
-        if(r != 0){
-        faux_negatifsPlot[m,j] = crit_mean$FN
-        faux_positifsPlot[m,j] = crit_mean$FP
-        ariPlot[m,j] = crit_mean$ARI
-        propHorsDiagPlot[m,j] = crit_mean$prop_hors_diag}
       }
       
-    } }
+      if (methode %in% c(methods_frob,
+                         "SampleNaivewithoutonlinequantilecorr",
+                         "OnlineUswithoutQuantonlinecorr",
+                         "StreamingUswithoutQuantonlinecorr",
+                         "OfflineUswithoutQuantcorr",
+                         "SampleRaw", "OnlRaw", "StrmRaw", "OfflRaw")) {
+        if (r == 0) {
+          faux_positifsPlot[m, j] <- crit_mean$FP
+        } else {
+          faux_negatifsPlot[m, j] <- crit_mean$FN
+          faux_positifsPlot[m, j] <- crit_mean$FP
+          ariPlot[m, j]           <- crit_mean$ARI
+          propHorsDiagPlot[m, j]  <- crit_mean$prop_hors_diag
+        }
+      }
+    }
+  }
   
-  
-  
-  
-  
-  #########################Graphiques##########################
-  
-  
+  ##############################################################
+  # GRAPHIQUES
+  ##############################################################
   setwd(figures)
-  
-  file <- paste0("scen-k", k, "-l", l, "-rho1", rho1,".pdf")
+  file <- paste0("scen-k", k, "-l", l, "-rho1", rho1, ".pdf")
   
   pdf(file, width = 25, height = 4)
   par(mfrow = c(1,5), mar = c(4,4,2,1))
-  ############################Erreur norme de Frobenius#################
-  plot(rList[1:13],
-       erreursSigmaPlot[,idxFrob[1]],
-       type="l",
-       log="y",
-       lwd=2,
-       col=cols_alpha[idxFrob[1]],
-       ylim=c(1e-1,1e2),
-       xaxt="n", yaxt="n",
-       xlab="", ylab="")
   
-  for(i in idxFrob[-1]){
-    lines(rList[1:13],
-          erreursSigmaPlot[,i],
-          lwd=2,
-          col=cols_alpha[i])
-  }
-  
-  axis(1,
-       at=rList[1:13],
-       las=1,
-       cex.axis=1.8)
-  
-  axis(2,
-       at=10^seq(-1,2),
-       labels=parse(text=paste0("10^",-1:2)),
-       las=1,
-       cex.axis=1.8)
-  
+  # 1) Frobenius -------------------------------------------------
+  plot_lines(erreursSigmaPlot, rList[1:13], subset_frob,
+             ylim = c(1e-1, 1e2), log = "y")
+  axis(1, at = rList[1:13], las = 1, cex.axis = 1.8)
+  axis(2, at = 10^seq(-1,2),
+       labels = parse(text = paste0("10^", -1:2)),
+       las = 1, cex.axis = 1.8)
   box()
   
-    ###########################Faux négatifs#######################
-  
-  plot(rList[2:13],
-       faux_negatifsPlot[2:13,1]/((rList[2:13]/100)*n)*100,
-       type="l",
-       lwd=2,
-       col=cols_alpha[1],
-       ylim=c(0,100),
-       xaxt="n",
-       yaxt="n",
-       xlab="",
-       ylab="")
-  
-  points(rList[2:13],
-         faux_negatifsPlot[2:13,1]/((rList[2:13]/100)*n)*100,
-         pch=pchs[1],
-         col=cols_alpha[1],
-         cex=1.1)
-  
-  for(i in idxAll[-1]){
-    
-    lines(rList[2:13],
-          faux_negatifsPlot[2:13,i]/((rList[2:13]/100)*n)*100,
-          lwd=2,
-          col=cols_alpha[i])
-    
-    points(rList[2:13],
-           faux_negatifsPlot[2:13,i]/((rList[2:13]/100)*n)*100,
-           pch=pchs[i],
-           col=cols_alpha[i],
-           cex=1.1)
+  # 2) FN --------------------------------------------------------
+  fn_rate <- function(i) faux_negatifsPlot[2:13, i] /
+    ((rList[2:13]/100) * n) * 100
+  plot(rList[2:13], fn_rate(idxFrob[1]), type = "l", lwd = lwd_value,
+       col = methods_df$color_alpha[idxFrob[1]],
+       lty = methods_df$lty[idxFrob[1]],
+       ylim = c(0,100), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+  for (k2 in 2:length(idxFrob)) {
+    i <- idxFrob[k2]
+    lines(rList[2:13], fn_rate(i), lwd = lwd_value,
+          col = methods_df$color_alpha[i],
+          lty = methods_df$lty[i])
   }
-  
-  axis(1,at=rList[-1],las=1,cex.axis=1.8)
-  axis(2,las=1,cex.axis=1.8)
-  box()  
-
-  
-  #######################Faux positifs###########################
-  plot(rList[1:13],
-       faux_positifsPlot[1:13,1]/((1-rList[1:13]/100)*n)*100,
-       type="l",
-       lwd=2,
-       col=cols_alpha[1],
-       ylim=c(0,20),
-       xaxt="n",
-       yaxt="n",
-       xlab="",
-       ylab="")
-  
-  points(rList[1:13],
-         faux_positifsPlot[1:13,1]/((1-rList[1:13]/100)*n)*100,
-         pch=pchs[1],
-         col=cols_alpha[1],
-         cex=1.1)
-  
-  for(i in idxAll[-1]){
-    
-    lines(rList[1:13],
-          faux_positifsPlot[1:13,i]/((1-rList[1:13]/100)*n)*100,
-          lwd=2,
-          col=cols_alpha[i])
-    
-    points(rList[1:13],
-           faux_positifsPlot[1:13,i]/((1-rList[1:13]/100)*n)*100,
-           pch=pchs[i],
-           col=cols_alpha[i],
-           cex=1.1)
-  }
-  
-  axis(1,at=rList[1:13],las=1,cex.axis=1.8)
-  axis(2,las=1,cex.axis=1.8)
+  axis(1, at = rList[-1], las = 1, cex.axis = 1.8)
+  axis(2, las = 1, cex.axis = 1.8)
   box()
   
-  ##############################AUC############################
-  plot(rList[2:13],
-       aucPlot[2:13,idxAUC[1]],
-       type="l",
-       lwd=2,
-       col=cols_alpha[idxAUC[1]],
-       ylim=c(0,1),
-       xaxt="n",
-       yaxt="n",
-       xlab="",
-       ylab="")
-  
-  
-  for(i in idxAUC[-1]){
-    
-    lines(rList[2:13],
-          aucPlot[2:13,i],
-          lwd=2,
-          col=cols_alpha[i])
+  # 3) FP --------------------------------------------------------
+  fp_rate <- function(i) faux_positifsPlot[1:13, i] /
+    ((1 - rList[1:13]/100) * n) * 100
+  plot(rList[1:13], fp_rate(idxList[1]), type = "l", lwd = lwd_value,
+       col = methods_df$color_alpha[idxList[1]],
+       lty = methods_df$lty[idxList[1]],
+       ylim = c(0,20), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+  for (k2 in 2:length(idxList)) {
+    i <- idxList[k2]
+    lines(rList[1:13], fp_rate(i), lwd = lwd_value,
+          col = methods_df$color_alpha[i],
+          lty = methods_df$lty[i])
   }
-  
-  
-  axis(1,
-       at=rList[2:13],
-       las=1,
-       cex.axis=1.8)
-  
-  axis(2,
-       at=seq(0,1,0.1),
-       las=1,
-       cex.axis=1.8)
-  
+  axis(1, at = rList[1:13], las = 1, cex.axis = 1.8)
+  axis(2, las = 1, cex.axis = 1.8)
   box()
-  #############################ARI#####################################
-  # 
-  # plot(rList[1:13],
-  #      ariPlot[1:13,1],
-  #      type="l",
-  #      lwd=2,
-  #      col=cols_alpha[1],
-  #      ylim=c(-1,1),
-  #      xaxt="n",
-  #      yaxt="n",
-  #      xlab="",
-  #      ylab="")
-  # 
-  # points(rList[1:13],
-  #        ariPlot[1:13,1],
-  #        pch=pchs[1],
-  #        col=cols_alpha[1],
-  #        cex=1.1)
-  # 
-  # for(i in idxAll[-1]){
-  #   
-  #   lines(rList[1:13],
-  #         ariPlot[1:13,i],
-  #         lwd=2,
-  #         col=cols_alpha[i])
-  #   
-  #   points(rList[1:13],
-  #          ariPlot[1:13,i],
-  #          pch=pchs[i],
-  #          col=cols_alpha[i],
-  #          cex=1.1)
-  # }
-  # 
-  # axis(1,at=rList[1:13],las=1,cex.axis=1.8)
-  # axis(2,at=seq(-1,1,0.1),las=1,cex.axis=1.8)
-  # box()    
-  ##########################Accuracy####################
   
+  # 4) AUC -------------------------------------------------------
+  plot_lines(aucPlot, rList[2:13], subset_auc, ylim = c(0,1))
+  axis(1, at = rList[-1], las = 1, cex.axis = 1.8)
+  axis(2, las = 1, cex.axis = 1.8)
+  box()
   
-  plot(rList[2:13],
-       1 - propHorsDiagPlot[2:13,1],
-       type = "l",
-       lwd = 2,
-       col = cols_alpha[1],
-       ylim = c(0,1),
-       xaxt = "n",
-       yaxt = "n",
-       xlab = "",
-       ylab = "")
-  
-  points(rList[2:13],
-         1 - propHorsDiagPlot[2:13,1],
-         pch = pchs[1],
-         col = cols_alpha[1],
-         cex = 1.1)
-  
-  for(i in idxAll[-1]){
-    
-    lines(rList[2:13],
-          1 - propHorsDiagPlot[2:13,i],
-          lwd = 2,
-          col = cols_alpha[i])
-    
-    points(rList[2:13],
-           1 - propHorsDiagPlot[2:13,i],
-           pch = pchs[i],
-           col = cols_alpha[i],
-           cex = 1.1)
+  # 5) Prop hors diag --------------------------------------------
+  prop_inv <- 1 - propHorsDiagPlot
+  plot(rList[2:13], prop_inv[2:13, idxList[1]],
+       type = "l", lwd = lwd_value,
+       col = methods_df$color_alpha[idxList[1]],
+       lty = methods_df$lty[idxList[1]],
+       ylim = c(0,1), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+  for (k2 in 2:length(idxList)) {
+    i <- idxList[k2]
+    lines(rList[2:13], prop_inv[2:13, i],
+          lwd = lwd_value,
+          col = methods_df$color_alpha[i],
+          lty = methods_df$lty[i])
   }
-  
-  axis(1,
-       at = rList[2:13],
-       las = 1,
-       cex.axis = 1.8)
-  
-  axis(2,
-       las = 1,
-       cex.axis = 1.8)
-  
+  axis(1, at = rList[1:13], las = 1, cex.axis = 1.8)
+  axis(2, las = 1, cex.axis = 1.8)
   box()
   
   dev.off()
-  
-  
-  
-  }
-    
-  
-####################################Temps de calculs#########
-
-temps_calcul = array(0,dim = c(length(methodes_frob),simNb))
-
-####Extraction
-
-k = 0; l = 0.01;rho1 = 0.3; r= 2
+}
 
 
-for(sim in 1:simNb){
-for (m in seq_along(methodes_frob)){
-  
-  methode = methodes_frob[m]
-  
-  setwd(resAlgo)
-  fitFile <- paste0(
-    "Fit-", methode,
-    "-d", d,
-    "-n", n,
-    "-k", k,
-    "-l", l,
-    "-rho", rho1,
-    "-r", r,
-    "-sim", sim,
-    ".RData"
-  )
-  
-  load(fitFile)
-  
-  temps_calcul[m,sim] = resultats$temps[3]
-  
-  
-  
-}}
+################################################################
+# 4) BOXPLOTS RELIÉS
+################################################################
 
+# --------------------------------------------------------------
+# Métadonnées boxplot (6 méthodes)
+# --------------------------------------------------------------
+box_df <- data.frame(
+  method = c("Sample naive", "Online", "Streaming",
+             "Offline", "OGK", "MCD"),
+  color  = c("darkgreen", "pink", "red",
+             "purple", "brown", "black"),
+  stringsAsFactors = FALSE
+)
+box_df$color_alpha <- adjustcolor(box_df$color, alpha.f = alpha_val)
+box_df$pch         <- 20
 
+# --------------------------------------------------------------
+# Préparation des données (matrices 100 x 6)
+# --------------------------------------------------------------
+list_configs <- list(
+  t(temps_calcul_n1e4_d10),
+  t(temps_calcul_n1e4_d100),
+  t(temps_calcul_n1e5_d10)
+)
+for (m in seq_along(list_configs)) {
+  colnames(list_configs[[m]]) <- box_df$method
+}
+
+labels_config <- c(
+  expression(n == 10^4 * "," ~ d == 10),
+  expression(n == 10^4 * "," ~ d == 100),
+  expression(n == 10^5 * "," ~ d == 10)
+)
+
+n_meth     <- nrow(box_df)
+method_gap <- 0.65
+group_gap  <- 2.5
+
+positions <- c(
+  1:6  * method_gap,
+  1:6  * method_gap + 6 * method_gap + group_gap,
+  1:6  * method_gap + 2 * (6 * method_gap + group_gap)
+)
+
+group_centers <- c(mean(positions[1:6]),
+                   mean(positions[7:12]),
+                   mean(positions[13:18]))
+
+pow_min <- -1; pow_max <- 2
+y_ticks <- 10^(pow_min:pow_max)
+
+# --------------------------------------------------------------
+# PDF
+# --------------------------------------------------------------
 setwd(figures)
+cairo_pdf("boxplot_temps_calcul.pdf", width = 12, height = 6)
 
+par(mar = c(5,5,2,1), mgp = c(2.5, 0.8, 0))
 
-noms <- c(
-  "Sple",
-  "Onl",
-  "Strm",
-  "Offl",
-  "OGK",
-  "MCD"
-)
+# Groupe 1 (initialise le repère)
+boxplot(list_configs[[1]],
+        at = positions[1:6], col = box_df$color,
+        names = rep("", 6), xaxt = "n", yaxt = "n",
+        ylab = "", xlim = c(min(positions)-1, max(positions)+1),
+        ylim = c(10^pow_min, 10^pow_max), log = "y",
+        outline = FALSE, boxwex = 1.5)
 
-cols <- c(
-  "darkgreen", # Sample naive
-  "blue",      # Online
-  "red",       # Streaming
-  "orange",    # Offline
-  "brown",     # OGK
-  "black"      # MCD
-)
+# Groupes 2 et 3
+for (g in 2:3) {
+  boxplot(list_configs[[g]],
+          at = positions[((g-1)*6+1):(g*6)],
+          col = box_df$color, names = rep("", 6),
+          xaxt = "n", yaxt = "n", add = TRUE,
+          outline = FALSE, boxwex = 1.5)
+}
 
+# Lignes reliant les médianes
+for (m in 1:n_meth) {
+  medians <- sapply(list_configs, function(cfg) median(cfg[, m], na.rm = TRUE))
+  x_m     <- positions[c(m, m + 6, m + 12)]
+  
+  lines(x_m, medians, col = box_df$color[m], lwd = 2, lty = 1)
+  points(x_m, medians, pch = box_df$pch[m],
+         col = box_df$color[m], cex = 1.4)
+}
 
-file <- paste0("temps_calcul-n", n, "-d", d,".pdf")
-
-pdf(file, width = 25, height = 7)
-
-
-boxplot(
-  t(temps_calcul),
-  names = noms,
-  col = cols,
-  las = 2,
-  log = "y",
-  ylab = "",
-  xlab = "",
-  main = "",
-  yaxt = "n",
-  ylim = c(10^-2, 10^2),
-  cex.axis = 2.5
-)
-
-axis(
-  2,
-  at = 10^seq(-2, 2),
-  labels = parse(text = paste0("10^", -2:2)),
-  las = 1,
-  cex.axis = 1.9
-)
-
+axis(1, at = group_centers, labels = labels_config,
+     tick = FALSE, cex.axis = 1.1)
+axis(2, at = y_ticks,
+     labels = parse(text = paste0("10^", pow_min:pow_max)),
+     las = 1, cex.axis = 1.1)
+box()
 
 dev.off()
-
-#######################Trajectoires##########################
-
-methodes_online_quantile = c(
-  "SampleNaiveQuantonlinecorr",
-  "OnlineUsQuantonlinecorr",
-  "StreamingUsonlineQuantcorr",
-  "OracleQC"
-)
-
-methodes_online_rescale = c(
-  "SampleNaivewithoutonlinequantilecorr",
-  "OnlineUswithoutQuantonlinecorr",
-  "StreamingUswithoutQuantonlinecorr",
-  "OracleRD"
-)
-
-methodes_online_raw = c(
-  "SampleRaw",
-  "OnlRaw",
-  "StrmRaw",
-  "Oracle"
-)
-
-methodes_online = c(
-  methodes_online_quantile,
-  methodes_online_rescale,
-  methodes_online_raw
-)
-
-
-# Symboles associés aux familles
-pch_methodes = rep(NA,length(methodes_online))
-
-# Correction quantile : étoile
-pch_methodes[methodes_online %in% methodes_online_quantile] = 8
-
-# Rescale distance : carré
-pch_methodes[methodes_online %in% methodes_online_rescale] = 15
-
-# Raw : triangle
-pch_methodes[methodes_online %in% methodes_online_raw] = 17
-
-
-
-# Symboles associés aux familles
-pch_methodes = rep(NA,length(methodes_online))
-
-pch_methodes[methodes_online %in% methodes_online_quantile] = 15 # carré
-pch_methodes[methodes_online %in% methodes_online_rescale]  = 8  # étoile
-pch_methodes[methodes_online %in% methodes_online_raw]      = 17 # triangle
-
-
-
-for(sc in scenarios){
-  
-  k = sc$k
-  l = sc$l
-  rho1 = sc$rho1
-  
-  
-  for(j in seq_along(rList[1:13])){
-    
-    r = rList[j]
-    
-    outlabTraj = array(0, dim = c(n,length(methodes_online)))
-    
-    
-    setwd(SimDir)
-    
-    dataFile = paste0(
-      'SimData-d', d,
-      '-n', n,
-      '-k', k,
-      '-l', l,
-      '-rho', rho1,
-      '-r', r,
-      "-sim", sim,
-      ".RData"
-    )
-    
-    print(dataFile)
-    
-    load(dataFile)
-    
-    
-    Z_clean = data$Z[data$labelsVrais == 0,]
-    
-    if(r != 0){
-      Z_cont = data$Z[data$labelsVrais == 1,]
-    }
-    
-    labels = data$labelsVrais
-    
-    
-    nboutliers = r/100*n
-    nbinliers = (1-r/100)*n
-    
-    
-    distinliers = rep(0,nbinliers)
-    
-    invSigma0 = solve(Sigma0)
-    
-    
-    for(m in 1:nbinliers){
-      
-      distinliers[m] =
-        t(Z_clean[m,]-mu0)%*%
-        invSigma0%*%
-        (Z_clean[m,]-mu0)
-      
-    }
-    
-    
-    if(r != 0){
-      
-      distoutliers = rep(0,nboutliers)
-      
-      for(m in 1:nboutliers){
-        
-        distoutliers[m] =
-          t(Z_cont[m,]-mu0)%*%
-          invSigma0%*%
-          (Z_cont[m,]-mu0)
-        
-      }
-    }
-    
-    
-    # ==========================
-    # Chargement des résultats
-    # ==========================
-    
-    for(s in seq_along(methodes_online)){
-      
-      methode = methodes_online[s]
-      
-      setwd(resAlgo)
-      
-      fitFile = paste0(
-        'Fit-',methode,
-        '-d', d,
-        '-n', n,
-        '-k', k,
-        '-l', l,
-        '-rho', rho1,
-        '-r', r,
-        '-sim', sim,
-        ".RData"
-      )
-      
-      load(fitFile)
-      
-      outlabTraj[,s] = resultats$outliers_labels
-      
-      if(methode == "StreamingUsonlineQuantcorr"){
-        diststrmqc = resultats$distances
-      }
-      
-    }
-    
-    
-    
-    # ==========================
-    # Taux
-    # ==========================
-    
-    rates_samplecov_wcorr =
-      compute_rates(outlabTraj[,1],labels)
-    
-    rates_online_corr =
-      compute_rates(outlabTraj[,2],labels)
-    
-    rates_strm_corr =
-      compute_rates(outlabTraj[,3],labels)
-    
-    rates_oracle_qc =
-      compute_rates(outlabTraj[,4],labels)
-    
-    
-    rates_samplecov_wocorr =
-      compute_rates(outlabTraj[,5],labels)
-    
-    rates_online_wocorr =
-      compute_rates(outlabTraj[,6],labels)
-    
-    rates_strm_wocorr =
-      compute_rates(outlabTraj[,7],labels)
-    
-    rates_oracle_rd =
-      compute_rates(outlabTraj[,8],labels)
-    
-    
-    rates_samplecov_raw =
-      compute_rates(outlabTraj[,9],labels)
-    
-    rates_online_raw =
-      compute_rates(outlabTraj[,10],labels)
-    
-    rates_strm_raw =
-      compute_rates(outlabTraj[,11],labels)
-    
-    rates_oracle =
-      compute_rates(outlabTraj[,12],labels)
-    
-    
-    
-    # ==========================
-    # Figure
-    # ==========================
-    
-    setwd(figures)
-    
-    nom_fichier = paste0(
-      "trajectories_k-",k,
-      "-l",l,
-      "-rho1",rho1,
-      "-r",r,
-      "-sim",sim,
-      ".pdf"
-    )
-    
-    
-    pdf(nom_fichier,width=14,height=10)
-    
-    par(mfrow=c(2,2),
-        mar=c(4,4,2,1))
-    
-    
-    x_vals = 1:length(rates_strm_corr$FN_rate)
-    
-    # =====================================================
-    # BOXplot distances
-    # =====================================================
-    
-    if(r != 0){
-      
-      boxplot(distinliers,
-              distoutliers,
-              
-              col=c("lightblue","darkred","red"),
-              names=c("Inliers","Outliers"),
-              ylim=c(0,30),
-              main="Mahalanobis distances",
-              ylab="Distance",
-              cex.axis=1.5,
-              cex.lab=1.5,
-              cex.main=1.5)
-      
-    }
-    
-    
-    # =====================================================
-    # FALSE NEGATIVE RATE
-    # =====================================================
-    
-    plot(x_vals,
-         rates_strm_corr$FN_rate*100,
-         type="l",
-         lwd=2,
-         col="red",
-         ylim=c(0,100),
-         xlab="",
-         ylab="",
-         main="False Negative Rate",
-         xaxt="n",
-         yaxt="n")
-    
-    
-    # fonction pour ajouter les symboles espacés
-    add_points <- function(x,y,pch,col){
-      id <- seq(1,length(x),by=1000)
-      points(x[id],
-             y[id],
-             pch=pch,
-             col=col,
-             cex=1.3)
-    }
-    
-    
-    
-    # Quantile
-    
-    lines(x_vals,
-          rates_samplecov_wcorr$FN_rate*100,
-          col="darkgreen",
-          lwd=2)
-    add_points(x_vals,
-               rates_samplecov_wcorr$FN_rate*100,
-               pch_methodes[1],
-               "darkgreen")
-    
-    
-    lines(x_vals,
-          rates_online_corr$FN_rate*100,
-          col="blue",
-          lwd=2)
-    add_points(x_vals,
-               rates_online_corr$FN_rate*100,
-               pch_methodes[2],
-               "blue")
-    
-    
-    lines(x_vals,
-          rates_strm_corr$FN_rate*100,
-          col="red",
-          lwd=2)
-    add_points(x_vals,
-               rates_strm_corr$FN_rate*100,
-               pch_methodes[3],
-               "red")
-    
-    
-    lines(x_vals,
-          rates_oracle_qc$FN_rate*100,
-          col="purple",
-          lwd=2)
-    add_points(x_vals,
-               rates_oracle_qc$FN_rate*100,
-               pch_methodes[4],
-               "purple")
-    
-    
-    
-    # Rescale
-    
-    lines(x_vals,
-          rates_samplecov_wocorr$FN_rate*100,
-          col="darkgreen",
-          lwd=2)
-    add_points(x_vals,
-               rates_samplecov_wocorr$FN_rate*100,
-               pch_methodes[5],
-               "darkgreen")
-    
-    
-    lines(x_vals,
-          rates_online_wocorr$FN_rate*100,
-          col="blue",
-          lwd=2)
-    add_points(x_vals,
-               rates_online_wocorr$FN_rate*100,
-               pch_methodes[6],
-               "blue")
-    
-    
-    lines(x_vals,
-          rates_strm_wocorr$FN_rate*100,
-          col="red",
-          lwd=2)
-    add_points(x_vals,
-               rates_strm_wocorr$FN_rate*100,
-               pch_methodes[7],
-               "red")
-    
-    
-    lines(x_vals,
-          rates_oracle_rd$FN_rate*100,
-          col="purple",
-          lwd=2)
-    add_points(x_vals,
-               rates_oracle_rd$FN_rate*100,
-               pch_methodes[8],
-               "purple")
-    
-    
-    
-    # Raw
-    
-    lines(x_vals,
-          rates_samplecov_raw$FN_rate*100,
-          col="darkgreen",
-          lwd=2)
-    add_points(x_vals,
-               rates_samplecov_raw$FN_rate*100,
-               pch_methodes[9],
-               "darkgreen")
-    
-    
-    lines(x_vals,
-          rates_online_raw$FN_rate*100,
-          col="blue",
-          lwd=2)
-    add_points(x_vals,
-               rates_online_raw$FN_rate*100,
-               pch_methodes[10],
-               "blue")
-    
-    
-    lines(x_vals,
-          rates_strm_raw$FN_rate*100,
-          col="red",
-          lwd=2)
-    add_points(x_vals,
-               rates_strm_raw$FN_rate*100,
-               pch_methodes[11],
-               "red")
-    
-    
-    lines(x_vals,
-          rates_oracle$FN_rate*100,
-          col="purple",
-          lwd=2)
-    add_points(x_vals,
-               rates_oracle$FN_rate*100,
-               pch_methodes[12],
-               "purple")
-    
-    
-    
-    axis(2,
-         las=1,
-         cex.axis=1.8)
-    
-    axis(1,
-         at=seq(1000,max(x_vals),by=1000),
-         las=1,
-         cex.axis=1.8)
-    
-    box()
-    # =====================================================
-    # FALSE POSITIVE RATE
-    # =====================================================
-    
-    plot(x_vals,
-         rates_strm_corr$FP_rate*100,
-         type="l",
-         lwd=2,
-         col="red",
-         ylim=c(0,20),
-         xlab="",
-         ylab="",
-         main="False Positive Rate",
-         xaxt="n",
-         yaxt="n")
-    
-    
-    # fonction pour ajouter les points espacés
-    add_points <- function(x,y,pch,col){
-      id <- seq(1,length(x),by=1000)
-      points(x[id],
-             y[id],
-             pch=pch,
-             col=col,
-             cex=1.3)
-    }
-    
-    
-    # Quantile
-    lines(x_vals,rates_samplecov_wcorr$FP_rate*100,
-          col="darkgreen",lwd=2)
-    add_points(x_vals,rates_samplecov_wcorr$FP_rate*100,
-               pch_methodes[1],"darkgreen")
-    
-    
-    lines(x_vals,rates_online_corr$FP_rate*100,
-          col="blue",lwd=2)
-    add_points(x_vals,rates_online_corr$FP_rate*100,
-               pch_methodes[2],"blue")
-    
-    
-    lines(x_vals,rates_strm_corr$FP_rate*100,
-          col="red",lwd=2)
-    add_points(x_vals,rates_strm_corr$FP_rate*100,
-               pch_methodes[3],"red")
-    
-    
-    lines(x_vals,rates_oracle_qc$FP_rate*100,
-          col="purple",lwd=2)
-    add_points(x_vals,rates_oracle_qc$FP_rate*100,
-               pch_methodes[4],"purple")
-    
-    
-    
-    # Rescale
-    lines(x_vals,rates_samplecov_wocorr$FP_rate*100,
-          col="darkgreen",lwd=2)
-    add_points(x_vals,rates_samplecov_wocorr$FP_rate*100,
-               pch_methodes[5],"darkgreen")
-    
-    
-    lines(x_vals,rates_online_wocorr$FP_rate*100,
-          col="blue",lwd=2)
-    add_points(x_vals,rates_online_wocorr$FP_rate*100,
-               pch_methodes[6],"blue")
-    
-    
-    lines(x_vals,rates_strm_wocorr$FP_rate*100,
-          col="red",lwd=2)
-    add_points(x_vals,rates_strm_wocorr$FP_rate*100,
-               pch_methodes[7],"red")
-    
-    
-    lines(x_vals,rates_oracle_rd$FP_rate*100,
-          col="purple",lwd=2)
-    add_points(x_vals,rates_oracle_rd$FP_rate*100,
-               pch_methodes[8],"purple")
-    
-    
-    
-    # Raw
-    lines(x_vals,rates_samplecov_raw$FP_rate*100,
-          col="darkgreen",lwd=2)
-    add_points(x_vals,rates_samplecov_raw$FP_rate*100,
-               pch_methodes[9],"darkgreen")
-    
-    
-    lines(x_vals,rates_online_raw$FP_rate*100,
-          col="blue",lwd=2)
-    add_points(x_vals,rates_online_raw$FP_rate*100,
-               pch_methodes[10],"blue")
-    
-    
-    lines(x_vals,rates_strm_raw$FP_rate*100,
-          col="red",lwd=2)
-    add_points(x_vals,rates_strm_raw$FP_rate*100,
-               pch_methodes[11],"red")
-    
-    
-    lines(x_vals,rates_oracle$FP_rate*100,
-          col="purple",lwd=2)
-    add_points(x_vals,rates_oracle$FP_rate*100,
-               pch_methodes[12],"purple")
-    
-    
-    
-    axis(2,
-         las=1,
-         cex.axis=1.8)
-    
-    axis(1,
-         at=seq(1000,max(x_vals),by=1000),
-         las=1,
-         cex.axis=1.8)
-    
-    box()
-    dev.off()
-    
-  }
-}
