@@ -43,11 +43,11 @@ methods_df <- data.frame(
             rep("Raw", 7)),
   color = c(
     # QC
-    "darkgreen", "pink", "red", "purple4", "brown", "black", "blue",
+    "darkgreen", "#FF6B6B", "red", "purple4", "brown", "black", "blue",
     # RD
-    "darkgreen", "pink", "red", "purple4", "brown", "black", "blue",
+    "darkgreen", "#FF6B6B", "red", "purple4", "brown", "black", "blue",
     # Raw
-    "darkgreen", "pink", "red", "purple4", "brown", "black", "blue"
+    "darkgreen", "#FF6B6B", "red", "purple4", "brown", "black", "blue"
   ),
   pch = c(
     rep(8,  7),   # QC  : étoiles
@@ -56,11 +56,12 @@ methods_df <- data.frame(
   ),
   lty = c(
     # QC
-    3, 2, 1, 4, 5, 1, 1,
+    1, 1, 1, 5, 5, 5, 3,
+    
     # RD
-    3, 2, 1, 4, 5, 1, 1,
+    1, 1, 1, 5, 5, 5, 3,
     # Raw
-    3, 2, 1, 4, 5, 1, 1
+    1, 1, 1, 5, 5, 5, 3
   ),
   stringsAsFactors = FALSE
 )
@@ -225,12 +226,12 @@ for (sc in scenarios) {
   # 2) FN --------------------------------------------------------
   fn_rate <- function(i) faux_negatifsPlot[2:13, i] /
     ((rList[2:13]/100) * n) * 100
-  plot(rList[2:13], fn_rate(idxFrob[1]), type = "l", lwd = lwd_value,
-       col = methods_df$color_alpha[idxFrob[1]],
-       lty = methods_df$lty[idxFrob[1]],
+  plot(rList[2:13], fn_rate(idxList[1]), type = "l", lwd = lwd_value,
+       col = methods_df$color_alpha[idxList[1]],
+       lty = methods_df$lty[idxList[1]],
        ylim = c(0,100), xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-  for (k2 in 2:length(idxFrob)) {
-    i <- idxFrob[k2]
+  for (k2 in 2:length(idxList)) {
+    i <- idxList[k2]
     lines(rList[2:13], fn_rate(i), lwd = lwd_value,
           col = methods_df$color_alpha[i],
           lty = methods_df$lty[i])
@@ -257,7 +258,7 @@ for (sc in scenarios) {
   box()
   
   # 4) AUC -------------------------------------------------------
-  plot_lines(aucPlot, rList[2:13], subset_auc, ylim = c(0,1))
+  plot_lines(aucPlot[2:13,], rList[2:13], subset_auc, ylim = c(0,1))
   axis(1, at = rList[-1], las = 1, cex.axis = 1.8)
   axis(2, las = 1, cex.axis = 1.8)
   box()
@@ -291,32 +292,56 @@ for (sc in scenarios) {
 # --------------------------------------------------------------
 # Métadonnées boxplot (6 méthodes)
 # --------------------------------------------------------------
+# box_df <- data.frame(
+#   method = c("Sample naive", "Online", "Streaming",
+#              "Offline", "OGK", "MCD"),
+#   color  = c("darkgreen", "pink", "red",
+#              "purple", "brown", "black"),
+#   stringsAsFactors = FALSE
+# )
+# box_df$color_alpha <- adjustcolor(box_df$color, alpha.f = alpha_val)
+# box_df$pch         <- 20
+
+# On prend les 6 premières méthodes de la famille QC comme référence
+# pour les noms courts : Sample naive, Online, Streaming, Offline, OGK, MCD
+ref_methods <- c(
+  "SampleNaiveQuantonlinecorr",
+  "OnlineUsQuantonlinecorr",
+  "StreamingUsonlineQuantcorr",
+  "OfflinewithQuantcorr",
+  "OGKQC",
+  "MCDQC"
+)
+
 box_df <- data.frame(
-  method = c("Sample naive", "Online", "Streaming",
-             "Offline", "OGK", "MCD"),
-  color  = c("darkgreen", "pink", "red",
-             "purple", "brown", "black"),
+  method      = c("Sample naive", "Online", "Streaming",
+                  "Offline", "OGK", "MCD"),
+  ref         = ref_methods,
   stringsAsFactors = FALSE
 )
-box_df$color_alpha <- adjustcolor(box_df$color, alpha.f = alpha_val)
-box_df$pch         <- 20
+
+# Récupération des attributs visuels depuis methods_df
+box_df$color       <- methods_df$color[match(box_df$ref, methods_df$method)]
+box_df$color_alpha <- methods_df$color_alpha[match(box_df$ref, methods_df$method)]
+box_df$lty         <- methods_df$lty[match(box_df$ref, methods_df$method)]
+box_df$pch         <- 20   # seul élément propre au boxplot : le symbole des médianes
 
 # --------------------------------------------------------------
 # Préparation des données (matrices 100 x 6)
 # --------------------------------------------------------------
 list_configs <- list(
-  t(temps_calcul_n1e4_d10),
   t(temps_calcul_n1e4_d100),
-  t(temps_calcul_n1e5_d10)
+  t(temps_calcul_n1e4_d10),
+    t(temps_calcul_n1e5_d10)
 )
 for (m in seq_along(list_configs)) {
   colnames(list_configs[[m]]) <- box_df$method
 }
 
 labels_config <- c(
-  expression(n == 10^4 * "," ~ d == 10),
   expression(n == 10^4 * "," ~ d == 100),
-  expression(n == 10^5 * "," ~ d == 10)
+  expression(n == 10^4 * "," ~ d == 10),
+    expression(n == 10^5 * "," ~ d == 10)
 )
 
 n_meth     <- nrow(box_df)
