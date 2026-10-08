@@ -292,15 +292,7 @@ for (sc in scenarios) {
 # --------------------------------------------------------------
 # Métadonnées boxplot (6 méthodes)
 # --------------------------------------------------------------
-# box_df <- data.frame(
-#   method = c("Sample naive", "Online", "Streaming",
-#              "Offline", "OGK", "MCD"),
-#   color  = c("darkgreen", "pink", "red",
-#              "purple", "brown", "black"),
-#   stringsAsFactors = FALSE
-# )
-# box_df$color_alpha <- adjustcolor(box_df$color, alpha.f = alpha_val)
-# box_df$pch         <- 20
+
 
 # On prend les 6 premières méthodes de la famille QC comme référence
 # pour les noms courts : Sample naive, Online, Streaming, Offline, OGK, MCD
