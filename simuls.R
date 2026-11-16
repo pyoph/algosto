@@ -4,7 +4,7 @@ if (!dir.exists(SimDir)) dir.create(SimDir)
 
 
 # Source parameters (must be in the same directory)
-source("params.R")
+source("parametres.R")
 
 setwd(SimDir)
 
