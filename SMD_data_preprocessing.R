@@ -1,12 +1,17 @@
+url =  "https://www.kaggle.com/api/v1/datasets/download/mgusat/smd-onmiad"
 
-url <- "https://github.com/NetManAIOps/OmniAnomaly/archive/refs/heads/master.zip"
-dest <- "smd.zip"
+
+options(timeout = 600)  # 10 minutes
+
+dest <- "archive.zip"
 setwd(smd_data_dir)
 
 download.file(url, destfile = dest, mode = "wb")
 
 unzip(dest)
-# chercher tous les fichiers SMD
+
+# download all SMD files
+
 files <- list.files(".", recursive = TRUE, full.names = TRUE)
 
 train_files  <- grep("train/machine", files, value = TRUE)
@@ -18,6 +23,41 @@ label_files <- grep("test_label/machine", files, value = TRUE)
 
 length(train_files)
 length(label_files)
+
+
+load_smd_machine <- function(test_path, label_path) {
+  
+  Z <- as.matrix(
+    read.table(test_path, sep = ",")
+  )
+  
+  labels <- scan(label_path)
+  
+  list(
+    Z = Z,
+    labels = labels,
+    name = basename(test_path)
+  )
+}
+
+
+remove_high_corr <- function(Z, threshold = 0.7)
+{
+  C <- cor(Z)
+  
+  C[lower.tri(C, diag = TRUE)] <- 0
+  
+  remove <- which(apply(abs(C) > threshold, 2, any))
+  
+  if(length(remove) > 0)
+  {
+    cat("Removing cols:", remove, "\n")
+  }
+  
+  Z[, -remove, drop = FALSE]
+  return(Z)
+}
+
 
 
 smd_data <- list()
@@ -44,189 +84,129 @@ for (i in seq_along(test_files)) {
   
 }
 
-nbmachines = length(smd_data)
+nbmachines <- length(smd_data)
 
-keep_columns_ok = list()
+batch_size = 10
 
-for(j in 1:nbmachines){
+for (j in 1:nbmachines) {
   
   cat("\n====================\n")
   cat("Machine", j, "\n")
   cat("====================\n")
   
-  
   Z <- smd_data[[j]]$Z
   labels <- smd_data[[j]]$labels
   
   Z <- as.matrix(Z)
+  
+  # Keep the first 23,000 observations 
   Z <- Z[1:23000, ]
-  
+  labels <- labels[1:23000]
   
   # ============================================================
-  # Filtre 1 : enlever les colonnes qui font planter les méthodes
+  # 1. Variable filtering
   # ============================================================
+  tol <- 1e-2
   
-  res <- tryCatch({
-    
-    clean_cols <- sequential_clean_columns_new(Z)
-    
-    list(
-      Z = clean_cols$Z,
-      keep = clean_cols$keep
-    )
-    
-  }, error = function(e) {
-    
-    cat("Erreur détectée -> retry sans colonne 1\n")
-    
-    Z2 <- Z[, -1, drop = FALSE]
-    
-    clean_cols <- sequential_clean_columns(Z2)
-    
-    list(
-      Z = clean_cols$Z,
-      keep = clean_cols$keep + 1
-    )
+  # Keep columns that:
+  # - do not contain non-finite values (NA, NaN, Inf)
+  # - have more than one unique value
+  # - have an empirical standard deviation > tol
+  # - have a MAD > tol
+  
+  valid_cols <- apply(Z, 2, function(col) {
+    if (any(!is.finite(col))) return(FALSE)
+    if (length(unique(col)) <= 1) return(FALSE)
+    if (sd(col, na.rm = TRUE) < tol) return(FALSE)
+    if (mad(col, na.rm = TRUE) < tol) return(FALSE)
+    return(TRUE)
   })
   
-  
-  Z <- res$Z
-  keep_columns_ok[[j]] <- res$keep
-  
+  Z <- Z[, valid_cols, drop = FALSE]
   
   # ============================================================
-  # Filtre 2 : enlever les colonnes avec MAD ~ 0
+  # Redundancy removal (correlation threshold = 0.7) and linear dependent columns
   # ============================================================
-  
-  tol <- 1e-3
-  
-  mad_cols <- apply(Z, 2, mad, na.rm = TRUE)
-  
-  keep <- which(mad_cols > tol)
-  
-  removed <- setdiff(seq_len(ncol(Z)), keep)
-  
-  if(length(removed) > 0){
-    cat(
-      "Colonnes retirées (MAD ~ 0):",
-      removed,
-      "\n"
-    )
-  }
-  
-  keep_columns_ok[[j]] <- keep_columns_ok[[j]][keep]
-  
-  Z <- Z[, keep, drop = FALSE]
-  
-  
-  # ============================================================
-  # Filtre 3 : corrélations élevées
-  # ============================================================
-  
-  col_before <- colnames(Z)
   
   Z <- remove_high_corr(
     Z,
-    threshold = 0.99
+    threshold = 0.7
   )
   
-  col_after <- colnames(Z)
+
+  ###################Detect linearity#######
   
-  keep_idx <- match(
-    col_after,
-    col_before
-  )
+  # QR with pivoting to detect linearly dependent columns
+  qr_Z <- qr(Z, tol = 1e-2)
   
-  # Mise à jour des colonnes globales gardées
-  keep_columns_ok[[j]] <- keep_columns_ok[[j]][keep_idx]
+  
+  
+  # Keep only the columns that are linearly independent
+  keep_cols <- sort(qr_Z$pivot[1:qr_Z$rank])
+  Z = Z[,keep_cols]
+  
   
   
   # ============================================================
-  # Labels
+  # 3. Robust standardization (median and MAD)
   # ============================================================
+  # Remove too low MAD
+  tol <- 1e-2
   
-  labels <- labels[1:23000]
+  # Identifier les colonnes à supprimer (MAD ou sd ~ 0, ou non-finis)
+  mad_vals <- apply(Z, 2, mad, na.rm = TRUE)
+  sd_vals  <- apply(Z, 2, sd,  na.rm = TRUE)
   
+  valid_cols <- which(
+    is.finite(mad_vals) & mad_vals > tol &
+    is.finite(sd_vals)  & sd_vals  > tol
+  )
+  
+  
+  Z <- Z[, valid_cols, drop = FALSE]
+  
+
+  # SRobust standardization
+  Z <- apply(Z, 2, function(x) {
+    med <- median(x, na.rm = TRUE)
+    mad_val <- mad(x, na.rm = TRUE)
+    (x - med) / mad_val
+  })
+  
+  Z <- as.matrix(Z)
+  
+  if (any(!is.finite(Z))) {
+    warning(paste("Machine", j, ": non-finite values detected after standardization. Replacing by 0."))
+    Z[!is.finite(Z)] <- 0
+  }  
+  # ============================================================
+  # Extract uncontaminated data (for covariance reference)
+  # ============================================================
   Z_clean <- Z[labels == 0, , drop = FALSE]
   
-  
   # ============================================================
-  # Vérification du nombre de lignes
+  # Verification of dimensions
   # ============================================================
-  
   cat("\n--- Vérification des dimensions ---\n")
+  cat("Z       :", nrow(Z), "lignes x", ncol(Z), "colonnes\n")
+  cat("labels  :", length(labels), "éléments\n")
+  cat("Z_clean :", nrow(Z_clean), "lignes x", ncol(Z_clean), "colonnes\n")
   
-  cat(
-    "Z       :",
-    nrow(Z),
-    "lignes x",
-    ncol(Z),
-    "colonnes\n"
-  )
-  
-  cat(
-    "labels  :",
-    length(labels),
-    "éléments\n"
-  )
-  
-  cat(
-    "Z_clean :",
-    nrow(Z_clean),
-    "lignes x",
-    ncol(Z_clean),
-    "colonnes\n"
-  )
-  
-  
-  # Vérifications strictes
-  if(nrow(Z) != 23000){
-    stop(
-      "Erreur machine ", j,
-      " : Z ne contient pas 23000 lignes."
-    )
-  }
-  
-  if(length(labels) != 23000){
-    stop(
-      "Erreur machine ", j,
-      " : labels ne contient pas 23000 éléments."
-    )
-  }
-  
-  if(nrow(Z_clean) > 23000){
-    stop(
-      "Erreur machine ", j,
-      " : Z_clean contient plus de 23000 lignes."
-    )
-  }
-  
-  # Vérifie la correspondance Z / labels
-  if(nrow(Z) != length(labels)){
-    stop(
-      "Erreur machine ", j,
-      " : nombre de lignes de Z différent du nombre de labels."
-    )
-  }
-  
+  if(nrow(Z) != 23000) stop("Erreur machine ", j, " : Z ne contient pas 23000 lignes.")
+  if(length(labels) != 23000) stop("Erreur machine ", j, " : labels ne contient pas 23000 éléments.")
   
   # ============================================================
-  # Sauvegarde
+  # Save
   # ============================================================
-  
-  data_smd_mach <- paste0(
-    "data_machine-", j, ".RData"
-  )
+  data_smd_mach <- paste0("data_machine-", j, ".RData")
   
   save(
     Z,
     Z_clean,
     labels,
+    batch_size,
     file = data_smd_mach
   )
   
-  cat(
-    "✔ Machine", j,
-    "sauvegardée correctement.\n"
-  )
+  
 }
