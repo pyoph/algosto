@@ -433,7 +433,7 @@ for(j in c(5,35,56)){
     outliers_labels = resUsStreaming$outlier_labels,
     distances = resUsStreaming$distances,
     temps = temps_streaming,
-    cum_times = resUsStreaming$cum_times
+    cum_times = resUsStreaming$time_cumulative
   )
   
   save(resultats,file = fitFile)
@@ -472,7 +472,7 @@ for(j in c(5,35,56)){
     outliers_labels = resUsOnline$outlier_labels,
     distances = resUsOnline$distances,
     temps = temps_online,
-    cum_times = resUsOnline$cum_times
+    cum_times = resUsOnline$time_cumulative
   )
   
   save(resultats,file = fitFile)
