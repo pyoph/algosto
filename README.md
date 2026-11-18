@@ -10,23 +10,24 @@ The implementation relies on the STARRS R package, available from the Comprehens
 
 The supplementary materials are organized as follows:
 
+```text
 
+.
 ├── README.md
 ├── main_SMD.R
 ├── main_simulated.R
 ├── R/
 │   ├── algexec.R
-│   ├── computeç_criteria.R
+│   ├── compute_criteria.R
 │   ├── crit_SMD.R
 │   ├── parameters.R
-│   └── plots.R
-│   └── plots_SMD.R
-│   └── simuls.R
-│   └── smd_algo.R
-│   └── smd_data_preprocessing
-├── anonym_package/
-
-
+│   ├── plots.R
+│   ├── plots_SMD.R
+│   ├── simuls.R
+│   ├── smd_algo.R
+│   └── smd_data_preprocessing.R
+└── anonym_package/
+```
 
 ## Required packages 
 
